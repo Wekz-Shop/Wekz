@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WeKz Shop — Teste Sprint M1 (Core Foundation)</title>
+<link rel="stylesheet" href="core/wkz-styles-base.css" />
+<style>
+  body{background:var(--darker,#080E1A);color:var(--text,#E2E8F0);font-family:sans-serif;padding:24px;max-width:640px;margin:0 auto}
+  h1{font-size:20px;margin-bottom:4px}
+  .sub{color:var(--muted,#94A3B8);font-size:13px;margin-bottom:20px}
+  .check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:14px;border:1px solid var(--border,#333)}
+  .pass{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3)}
+  .fail{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.3)}
+  .icon{flex-shrink:0}
+  .detail{color:var(--muted,#94A3B8);font-size:12px;margin-top:2px}
+  #summary{margin-top:20px;padding:14px;border-radius:8px;font-weight:700;text-align:center}
+</style>
+</head>
+<body>
+  <h1>Sprint M1 — Teste de Core Foundation</h1>
+  <div class="sub">Verifica se wkz-bus.js + wkz-core.js carregam sem erro e expõem os símbolos esperados, sem depender do monólito.</div>
+  <div id="results"></div>
+  <div id="summary"></div>
+
+  <script src="core/wkz-bus.js"></script>
+  <script src="core/wkz-core.js"></script>
+  <script>
+    var results = document.getElementById('results');
+    var pass = 0, fail = 0;
+
+    function check(label, fn) {
+      var ok = false, detail = '';
+      try {
+        ok = !!fn();
+      } catch (e) {
+        ok = false;
+        detail = e.message;
+      }
+      var div = document.createElement('div');
+      div.className = 'check ' + (ok ? 'pass' : 'fail');
+      div.innerHTML = '<span class="icon">' + (ok ? '✅' : '❌') + '</span>' +
+        '<div><div>' + label + '</div>' + (detail ? '<div class="detail">' + detail + '</div>' : '') + '</div>';
+      results.appendChild(div);
+      ok ? pass++ : fail++;
+    }
+
+    /* FIX (achado no teste real em navegador, não aparecia no harness Node):
+       showToast() só é criada dentro de wkzMaintenanceInit(), que roda no
+       evento DOMContentLoaded — se essa checklist rodasse de forma síncrona
+       logo após os <script>, ela testaria showToast ANTES dele existir
+       (falso-negativo, não um bug do wkz-core.js). Por isso todo o
+       checklist agora roda dentro de window.addEventListener('load', ...),
+       que dispara depois de DOMContentLoaded — mesma ordem que qualquer
+       módulo real (Buyer/Seller/Admin) vai experimentar em produção. */
+    window.addEventListener('load', runChecklist);
+
+    function runChecklist() {
+
+    // ── Bloco WkzBus ──
+    check('WkzBus existe e expõe on/emit/makeReactive', function () {
+      return typeof WkzBus === 'object' && typeof WkzBus.on === 'function' &&
+        typeof WkzBus.emit === 'function' && typeof WkzBus.makeReactive === 'function';
+    });
+    check('window._wkzNavHooks é o Proxy do WkzBus (não duplicado pelo WkzApp)', function () {
+      return typeof window._wkzNavHooks === 'object';
+    });
+    check('WkzBus.emit → listener dispara corretamente', function () {
+      var got = null;
+      WkzBus.on('test:ping', function (d) { got = d; });
+      WkzBus.emit('test:ping', { ok: true });
+      return got && got.ok === true;
+    });
+
+    // ── Bloco 1: Segurança + WkzApp ──
+    check('escapeHtml() sanitiza corretamente', function () {
+      return escapeHtml('<script>x</script' + '>') === '&lt;script&gt;x&lt;/script&gt;';
+    });
+    check('WkzApp existe e delega nav hooks para o WkzBus (fix da colisão)', function () {
+      var fired = false;
+      WkzApp.nav.register(function (id) { if (id === 'test-page') fired = true; });
+      WkzApp.setPage('test-page');
+      return fired === true;
+    });
+
+    // ── Bloco 1b: Sanitização ──
+    check('wkzSanitizeHTML() remove tags perigosas', function () {
+      return typeof wkzSanitizeHTML === 'function' &&
+        wkzSanitizeHTML('<img src=x onerror=alert(1)>', true).indexOf('onerror') === -1;
+    });
+
+    // ── Bloco 2: Utilitários ──
+    check('wkzUid() gera IDs únicos sem colisão', function () {
+      var a = wkzUid('t'), b = wkzUid('t');
+      return a !== b;
+    });
+    check('showToast() está definida (versão única consolidada — Patch 3)', function () {
+      return typeof window.showToast === 'function';
+    });
+
+    // ── Bloco 3+4+5: Preços, Catálogo, Estado ──
+    check('wkzExactPrice()/wkzExactOff() calculam corretamente', function () {
+      return wkzExactPrice(100, 50) === 50 && Math.round(wkzExactOff(50, 100)) === 50;
+    });
+    check('products[] carregado com 28 itens', function () {
+      return Array.isArray(products) && products.length === 28;
+    });
+    check('cartItemsData é reativo (Proxy do WkzBus.makeReactive)', function () {
+      var fired = false;
+      WkzBus.on('cart:change', function () { fired = true; });
+      cartItemsData.push({ id: 'test', qty: 1 });
+      cartItemsData.length = 0; // limpa após o teste
+      return fired === true;
+    });
+
+    // ── Bloco 6: Router ──
+    check('MapsTo() e showPage() (delegado) existem', function () {
+      return typeof window.MapsTo === 'function' && typeof window.showPage === 'function' &&
+        window.showPage._wkzDelegated === true;
+    });
+
+    // ── Bloco 7: Fiscal ──
+    check('WkzFiscalSplit existe e calcula IBS/CBS', function () {
+      return typeof WkzFiscalSplit === 'object';
+    });
+
+    // ── Bloco 8: Notificações ──
+    check('WKZ_NOTIF existe com inbox inicializado', function () {
+      return typeof WKZ_NOTIF === 'object' && Array.isArray(WKZ_NOTIF.inbox);
+    });
+
+    // ── Bloco 10: LGPD ──
+    check('wkzConsentAcceptAll() está exposta globalmente', function () {
+      return typeof window.wkzConsentAcceptAll === 'function';
+    });
+
+    var summary = document.getElementById('summary');
+    summary.style.background = fail === 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
+    summary.textContent = fail === 0
+      ? '✅ ' + pass + '/' + (pass + fail) + ' testes passaram — Core Foundation OK'
+      : '⚠️ ' + fail + ' falha(s) de ' + (pass + fail) + ' testes — revisar antes do Sprint M2';
+    } // fim runChecklist()
+  </script>
+</body>
+</html>
