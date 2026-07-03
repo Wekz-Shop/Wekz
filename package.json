@@ -1,0 +1,18 @@
+{
+  "name": "wekz-shop",
+  "version": "2.9.33",
+  "description": "WeKzShop — marketplace de dropshipping global para consumidores brasileiros. Sprint M1: Core Foundation (wkz-bus.js + wkz-core.js) extraídos do monólito v2.9.36.",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "check": "node --check core/wkz-bus.js && node --check core/wkz-core.js",
+    "check:combined": "cat core/wkz-bus.js core/wkz-core.js > /tmp/wkz-combined-check.js && node --check /tmp/wkz-combined-check.js",
+    "test:m1": "node tools/harness-node.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wekz-Shop/Wekz.git"
+  }
+}
