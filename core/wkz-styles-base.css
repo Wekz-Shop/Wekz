@@ -1,0 +1,65 @@
+/* ════════════════════════════════════════════════════════════════════════
+   wkz-styles-base.css — WeKz Shop Design Tokens
+   Carregado por TODOS os módulos, ANTES do CSS específico de cada um.
+   Sprint M1 — Core Foundation.
+   Origem monólito: linhas 213–246 (:root tokens) — extraídos verbatim,
+   nenhum valor foi alterado (Princípio Zero Rewrite).
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --teal: #00B4AB;
+  --purple: #7C3AED;
+  --blue: #2563EB;
+  --cyan: #06B6D4;
+  --dark: #0F172A;
+  --darker: #080E1A;
+  --card: #151E2E;
+  --card2: #1A2540;
+  --text: #E2E8F0;
+  --muted: #94A3B8;
+  --border: rgba(255,255,255,0.08);
+  --grad1: linear-gradient(135deg, #00B4AB, #7C3AED);
+  --grad2: linear-gradient(135deg, #2563EB, #7C3AED);
+  --grad3: linear-gradient(135deg, #06B6D4, #2563EB);
+  --glow-teal: 0 0 40px rgba(0,180,171,0.3);
+  --glow-purple: 0 0 40px rgba(124,58,237,0.3);
+  --radius: 18px;
+  --radius-sm: 10px;
+  --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+
+  /* ── v2.9.25 — ESCALA TIPOGRÁFICA OFICIAL (DM Sans, pós-Syne) ──
+     7 passos fixos. Display/H1 usam peso 800 + letter-spacing negativo
+     pra compensar o que a Syne fazia "de graça" com as formas geométricas
+     dela — DM Sans em 700 sozinho fica confiante mas não tão "pesado"
+     pra título grande, por isso o aperto de tracking + peso 800 aqui. */
+  --fs-display: 48px;
+  --fs-h1: 36px;
+  --fs-h2: 28px;
+  --fs-h3: 22px;
+  --fs-body: 16px;
+  --fs-small: 14px;
+  --fs-caption: 12px;
+}
+
+/* ── Utilitários de escala tipográfica (DM Sans, 7 passos) ──
+   Origem monólito: linhas ~247-254 */
+.text-display{font-family:'DM Sans',sans-serif;font-size:var(--fs-display);font-weight:800;line-height:1.08;letter-spacing:-0.02em;}
+.text-h1{font-family:'DM Sans',sans-serif;font-size:var(--fs-h1);font-weight:800;line-height:1.15;letter-spacing:-0.01em;}
+.text-h2{font-family:'DM Sans',sans-serif;font-size:var(--fs-h2);font-weight:700;line-height:1.2;}
+.text-h3{font-family:'DM Sans',sans-serif;font-size:var(--fs-h3);font-weight:700;line-height:1.25;}
+.text-body{font-family:'DM Sans',sans-serif;font-size:var(--fs-body);font-weight:400;line-height:1.5;}
+.text-small{font-family:'DM Sans',sans-serif;font-size:var(--fs-small);font-weight:500;line-height:1.45;}
+.text-caption{font-family:'DM Sans',sans-serif;font-size:var(--fs-caption);font-weight:600;letter-spacing:0.02em;line-height:1.4;}
+
+/* ── PATCH 1 (plano Seção 7) — PDP Mobile Sticky Bar ──────────────────────
+   ATENÇÃO: estas regras NÃO devem ficar aqui em produção — o plano exige
+   que fiquem em wkz-buyer-styles.css, escopadas ao módulo Buyer, porque
+   dependem de body[data-view="product"], setado apenas por openProduct()
+   (wkz-buyer.js, Sprint M2). Mantidas aqui comentadas só como referência
+   de que o contrato de seletor não pode ser perdido na extração real:
+
+   body[data-view="product"] #pdpMobileStickyBar { display:flex; }
+   body:not([data-view="product"]) #pdpMobileStickyBar { display:none !important; }
+   body[data-view="product"] { padding-bottom:175px; }
+   body[data-view="product"] #kzcBar { bottom:175px; }
+   ────────────────────────────────────────────────────────────────────── */
