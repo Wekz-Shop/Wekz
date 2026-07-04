@@ -2,33 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>WeKz Shop — Migração Modular</title>
-  <link rel="stylesheet" href="core/wkz-styles-base.css" />
-  <style>
-    body{background:var(--darker,#080E1A);color:var(--text,#E2E8F0);font-family:sans-serif;padding:24px;max-width:560px;margin:0 auto;line-height:1.5}
-    h1{font-size:20px}
-    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:16px}
-    .done{background:rgba(16,185,129,0.15);color:#10B981}
-    .pending{background:rgba(148,163,184,0.15);color:var(--muted,#94A3B8)}
-    a{color:var(--teal,#00B4AB)}
-    ul{padding-left:20px}
-  </style>
+  <meta http-equiv="refresh" content="0; url=buyer/wkz-buyer.html" />
+  <title>WeKz Shop</title>
 </head>
 <body>
-  <!-- Orquestrador raiz — TEMPORÁRIO enquanto o roteiro de 5 sprints está
-       em andamento. NÃO redireciona automaticamente para wkz-buyer.html
-       porque esse arquivo só existe a partir do Sprint M2 — um redirect
-       cego pra um arquivo inexistente é o que causava o 404 anterior.
-       Quando o Sprint M2 estiver pronto, trocar o <meta refresh> de volta
-       para apontar para wkz-buyer.html como ponto de entrada público. -->
-  <h1>WeKz Shop — Migração Modular</h1>
-  <p><span class="badge done">✅ Sprint M1 — Core Foundation</span></p>
-  <p><span class="badge pending">⏳ Sprint M2 — Buyer Core</span></p>
-  <p>O módulo Buyer (<code>wkz-buyer.html</code>) ainda não existe neste repositório — é o próximo passo do roteiro. Por isso a raiz do site ainda não redireciona automaticamente.</p>
-  <ul>
-    <li><a href="test-m1.html">Ver teste do Sprint M1 (Core Foundation)</a></li>
-    <li><a href="docs/CHANGELOG_SPRINT_M1.md">Changelog do Sprint M1</a></li>
-  </ul>
+  <!-- Sprint M2: wkz-buyer.html agora existe de verdade, então a raiz
+       volta a redirecionar automaticamente (comportamento que o M1 tinha
+       deixado pendente por não ter ainda o arquivo de destino). -->
+  <p>Redirecionando para <a href="buyer/wkz-buyer.html">WeKz Shop</a>…</p>
 </body>
 </html>
