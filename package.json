@@ -9,7 +9,9 @@
   "scripts": {
     "check": "node --check core/wkz-bus.js && node --check core/wkz-core.js",
     "check:combined": "cat core/wkz-bus.js core/wkz-core.js > /tmp/wkz-combined-check.js && node --check /tmp/wkz-combined-check.js",
-    "test:m1": "node tools/harness-node.js"
+    "test:m1": "node tools/harness-node.js",
+    "test:m2": "node buyer/harness-buyer-test.js",
+    "check:buyer": "node --check buyer/wkz-buyer.js"
   },
   "repository": {
     "type": "git",
