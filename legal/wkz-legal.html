@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WeKz Shop — Institucional & Legal</title>
+  <link rel="stylesheet" href="../core/wkz-styles-base.css" />
+  <link rel="stylesheet" href="../shared/wkz-styles-full.css" />
+</head>
+<body>
+  <!-- wkz-legal.html — Sprint M2
+       Módulo compartilhado por TODAS as personas (Buyer/Seller/Admin).
+       Contém as páginas institucionais/legais que não têm JS próprio
+       pesado (Central de Ajuda, Mediação de Disputas, Rastreamento-info,
+       Devoluções-política, Suporte Técnico, Sobre a WeKz, Termos, LGPD,
+       Antifraude, Garantia de Autenticidade, WCAG).
+       Motivo de ser um arquivo separado em vez de duplicado em cada
+       módulo: conteúdo legal (LGPD/CDC) deve ter fonte única — duplicar
+       em wkz-buyer.html + wkz-seller.html + wkz-admin.html criaria risco
+       real de compliance (atualização que só entra em alguns arquivos).
+       Links internos entre páginas legais usam MapsTo() normalmente.
+       Links para páginas de OUTRO módulo (home, client-profile, help,
+       pg-comprar — todas em wkz-buyer.html) foram convertidos de
+       showPage('x') para window.location.href='wkz-buyer.html#x', porque
+       MapsTo() só enxerga divs #page-X dentro do MESMO documento. -->
+<div id="page-pg-suporte" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(6,182,212,0.12),rgba(0,180,171,0.12));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › Suporte › <span>Central de Ajuda</span></div>
+      <h1 class="inner-page-title"><span class="wkz-icon wkz-icon-headphones"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></span> Central de Ajuda e <span>FAQs da Plataforma</span></h1>
+      <p class="inner-page-sub">Tudo sobre usabilidade da sua conta, navegação na plataforma e proteção dos seus dados pessoais.</p>
+      <div style="display:flex;gap:0;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:50px;overflow:hidden;max-width:520px;margin-top:20px;">
+        <input type="text" id="faqSearchInput" class="wkz-input wkz-input--ghost" placeholder="Buscar nas FAQs da plataforma..." style="flex:1;padding:14px 20px;font-size:14px;" onkeydown="if(event.key==='Enter'){event.preventDefault();searchFaqs();}">
+        <button style="background:var(--grad1);border:none;color:#fff;padding:14px 24px;cursor:pointer;font-size:14px;font-weight:700;" onclick="searchFaqs()">Buscar</button>
+      </div>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- AVISO INTERMEDIADOR -->
+    <div class="inner-section">
+      <div class="info-notice" style="border-left-color:#06B6D4;">
+        <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-width="3"/></svg></span>
+        <div><strong>Esta Central cobre exclusivamente a plataforma WeKz Shop.</strong> Dúvidas sobre produtos específicos, prazos de envio ou qualidade de itens devem ser direcionadas diretamente ao lojista responsável pelo anúncio. A WeKz atua como intermediadora tecnológica.</div>
+      </div>
+    </div>
+
+    <!-- FAQ POR TEMA -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon wkz-icon-helpcirc"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg></span> Perguntas Frequentes</h2>
+      <div class="faq-themes">
+        <button class="faq-theme-btn active" onclick="showFaqTheme('pedidos',this)"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Pedidos</button>
+        <button class="faq-theme-btn" onclick="showFaqTheme('pagamentos',this)"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Pagamentos</button>
+        <button class="faq-theme-btn" onclick="showFaqTheme('entrega',this)"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Entrega</button>
+        <button class="faq-theme-btn" onclick="showFaqTheme('devolucao',this)"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span> Devoluções</button>
+        <button class="faq-theme-btn" onclick="showFaqTheme('conta',this)"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Conta</button>
+        <button class="faq-theme-btn" onclick="showFaqTheme('vendedor',this)"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span> Vendedores</button>
+      </div>
+      <div id="faqContent" class="faq-list" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- SEGURANÇA DE CONTA -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Segurança e Privacidade da Conta</h2>
+      <div class="dispute-steps">
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#06B6D4,#0284C7);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><div><strong>Autenticação de dois fatores (2FA)</strong><p>Ative o 2FA em Minha Conta → Segurança. Recomendado para todas as contas com dados de pagamento salvos.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#06B6D4,#0284C7);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><strong>Seus dados são nossos, não dos lojistas</strong><p>A WeKz não compartilha seu endereço, CPF ou dados bancários com lojistas. Eles recebem apenas o necessário para processar o envio, conforme nossa Política de Privacidade (LGPD/GDPR).</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#06B6D4,#0284C7);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div><div><strong>Recuperação de acesso</strong><p>Perdeu o acesso? Use "Esqueci minha senha" na tela de login. Você receberá um link seguro no e-mail cadastrado. Sessões suspeitas podem ser encerradas remotamente em Configurações → Sessões Ativas.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#06B6D4,#0284C7);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div><div><strong>Exclusão de dados (LGPD Art. 18)</strong><p>Você tem direito de solicitar a exclusão total de seus dados. Acesse Minha Conta → Privacidade → Solicitar Exclusão. O prazo de processamento é de até 15 dias úteis.</p></div></div>
+      </div>
+    </div>
+
+    <!-- CANAIS DE CONTATO RÁPIDO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Fale com a Plataforma</h2>
+      <div class="contact-cards">
+        <div class="contact-card" onclick="showToast('Iniciando chat ao vivo...')">
+          <div class="contact-card-head">
+            <div class="contact-icon" style="background:linear-gradient(135deg,#00B4AB,#06B6D4);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+            <h3>Chat ao Vivo</h3>
+          </div>
+          <p>Resposta em menos de 2 minutos</p>
+          <div class="contact-status green">● Online agora</div>
+          <button class="btn-primary" style="margin-top:12px;width:100%;">Iniciar Chat</button>
+        </div>
+        <div class="contact-card" onclick="showToast('Abrindo WhatsApp...')">
+          <div class="contact-card-head">
+            <div class="contact-icon" style="background:linear-gradient(135deg,#22C55E,#16A34A);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
+            <h3>WhatsApp</h3>
+          </div>
+          <p>+55 (11) 9 9000-0000</p>
+          <div class="contact-status green">● Disponível 24/7</div>
+          <button class="btn-primary" style="margin-top:12px;width:100%;background:linear-gradient(135deg,#22C55E,#16A34A);">Chamar no WhatsApp</button>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-head">
+            <div class="contact-icon" style="background:linear-gradient(135deg,#7C3AED,#2563EB);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <h3>E-mail</h3>
+          </div>
+          <p>suporte@wekzshop.com</p>
+          <div class="contact-status yellow">● Resposta em até 4h</div>
+          <button class="btn-primary" style="margin-top:12px;width:100%;background:var(--grad2);" onclick="showToast('Abrindo formulário...')">Enviar E-mail</button>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-head">
+            <div class="contact-icon" style="background:linear-gradient(135deg,#F59E0B,#EF4444);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.09 8.81 19.79 19.79 0 01.07 2.18 2 2 0 012.07.07h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
+            <h3>Telefone</h3>
+          </div>
+          <p>0800 700 0000 (Gratuito)</p>
+          <div class="contact-status yellow">● Seg–Sex 8h–22h</div>
+          <button class="btn-primary" style="margin-top:12px;width:100%;background:linear-gradient(135deg,#F59E0B,#EF4444);" onclick="showToast('Ligue: 0800 700 0000')">Ver número</button>
+        </div>
+
+        <!-- ⚖️ NOVO: DENÚNCIA DE FALSIFICAÇÃO / VIOLAÇÃO (STJ Tema 533/987) -->
+        <div class="contact-card" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(239,68,68,0.04));border:2px solid rgba(239,68,68,0.3);">
+          <div class="contact-card-head">
+            <div class="contact-icon" style="background:linear-gradient(135deg,#EF4444,#DC2626);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-width="3"/></svg></div>
+            <h3>🚨 Denúncia de Falsificação / Violação</h3>
+          </div>
+          <p style="font-size:12px;"><strong>Lei 12.965/14 (Marco Civil) + STJ Tema 533/987</strong> — Se você identificou um produto falsificado, marcas contrafeitas ou violação de direitos intelectuais, abra uma denúncia formal. Oferecemos proteção jurídica total.</p>
+          <div class="contact-status" style="background:rgba(239,68,68,0.15);color:#EF4444;border-color:rgba(239,68,68,0.3);">⚠️ Requer documentação probatória</div>
+          <button class="btn-primary" style="margin-top:12px;width:100%;background:linear-gradient(135deg,#EF4444,#DC2626);" onclick="wkzOpenNoticeModal()">🚨 Abrir Denúncia Formal</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: MEDIAÇÃO DE DISPUTAS ═══════════════════════ -->
+<div id="page-pg-disputes" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(124,58,237,0.14),rgba(37,99,235,0.12));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › Suporte › <span>Mediação de Disputas</span></div>
+      <h1 class="inner-page-title"><span class="wkz-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 6l9-3 9 3"/><path d="M3 6c0 4 3 6 6 6s6-2 6-6"/><path d="M9 18c0 2 1.5 3 3 3s3-1 3-3c0-2-3-6-3-6s-3 4-3 6z"/></svg></span> Mediação de Disputas <span>&amp; Reembolsos</span></h1>
+      <p class="inner-page-sub">A WeKz atua como intermediadora neutra. Conheça o fluxo oficial, seus direitos e os prazos de estorno bancário.</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- NOTA LEGAL -->
+    <div class="inner-section">
+      <div class="info-notice" style="border-left-color:#7C3AED;">
+        <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <div><strong>Posição jurídica da WeKz Shop:</strong> Operamos como plataforma de intermediação tecnológica, em conformidade com o Art. 18 do Marco Civil da Internet (Lei 12.965/2014). A responsabilidade primária sobre a qualidade, entrega e condições do produto é do lojista. A WeKz intervém como árbitro neutro para garantir o equilíbrio da relação de consumo.</div>
+      </div>
+    </div>
+
+    <!-- FLUXO DE DISPUTAS -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span> Fluxo Oficial de Mediação</h2>
+      <div class="dispute-steps">
+        <div class="ds-step"><div class="ds-num">1</div><div><strong>Tente resolver diretamente com o lojista</strong><p>Acesse Meus Pedidos → Chat com o Vendedor. A maioria dos problemas é resolvida em até 24h. O lojista é o responsável direto pelo produto e envio.</p></div></div>
+        <div class="ds-step"><div class="ds-num">2</div><div><strong>Abra uma Disputa Formal na plataforma</strong><p>Sem resposta em 48h? Acesse Meus Pedidos → Abrir Disputa. Descreva o problema e anexe evidências (fotos, prints, NF). O prazo para abertura é de até 30 dias após o recebimento.</p></div></div>
+        <div class="ds-step"><div class="ds-num">3</div><div><strong>Análise e mediação pela equipe WeKz</strong><p>Nossa equipe de mediação analisa as evidências de ambas as partes com imparcialidade. Decisão emitida em até 48 horas úteis após a coleta completa de evidências.</p></div></div>
+        <div class="ds-step"><div class="ds-num">4</div><div><strong>Resolução e estorno bancário</strong><p>Decisão favorável ao comprador: reembolso integral processado em até 2 dias úteis pela WeKz. O prazo de crédito na sua conta varia por modalidade: Pix (até 1 dia útil) · Cartão de crédito (1–2 faturas, conforme a operadora) · Boleto (até 5 dias úteis). Todos os casos ficam registrados por 5 anos.</p></div></div>
+      </div>
+
+      <!-- BOTÃO CTA: ABRIR DISPUTA -->
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-primary" style="background:linear-gradient(135deg,#7C3AED,#2563EB);flex:1;min-width:200px;padding:14px;font-size:14px;font-weight:700;" onclick="wkzOpenDisputeTicketModal()">
+          <span style="margin-right:6px;">⚖️</span> Abrir Disputa Formal
+        </button>
+        <button class="btn-secondary" style="flex:1;min-width:200px;padding:14px;font-size:14px;" onclick="window.location.href='wkz-buyer.html#client-profile'">
+          📋 Meus Tickets Ativos
+        </button>
+      </div>
+    </div>
+
+    <!-- PRAZOS DE ESTORNO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Prazos de Estorno por Modalidade</h2>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+          <thead><tr style="background:rgba(124,58,237,0.12);">
+            <th style="padding:12px 14px;text-align:left;color:var(--text);font-weight:700;border-bottom:1px solid var(--border);">Método de Pagamento</th>
+            <th style="padding:12px 14px;text-align:left;color:var(--text);font-weight:700;border-bottom:1px solid var(--border);">Prazo WeKz processa</th>
+            <th style="padding:12px 14px;text-align:left;color:var(--text);font-weight:700;border-bottom:1px solid var(--border);">Crédito na conta</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:11px 14px;color:var(--muted);">Pix</td><td style="padding:11px 14px;color:var(--muted);">Imediato após decisão</td><td style="padding:11px 14px;color:#4ADE80;font-weight:600;">Até 1 dia útil</td></tr>
+            <tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);"><td style="padding:11px 14px;color:var(--muted);">Cartão de Crédito</td><td style="padding:11px 14px;color:var(--muted);">Até 2 dias úteis</td><td style="padding:11px 14px;color:#FCD34D;font-weight:600;">1–2 faturas (operadora)</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:11px 14px;color:var(--muted);">Boleto Bancário</td><td style="padding:11px 14px;color:var(--muted);">Até 2 dias úteis</td><td style="padding:11px 14px;color:#FCD34D;font-weight:600;">Até 5 dias úteis</td></tr>
+            <tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);"><td style="padding:11px 14px;color:var(--muted);">WeKz Coins</td><td style="padding:11px 14px;color:var(--muted);">Imediato após decisão</td><td style="padding:11px 14px;color:#4ADE80;font-weight:600;">Instantâneo na carteira</td></tr>
+            <tr><td style="padding:11px 14px;color:var(--muted);">PayPal / Carteira Digital</td><td style="padding:11px 14px;color:var(--muted);">Até 2 dias úteis</td><td style="padding:11px 14px;color:#FCD34D;font-weight:600;">Até 5 dias úteis</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px;display:flex;align-items:flex-start;gap:6px;"><span class="wkz-icon" aria-hidden="true" style="flex-shrink:0;margin-top:1px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg></span> Os prazos acima referem-se ao processamento pela WeKz. O crédito efetivo depende exclusivamente da instituição financeira do comprador. A WeKz não controla o sistema bancário de terceiros.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: RASTREAMENTO DE ENVIOS ═══════════════════════ -->
+<div id="page-pg-tracking-info" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(0,180,171,0.12),rgba(34,197,94,0.1));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › Suporte › <span>Rastreamento de Envios</span></div>
+      <h1 class="inner-page-title"><span class="wkz-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Rastreamento <span>de Envios</span></h1>
+      <p class="inner-page-sub">Entenda como funciona o código de rastreio, os fluxos alfandegários internacionais e o que fazer se seu envio parar.</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- COMO FUNCIONA O CÓDIGO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M3 17h4v4H3z"/></svg></span> Como Funciona o Código de Rastreio</h2>
+      <div class="dispute-steps">
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#00B4AB,#22C55E);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div><strong>Geração do código (D+1 após confirmação)</strong><p>O código de rastreio é gerado pelo lojista ao despachar o produto. Você recebe uma notificação automática por e-mail e no app. Pode levar até 24h para aparecer no sistema da transportadora.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#00B4AB,#22C55E);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div><strong>Envio internacional — etapas alfandegárias</strong><p>Pedidos internacionais passam por até 4 etapas: Coleta → Triagem no país de origem → Embarque internacional → Alfândega brasileira (Receita Federal) → Distribuição nacional. O prazo médio em alfândega é de 3 a 15 dias úteis, fora do controle da WeKz ou do lojista.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#00B4AB,#22C55E);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V10"/><path d="M19 21V10"/><path d="M3 10l9-6 9 6"/><path d="M9 21v-7"/><path d="M15 21v-7"/></svg></div><div><strong>Impostos e taxação (Remessa Conforme)</strong><p>Compras até US$ 50 de lojistas cadastrados no programa Remessa Conforme são isentas de imposto de importação. Para valores acima, a WeKz gera automaticamente a documentação fiscal e alerta o comprador antes da compra. Taxas são de responsabilidade do comprador conforme a legislação brasileira.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#00B4AB,#22C55E);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg></div><div><strong>Pedido parado há mais de 30 dias?</strong><p>Se o rastreio não atualizar por mais de 30 dias corridos (envio nacional) ou 60 dias (internacional), você pode abrir uma disputa formal em Meus Pedidos. A WeKz aciona o lojista e a transportadora para apuração.</p></div></div>
+      </div>
+    </div>
+
+    <!-- TRANSPORTADORAS -->
+    <div class="inner-section">
+      <div class="info-notice" style="border-left-color:#22C55E;">
+        <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#22C55E" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg></span>
+        <div><strong>A WeKz não opera frota própria.</strong> O transporte físico é contratado pelo lojista junto a transportadoras parceiras (Correios, DHL, FedEx, Kangu, Pegaki e outras). Eventuais atrasos ou danos em trânsito são de responsabilidade da transportadora e do lojista, não da plataforma WeKz Shop.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: DIRETRIZES DE DEVOLUÇÃO ═══════════════════════ -->
+<div id="page-pg-returns" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(239,68,68,0.10));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › Suporte › <span>Diretrizes de Devolução</span></div>
+      <h1 class="inner-page-title"><span class="wkz-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span> Diretrizes de Devolução <span>de Lojistas</span></h1>
+      <p class="inner-page-sub">Regras de devolução, logística reversa e as condições exigidas pelos lojistas para aceite do produto devolvido.</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- NOTA LEGAL -->
+    <div class="inner-section">
+      <div class="info-notice" style="border-left-color:#F59E0B;">
+        <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-width="3"/></svg></span>
+        <div><strong>Política de devolução é definida por cada lojista,</strong> não pela WeKz Shop. A plataforma exige que todos os lojistas cadastrados cumpram minimamente o Código de Defesa do Consumidor (CDC) — inclusive o direito de arrependimento de 7 dias para compras online (Art. 49). Lojistas podem oferecer condições mais favoráveis.</div>
+      </div>
+    </div>
+
+    <!-- FLUXO DE DEVOLUÇÃO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span> Como Solicitar uma Devolução</h2>
+      <div class="dispute-steps">
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#F59E0B,#EF4444);">1</div><div><strong>Verifique o prazo e a política do lojista</strong><p>Acesse a página do produto → "Política de Devolução do Lojista". O prazo padrão mínimo é 7 dias corridos a partir do recebimento (direito de arrependimento, CDC Art. 49). Defeito de fabricação: 30 dias (bens não-duráveis) ou 90 dias (bens duráveis), conforme CDC Art. 26.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#F59E0B,#EF4444);">2</div><div><strong>Condições obrigatórias do produto para devolução</strong><p>O produto deve ser devolvido: na embalagem original (quando possível), sem sinais de uso indevido, acompanhado de todos os acessórios e nota fiscal. Produtos personalizados, itens de higiene abertos e softwares com lacre violado geralmente não são elegíveis — verifique a política específica do lojista.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#F59E0B,#EF4444);">3</div><div><strong>Logística reversa — quem paga o frete?</strong><p>Para arrependimento (sem defeito): o frete de retorno é de responsabilidade do comprador, salvo política contrária do lojista. Para defeito comprovado ou produto incorreto: o lojista é obrigado a arcar com o frete reverso. Em disputas, a WeKz pode intermediar a contratação da coleta.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#F59E0B,#EF4444);">4</div><div><strong>Confirmação do recebimento e reembolso</strong><p>Após o lojista confirmar o recebimento do produto em boas condições, o reembolso é processado pela WeKz em até 2 dias úteis. O crédito na sua conta segue os prazos por modalidade de pagamento (ver Mediação de Disputas).</p></div></div>
+      </div>
+    </div>
+
+    <!-- TABELA CDC -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></span> Seus Direitos Legais (CDC)</h2>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+          <thead><tr style="background:rgba(245,158,11,0.1);">
+            <th style="padding:12px 14px;text-align:left;color:var(--text);font-weight:700;border-bottom:1px solid var(--border);">Situação</th>
+            <th style="padding:12px 14px;text-align:left;color:var(--text);font-weight:700;border-bottom:1px solid var(--border);">Prazo Legal</th>
+            <th style="padding:12px 14px;text-align:left;color:var(--text);font-weight:700;border-bottom:1px solid var(--border);">Base Legal</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:11px 14px;color:var(--muted);">Arrependimento (online)</td><td style="padding:11px 14px;color:#4ADE80;font-weight:600;">7 dias corridos</td><td style="padding:11px 14px;color:var(--muted);">CDC Art. 49</td></tr>
+            <tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);"><td style="padding:11px 14px;color:var(--muted);">Defeito — bem não-durável</td><td style="padding:11px 14px;color:#FCD34D;font-weight:600;">30 dias</td><td style="padding:11px 14px;color:var(--muted);">CDC Art. 26, I</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:11px 14px;color:var(--muted);">Defeito — bem durável</td><td style="padding:11px 14px;color:#FCD34D;font-weight:600;">90 dias</td><td style="padding:11px 14px;color:var(--muted);">CDC Art. 26, II</td></tr>
+            <tr><td style="padding:11px 14px;color:var(--muted);">Produto não entregue</td><td style="padding:11px 14px;color:#F87171;font-weight:600;">Sem prazo limite</td><td style="padding:11px 14px;color:var(--muted);">CDC Art. 35</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: SUPORTE TÉCNICO PLATAFORMA ═══════════════════════ -->
+<div id="page-pg-techsupport" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(124,58,237,0.12));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › Suporte › <span>Suporte Técnico</span></div>
+      <h1 class="inner-page-title"><span class="wkz-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span> Suporte Técnico <span>Plataforma 24/7</span></h1>
+      <p class="inner-page-sub">Exclusivo para falhas do sistema WeKz: erros de checkout, bugs do site, falhas de pagamento e problemas de acesso à conta.</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- NOTA DE ESCOPO -->
+    <div class="inner-section">
+      <div class="info-notice" style="border-left-color:#EF4444;">
+        <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#EF4444" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg></span>
+        <div><strong>Este canal é estritamente técnico.</strong> Não atendemos aqui: atrasos de entrega, qualidade de produtos ou reclamações contra lojistas. Para isso, use <span style="color:var(--teal);cursor:pointer;" onclick="showPage('pg-disputes')">Mediação de Disputas</span> ou <span style="color:var(--teal);cursor:pointer;" onclick="showPage('pg-suporte')">Central de Ajuda</span>.</div>
+      </div>
+    </div>
+
+    <!-- PROBLEMAS COMUNS -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg></span> Problemas Técnicos Mais Comuns</h2>
+      <div class="dispute-steps">
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#EF4444,#7C3AED);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div><strong>Pagamento recusado ou não confirmado</strong><p>Se o valor foi debitado mas o pedido não foi gerado, aguarde até 30 minutos — pode ser latência bancária. Persistindo, acesse Minha Conta → Pagamentos → Histórico de Tentativas e abra um chamado técnico com o ID da transação. Não faça uma nova compra antes de confirmar o estorno da primeira tentativa.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#EF4444,#7C3AED);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><div><strong>Erro ao fazer login ou conta bloqueada</strong><p>Tentativas excessivas de login bloqueiam a conta por 30 minutos (proteção anti-força-bruta). Para desbloqueio imediato, use "Esqueci minha senha". Se o e-mail de recuperação não chegar em 5 minutos, verifique o spam. Para bloqueios por suspeita de fraude, envie seu documento ao canal de identidade: identidade@wekzshop.com.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#EF4444,#7C3AED);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></div><div><strong>Erro no checkout / carrinho não finaliza</strong><p>Tente: (1) limpar o cache do navegador ou app, (2) desativar extensões de bloqueio de anúncios, (3) usar outra rede (WiFi → Dados móveis). Se o erro persistir, registre o código de erro exibido na tela e reporte pelo formulário abaixo com o código e um screenshot.</p></div></div>
+        <div class="ds-step"><div class="ds-num" style="background:linear-gradient(135deg,#EF4444,#7C3AED);"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="9" width="10" height="10" rx="5"/><path d="M12 9V6M9 6L7 4M15 6l2-2M5 13H3M21 13h-2M6 18l-2 2M18 18l2 2"/></svg></div><div><strong>Bug visual ou funcionalidade quebrada</strong><p>Encontrou algo quebrado no site ou app? Descreva o comportamento esperado versus o observado, informe seu sistema operacional, navegador e versão do app. Bugs confirmados são priorizados e corrigidos em até 72h úteis. Contribuições de bug report são recompensadas com WeKz Coins.</p></div></div>
+      </div>
+    </div>
+
+    <!-- FORMULÁRIO TÉCNICO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> Abrir Chamado Técnico</h2>
+      <div class="contact-form-wrap">
+        <div class="form-group">
+          <label class="form-label">Tipo de problema técnico</label>
+          <select class="form-select wkz-select wkz-select--lg">
+            <option>Pagamento não confirmado / debitado indevidamente</option>
+            <option>Erro no checkout ou carrinho</option>
+            <option>Login bloqueado ou erro de autenticação</option>
+            <option>Bug visual ou funcionalidade quebrada</option>
+            <option>App não carrega ou trava</option>
+            <option>Notificação não recebida</option>
+            <option>Outro problema técnico</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Código de erro (se exibido)</label>
+          <input class="form-input wkz-input" type="text" placeholder="Ex: ERR_CHECKOUT_402 ou ID da transação">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição do problema <span class="req">*</span></label>
+          <textarea class="form-input wkz-input" rows="5" placeholder="Descreva o que aconteceu, qual era o comportamento esperado e qual foi o observado..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Anexar screenshot (opcional)</label>
+          <div class="upload-box" onclick="showToast('Selecionar arquivo...')">
+            <div style="display:flex;justify-content:center;margin-bottom:4px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></span></div>
+            <div style="font-size:12px;margin-top:4px;">Screenshot, log ou vídeo · Máx 10MB</div>
+          </div>
+        </div>
+        <button class="btn-submit" onclick="showToast('Chamado técnico enviado! Resposta em até 4h.')"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> Enviar Chamado Técnico</button>
+      </div>
+    </div>
+
+    <!-- STATUS DA PLATAFORMA -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span> Status da Plataforma</h2>
+      <div style="background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;gap:16px;">
+        <span style="display:inline-block;width:12px;height:12px;background:#22C55E;border-radius:50%;animation:kzlive-pulse 1.5s infinite;flex-shrink:0;"></span>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#4ADE80;">Todos os sistemas operacionais</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Checkout · Pagamentos · Rastreamento · API · CDN · Uptime atual: 99.7%</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: WEKZ (Sobre) ═══════════════════════ -->
+<div id="page-pg-wekz" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(0,180,171,0.12));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › WeKz</div>
+      <h1 class="inner-page-title">Sobre a <span>WeKz Shop</span></h1>
+      <p class="inner-page-sub">Somos uma empresa de tecnologia com missão de transformar o comércio global através de inovação, segurança e transparência radical.</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- DESCRICAO INSTITUCIONAL -->
+    <div class="inner-section">
+      <div class="about-hero-split">
+        <div>
+          <h2 class="inner-section-title" style="margin-bottom:16px;">A <span style="background:var(--grad1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">WeKz Shop</span></h2>
+          <p style="font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:16px;">A <strong style="color:var(--text);">WeKz Shop</strong> é um ecossistema tecnológico global de marketplace que atua exclusivamente na intermediação comercial entre usuários compradores e usuários vendedores independentes, nacionais e internacionais. Fornecemos uma aplicação de internet altamente segura, moderna e intuitiva para aproximar fronteiras mercadológicas.</p>
+          <p style="font-size:14px;line-height:1.75;color:var(--muted);margin-bottom:24px;padding:14px 16px;background:rgba(0,180,171,0.07);border-left:3px solid var(--teal);border-radius:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 6l9-3 9 3"/><path d="M3 6c0 4 3 6 6 6s6-2 6-6"/><path d="M9 18c0 2 1.5 3 3 3s3-1 3-3c0-2-3-6-3-6s-3 4-3 6z"/></svg></span> <strong style="color:var(--text);">Nota Legal:</strong> A WeKz Shop não figura como proprietária, fabricante, armazenadora ou transportadora dos produtos anunciados, operando estritamente como prestadora de serviços de tecnologia e facilitação de pagamentos, em estrita conformidade com o <strong style="color:var(--teal);">Artigo 18 da Lei Federal nº 12.965/2014 (Marco Civil da Internet)</strong>.</p>
+          <div class="about-stats" id="about-stats-container">
+            <div class="about-stat"><div class="as-value" id="stat-paises">180+</div><div class="as-label">países atendidos</div></div>
+            <div class="about-stat"><div class="as-value" id="stat-usuarios">12M+</div><div class="as-label">usuários ativos</div></div>
+            <div class="about-stat"><div class="as-value" id="stat-lojas">85k+</div><div class="as-label">lojas verificadas</div></div>
+            <div class="about-stat"><div class="as-value" id="stat-uptime">99.7<span style="font-size:14px;">%</span></div><div class="as-label">uptime <span style="display:inline-block;width:7px;height:7px;background:#22C55E;border-radius:50%;margin-left:4px;vertical-align:middle;animation:kzlive-pulse 1.5s infinite;"></span></div></div>
+          </div>
+          <script>
+          (function(){
+            var ran=false;
+            function animCount(id,target,suffix,duration,isFloat){
+              var el=document.getElementById(id); if(!el) return;
+              var current=0,step=target/(duration/16);
+              var t=setInterval(function(){
+                current+=step; if(current>=target){current=target;clearInterval(t);}
+                el.innerHTML=(isFloat?current.toFixed(1):Math.floor(current))+suffix;
+              },16);
+            }
+            var obs=new IntersectionObserver(function(entries){
+              entries.forEach(function(e){
+                if(e.isIntersecting&&!ran){
+                  ran=true;
+                  animCount('stat-paises',180,'+',1400,false);
+                  animCount('stat-usuarios',12,'M+',1600,false);
+                  animCount('stat-lojas',85,'k+',1500,false);
+                  var upEl=document.getElementById('stat-uptime'); var v=0;
+                  var t2=setInterval(function(){v+=99.7/110;if(v>=99.7){v=99.7;clearInterval(t2);}upEl.innerHTML=v.toFixed(1)+'<span style="font-size:14px;">%</span>';},16);
+                  obs.disconnect();
+                }
+              });
+            },{threshold:0.3});
+            var el=document.getElementById('about-stats-container');
+            if(el)obs.observe(el);
+          })();
+          </script>
+        </div>
+        <div class="about-visual">
+          <div style="display:flex;justify-content:center;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span></div>
+          <div style="font-size:36px;text-align:center;margin-top:-20px;font-family:'DM Sans',sans-serif;font-weight:800;background:var(--grad1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">WeKz Shop</div>
+          <div style="font-size:13px;color:var(--muted);text-align:center;">Global Marketplace</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MISSÃO -->
+    <div class="inner-section" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;">
+      <h2 class="inner-section-title" style="margin-bottom:16px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> Nossa <span style="background:var(--grad1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Missão</span></h2>
+      <p style="font-size:15px;line-height:1.85;color:var(--muted);">Nossa missão é <strong style="color:var(--text);">democratizar o acesso ao comércio global</strong> de forma inteligente, transparente e blindada contra riscos. Unimos engenharia de software avançada a uma infraestrutura de pagamentos rigorosa para garantir que a experiência de compra transfronteiriça seja tão simples e segura quanto o comércio local. Impulsionamos o crescimento de lojistas verificados enquanto oferecemos ao consumidor final a certeza de um ambiente digital íntegro, inovador e focado na <strong style="color:var(--teal);">excelência do suporte humano</strong>.</p>
+    </div>
+
+    <!-- VALORES -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M2 9h20M6 3l4 6m4 0l4-6"/></svg></span> Nossos Valores</h2>
+      <div class="values-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));">
+        <div class="value-card">
+          <div class="value-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div>
+          <h3>Transparência Radical</h3>
+          <p>Informações claras sobre o papel de intermediação da plataforma, taxas e fluxos de entrega. Sem letras pequenas, sem ambiguidades.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span></div>
+          <h3>Segurança Cibernética e Jurídica</h3>
+          <p>Proteção integral de dados com criptografia de ponta e conformidade irrestrita com as normas de consumo e proteção à privacidade (LGPD/GDPR).</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span></div>
+          <h3>Inovação Disruptiva</h3>
+          <p>Desenvolvimento contínuo de soluções front-end e back-end para mitigar erros e acelerar transações. Tecnologia como pilar estratégico, não como acessório.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span></div>
+          <h3>Tolerância Zero à Fraude</h3>
+          <p>Rigoroso processo de <strong>KYC (Know Your Customer)</strong> para entrada de vendedores, assegurando a legitimidade e a integridade do ecossistema.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIDERANÇA -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Liderança e Fundador</h2>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start;">
+        <div style="flex-shrink:0;">
+          <div style="width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#00B4AB);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:36px;font-weight:800;color:#fff;box-shadow:0 0 0 4px rgba(0,180,171,0.2),0 0 24px rgba(124,58,237,0.3);">W</div>
+          <div style="text-align:center;margin-top:10px;"><span style="font-size:11px;background:linear-gradient(90deg,#7C3AED,#00B4AB);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Fundador</span></div>
+        </div>
+        <div>
+          <h3 style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px;">Weslan Silva</h3>
+          <p style="font-size:13px;color:var(--teal);font-weight:600;margin-bottom:16px;letter-spacing:0.5px;">Fundador &amp; Arquiteto Principal de Sistemas · WeKz Shop</p>
+          <p style="font-size:14.5px;line-height:1.8;color:var(--muted);margin-bottom:14px;">Acadêmico em <strong style="color:var(--text);">Análise e Desenvolvimento de Sistemas</strong> pela Universidade Cruzeiro do Sul e profissional atuante na área de segurança pública no Estado de São Paulo, Weslan aplica as premissas da disciplina operacional, ética institucional e proteção ao cidadão na arquitetura técnica da plataforma.</p>
+          <p style="font-size:14.5px;line-height:1.8;color:var(--muted);margin-bottom:20px;">Motivado pelo desejo de construir um ambiente de comércio eletrônico verdadeiramente seguro e livre de vulnerabilidades para usuários brasileiros e internacionais, o fundador lidera a evolução do código da WeKz Shop sob a filosofia <strong style="color:var(--text);">"Security by Design"</strong> — segurança desde a concepção. Essa sinergia entre o rigor técnico do desenvolvimento de software e o compromisso com a integridade garante que o ecossistema WeKz Shop opere como uma <strong style="color:var(--teal);">fortaleza digital</strong> para compradores e vendedores.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <span style="font-size:12px;padding:5px 12px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);border-radius:20px;color:#A78BFA;display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 6 3 6 3s6-1 6-3v-5"/></svg></span> ADS — Cruzeiro do Sul</span>
+            <span style="font-size:12px;padding:5px 12px;background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.25);border-radius:20px;color:var(--teal);display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Security by Design</span>
+            <span style="font-size:12px;padding:5px 12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:20px;color:#4ADE80;display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="6" height="6"/><path d="M2 12h2m16 0h2m-9-9v2m0 16v2M5.64 5.64l1.41 1.41m9.9 9.9 1.41 1.41M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/></svg></span> Co-fundação com IA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- IMPRENSA / CONTATO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2h12a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M16 2v4H8V2m0 8h8m-8 4h8m-8 4h5"/></svg></span> Imprensa &amp; Contato Corporativo</h2>
+      <p style="font-size:14.5px;line-height:1.8;color:var(--muted);margin-bottom:24px;">O ecossistema WeKz Shop valoriza a comunicação clara com a sociedade, parceiros de tecnologia e a mídia. Atualmente, todas as demandas institucionais, esclarecimentos de imprensa, relatórios de transparência ou propostas de parcerias corporativas são centralizados e avaliados diretamente pela nossa diretoria de tecnologia e compliance.</p>
+      <div class="info-cards-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));">
+        <div class="info-card" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(0,180,171,0.06));border-color:rgba(0,180,171,0.2);">
+          <div class="info-card-icon" style="background:linear-gradient(135deg,#7C3AED,#00B4AB);"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span></div>
+          <h3 style="font-size:16px;">Canal Corporativo Exclusivo</h3>
+          <p style="font-size:14px;line-height:1.7;">Para submeter uma solicitação oficial — imprensa, parcerias, compliance ou relatos de transparência — entre em contato através do nosso canal direto:<br><br><a href="mailto:corporativo@wekzshop.com" style="color:var(--teal);font-weight:700;font-size:15px;">corporativo@wekzshop.com</a><br><span style="font-size:12px;color:var(--muted);">Tempo de resposta: até 2 dias úteis</span></p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon" style="background:linear-gradient(135deg,#1D4ED8,#7C3AED);"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2h12a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M16 2v4H8V2m0 8h8m-8 4h8m-8 4h5"/></svg></span></div>
+          <h3>Imprensa</h3>
+          <p>Notas, releases, entrevistas e esclarecimentos à mídia. Todas as demandas centralizadas pelo fundador.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon" style="background:linear-gradient(135deg,#22C55E,#059669);"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></span></div>
+          <h3>Parcerias Tecnológicas</h3>
+          <p>Integrações, APIs, parcerias estratégicas e propostas de colaboração com o ecossistema WeKz.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon" style="background:linear-gradient(135deg,#7C3AED,#DB2777);"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 6l9-3 9 3"/><path d="M3 6c0 4 3 6 6 6s6-2 6-6"/><path d="M9 18c0 2 1.5 3 3 3s3-1 3-3c0-2-3-6-3-6s-3 4-3 6z"/></svg></span></div>
+          <h3>Jurídico &amp; Compliance</h3>
+          <p>LGPD, GDPR, relatórios de transparência e demandas regulatórias tratadas com prioridade.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: TERMOS ═══════════════════════ -->
+<div id="page-pg-terms" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(15,23,42,0.8),rgba(37,99,235,0.1));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › <span onclick="showPage('pg-wekz')">WeKz</span> › Termos de Uso</div>
+      <h1 class="inner-page-title"><span class="wkz-icon wkz-icon-clipboard"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span> Termos de <span>Uso</span></h1>
+      <p class="inner-page-sub">Última atualização: 11 de junho de 2026 · Versão 3.3 — adicionadas cláusulas CDC art. 49 e Disputas (JUR-01)</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+    <div class="legal-doc">
+      <div class="legal-toc"><h4>Sumário</h4><a onclick="document.getElementById('t1').scrollIntoView({behavior:'smooth'})">1. Aceitação dos Termos</a><a onclick="document.getElementById('t2').scrollIntoView({behavior:'smooth'})">2. Cadastro e Conta</a><a onclick="document.getElementById('t3').scrollIntoView({behavior:'smooth'})">3. Conduta do Usuário</a><a onclick="document.getElementById('t4').scrollIntoView({behavior:'smooth'})">4. Compras e Pagamentos</a><a onclick="document.getElementById('t5').scrollIntoView({behavior:'smooth'})">5. Responsabilidades</a><a onclick="document.getElementById('t6').scrollIntoView({behavior:'smooth'})">6. Propriedade Intelectual</a><a onclick="document.getElementById('t7').scrollIntoView({behavior:'smooth'})">7. Devolução e Arrependimento</a><a onclick="document.getElementById('t8').scrollIntoView({behavior:'smooth'})">8. Disputas e Mediação</a><a onclick="document.getElementById('t9').scrollIntoView({behavior:'smooth'})">9. Rescisão</a></div>
+      <div class="legal-content">
+        <h3 id="t1">1. Aceitação dos Termos</h3>
+        <p>Ao criar uma conta ou realizar qualquer transação na plataforma WeKz Shop ("Plataforma"), você concorda integralmente com estes Termos de Uso, nossa Política de Privacidade e todas as políticas aplicáveis. Se não concordar com qualquer disposição, não utilize nossos serviços.</p>
+        <p>Estes Termos constituem um acordo juridicamente vinculante entre você ("Usuário") e WeKz Tecnologia e Comércio Ltda. ("WeKz"), inscrita no CNPJ 00.000.000/0001-00, com sede em Hortolândia/SP.</p>
+        <h3 id="t2">2. Cadastro e Conta</h3>
+        <p><strong>2.1 Elegibilidade:</strong> O uso da Plataforma é permitido apenas para maiores de 18 anos ou para menores legalmente emancipados. Ao se cadastrar, você declara ser maior de idade ou ter autorização legal para celebrar contratos.</p>
+        <p><strong>2.2 Veracidade das informações:</strong> Você se compromete a fornecer informações verdadeiras, completas e atualizadas. Dados falsos resultam em cancelamento imediato da conta e possível responsabilização civil e criminal.</p>
+        <p><strong>2.3 Segurança da conta:</strong> Você é responsável por manter a confidencialidade de suas credenciais de acesso e por todas as atividades realizadas em sua conta. Notifique imediatamente a WeKz em caso de acesso não autorizado.</p>
+        <p><strong>2.4 Verificação KYC:</strong> A WeKz reserva-se o direito de solicitar documentos de verificação de identidade a qualquer momento. Contas não verificadas podem ter funcionalidades limitadas.</p>
+        <h3 id="t3">3. Conduta do Usuário</h3>
+        <p>É expressamente proibido: fraudar ou enganar outros usuários; publicar conteúdo falso, ofensivo, difamatório ou ilegal; realizar raspagem (scraping) de dados da Plataforma; criar múltiplas contas para contornar restrições; interferir na operação dos sistemas WeKz; revender acesso à Plataforma sem autorização.</p>
+        <h3 id="t4">4. Compras e Pagamentos</h3>
+        <p><strong>4.1</strong> Ao realizar uma compra, você celebra um contrato diretamente com o vendedor. A WeKz atua como intermediária e não é parte no contrato de compra e venda, exceto quando for a vendedora direta.</p>
+        <p><strong>4.2</strong> Os preços exibidos incluem impostos aplicáveis (quando mencionado). Frete, seguros e taxas alfandegárias são indicados separadamente antes da confirmação do pedido.</p>
+        <p><strong>4.3</strong> A WeKz utiliza tecnologia de pagamento certificada PCI DSS. Dados de cartão não são armazenados em nossos servidores.</p>
+        <h3 id="t5">5. Limitação de Responsabilidade</h3>
+        <p>A WeKz não se responsabiliza por: danos indiretos, consequenciais ou lucros cessantes; qualidade, segurança ou legalidade dos produtos anunciados por terceiros; condutas de vendedores independentes após o encerramento de disputas; falhas de infraestrutura além de nosso controle (caso fortuito ou força maior).</p>
+        <h3 id="t6">6. Propriedade Intelectual</h3>
+        <p>Todo o conteúdo da Plataforma (logos, textos, código, design, marcas) é de propriedade exclusiva da WeKz ou licenciado à WeKz. É proibida a reprodução, modificação ou distribuição sem autorização escrita prévia.</p>
+
+        <!-- FIX JUR-01: cláusula de Devolução e Arrependimento — CDC art. 49 -->
+        <h3 id="t7">7. Devolução e Direito de Arrependimento</h3>
+        <p><strong>7.1 Direito de arrependimento (CDC art. 49):</strong> Em conformidade com o art. 49 do Código de Defesa do Consumidor (Lei 8.078/1990), o consumidor que realizou compra fora de estabelecimento comercial físico — inclusive pela internet — tem o direito de desistir da compra no prazo de <strong>7 (sete) dias corridos</strong> a contar da data de recebimento do produto ou da assinatura do contrato de serviço, sem necessidade de justificativa.</p>
+        <p><strong>7.2 Exercício do direito:</strong> Para exercer o direito de arrependimento, acesse "Meus Pedidos" no painel do comprador e selecione "Solicitar devolução", ou entre em contacto com o suporte WeKz em até 7 dias após o recebimento. O produto deve ser devolvido em condições originais, sem uso, com embalagem e acessórios.</p>
+        <p><strong>7.3 Reembolso:</strong> Após confirmação da devolução pelo vendedor, o reembolso integral — incluindo frete — será processado em até 10 dias úteis pelo mesmo meio de pagamento utilizado na compra. Para pagamentos via cartão de crédito, o prazo de creditação depende da operadora.</p>
+        <p><strong>7.4 Produtos excluídos:</strong> Ficam excluídos do direito de arrependimento os produtos personalizados, perecíveis, de higiene íntima (se abertos), conteúdo digital já descarregado, conforme §§ únicos aplicáveis do CDC e do Decreto 7.962/2013.</p>
+        <p><strong>7.5 Garantia legal:</strong> Independentemente do direito de arrependimento, o consumidor tem direito à garantia legal de 30 dias para produtos não duráveis e 90 dias para produtos duráveis, em caso de vício ou defeito (CDC art. 26).</p>
+
+        <!-- FIX JUR-01: cláusula de Disputas e Mediação -->
+        <h3 id="t8">8. Disputas, Mediação e Foro Competente</h3>
+        <p><strong>8.1 Central de Disputas e Kz Dispute Copilot — instância obrigatória:</strong> Em caso de conflito entre comprador e vendedor, as partes obrigam-se a utilizar primeiramente a Central de Disputas interna da Plataforma, mediada pelo <strong>"Kz Dispute Copilot"</strong> — sistema de inteligência artificial que analisa evidências, histórico de conformidade das partes e emite parecer técnico preliminar. Essa instância digital constitui condição prévia e obrigatória antes de qualquer acionamento de mediação externa, Procon ou Poder Judiciário. As partes têm até 72 horas, a partir da abertura da disputa, para chegar a um acordo, podendo a WeKz intervir como mediadora humana mediante solicitação ou recomendação do Kz Dispute Copilot.</p>
+        <p><strong>8.2 Mediação extrajudicial:</strong> Caso não seja atingido acordo pela via interna, as partes poderão recorrer a câmaras de mediação e arbitragem reconhecidas, como o CIESP/FIESP ou o CAM-CCBC, antes de recorrer ao Judiciário.</p>
+        <p><strong>8.3 Procon e plataformas públicas:</strong> O consumidor pode registar reclamações no Procon do seu estado ou na plataforma federal consumidor.gov.br, nos termos do Decreto 7.962/2013 (E-Commerce).</p>
+        <p><strong>8.4 Foro competente:</strong> Estes Termos são regidos pelas leis da República Federativa do Brasil. O foro competente para dirimir quaisquer controvérsias é o da Comarca de Hortolândia/SP, salvo disposição legal em contrário — incluindo o domicílio do consumidor, conforme facultado pelo CDC art. 101, I.</p>
+
+        <h3 id="t9">9. Rescisão e Suspensão</h3>
+        <p>A WeKz pode suspender ou encerrar sua conta a qualquer momento, com ou sem aviso, em caso de violação destes Termos. Você pode encerrar sua conta a qualquer momento pelo painel de configurações, sujeito à conclusão de transações em andamento.</p>
+        <p style="margin-top:24px;padding:16px;background:rgba(0,180,171,0.06);border-radius:10px;font-size:13px;color:var(--muted);">Estes Termos são regidos pelas leis da República Federativa do Brasil. Foro competente: Comarca de Hortolândia/SP (cláusula 8.4). WeKz Tecnologia e Comércio Ltda. — CNPJ [a preencher antes do lançamento].</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: PRIVACIDADE ═══════════════════════ -->
+<div id="page-pg-privacy" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(15,23,42,0.8),rgba(0,180,171,0.1));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › Privacidade & LGPD</div>
+      <h1 class="inner-page-title"><span class="wkz-icon wkz-icon-lock"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Política de <span>Privacidade</span></h1>
+      <p class="inner-page-sub">Conformidade com LGPD (Lei 13.709/2018) e GDPR (Regulamento EU 2016/679) · Última atualização: maio 2025</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+    <div class="legal-doc">
+      <div class="legal-toc"><h4>Seus Direitos (LGPD)</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+          <div class="lgpd-right" onclick="lgpdOpenAcessarDados()" role="button" tabindex="0" aria-label="Acessar meus dados coletados"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span> Acessar meus dados</div>
+          <div class="lgpd-right" onclick="lgpdOpenCorrigirDados()" role="button" tabindex="0" aria-label="Corrigir dados do perfil"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span> Corrigir dados</div>
+          <div class="lgpd-right" onclick="lgpdOpenPortabilidade()" role="button" tabindex="0" aria-label="Solicitar portabilidade de dados"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg></span> Portabilidade</div>
+          <div class="lgpd-right" onclick="lgpdOpenExcluirConta()" role="button" tabindex="0" aria-label="Excluir minha conta"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6m5 0V4h4v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span> Excluir minha conta</div>
+          <div class="lgpd-right" onclick="wkzConsentOpenModal()" role="button" tabindex="0" aria-label="Revogar consentimento de cookies"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span> Revogar consentimento</div>
+          <div class="lgpd-right" onclick="lgpdOpenDpo()" role="button" tabindex="0" aria-label="Contatar o Encarregado DPO"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> Contatar o DPO</div>
+        </div>
+      </div>
+      <div class="legal-content">
+        <h3>Dados que coletamos</h3>
+        <p><strong>Dados de cadastro:</strong> nome, e-mail, telefone, CPF/documento, data de nascimento, endereço.</p>
+        <p><strong>Dados de uso:</strong> páginas visitadas, buscas realizadas, produtos visualizados, tempo de sessão, dispositivo e IP.</p>
+        <p><strong>Dados de transação:</strong> histórico de compras e vendas, formas de pagamento utilizadas (dados completos do cartão nunca são armazenados), endereços de entrega.</p>
+        <p><strong>Comunicações:</strong> mensagens trocadas com vendedores e com o suporte WeKz.</p>
+        <h3>Como usamos seus dados</h3>
+        <ul class="alert-list" style="margin-top:8px;"><li class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p>Processar pedidos e pagamentos</p></li><li class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p>Verificar identidade (KYC/AML)</p></li><li class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p>Personalizar recomendações de produtos</p></li><li class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p>Prevenir fraudes e garantir segurança</p></li><li class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p>Cumprir obrigações legais e regulatórias</p></li><li class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p>Comunicações de marketing (apenas com consentimento)</p></li></ul>
+        <p><strong>Tratamento por Inteligência Artificial:</strong> dados de navegação, histórico de compras e comportamento de negociação são processados por módulos de IA proprietários para finalidades específicas: o <strong>Smart Negotiator</strong> analisa seu padrão de interação para gerar descontos dinâmicos e cupons personalizados; o <strong>Kz FX Guard</strong> processa dados de localização e moeda de preferência para calcular spreads de conversão cambial em tempo real. Nenhuma decisão automatizada é definitiva sem possibilidade de revisão humana mediante solicitação ao DPO.</p>
+        <h3>Compartilhamento de dados</h3>
+        <p>Seus dados são compartilhados apenas quando necessário com: processadoras de pagamento (dados mínimos para processar transações), transportadoras (nome e endereço para entrega), autoridades públicas (quando exigido por lei), e parceiros tecnológicos sob rigorosos acordos de confidencialidade e DPA.</p>
+        <p><strong>Nunca vendemos seus dados pessoais.</strong></p>
+        <h3>Transferência Internacional de Dados (Logística Transfronteiriça)</h3>
+        <p>Para viabilizar o <strong>Rastreador Transfronteiriço</strong> e a entrega de produtos comercializados por fornecedores internacionais, dados estritamente necessários ao envio — nome do destinatário, endereço de entrega, telefone de contato e identificação da encomenda — são transferidos a transportadoras, despachantes aduaneiros e fornecedores parceiros localizados fora do Brasil. Essas transferências observam o art. 33 da LGPD, ocorrendo apenas mediante cláusulas contratuais de proteção de dados (DPA) e exclusivamente na medida necessária ao cumprimento do contrato de compra e venda. Dados financeiros completos e documentos de identidade não são compartilhados internacionalmente.</p>
+        <h3>Retenção de dados</h3>
+        <p>Dados de conta: enquanto ativa + 5 anos após encerramento. Dados de transação: 10 anos (obrigação fiscal). Logs de acesso: 6 meses (Marco Civil da Internet). Dados de marketing: até revogação do consentimento.</p>
+        <h3>Segurança</h3>
+        <p>Utilizamos: criptografia AES-256 em repouso e TLS 1.3 em trânsito, autenticação multifator, auditoria de acesso contínua, servidores em data centers certificados ISO 27001 localizados no Brasil, testes de penetração regulares por empresas especializadas.</p>
+        <h3>Cookies</h3>
+        <p>Utilizamos cookies essenciais (funcionamento do site), analíticos (Google Analytics — anonimizado) e de marketing (apenas com consentimento). Você pode gerenciar preferências de cookies pelo banner de consentimento ou nas configurações do navegador.</p>
+        <p style="margin-top:24px;padding:16px;background:rgba(0,180,171,0.06);border-radius:10px;font-size:13px;color:var(--muted);">Encarregado de Proteção de Dados (DPO): dpo@wekzshop.com · Para exercer seus direitos LGPD, envie solicitação para lgpd@wekzshop.com com comprovante de identidade.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: ANTI-FRAUDE ═══════════════════════ -->
+<div id="page-pg-antifraude" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(124,58,237,0.1));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › Anti-Fraude</div>
+      <h1 class="inner-page-title"><span class="wkz-icon wkz-icon-shield"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg></span> Política <span>Anti-Fraude</span></h1>
+      <p class="inner-page-sub">Nosso compromisso com a segurança de cada transação. Conheça como protegemos você 24 horas por dia.</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Como Detectamos Fraudes</h2>
+      <div class="security-features">
+        <div class="sf-item"><div class="sf-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="6" height="6"/><path d="M2 12h2m16 0h2m-9-9v2m0 16v2M5.64 5.64l1.41 1.41m9.9 9.9 1.41 1.41M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/></svg></span></div><div><h3>Kz AI Guard — IA Anti-Fraude em Tempo Real</h3><p>Nosso motor proprietário <strong>Kz AI Guard</strong> analisa mais de 500 variáveis por transação em milissegundos: localização, dispositivo, padrão de compra, velocidade de digitação e histórico do usuário.</p></div></div>
+        <div class="sf-item"><div class="sf-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div><div><h3>Verificação KYC/AML</h3><p>Todos os vendedores passam por verificação de identidade, consulta a listas de sanções internacionais (OFAC, ONU) e análise de PEP (Pessoa Politicamente Exposta). A WeKz reserva-se o direito de solicitar documentação complementar de identidade também a compradores, sempre que o Kz AI Guard identificar indícios de fraude, lavagem de dinheiro ou perfis falsos, em conformidade com a Lei 9.613/1998.</p></div></div>
+        <div class="sf-item"><div class="sf-icon"><span class="wkz-icon wkz-icon-barchart"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span></div><div><h3>Análise Comportamental</h3><p>Monitoramos padrões anormais: múltiplos cadastros do mesmo IP, velocidade de transações, sequências de cartões testados e comportamento de bot.</p></div></div>
+        <div class="sf-item"><div class="sf-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span></div><div><h3>Rede de Inteligência Compartilhada</h3><p>Participamos de consórcios de prevenção à fraude e compartilhamos (anonimamente) dados de ameaças com outras plataformas para proteção coletiva.</p></div></div>
+      </div>
+    </div>
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Sinais de Alerta — Proteja-se</h2>
+      <div class="alert-list">
+        <div class="alert-item red"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span></span><p><strong>A WeKz NUNCA pede senha por e-mail, WhatsApp ou telefone.</strong> Se receber tal solicitação, ignore e reporte imediatamente.</p></div>
+        <div class="alert-item red"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span></span><p><strong>Desconfie de vendedores que pedem pagamento fora da plataforma.</strong> Todas as transações devem ocorrer exclusivamente pelo site ou app WeKz.</p></div>
+        <div class="alert-item yellow"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span></span><p>Preços muito abaixo do mercado para produtos de alto valor (eletrônicos, joias) geralmente indicam golpe. Use a comparação de preços antes de comprar.</p></div>
+        <div class="alert-item yellow"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span></span><p>Verifique sempre o selo de verificação <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span> do vendedor antes de comprar. Lojas não verificadas têm risco maior. <a onclick="showPage('pg-garantia-autenticidade')" style="color:var(--teal);cursor:pointer;font-weight:600;">Entenda o Selo WeKz →</a></p></div>
+        <div class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p>Compras realizadas dentro da plataforma têm proteção total. Nunca transacione por links externos enviados por vendedores.</p></div>
+      </div>
+    </div>
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a2 2 0 010 4m-4-4v-2l-8 4 8 4v-2M5 8H3a1 1 0 00-1 1v2a1 1 0 001 1h2"/></svg></span> Reportar uma Fraude</h2>
+      <div class="report-box">
+        <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">Identificou algo suspeito? Reporte agora. Cada reporte nos ajuda a proteger milhares de outros usuários. Seu nome não será revelado ao denunciado.</p>
+        <div class="form-group"><label class="form-label">Tipo de ocorrência</label>
+          <select class="form-select wkz-select wkz-select--lg">
+            <option>Produto falsificado / réplica</option><option>Phishing / site falso</option>
+            <option>Vendedor solicitando pagamento externo</option><option>Conta hackeada</option>
+            <option>Golpe de entrega / produto não enviado</option><option>Lavagem de dinheiro suspeita</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Descrição detalhada</label>
+          <textarea class="form-input wkz-input" rows="4" placeholder="Descreva o que aconteceu com o máximo de detalhes. Inclua IDs de pedidos, links suspeitos ou prints de conversas."></textarea>
+        </div>
+        <button class="btn-submit" style="background:linear-gradient(135deg,#EF4444,#DC2626);" onclick="submitFraudReport(this)"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a2 2 0 010 4m-4-4v-2l-8 4 8 4v-2M5 8H3a1 1 0 00-1 1v2a1 1 0 001 1h2"/></svg></span> Enviar Reporte de Fraude</button>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;">Resposta em até 2 horas para casos urgentes. Canal direto: antifraude@wekzshop.com</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: GARANTIA DE AUTENTICIDADE (v2.7.22) ═══════════════════════ -->
+<div id="page-pg-garantia-autenticidade" class="page">
+  <div class="inner-page-hero" style="background:linear-gradient(135deg,rgba(0,180,171,0.14),rgba(37,99,235,0.10));">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › <span onclick="showPage('pg-antifraude')">Anti-Fraude</span> › Garantia de Autenticidade</div>
+      <h1 class="inner-page-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span> Garantia de <span>Autenticidade</span> WeKz</h1>
+      <p class="inner-page-sub">Cada produto vendido na WeKz Shop passa por um protocolo rigoroso de verificação. Entenda como o Selo WeKz funciona e o que ele significa para você.</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- O QUE É O SELO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span> O que é o Selo WeKz de Autenticidade?</h2>
+      <div style="display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:260px;">
+          <p style="color:var(--muted);font-size:14px;line-height:1.75;margin-bottom:16px;">
+            O <strong style="color:var(--text);">Selo WeKz de Autenticidade</strong> é a certificação concedida a vendedores e produtos que passaram pela nossa verificação de identidade, documentação e procedência. Ele aparece como <strong style="color:#22C55E;display:inline-flex;align-items:center;gap:4px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span> Verificado</strong> na ficha de cada produto elegível.
+          </p>
+          <p style="color:var(--muted);font-size:14px;line-height:1.75;margin-bottom:16px;">
+            O selo não é decorativo: ele é vinculado ao CNPJ/CPF do lojista, à NF-e do produto e ao histórico de conformidade da loja na plataforma. Se qualquer um desses vínculos for rompido, o selo é suspenso automaticamente.
+          </p>
+          <p style="color:var(--muted);font-size:14px;line-height:1.75;">
+            Para produtos de alto valor (acima de R$ 800), a WeKz exige documentação de procedência adicional — nota fiscal de origem, código de série do fabricante ou certificado de importação — antes de autorizar a publicação do anúncio.
+          </p>
+        </div>
+        <div style="flex-shrink:0;background:var(--card);border:1px solid rgba(0,180,171,0.3);border-radius:20px;padding:28px 32px;text-align:center;box-shadow:0 0 32px rgba(0,180,171,0.12);min-width:200px;">
+          <div style="display:flex;justify-content:center;margin-bottom:8px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span></div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;background:linear-gradient(90deg,#00B4AB,#2563EB);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">SELO WEKZ</div>
+          <div style="font-size:11px;color:#22C55E;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:4px;justify-content:center;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span> Autenticidade Verificada</div>
+          <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;font-size:11px;color:var(--muted);line-height:1.6;">Vendedor KYC aprovado<br>Produto com procedência<br>NF-e emitida obrigatória</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROTOCOLO DE VERIFICAÇÃO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 2v6l-2 2v4h12v-4l-2-2V2H7zm-2 14v4h14v-4"/><line x1="12" y1="16" x2="12" y2="20"/></svg></span> Protocolo de Verificação em 4 Camadas</h2>
+      <div class="security-features">
+        <div class="sf-item">
+          <div class="sf-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="8" cy="12" r="2"/><line x1="14" y1="10" x2="20" y2="10"/><line x1="14" y1="14" x2="18" y2="14"/></svg></span></div>
+          <div>
+            <h3>Camada 1 — KYC do Vendedor</h3>
+            <p>Verificação de CPF/CNPJ, comprovante de endereço, selfie com documento ao vivo e consulta a listas de sanções internacionais (OFAC, ONU, PEP). Aprovação manual por analista WeKz antes da primeira venda.</p>
+          </div>
+        </div>
+        <div class="sf-item">
+          <div class="sf-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></span></div>
+          <div>
+            <h3>Camada 2 — Documentação de Produto</h3>
+            <p>Para categorias de risco (eletrônicos, cosméticos importados, joias, medicamentos OTC, relógios de luxo): o vendedor deve enviar nota fiscal de aquisição, código de barras/série do fabricante e, quando aplicável, laudo de importação ou licença ANVISA/INMETRO.</p>
+          </div>
+        </div>
+        <div class="sf-item">
+          <div class="sf-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="6" height="6"/><path d="M2 12h2m16 0h2m-9-9v2m0 16v2M5.64 5.64l1.41 1.41m9.9 9.9 1.41 1.41M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/></svg></span></div>
+          <div>
+            <h3>Camada 3 — Verificação Contínua por IA</h3>
+            <p>Nosso modelo de linguagem analisa as fotos dos anúncios em busca de inconsistências visuais (logotipos alterados, embalagens genéricas, marcas d'água de revendedores não autorizados). Produtos suspeitos são automaticamente colocados em revisão antes de aparecer para compradores.</p>
+          </div>
+        </div>
+        <div class="sf-item">
+          <div class="sf-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span></div>
+          <div>
+            <h3>Camada 4 — Histórico de Conformidade</h3>
+            <p>O selo permanece ativo apenas enquanto o vendedor mantiver: taxa de disputas por "produto diferente" abaixo de 1%, avaliação média ≥ 4.0★ e emissão de NF-e em 100% das vendas. Qualquer violação aciona revisão automática e pode suspender o selo imediatamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORIAS DE RISCO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Categorias e Nível de Verificação</h2>
+      <div style="overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border);">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:var(--card2);border-bottom:1px solid var(--border);">
+              <th style="padding:12px 16px;text-align:left;font-family:'DM Sans',sans-serif;color:var(--text);">Categoria</th>
+              <th style="padding:12px 16px;text-align:left;font-family:'DM Sans',sans-serif;color:var(--text);">Nível de Verificação</th>
+              <th style="padding:12px 16px;text-align:left;font-family:'DM Sans',sans-serif;color:var(--text);">Documentos Exigidos</th>
+              <th style="padding:12px 16px;text-align:left;font-family:'DM Sans',sans-serif;color:var(--text);">Prazo Revisão</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:10px 16px;color:var(--muted);">Eletrônicos (acima de R$800)</td>
+              <td style="padding:10px 16px;"><span style="color:#EF4444;font-weight:700;">● Alto</span></td>
+              <td style="padding:10px 16px;color:var(--muted);">NF-e + nº série + laudo técnico (importados)</td>
+              <td style="padding:10px 16px;color:var(--muted);">Até 48h</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:10px 16px;color:var(--muted);">Cosméticos & Perfumaria Importada</td>
+              <td style="padding:10px 16px;"><span style="color:#EF4444;font-weight:700;">● Alto</span></td>
+              <td style="padding:10px 16px;color:var(--muted);">NF-e + registro ANVISA ou DI + fotos embalagem</td>
+              <td style="padding:10px 16px;color:var(--muted);">Até 72h</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:10px 16px;color:var(--muted);">Joias, Relógios & Luxo</td>
+              <td style="padding:10px 16px;"><span style="color:#EF4444;font-weight:700;">● Alto</span></td>
+              <td style="padding:10px 16px;color:var(--muted);">NF-e + certificado de autenticidade do fabricante</td>
+              <td style="padding:10px 16px;color:var(--muted);">Até 48h</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:10px 16px;color:var(--muted);">Moda & Calçados (marcas premium)</td>
+              <td style="padding:10px 16px;"><span style="color:#F59E0B;font-weight:700;">● Médio</span></td>
+              <td style="padding:10px 16px;color:var(--muted);">NF-e + fotos de etiquetas internas</td>
+              <td style="padding:10px 16px;color:var(--muted);">Até 24h</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:10px 16px;color:var(--muted);">Casa & Decoração</td>
+              <td style="padding:10px 16px;"><span style="color:#22C55E;font-weight:700;">● Padrão</span></td>
+              <td style="padding:10px 16px;color:var(--muted);">NF-e obrigatória</td>
+              <td style="padding:10px 16px;color:var(--muted);">Até 12h</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 16px;color:var(--muted);">Demais categorias</td>
+              <td style="padding:10px 16px;"><span style="color:#22C55E;font-weight:700;">● Padrão</span></td>
+              <td style="padding:10px 16px;color:var(--muted);">NF-e obrigatória + KYC vendedor</td>
+              <td style="padding:10px 16px;color:var(--muted);">Até 12h</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEUS DIREITOS -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 6l9-3 9 3"/><path d="M3 6c0 4 3 6 6 6s6-2 6-6"/><path d="M9 18c0 2 1.5 3 3 3s3-1 3-3c0-2-3-6-3-6s-3 4-3 6z"/></svg></span> Seus Direitos se o Produto For Falso</h2>
+      <div class="alert-list">
+        <div class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p><strong>Reembolso integral imediato.</strong> Se você receber um produto comprovadamente falsificado (diferente do anunciado, réplica ou contrafeito), a WeKz reembolsa 100% do valor pago — incluindo frete — em até 24h após confirmação do problema.</p></div>
+        <div class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p><strong>Você não precisa devolver réplicas de alto risco.</strong> Para produtos que representem risco de saúde ou segurança (cosméticos falsificados, eletrônicos sem certificação), a WeKz pode autorizar descarte seguro e ainda assim processar o reembolso.</p></div>
+        <div class="alert-item green"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></span><p><strong>O vendedor é banido imediatamente.</strong> Qualquer lojista comprovadamente responsável por vender produtos falsificados é banido da plataforma, tem o saldo retido por 90 dias e os dados encaminhados ao Ministério Público, conforme Lei 9.279/1996 (crimes contra propriedade industrial).</p></div>
+        <div class="alert-item yellow"><span><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span></span><p><strong>Como acionar a proteção:</strong> Vá em Meus Pedidos → selecione o pedido → "Abrir Disputa" → escolha "Produto falsificado ou diferente do anunciado". Fotografe o produto e envie. Nossa equipe responde em até 2h em dias úteis.</p></div>
+      </div>
+    </div>
+
+    <!-- COMO VERIFICAR O SELO -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Como Verificar o Selo em uma Ficha de Produto</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--grad1);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#fff;margin:0 auto 10px;">1</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--text);">Faixa "Vendedor Verificado"</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Logo abaixo do nome do vendedor, procure a barra verde com <strong style="color:#22C55E;display:inline-flex;align-items:center;gap:3px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span> Verificado WeKz</strong>. Ela indica que o KYC foi aprovado.</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--grad1);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#fff;margin:0 auto 10px;">2</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--text);display:inline-flex;align-items:center;gap:4px;">Selo <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span> na Foto Principal</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Produtos de alto valor com documentação completa exibem o ícone <span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span> sobreposto à imagem principal do produto.</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--grad1);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#fff;margin:0 auto 10px;">3</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--text);">Seção "Proteção WeKz"</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Na lateral direita da ficha, a seção de proteção lista explicitamente se o produto tem <em style="color:var(--teal);font-style:normal;">"Garantia de Autenticidade WeKz"</em> ativa.</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--grad1);display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#fff;margin:0 auto 10px;">4</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--text);">Histórico da Loja</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Clique no nome do vendedor para ver o perfil: data de ingresso, total de vendas, avaliação média e se o status do selo está ativo ou suspenso.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA DUPLO -->
+    <div class="inner-section" style="text-align:center;padding:32px 0 8px;">
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="showPage('pg-antifraude')" style="background:var(--grad1);border:none;color:#fff;padding:13px 28px;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg></span> Ver Política Anti-Fraude</button>
+        <button onclick="window.location.href='wkz-buyer.html#pg-comprar'" style="background:transparent;border:1px solid rgba(0,180,171,0.4);color:var(--teal);padding:13px 28px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='rgba(0,180,171,0.4)'"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Guia do Comprador</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:18px;">Dúvidas sobre o Selo WeKz? Fale conosco: <strong style="color:var(--text);">autenticidade@wekzshop.com</strong></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE: TERMOS PARA VENDEDORES (JUR-V01) ═══════════════════════ -->
+
+<div id="page-pg-wcag" class="page">
+  <div class="inner-page-hero wcag-hero">
+    <div class="inner-page-hero-inner">
+      <div class="inner-breadcrumb"><span onclick="window.location.href='wkz-buyer.html'">Home</span> › <span onclick="showPage('pg-wekz')">WeKz</span> › Acessibilidade</div>
+      <h1 class="inner-page-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="4" r="2"/><path d="M9 9h4l2 8H7"/><path d="M7 17a5 5 0 0010 0"/></svg></span> Declaração de <span>Acessibilidade</span></h1>
+      <p class="inner-page-sub">WeKz Shop — Conformidade WCAG 2.1 · Versão 1.0 · 15 de junho de 2026 (A11Y-01)</p>
+    </div>
+  </div>
+  <div class="inner-page-body">
+
+    <!-- Conformidade geral -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span> Nível de Conformidade</h2>
+      <div class="wcag-conformance-badge" role="img" aria-label="Conformidade parcial WCAG 2.1 nível AA">
+        <div class="wcag-conformance-badge-level">AA</div>
+        <div class="wcag-conformance-badge-text">
+          <strong style="color:var(--text);">Conformidade Parcial — WCAG 2.1 Nível AA</strong><br>
+          <span style="color:var(--muted);">Web Content Accessibility Guidelines 2.1 (W3C Recommendation 05 Jun 2018)</span>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">
+        A WeKz Shop comprometeu-se em tornar sua plataforma acessível em conformidade com os critérios WCAG 2.1 nível AA e com a <strong style="color:var(--text);">Lei Brasileira de Inclusão (Lei 13.146/2015 — LBI)</strong>, art. 63, que determina obrigatoriedade de acessibilidade em sítios e portais eletrônicos.
+        Esta declaração foi elaborada com base em autoavaliação realizada em junho de 2026.
+        Itens marcados como <em style="display:inline-flex;align-items:center;gap:3px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></span> Parcial</em> ou <em style="display:inline-flex;align-items:center;gap:3px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="11" x2="20" y2="11"/><line x1="9" y1="7" x2="20" y2="7"/><line x1="9" y1="15" x2="20" y2="15"/><polyline points="5,7 6,8 8,6"/><polyline points="5,11 6,12 8,10"/></svg></span> Pendente</em> constam em nosso roadmap de melhoria contínua.
+      </p>
+
+      <div class="wcag-principles-grid">
+        <div class="wcag-principle">
+          <div class="wcag-principle-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span></div>
+          <div class="wcag-principle-title">Perceptível</div>
+          <ul class="wcag-checklist" aria-label="Critérios Perceptível">
+            <li>Alternativas textuais para todos os ícones decorativos (aria-hidden)</li>
+            <li>Ícone Kz com aria-label descritivo (role="img")</li>
+            <li class="partial">Contraste de texto ≥ 4.5:1 — auditoria em andamento em seções secundárias</li>
+            <li class="partial">Legendas em vídeos (KZ Live) — parcial, pendente integração de closed captions</li>
+            <li>Conteúdo redimensionável até 200% sem perda de funcionalidade</li>
+            <li class="pending">Declaração formal de linguagem de sinais (LIBRAS) — pendente</li>
+          </ul>
+        </div>
+        <div class="wcag-principle">
+          <div class="wcag-principle-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg></span></div>
+          <div class="wcag-principle-title">Operável</div>
+          <ul class="wcag-checklist" aria-label="Critérios Operável">
+            <li>Skip-link "Ir para o conteúdo principal" implementado (tecla Tab, 1ª interação)</li>
+            <li>focus-visible ativo em todos os controles interativos (outline teal 2px)</li>
+            <li>Navegação completa por teclado (Tab / Shift+Tab / Enter / Espaço)</li>
+            <li>prefers-reduced-motion respeitado — animações desativadas quando preferência detectada</li>
+            <li class="partial">Tempo de sessão — aviso antes de expirar em desenvolvimento</li>
+            <li>Nenhum conteúdo pisca mais de 3× por segundo</li>
+          </ul>
+        </div>
+        <div class="wcag-principle">
+          <div class="wcag-principle-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 2A2.5 2.5 0 017 4.5c0 .28.05.55.13.8C5.87 5.8 5 7.05 5 8.5A3.5 3.5 0 008.5 12h7a3.5 3.5 0 003.5-3.5c0-1.45-.87-2.7-2.13-3.2.08-.25.13-.52.13-.8A2.5 2.5 0 0014.5 2c-.86 0-1.62.44-2.06 1.1A2.48 2.48 0 0011.5 3c-.37 0-.72.08-1.03.22A2.49 2.49 0 009.5 2z"/><path d="M8.5 12v8m7-8v8M6 20h12"/></svg></span></div>
+          <div class="wcag-principle-title">Compreensível</div>
+          <ul class="wcag-checklist" aria-label="Critérios Compreensível">
+            <li>Idioma da página declarado: lang="pt-BR"</li>
+            <li>Labels associados a todos os campos de formulário (label for / aria-label)</li>
+            <li>Mensagens de erro descritivas e sugestões de correção</li>
+            <li class="partial">Consistência de navegação — revisão de padrões mobile em andamento</li>
+            <li>Confirmação antes de ações irreversíveis (exclusão de conta, cancelamento de pedido)</li>
+          </ul>
+        </div>
+        <div class="wcag-principle">
+          <div class="wcag-principle-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span></div>
+          <div class="wcag-principle-title">Robusto</div>
+          <ul class="wcag-checklist" aria-label="Critérios Robusto">
+            <li>HTML semântico: nav, main, footer, section, article com roles ARIA</li>
+            <li>role="dialog" + aria-modal="true" em todos os modais</li>
+            <li>aria-live="polite" em atualizações dinâmicas (notificações, rastreamento)</li>
+            <li>Testado com NVDA (Windows) e VoiceOver (macOS/iOS)</li>
+            <li class="partial">Testado com TalkBack (Android) — cobertura parcial</li>
+            <li class="pending">Auditoria formal por entidade externa — prevista para Q3 2026</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tecnologias assistivas suportadas -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span> Tecnologias Assistivas Testadas</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px;">
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;font-size:12px;text-align:center;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></span></div>
+          <div style="font-weight:700;margin-bottom:4px;">NVDA + Chrome</div>
+          <div style="color:var(--muted);">Windows — suporte principal</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;font-size:12px;text-align:center;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span></div>
+          <div style="font-weight:700;margin-bottom:4px;">VoiceOver + Safari</div>
+          <div style="color:var(--muted);">macOS / iOS</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;font-size:12px;text-align:center;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18V9a6 6 0 0112 0v9"/><path d="M6 12H4a1 1 0 00-1 1v3a1 1 0 001 1h2m12 0h2a1 1 0 001-1v-3a1 1 0 00-1-1h-2"/><line x1="9" y1="21" x2="9" y2="18"/><line x1="15" y1="21" x2="15" y2="18"/></svg></span></div>
+          <div style="font-weight:700;margin-bottom:4px;">TalkBack + Chrome</div>
+          <div style="color:var(--muted);">Android — suporte parcial</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;font-size:12px;text-align:center;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg></span></div>
+          <div style="font-weight:700;margin-bottom:4px;">Navegação por teclado</div>
+          <div style="color:var(--muted);">Chrome, Firefox, Edge</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recursos de acessibilidade implementados -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span> Recursos Implementados na Plataforma</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:12px;">
+        <div style="background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.18);border-radius:12px;padding:16px;font-size:13px;">
+          <strong style="color:var(--text);display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg></span> Skip-link</strong>
+          <p style="color:var(--muted);margin-top:6px;line-height:1.6;">Link "Ir para conteúdo" aparece ao pressionar Tab na primeira vez. Permite usuários de leitores de tela e navegação por teclado pularem o menu de navegação.</p>
+        </div>
+        <div style="background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.18);border-radius:12px;padding:16px;font-size:13px;">
+          <strong style="color:var(--text);display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> Focus Visible</strong>
+          <p style="color:var(--muted);margin-top:6px;line-height:1.6;">Indicador de foco de teclado visível (outline teal, 2px) em todos os botões, links e controles. Removido apenas quando o mouse está em uso (focus:not(:focus-visible)).</p>
+        </div>
+        <div style="background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.18);border-radius:12px;padding:16px;font-size:13px;">
+          <strong style="color:var(--text);display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg></span> Reduced Motion</strong>
+          <p style="color:var(--muted);margin-top:6px;line-height:1.6;">A preferência do sistema prefers-reduced-motion é detectada automaticamente. Quando ativa, todas as animações e transições são reduzidas a 0.01ms.</p>
+        </div>
+        <div style="background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.18);border-radius:12px;padding:16px;font-size:13px;">
+          <strong style="color:var(--text);display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> ARIA Labels</strong>
+          <p style="color:var(--muted);margin-top:6px;line-height:1.6;">Todos os ícones decorativos têm aria-hidden="true". Ícones funcionais têm aria-label descritivo. Modais usam role="dialog" + aria-modal="true".</p>
+        </div>
+        <div style="background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.18);border-radius:12px;padding:16px;font-size:13px;">
+          <strong style="color:var(--text);display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a2 2 0 010 4m-4-4v-2l-8 4 8 4v-2M5 8H3a1 1 0 00-1 1v2a1 1 0 001 1h2"/></svg></span> Live Regions</strong>
+          <p style="color:var(--muted);margin-top:6px;line-height:1.6;">Atualizações dinâmicas (toasts, notificações, status de rastreamento) usam aria-live="polite" e aria-atomic="true" para anunciar ao leitor de tela sem interromper.</p>
+        </div>
+        <div style="background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.18);border-radius:12px;padding:16px;font-size:13px;">
+          <strong style="color:var(--text);display:inline-flex;align-items:center;gap:5px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span> Formulários Acessíveis</strong>
+          <p style="color:var(--muted);margin-top:6px;line-height:1.6;">Todos os campos de formulário têm labels associados. Campos de cartão de crédito têm aria-label explícito (número, validade, CVV, nome). Autocomplete configurado.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Limitações conhecidas -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="11" x2="20" y2="11"/><line x1="9" y1="7" x2="20" y2="7"/><line x1="9" y1="15" x2="20" y2="15"/><polyline points="5,7 6,8 8,6"/><polyline points="5,11 6,12 8,10"/></svg></span> Limitações Conhecidas e Roadmap</h2>
+      <div style="background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.22);border-radius:12px;padding:18px;font-size:13px;color:var(--muted);">
+        <p style="margin-bottom:12px;color:var(--text);">Os seguintes itens foram identificados e constam no roadmap de melhoria:</p>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">
+          <li style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;margin-top:2px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></span></span><span><strong style="color:var(--text);">Contraste em seções secundárias:</strong> Auditoria completa de todos os elementos de texto contra fundo em andamento. Algumas seções de conteúdo dinâmico podem apresentar contraste abaixo de 4.5:1 em determinadas configurações de tema. Previsão: Q3 2026.</span></li>
+          <li style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;margin-top:2px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></span></span><span><strong style="color:var(--text);">Closed Captions no KZ Live:</strong> O módulo de live shopping ainda não oferece legendas automáticas. Integração com API de transcrição em tempo real prevista para Q4 2026.</span></li>
+          <li style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;margin-top:2px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></span></span><span><strong style="color:var(--text);">TalkBack (Android):</strong> Cobertura de testes parcial. Fluxo de compra testado; fluxo de vendedor e seções de live shopping em revisão.</span></li>
+          <li style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;margin-top:2px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="11" x2="20" y2="11"/><line x1="9" y1="7" x2="20" y2="7"/><line x1="9" y1="15" x2="20" y2="15"/><polyline points="5,7 6,8 8,6"/><polyline points="5,11 6,12 8,10"/></svg></span></span><span><strong style="color:var(--text);">Auditoria externa WCAG:</strong> Avaliação formal por entidade certificada em acessibilidade digital prevista para Q3 2026. Esta declaração será atualizada com os resultados.</span></li>
+          <li style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;margin-top:2px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="11" x2="20" y2="11"/><line x1="9" y1="7" x2="20" y2="7"/><line x1="9" y1="15" x2="20" y2="15"/><polyline points="5,7 6,8 8,6"/><polyline points="5,11 6,12 8,10"/></svg></span></span><span><strong style="color:var(--text);">Interpretação em LIBRAS:</strong> Inclusão de vídeos em Língua Brasileira de Sinais para os principais fluxos (compra, rastreamento, disputas) prevista para 2026.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Contato para acessibilidade -->
+    <div class="inner-section">
+      <h2 class="inner-section-title"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span> Feedback e Contato</h2>
+      <div class="wcag-contact-box">
+        <p style="color:var(--muted);line-height:1.7;margin-bottom:14px;">
+          Se você encontrar alguma barreira de acessibilidade em nosso site ou tiver sugestões de melhoria, entre em contato. Comprometemo-nos a responder em até <strong style="color:var(--text);">5 dias úteis</strong>.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div style="display:flex;align-items:center;gap:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> <strong style="color:var(--text);">E-mail:</strong> <span style="color:var(--teal);">acessibilidade@wekzshop.com</span></div>
+          <div style="display:flex;align-items:center;gap:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.09 8.81 19.79 19.79 0 01.07 2.18 2 2 0 012.07.07h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></span> <strong style="color:var(--text);">Telefone (horário comercial):</strong> <span style="color:var(--muted);">(11) 0000-0000</span></div>
+          <div style="display:flex;align-items:center;gap:6px;"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span> <strong style="color:var(--text);">Chat:</strong> <span style="color:var(--teal);cursor:pointer;" onclick="window.location.href='wkz-buyer.html#help'">Central de Ajuda</span> → opção "Acessibilidade"</div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:14px;border-top:1px solid rgba(255,255,255,0.07);padding-top:10px;">
+          Esta declaração é periodicamente revisada. Última revisão: 15/06/2026. 
+          Referência normativa: <strong>WCAG 2.1</strong> (W3C), <strong>e-MAG 3.1</strong> (Governo Federal), <strong>LBI art. 63</strong> (Lei 13.146/2015).
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<!-- ═══════════════════════ DYNAMIC: CATEGORY TEMPLATE ═══════════════════════ -->
+
+  <script src="../core/wkz-bus.js"></script>
+  <script src="../core/wkz-core.js"></script>
+  <script>
+    /* Bootstrap deste módulo: lê o hash da URL (ex.: wkz-legal.html#pg-terms)
+       e navega direto pra página pedida; senão cai na primeira página
+       (Central de Ajuda). Sem isso, um link vindo de fora sempre abriria
+       na primeira #page-X do documento, ignorando o destino pretendido. */
+    document.addEventListener('DOMContentLoaded', function () {
+      var target = (window.location.hash || '').replace('#', '') || 'pg-suporte';
+      MapsTo(target);
+      if (window.WkzBus) window.WkzBus.emit('module:ready', { module: 'legal' });
+    });
+  </script>
+</body>
+</html>
