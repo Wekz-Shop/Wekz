@@ -21,7 +21,9 @@ jobs:
       # todos os mÃ³dulos core antes de publicar â€” espelha o workflow local
       # de "node --check obrigatÃ³rio apÃ³s cada mudanÃ§a".
       - run: npm run check
+      - run: npm run check:buyer
       - run: npm run test:m1
+      - run: npm run test:m2
 
   deploy:
     needs: validate
