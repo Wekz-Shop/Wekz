@@ -17,9 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      # Mesmo sem bundler (HTML/JS/CSS estáticos), validamos sintaxe de
-      # todos os módulos core antes de publicar — espelha o workflow local
-      # de "node --check obrigatório após cada mudança".
+      # Mesmo sem bundler (HTML/JS/CSS estÃ¡ticos), validamos sintaxe de
+      # todos os mÃ³dulos core antes de publicar â€” espelha o workflow local
+      # de "node --check obrigatÃ³rio apÃ³s cada mudanÃ§a".
       - run: npm run check
       - run: npm run check:buyer
       - run: npm run check:seller
