@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WeKz Shop — Teste Sprint M3 (Seller Hub)</title>
+<link rel="stylesheet" href="core/wkz-styles-base.css" />
+<style>
+  body{background:var(--darker,#080E1A);color:var(--text,#E2E8F0);font-family:sans-serif;padding:24px;max-width:640px;margin:0 auto}
+  h1{font-size:20px;margin-bottom:4px}
+  .sub{color:var(--muted,#94A3B8);font-size:13px;margin-bottom:20px}
+  .check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:14px;border:1px solid var(--border,#333)}
+  .pass{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3)}
+  .fail{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.3)}
+  .icon{flex-shrink:0}
+  .detail{color:var(--muted,#94A3B8);font-size:12px;margin-top:2px}
+  #summary{margin-top:20px;padding:14px;border-radius:8px;font-weight:700;text-align:center}
+  iframe{width:100%;height:0;border:0;position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+  <h1>Sprint M3 — Teste de Seller Hub</h1>
+  <div class="sub">Carrega wkz-seller.html num iframe oculto e verifica se o dashboard e as páginas institucionais do vendedor renderizam corretamente.</div>
+  <div id="results"></div>
+  <div id="summary"></div>
+
+  <iframe id="sellerFrame" src="seller/wkz-seller.html"></iframe>
+
+  <script>
+    var results = document.getElementById('results');
+    var pass = 0, fail = 0;
+
+    function check(label, fn) {
+      var ok = false, detail = '';
+      try { ok = !!fn(); } catch (e) { ok = false; detail = e.message; }
+      var div = document.createElement('div');
+      div.className = 'check ' + (ok ? 'pass' : 'fail');
+      div.innerHTML = '<span class="icon">' + (ok ? '✅' : '❌') + '</span>' +
+        '<div><div>' + label + '</div>' + (detail ? '<div class="detail">' + detail + '</div>' : '') + '</div>';
+      results.appendChild(div);
+      ok ? pass++ : fail++;
+    }
+
+    function finish() {
+      var summary = document.getElementById('summary');
+      summary.style.background = fail === 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
+      summary.textContent = fail === 0
+        ? '✅ ' + pass + '/' + (pass + fail) + ' testes passaram — Seller Hub renderiza OK'
+        : '⚠️ ' + fail + ' falha(s) de ' + (pass + fail) + ' testes — revisar antes do Sprint M4';
+    }
+
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var frame = document.getElementById('sellerFrame');
+        var doc, win;
+        try {
+          doc = frame.contentDocument;
+          win = frame.contentWindow;
+        } catch (e) {
+          check('Consegue acessar o documento do iframe', function () { return false; });
+          finish();
+          return;
+        }
+
+        check('As 8 páginas Seller existem no DOM', function () {
+          return doc.querySelectorAll('[id^="page-"]').length === 8;
+        });
+        check('#page-dashboard está ativo por padrão (bootstrap sem hash)', function () {
+          var d = doc.getElementById('page-dashboard');
+          return d && d.classList.contains('active');
+        });
+        check('WkzBus/WkzApp/MapsTo existem no escopo do Seller', function () {
+          return typeof win.WkzBus === 'object' && typeof win.WkzApp === 'object' && typeof win.MapsTo === 'function';
+        });
+        check('switchDashTab troca de painel corretamente', function () {
+          var el = doc.getElementById('sidebarDenuncias');
+          win.switchDashTab('denuncias', el);
+          var ok = doc.getElementById('dash-denuncias').style.display === 'block';
+          win.switchDashTab('overview', doc.querySelector('.sidebar-nav-item'));
+          return ok;
+        });
+        check('Aba "Denúncias" não quebra (painel vazio esperado — ver changelog)', function () {
+          var el = doc.getElementById('sidebarDenuncias');
+          win.switchDashTab('denuncias', el);
+          return true; // se chegou aqui sem exceção, passou
+        });
+        check('MapsTo troca de página corretamente (dashboard → pg-vender)', function () {
+          win.MapsTo('pg-vender');
+          var ok = doc.getElementById('page-pg-vender').classList.contains('active');
+          win.MapsTo('dashboard');
+          return ok;
+        });
+        check('page-auth-seller existe e reconecta com wkz-buyer.html', function () {
+          win.MapsTo('auth-seller');
+          var p = doc.getElementById('page-auth-seller');
+          var ok = p && p.classList.contains('active');
+          win.MapsTo('dashboard');
+          return ok;
+        });
+        check('Nenhuma página Buyer/Admin/Legal vazou pro Seller', function () {
+          var vazadas = ['page-home','page-product','page-admin-dashboard','page-pg-terms'];
+          return vazadas.every(function(id){ return !doc.getElementById(id); });
+        });
+        check('validateCNPJ/sellerNextStep/sellerGoBack existem', function () {
+          return typeof win.validateCNPJ === 'function' && typeof win.sellerNextStep === 'function' && typeof win.sellerGoBack === 'function';
+        });
+
+        finish();
+      }, 600);
+    });
+  </script>
+</body>
+</html>

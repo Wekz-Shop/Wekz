@@ -11,7 +11,9 @@
     "check:combined": "cat core/wkz-bus.js core/wkz-core.js > /tmp/wkz-combined-check.js && node --check /tmp/wkz-combined-check.js",
     "test:m1": "node tools/harness-node.js",
     "test:m2": "node buyer/harness-buyer-test.js",
-    "check:buyer": "node --check buyer/wkz-buyer.js"
+    "check:buyer": "node --check buyer/wkz-buyer.js",
+    "test:m3": "node seller/harness-seller-test.js",
+    "check:seller": "node --check seller/wkz-seller.js"
   },
   "repository": {
     "type": "git",
