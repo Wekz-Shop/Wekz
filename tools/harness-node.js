@@ -33,6 +33,7 @@ class FakeElement {
   get innerHTML() { return this._html || ''; }
   focus() {}
   click() {}
+  insertAdjacentHTML(pos, html) { /* no-op no mock — suficiente pra não travar */ }
 }
 
 const fakeDocument = {
