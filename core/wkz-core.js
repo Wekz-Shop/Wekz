@@ -1156,6 +1156,61 @@ const products = [
  * @param {number} off - Percentual de desconto (ex: 34 para 34%)
  * @returns {number}   - Preço de venda exato com 2 casas decimais
  */
+// ─── CURRENCY (compartilhado — usado por core, buyer e seller) ───
+let currentCurrency='BRL';
+const rates={BRL:1,USD:0.185,EUR:0.172,GBP:0.147,JPY:27.9,ARS:185,MXN:3.18,CNY:1.34};
+const symbols={BRL:'R$',USD:'$',EUR:'€',GBP:'£',JPY:'¥',ARS:'$',MXN:'$',CNY:'¥'};
+
+/* ── CORREÇÃO 1: formatPrice NaN-safe ─────────────────────────────────
+   Aceita number OU string (ex: "R$ 1.299,99", "$ 299.00", "1299")
+   Remove símbolo, separadores de milhar e converte vírgula→ponto antes
+   de operar. Retorna "0.00" se o parse falhar ou a taxa não existir.
+   ──────────────────────────────────────────────────────────────────── */
+function formatPrice(input) {
+  // 1. Normaliza para número
+  let brl;
+  if (typeof input === 'number') {
+    brl = input;
+  } else {
+    // Remove qualquer símbolo de moeda, espaços, e separadores de milhar
+    const clean = String(input)
+      .replace(/[R$€£¥\s]/g, '')   // símbolos e espaços
+      .replace(/\./g, '')           // pontos de milhar (pt-BR: 1.299,99)
+      .replace(',', '.');           // vírgula decimal → ponto
+    brl = parseFloat(clean);
+  }
+
+  // 2. Fallback: valor inválido ou taxa ausente → "0.00"
+  const rate = rates[currentCurrency];
+  if (isNaN(brl) || brl === null || !rate) {
+    return `${symbols[currentCurrency] || ''} 0.00`;
+  }
+
+  // 3. Converte
+  const converted = brl * rate;
+
+  // 4. Formata conforme moeda
+  try {
+    if (currentCurrency === 'JPY') {
+      // Yen não tem centavos
+      return `${symbols[currentCurrency]} ${Math.round(converted).toLocaleString()}`;
+    }
+    if (currentCurrency === 'BRL') {
+      return `R$ ${converted.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `${symbols[currentCurrency]} ${converted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  } catch(e) {
+    return `${symbols[currentCurrency]} ${converted.toFixed(2)}`;
+  }
+}
+
+/**
+ * Calcula o preço de venda exato a partir do preço original e do percentual
+ * de desconto, sem nenhum arredondamento intermediário.
+ * @param {number} op  - Preço original (De:)
+ * @param {number} off - Percentual de desconto (ex: 34 para 34%)
+ * @returns {number}   - Preço de venda exato com 2 casas decimais
+ */
 function wkzExactPrice(op, off) {
   if (!op || op <= 0 || !off || off <= 0 || off >= 100) return op || 0;
   // Usa arredondamento bancário (half-even) na 2ª casa decimal para evitar
