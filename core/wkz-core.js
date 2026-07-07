@@ -305,8 +305,16 @@ var WkzApp = (function() {
     }
 
     // 4. Protege window._wkzNavHooks contra reassignment (push() via Proxy interno continua OK)
+    /* FIX: passar "value" explicitamente (lendo o valor atual antes) em vez
+       de omitir e confiar no comportamento implícito de "preservar valor
+       existente". A omissão funciona em qualquer engine JS real (browser),
+       mas o ambiente de teste headless (Node vm.runInContext, usado nos
+       harnesses de CI) tem uma discrepância nesse caso específico e reseta
+       o valor pra undefined — sendo explícito remove a ambiguidade nos
+       dois ambientes, sem mudar o comportamento em produção. */
     try {
       Object.defineProperty(global, '_wkzNavHooks', {
+        value: global._wkzNavHooks,
         writable: false,
         configurable: false
       });
@@ -6793,4 +6801,52 @@ function formatLogTime(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' às ' +
          d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+}
+
+/* ── FIX (achado via test-m3.html real em navegador): formatPrice movida
+   pro core (compartilhada) ──────────────────────────────────────────────
+   wkz-seller.js chama formatPrice() em 12+ lugares (lista de produtos,
+   preview do PDP, calculadora de margem, modal de marketing) SEM guard —
+   só existia em wkz-buyer.js, geraria ReferenceError real em qualquer uma
+   dessas telas do Seller. Movida com suas 3 dependências diretas
+   (currentCurrency/rates/symbols). Cópia idêntica mantida em
+   wkz-buyer.js (mesmo padrão já usado com FAQ_THEMES_DATA/FRAUD_REPORTS).
+   No Seller, currentCurrency nunca muda de 'BRL' (o seletor de moeda do
+   topbar foi redirecionado pro Buyer no Sprint M3), então os preços
+   sempre aparecem em Real — comportamento correto para o painel do
+   vendedor. Origem monólito: bloco de preços/i18n do Buyer (M2). */
+let currentCurrency='BRL';
+const rates={BRL:1,USD:0.185,EUR:0.172,GBP:0.147,JPY:27.9,ARS:185,MXN:3.18,CNY:1.34};
+const symbols={BRL:'R$',USD:'$',EUR:'€',GBP:'£',JPY:'¥',ARS:'$',MXN:'$',CNY:'¥'};
+
+function formatPrice(input) {
+  let brl;
+  if (typeof input === 'number') {
+    brl = input;
+  } else {
+    const clean = String(input)
+      .replace(/[R$€£¥\s]/g, '')
+      .replace(/\./g, '')
+      .replace(',', '.');
+    brl = parseFloat(clean);
+  }
+
+  const rate = rates[currentCurrency];
+  if (isNaN(brl) || brl === null || !rate) {
+    return `${symbols[currentCurrency] || ''} 0.00`;
+  }
+
+  const converted = brl * rate;
+
+  try {
+    if (currentCurrency === 'JPY') {
+      return `${symbols[currentCurrency]} ${Math.round(converted).toLocaleString()}`;
+    }
+    if (currentCurrency === 'BRL') {
+      return `R$ ${converted.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `${symbols[currentCurrency]} ${converted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  } catch(e) {
+    return `${symbols[currentCurrency]} ${converted.toFixed(2)}`;
+  }
 }
