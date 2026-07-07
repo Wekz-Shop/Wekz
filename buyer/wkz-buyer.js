@@ -1003,7 +1003,58 @@ function renderReviews(){
   }
 }
 
-// ─── CURRENCY: formatPrice/currentCurrency/rates/symbols agora em core/wkz-core.js (compartilhado) ───
+// ─── CURRENCY ───
+/* FIX (achado via test-m3.html real): currentCurrency/rates/symbols
+   MOVIDOS pro core — removidos daqui porque são let/const (diferente de
+   formatLogTime, que é function declaration e pode duplicar com
+   segurança). Duas declarações const/let com o mesmo nome no MESMO
+   documento (core carrega antes de buyer, sempre juntos) é SyntaxError,
+   não um "override" silencioso. formatPrice() continua definida aqui
+   também (function declaration — redeclaração é segura, só sobrescreve),
+   mas agora lê o MESMO currentCurrency/rates/symbols do core. */
+
+/* ── CORREÇÃO 1: formatPrice NaN-safe ─────────────────────────────────
+   Aceita number OU string (ex: "R$ 1.299,99", "$ 299.00", "1299")
+   Remove símbolo, separadores de milhar e converte vírgula→ponto antes
+   de operar. Retorna "0.00" se o parse falhar ou a taxa não existir.
+   ──────────────────────────────────────────────────────────────────── */
+function formatPrice(input) {
+  // 1. Normaliza para número
+  let brl;
+  if (typeof input === 'number') {
+    brl = input;
+  } else {
+    // Remove qualquer símbolo de moeda, espaços, e separadores de milhar
+    const clean = String(input)
+      .replace(/[R$€£¥\s]/g, '')   // símbolos e espaços
+      .replace(/\./g, '')           // pontos de milhar (pt-BR: 1.299,99)
+      .replace(',', '.');           // vírgula decimal → ponto
+    brl = parseFloat(clean);
+  }
+
+  // 2. Fallback: valor inválido ou taxa ausente → "0.00"
+  const rate = rates[currentCurrency];
+  if (isNaN(brl) || brl === null || !rate) {
+    return `${symbols[currentCurrency] || ''} 0.00`;
+  }
+
+  // 3. Converte
+  const converted = brl * rate;
+
+  // 4. Formata conforme moeda
+  try {
+    if (currentCurrency === 'JPY') {
+      // Yen não tem centavos
+      return `${symbols[currentCurrency]} ${Math.round(converted).toLocaleString()}`;
+    }
+    if (currentCurrency === 'BRL') {
+      return `R$ ${converted.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `${symbols[currentCurrency]} ${converted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  } catch(e) {
+    return `${symbols[currentCurrency]} ${converted.toFixed(2)}`;
+  }
+}
 
 /* updateCurrency definitivo está declarado no bloco i18n abaixo (após TRANSLATIONS).
    Versão inline removida para evitar conflito de hoisting. */
@@ -7321,13 +7372,21 @@ window._kzcGetList = window._kzcGetList || function() { return []; };
    Substitui o padrão de múltiplos showPage wraps que criava loops de escopo.
    Cada módulo chama window.registerNavHook(fn) em vez de sobrescrever showPage.
    MapsTo itera o array de forma segura com try/catch por hook. ── */
+/* FIX (achado via test-m3.html real): window._wkzNavHooks já existe
+   (Proxy do WkzBus, congelado por wkzFreezeApp() após o boot) por volta
+   da hora em que este código roda. O guard "window._wkzNavHooks || []"
+   ainda EXECUTA a atribuição mesmo quando o valor não muda — e atribuir
+   a uma propriedade congelada lança TypeError independente do valor.
+   Corrigido para só atribuir se realmente não existir. */
 (function bootstrapNavRegistry() {
-  window._wkzNavHooks = window._wkzNavHooks || [];
-  window.registerNavHook = window.registerNavHook || function(fn) {
-    if (typeof fn === 'function' && window._wkzNavHooks.indexOf(fn) === -1) {
-      window._wkzNavHooks.push(fn);
-    }
-  };
+  if (!window._wkzNavHooks) window._wkzNavHooks = [];
+  if (!window.registerNavHook) {
+    window.registerNavHook = function(fn) {
+      if (typeof fn === 'function' && window._wkzNavHooks.indexOf(fn) === -1) {
+        window._wkzNavHooks.push(fn);
+      }
+    };
+  }
 })();
 
 // ══════════════════════════════════════════════════════
@@ -9735,394 +9794,12 @@ function renderHelp(){
     </div>`).join('');
 }
 
-function toggleFaq(i){
-  const ans = document.getElementById('faq-ans-'+i);
-  const icon = document.getElementById('faq-icon-'+i);
-  const open = ans.style.display==='block';
-  ans.style.display = open?'none':'block';
-  icon.textContent = open?'▼':'▲';
-}
+/* FIX (auditoria pré-push): toggleFaq/FAQ_THEMES_DATA/showFaqTheme/searchFaqs
+   REMOVIDOS daqui — duplicavam declaração `const FAQ_THEMES_DATA` já
+   presente em wkz-core.js (SyntaxError real: const não pode ser
+   redeclarado entre <script> tags, diferente de function). Agora vêm
+   só do core, carregado antes deste arquivo. */
 
-/* ════════════════════════════════════════════════════════════
-   WeKz Shop v1.9.0 — MAINTENANCE PATCH
-   Funções em falta, correcções de bugs e melhorias de UX
-   ════════════════════════════════════════════════════════════ */
-
-/* ══════════════════════════════════════════════════════════════════════
-   _wkzConfirm v2.2.0 — Modal de Confirmação Customizado WeKz
-   Substitui window.confirm() nativo por Promise-based modal com o
-   visual do design system da plataforma.
-   API: window._wkzConfirm(msg, opts?) → Promise<boolean>
-   opts: { title, icon, confirmLabel, cancelLabel, variant }
-   variant: 'danger' | 'warning' | 'info' (default: 'info')
-   ══════════════════════════════════════════════════════════════════════ */
-(function() {
-  /* ── CSS do modal — injectado uma única vez ── */
-  var _cssId = 'wkz-confirm-modal-style';
-  if (!document.getElementById(_cssId)) {
-    var s = document.createElement('style');
-    s.id = _cssId;
-    s.textContent = `
-/* ── WeKz Confirm Modal ── */
-@keyframes wkzConfirmIn {
-  0%   { opacity:0; transform:scale(0.88) translateY(18px); }
-  60%  { opacity:1; transform:scale(1.02) translateY(-3px); }
-  100% { opacity:1; transform:scale(1)    translateY(0); }
-}
-@keyframes wkzConfirmOut {
-  0%   { opacity:1; transform:scale(1)    translateY(0); }
-  100% { opacity:0; transform:scale(0.9)  translateY(10px); }
-}
-@keyframes wkzConfirmOverlayIn  { from { opacity:0; } to { opacity:1; } }
-@keyframes wkzConfirmOverlayOut { from { opacity:1; } to { opacity:0; } }
-
-#wkzConfirmOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(8,14,26,0.72);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  animation: wkzConfirmOverlayIn 0.22s ease forwards;
-}
-#wkzConfirmOverlay.closing {
-  animation: wkzConfirmOverlayOut 0.22s ease forwards;
-}
-#wkzConfirmBox {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  background: #151E2E;
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.07),
-    0 24px 64px rgba(0,0,0,0.6),
-    0 0 40px rgba(0,180,171,0.08);
-  animation: wkzConfirmIn 0.38s cubic-bezier(0.34,1.4,0.64,1) forwards;
-}
-#wkzConfirmBox.closing {
-  animation: wkzConfirmOut 0.22s ease forwards;
-}
-/* Linha de cor no topo — muda por variant */
-#wkzConfirmBox::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-#wkzConfirmBox.variant-danger::before  { background: linear-gradient(90deg,#EF4444,#7C3AED); }
-#wkzConfirmBox.variant-warning::before { background: linear-gradient(90deg,#F59E0B,#EF4444); }
-#wkzConfirmBox.variant-info::before    { background: linear-gradient(90deg,#00B4AB,#7C3AED); }
-/* Brilho sutil no topo */
-#wkzConfirmBox::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(0,180,171,0.04) 0%, transparent 60%);
-  pointer-events: none;
-  border-radius: 22px;
-}
-.wkz-confirm-inner {
-  padding: 28px 26px 22px;
-  position: relative;
-  z-index: 1;
-}
-.wkz-confirm-icon-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  margin: 0 auto 18px;
-  font-size: 26px;
-  flex-shrink: 0;
-}
-.variant-danger  .wkz-confirm-icon-wrap { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.25); }
-.variant-warning .wkz-confirm-icon-wrap { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); }
-.variant-info    .wkz-confirm-icon-wrap { background: rgba(0,180,171,0.1);   border: 1px solid rgba(0,180,171,0.25); }
-.wkz-confirm-title {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 17px;
-  font-weight: 800;
-  color: #E2E8F0;
-  text-align: center;
-  margin-bottom: 10px;
-  line-height: 1.3;
-}
-.wkz-confirm-msg {
-  font-size: 13px;
-  color: #94A3B8;
-  text-align: center;
-  line-height: 1.65;
-  margin-bottom: 24px;
-}
-.wkz-confirm-msg strong { color: #E2E8F0; font-weight: 600; }
-.wkz-confirm-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.wkz-confirm-btn {
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
-  border: none;
-  letter-spacing: 0.3px;
-  outline: none;
-}
-.wkz-confirm-btn:focus-visible { outline: 2px solid rgba(0,180,171,0.6); outline-offset: 2px; }
-.wkz-confirm-btn-cancel {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #94A3B8;
-}
-.wkz-confirm-btn-cancel:hover {
-  background: rgba(255,255,255,0.09);
-  color: #E2E8F0;
-  border-color: rgba(255,255,255,0.18);
-}
-/* Confirm button — muda por variant */
-.variant-danger  .wkz-confirm-btn-ok { background: linear-gradient(135deg,#EF4444,#DC2626); color:#fff; }
-.variant-warning .wkz-confirm-btn-ok { background: linear-gradient(135deg,#F59E0B,#D97706); color:#0F172A; }
-.variant-info    .wkz-confirm-btn-ok { background: linear-gradient(135deg,#00B4AB,#7C3AED); color:#fff; }
-.wkz-confirm-btn-ok:hover { transform: translateY(-1px); filter: brightness(1.1); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-.wkz-confirm-btn-ok:active { transform: translateY(0); }
-/* Mascote Kz mini no rodapé do modal */
-.wkz-confirm-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 26px 18px;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  font-size: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: rgba(148,163,184,0.4);
-}
-.wkz-confirm-footer svg { opacity: 0.35; }
-@media (max-width: 420px) {
-  .wkz-confirm-actions { grid-template-columns: 1fr; }
-  .wkz-confirm-btn-ok  { order: -1; }
-}
-    `;
-    document.head.appendChild(s);
-  }
-
-  /* ── Mapa de defaults por variante ── */
-  var VARIANT_DEFAULTS = {
-    danger:  { icon: '🚪', title: 'Confirmar ação' },
-    warning: { icon: '⚠️', title: 'Atenção' },
-    info:    { icon: 'ℹ️', title: 'Confirmar' },
-  };
-
-  /* ── Fecha com animação e resolve a Promise ── */
-  function _closeConfirm(overlay, box, resolve, result) {
-    overlay.classList.add('closing');
-    box.classList.add('closing');
-    setTimeout(function() {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      document.body.style.overflow = _prevOverflow || '';
-      resolve(result);
-    }, 220);
-  }
-
-  var _prevOverflow = '';
-
-  /* ── Função pública — retorna Promise<boolean> ── */
-  window._wkzConfirm = function(msg, opts) {
-    opts = opts || {};
-    var variant  = opts.variant || 'info';
-    var defaults = VARIANT_DEFAULTS[variant] || VARIANT_DEFAULTS.info;
-    var icon     = opts.icon         || defaults.icon;
-    var title    = opts.title        || defaults.title;
-    var okLabel  = opts.confirmLabel || 'Confirmar';
-    var noLabel  = opts.cancelLabel  || 'Cancelar';
-
-    return new Promise(function(resolve) {
-      /* Remove modal anterior se houver (edge case) */
-      var prev = document.getElementById('wkzConfirmOverlay');
-      if (prev) prev.parentNode && prev.parentNode.removeChild(prev);
-
-      /* Salva overflow e bloqueia scroll */
-      _prevOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-
-      var overlay = document.createElement('div');
-      overlay.id = 'wkzConfirmOverlay';
-
-      overlay.innerHTML =
-        '<div id="wkzConfirmBox" class="variant-' + variant + '">' +
-          '<div class="wkz-confirm-inner">' +
-            '<div class="wkz-confirm-icon-wrap">' + icon + '</div>' +
-            '<div class="wkz-confirm-title">' + title + '</div>' +
-            '<div class="wkz-confirm-msg">' + msg + '</div>' +
-            '<div class="wkz-confirm-actions">' +
-              '<button class="wkz-confirm-btn wkz-confirm-btn-cancel" id="wkzConfirmNo">' + noLabel + '</button>' +
-              '<button class="wkz-confirm-btn wkz-confirm-btn-ok"     id="wkzConfirmOk">' + okLabel + '</button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="wkz-confirm-footer">' +
-            '<svg width="14" height="14" viewBox="0 0 40 40" fill="none">' +
-              '<ellipse cx="20" cy="26" rx="13" ry="10" fill="#0F172A" stroke="rgba(0,180,171,0.5)" stroke-width="1.5"/>' +
-              '<ellipse cx="20" cy="21" rx="11" ry="13" fill="#1A2540"/>' +
-              '<polygon points="13,10 17,2 20,7 23,2 27,10" fill="#00B4AB" opacity="0.9"/>' +
-              '<ellipse cx="16" cy="18" rx="2.5" ry="3" fill="#06B6D4"/>' +
-              '<ellipse cx="24" cy="18" rx="2.5" ry="3" fill="#7C3AED"/>' +
-            '</svg>' +
-            'WeKz Shop · Ação segura' +
-          '</div>' +
-        '</div>';
-
-      document.body.appendChild(overlay);
-
-      var box = document.getElementById('wkzConfirmBox');
-
-      /* Botão OK */
-      document.getElementById('wkzConfirmOk').addEventListener('click', function() {
-        _closeConfirm(overlay, box, resolve, true);
-      });
-
-      /* Botão Cancelar */
-      document.getElementById('wkzConfirmNo').addEventListener('click', function() {
-        _closeConfirm(overlay, box, resolve, false);
-      });
-
-      /* Clique no overlay fecha com false */
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) _closeConfirm(overlay, box, resolve, false);
-      });
-
-      /* Teclado: Enter confirma, Escape cancela */
-      function _keyHandler(e) {
-        if (e.key === 'Enter')  { document.removeEventListener('keydown', _keyHandler); _closeConfirm(overlay, box, resolve, true); }
-        if (e.key === 'Escape') { document.removeEventListener('keydown', _keyHandler); _closeConfirm(overlay, box, resolve, false); }
-      }
-      document.addEventListener('keydown', _keyHandler);
-
-      /* Foca o botão OK por acessibilidade */
-      setTimeout(function() {
-        var okBtn = document.getElementById('wkzConfirmOk');
-        if (okBtn) okBtn.focus();
-      }, 80);
-    });
-  };
-})();
-
-/* ── otpNext: navegação automática entre caixas OTP ── */
-window.otpNext = function(input, index) {
-  const boxes = document.querySelectorAll('#otpBoxes .otp-box');
-  if (!boxes.length) return;
-  /* Aceita apenas dígitos */
-  input.value = input.value.replace(/[^0-9]/g, '');
-  if (input.value.length === 1 && index < boxes.length - 1) {
-    boxes[index + 1].focus();
-  }
-  /* Ao completar todos os 6 dígitos — verificar automaticamente */
-  const code = Array.from(boxes).map(b => b.value).join('');
-  if (code.length === boxes.length && boxes.length > 0) {
-    /* Verificação simulada */
-    const allFilled = Array.from(boxes).every(b => b.value.length === 1);
-    if (allFilled) {
-      setTimeout(() => {
-        if (typeof showToast === 'function') showToast('✅ Código verificado com sucesso!');
-        /* Avançar para próximo passo do registo se aplicável */
-        const nextBtn = document.getElementById('regNext4');
-        if (nextBtn) nextBtn.click();
-      }, 280);
-    }
-  }
-};
-
-/* ── Suporte a backspace no OTP: volta ao campo anterior ── */
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Backspace') {
-    const boxes = document.querySelectorAll('#otpBoxes .otp-box');
-    boxes.forEach((box, idx) => {
-      if (document.activeElement === box && box.value === '' && idx > 0) {
-        boxes[idx - 1].focus();
-      }
-    });
-  }
-});
-
-/* ── trackOrder: rastreamento de pedido pelo input ── */
-window.trackOrder = function() {
-  const input = document.getElementById('trackInput');
-  if (!input) return;
-  const code = input.value.trim().toUpperCase();
-  const result = document.getElementById('trackResult');
-  if (!result) return;
-
-  if (!code) {
-    if (typeof showToast === 'function') showToast('⚠️ Insira o número do pedido ou código de rastreamento.');
-    return;
-  }
-
-  /* Procura nos dados mock */
-  const order = DB && DB.trackingOrders && (DB.trackingOrders[code] || Object.values(DB.trackingOrders).find(o => o.product && o.product.toUpperCase().includes(code)));
-
-  result.style.display = 'block';
-
-  if (!order) {
-    result.innerHTML = `
-      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:20px;text-align:center;">
-        <div style="font-size:28px;margin-bottom:10px;">🔍</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#EF4444;margin-bottom:6px;">Pedido não encontrado</div>
-        <div style="font-size:13px;color:var(--muted);">Verifique o código e tente novamente. Ex: <strong style="color:var(--text);">WKZ-8821</strong></div>
-      </div>`;
-    return;
-  }
-
-  const stepIcons = ['📋','📦','🚚','🔄','🛵','✅'];
-  const stepsHTML = order.steps.map((s, i) => `
-    <div style="display:flex;gap:12px;margin-bottom:${i < order.steps.length-1 ? '0' : '0'};">
-      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-        <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;
-          background:${s.done ? 'var(--teal)' : s.active ? 'rgba(0,180,171,0.15)' : 'var(--card2)'};
-          border:2px solid ${s.done || s.active ? 'var(--teal)' : 'var(--border)'};
-          box-shadow:${s.active ? '0 0 16px rgba(0,180,171,0.4)' : 'none'};">
-          ${s.done ? '✓' : stepIcons[i] || '•'}
-        </div>
-        ${i < order.steps.length-1 ? `<div style="width:2px;flex:1;min-height:20px;margin:3px 0;background:${s.done ? 'var(--teal)' : 'var(--border)'};"></div>` : ''}
-      </div>
-      <div style="padding-bottom:${i < order.steps.length-1 ? '16px' : '0'};min-width:0;">
-        <div style="font-size:13px;font-weight:700;color:${s.active ? 'var(--teal)' : s.done ? 'var(--text)' : 'var(--muted)'};">${s.title}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${s.desc}</div>
-        ${s.date && s.date !== '—' ? `<div style="font-size:10px;color:var(--muted);opacity:0.7;margin-top:2px;">${s.date}</div>` : ''}
-      </div>
-    </div>`).join('');
-
-  result.innerHTML = `
-    <!-- FIX JUR-02: banner de modo demonstração — dados fictícios, CDC art. 37 -->
-    <div style="display:flex;align-items:center;gap:8px;background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#FCD34D;">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span>⚙️ <strong>Dados de demonstração</strong> — rastreamento fictício para fins de teste. Integração com transportadoras reais disponível após o lançamento.</span>
-    </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad1);"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-        <div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;">${order.product}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Vendido por <strong style="color:var(--text);">${order.store}</strong></div>
-        </div>
-        <span style="background:rgba(0,180,171,0.12);border:1px solid rgba(0,180,171,0.3);color:var(--teal);padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;">${order.status}</span>
-      </div>
-      <div>${stepsHTML}</div>
-    </div>`;
-};
 
 /* Auto-init FAQ: activar tema 'pedidos' quando a página help é carregada */
 (function() {
@@ -11004,3 +10681,1354 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof wkzInjectMobileBell === 'function') wkzInjectMobileBell();
   }, 300);
 });
+
+/* ════════════════════════════════════════════════════════════════════════
+   BLOCOS ADICIONAIS — encontrados na auditoria final pré-push (após M2)
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Footer accordion (mobile) — origem 19303–19321 ── */
+(function(){
+  function syncFooterAccordion(){
+    var cols = document.querySelectorAll('.footer-nav-col details');
+    if(window.innerWidth >= 769){
+      cols.forEach(function(d){ d.setAttribute('open',''); });
+    } else {
+      // On mobile: only "Comprar" stays open by default; others close
+      // (only reset if we're coming from desktop)
+      if(document.body.dataset.footerDesktop === '1'){
+        cols.forEach(function(d,i){ if(i!==0) d.removeAttribute('open'); });
+      }
+      document.body.dataset.footerDesktop = '0';
+      return;
+    }
+    document.body.dataset.footerDesktop = '1';
+  }
+  syncFooterAccordion();
+  window.addEventListener('resize', syncFooterAccordion);
+})();
+
+/* ── Validação de formulário (email/telefone/CEP) + auto-adapt + botão
+   voltar da flash sale — origem 34422–34684 ── */
+(function(){
+
+/* ========= TOAST MELHORADO ========= */
+function enhancedToast(message, type='error'){
+  let toast = document.getElementById('toast-enhanced');
+
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'toast-enhanced';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+
+  toast.className = 'toast ' + (type === 'success' ? 'toast-success' : 'toast-error');
+  toast.innerHTML = '<span class="toast-icon">'+(type === 'success' ? '✅' : '⚠️')+'</span><span>'+message+'</span>';
+
+  toast.style.display = 'flex';
+
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 3500);
+}
+
+/* ========= DETECÇÃO AUTOMÁTICA DE PAÍS ========= */
+function detectCountry(){
+  const lang = navigator.language || 'pt-BR';
+
+  const countryMap = {
+    'pt-BR': {country:'Brasil', flag:'🇧🇷', ddi:'+55', cep:'00000-000'},
+    'en-US': {country:'Estados Unidos', flag:'🇺🇸', ddi:'+1', cep:'10001'},
+    'es-ES': {country:'Espanha', flag:'🇪🇸', ddi:'+34', cep:'28001'},
+    'fr-FR': {country:'França', flag:'🇫🇷', ddi:'+33', cep:'75001'},
+    'de-DE': {country:'Alemanha', flag:'🇩🇪', ddi:'+49', cep:'10115'}
+  };
+
+  return countryMap[lang] || countryMap['pt-BR'];
+}
+
+function autoAdaptForms(){
+  const locale = detectCountry();
+
+  document.querySelectorAll('.phone-ddi').forEach(el => {
+    el.textContent = locale.ddi;
+  });
+
+  document.querySelectorAll('.phone-flag, .flag').forEach(el => {
+    el.textContent = locale.flag;
+  });
+
+  document.querySelectorAll('.cep-input').forEach(el => {
+    el.placeholder = locale.cep;
+  });
+
+  document.querySelectorAll('select[name="country"], .country-select').forEach(el => {
+    for(let i=0;i<el.options.length;i++){
+      if(el.options[i].text.includes(locale.country)){
+        el.selectedIndex = i;
+        break;
+      }
+    }
+  });
+}
+
+/* ========= VALIDAÇÕES ========= */
+function setFieldError(input, message){
+  input.classList.add('input-error');
+
+  let old = input.parentElement.querySelector('.field-error-msg');
+  if(old) old.remove();
+
+  const msg = document.createElement('span');
+  msg.className = 'field-error-msg';
+  msg.textContent = message;
+
+  input.parentElement.appendChild(msg);
+
+  enhancedToast(message, 'error');
+}
+
+function clearFieldError(input){
+  input.classList.remove('input-error');
+
+  const msg = input.parentElement.querySelector('.field-error-msg');
+  if(msg) msg.remove();
+}
+
+function validateEmail(value){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+/* [FIX v2.9.13] validateEmail é usado fora desta IIFE — por doLogin() e
+   pelo formulário de cadastro — mas estava preso neste escopo local,
+   causando "ReferenceError: validateEmail is not defined" (não tratado)
+   sempre que o e-mail informado continha "@". Expor globalmente corrige
+   o fluxo de login/cadastro sem alterar o comportamento interno. */
+window.validateEmail = validateEmail;
+
+function validatePhone(value){
+  return value.replace(/\D/g,'').length >= 10;
+}
+
+function validateCEP(value){
+  return value.replace(/\D/g,'').length >= 5;
+}
+
+function initValidation(){
+  const inputs = document.querySelectorAll('input, textarea, select');
+
+  inputs.forEach(input => {
+
+    input.addEventListener('blur', () => {
+      const val = input.value.trim();
+      const type = input.type;
+
+      clearFieldError(input);
+
+      if(input.required && !val){
+        setFieldError(input, 'Este campo é obrigatório.');
+        return;
+      }
+
+      if(type === 'email' && val && !validateEmail(val)){
+        setFieldError(input, 'E-mail inválido. Corrija imediatamente.');
+        return;
+      }
+
+      if((input.name || '').toLowerCase().includes('phone') && val && !validatePhone(val)){
+        setFieldError(input, 'Telefone inválido.');
+        return;
+      }
+
+      if(
+        input.classList.contains('cep-input') &&
+        val &&
+        !validateCEP(val)
+      ){
+        setFieldError(input, 'CEP/Código postal inválido.');
+        return;
+      }
+
+      if(type === 'password' && val.length > 0 && val.length < 8){
+        setFieldError(input, 'A senha deve possuir no mínimo 8 caracteres.');
+      }
+    });
+
+    input.addEventListener('input', () => {
+      if(input.classList.contains('input-error')){
+        clearFieldError(input);
+      }
+    });
+  });
+}
+
+/* ========= CEP COM SINCRONIA ========= */
+async function lookupCEP(cep){
+  const cleaned = cep.replace(/\D/g,'');
+
+  if(cleaned.length === 8){
+    const res = await fetch('https://viacep.com.br/ws/' + cleaned + '/json/');
+    return await res.json();
+  }
+
+  if(cleaned.length >= 5){
+    const res = await fetch('https://api.zippopotam.us/us/' + cleaned);
+    if(res.ok){
+      return await res.json();
+    }
+  }
+
+  return null;
+}
+
+function initCEP(){
+  document.querySelectorAll('.cep-input').forEach(input => {
+
+    input.addEventListener('blur', async () => {
+      const val = input.value.trim();
+
+      if(!validateCEP(val)) return;
+
+      try{
+        enhancedToast('Sincronizando CEP...', 'success');
+
+        const data = await lookupCEP(val);
+
+        if(!data){
+          enhancedToast('CEP não localizado.', 'error');
+          return;
+        }
+
+        const form = input.closest('form') || document;
+
+        const cityInput =
+          form.querySelector('input[name="city"]') ||
+          form.querySelector('input[placeholder*="Cidade"]');
+
+        const stateInput =
+          form.querySelector('input[name="state"]') ||
+          form.querySelector('input[placeholder*="Estado"]');
+
+        if(data.localidade && cityInput){
+          cityInput.value = data.localidade;
+        }
+
+        if(data.uf && stateInput){
+          stateInput.value = data.uf;
+        }
+
+        if(data.places && data.places[0]){
+          if(cityInput) cityInput.value = data.places[0]['place name'] || '';
+          if(stateInput) stateInput.value = data.places[0]['state abbreviation'] || '';
+        }
+
+        enhancedToast('CEP sincronizado com sucesso.', 'success');
+
+      } catch(e){
+        enhancedToast('Falha ao sincronizar CEP.', 'error');
+      }
+    });
+  });
+}
+
+/* ========= PREVENÇÃO DE SUBMISSÃO INVÁLIDA ========= */
+function secureForms(){
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', e => {
+
+      const invalid = form.querySelectorAll('.input-error');
+
+      if(invalid.length > 0){
+        e.preventDefault();
+        enhancedToast('Existem dados incorretos no formulário.', 'error');
+      }
+    });
+  });
+}
+
+function createFlashBackButton(){
+  if(document.getElementById('flashBackBtn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'flashBackBtn';
+  btn.className = 'flash-back-btn';
+  btn.innerHTML = '← Voltar';
+  btn.style.display = 'none';
+  btn.addEventListener('click', () => showPage('home'));
+  document.body.appendChild(btn);
+
+  // Show button only when Flash Sale page is active
+  const observer = new MutationObserver(() => {
+    const flashPage = document.getElementById('page-pg-flash');
+    btn.style.display = (flashPage && flashPage.classList.contains('active')) ? 'block' : 'none';
+  });
+  observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  createFlashBackButton();
+  autoAdaptForms();
+  initValidation();
+  initCEP();
+  secureForms();
+});
+
+})();
+
+/* ── "Ver todos" no grid de produtos — origem 34689–34710 ── */
+/* ═══════════════════════════════════════════════════════════
+   WEKZ COMMERCE — script unificado v1.0.8
+   • addToCart usa cartItemsData (array canônico do script principal)
+   • updateCartUI atualiza AMBOS os badges (desktop + mobile) + anima
+   • Sem duplicação de funções / arrays paralelos
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── "Ver todos" ── */
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.see-all').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var section = btn.closest('.section');
+      if (!section) return;
+      section.querySelectorAll('.product-card').forEach(function(card, i) {
+        if (i >= 8) card.style.display = 'block';
+      });
+      btn.textContent = 'Todos exibidos ✓';
+      var title = section.querySelector('.section-title');
+      if (title) title.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+});
+
+/* ── WEKZ BOOST — overlay de cupom/ofertas, KZ Wisdom banner, sons ───────
+   origem 36064–36534 ── */
+/* ═══════════════════════════════════════════
+   WEKZ BOOST JS — Overlay + Cupom + Ofertas
+   ═══════════════════════════════════════════ */
+
+const WEKZ_COUPONS = {
+  'WEKZ10' : { disc: 10, type:'%', label:'10% de desconto em toda a loja!' },
+  'WEKZ20' : { disc: 20, type:'%', label:'20% de desconto exclusivo!' },
+  'BOOST20': { disc: 20, type:'%', label:'Boost ativado! 20% OFF na sua compra.' },
+  'FRETE0' : { disc: 0,  type:'frete', label:'Frete grátis aplicado ao carrinho!' },
+  'FLASH50': { disc: 50, type:'%', label:'Oferta relâmpago! 50% de desconto.' },
+  'NOVO15' : { disc: 15, type:'%', label:'Bem-vindo! 15% OFF na 1ª compra.' },
+};
+
+let _boostOpen = false;
+
+function toggleWekzBoost(){
+  _boostOpen ? closeWekzBoost() : openWekzBoost();
+}
+
+function openWekzBoost(){
+  _boostOpen = true;
+  const overlay = document.getElementById('wekzBoostOverlay');
+  const btn     = document.getElementById('bnavBoostBtn');
+  const icon    = document.getElementById('bnavBoostIcon');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  btn.classList.add('boost-open');
+  /* Animate logo on button click */
+  icon.classList.remove('wkz-logo-animating');
+  void icon.offsetWidth; /* reflow to restart animation */
+  icon.classList.add('wkz-logo-animating');
+  icon.addEventListener('animationend', () => icon.classList.remove('wkz-logo-animating'), { once: true });
+  /* Re-trigger welcome logo pop animation */
+  const wLogo = document.getElementById('wkzBoostLogoImg');
+  if(wLogo){ wLogo.style.animation='none'; void wLogo.offsetWidth; wLogo.style.animation=''; }
+  document.body.style.overflow = 'hidden';
+  renderBoostOffers();
+  // Mostra cupons de vendedores se existirem
+  const selBlock = document.getElementById('wkzSellerCouponsBlock');
+  if(selBlock) selBlock.style.display = Object.keys(SELLER_COUPONS).length ? '' : 'none';
+}
+
+function closeWekzBoost(){
+  _boostOpen = false;
+  const overlay = document.getElementById('wekzBoostOverlay');
+  const btn     = document.getElementById('bnavBoostBtn');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  btn.classList.remove('boost-open');
+  document.body.style.overflow = '';
+}
+
+function wekzBoostOverlayClick(e){
+  if(e.target === document.getElementById('wekzBoostOverlay')) closeWekzBoost();
+}
+
+function fillCoupon(code){
+  const inp = document.getElementById('wkzCouponInput');
+  if(inp){ inp.value = code; inp.focus(); }
+  hideCouponFeedback();
+}
+
+function hideCouponFeedback(){
+  const fb = document.getElementById('wkzCouponFeedback');
+  if(fb) fb.style.display = 'none';
+}
+
+function applyWekzCoupon(){
+  const inp   = document.getElementById('wkzCouponInput');
+  const fb    = document.getElementById('wkzCouponFeedback');
+  const btn   = document.getElementById('wkzCouponBtnTxt');
+  if(!inp || !fb) return;
+
+  const code  = inp.value.trim().toUpperCase();
+  if(!code){ showFeedback('⚠️ Digite um código de cupom.','err'); return; }
+
+  /* Loading state */
+  if(btn) btn.textContent = '...';
+  setTimeout(()=>{
+    if(btn) btn.textContent = 'Aplicar';
+
+    // Já aplicado?
+    if(window._activeCoupon && window._activeCoupon.code === code){
+      showFeedback('ℹ️ Cupom '+code+' já está activo no carrinho.','ok'); return;
+    }
+    // Já usado nesta sessão?
+    window._usedCoupons = window._usedCoupons || {};
+    if(window._usedCoupons[code]){
+      showFeedback('❌ Cupom '+code+' já foi utilizado nesta sessão.','err'); return;
+    }
+
+    const coupon = WEKZ_COUPONS[code] || SELLER_COUPONS[code];
+    if(coupon){
+      if(coupon.validade && new Date(coupon.validade) < new Date()){
+        showFeedback('❌ Cupom expirado.','err'); return;
+      }
+      if(coupon.usos > 0 && (coupon._used||0) >= coupon.usos){
+        showFeedback('❌ Cupom esgotado.','err'); return;
+      }
+      // [v2.9.30] Bloqueia cupons de %/valor fixo quando todo o carrinho já tem
+      // desconto anunciado — mesma regra de applyCartCoupon()/applyCartCouponV2().
+      if(coupon.type !== 'frete' && _wkzCouponEligibleSubtotal() <= 0){
+        showFeedback(_wkzCouponBlockedMsg(),'err'); return;
+      }
+      coupon._used = (coupon._used||0) + 1;
+      window._usedCoupons[code] = true;
+      window._activeCoupon = { code, ...coupon };
+      showFeedback('✅ ' + coupon.label, 'ok');
+      inp.value = '';
+      if(typeof showToast === 'function') showToast('🏷️ Cupom ' + code + ' aplicado!');
+      if(typeof updateCartUI === 'function') updateCartUI();
+    } else {
+      showFeedback('❌ Cupom inválido ou expirado. Tente: WEKZ10, FRETE0', 'err');
+    }
+  }, 600);
+
+  function showFeedback(msg, type){
+    fb.textContent  = msg;
+    fb.className    = 'wkz-coupon-feedback ' + type;
+    fb.style.display = 'block';
+    if(type === 'ok') setTimeout(hideCouponFeedback, 4000);
+  }
+}
+
+function applyCartCoupon(){
+  const inp = document.getElementById('cartCouponField');
+  if(!inp) return;
+  const code = inp.value.trim().toUpperCase();
+  if(!code){ showToast('⚠️ Digite um código de cupom.'); return; }
+
+  // Impede reaplicar o mesmo cupom
+  if(window._activeCoupon && window._activeCoupon.code === code){
+    showToast('ℹ️ Cupom '+code+' já está aplicado.'); return;
+  }
+
+  // Verifica se cupom já foi usado nesta sessão
+  window._usedCoupons = window._usedCoupons || {};
+  if(window._usedCoupons[code]){
+    showToast('❌ Cupom '+code+' já utilizado nesta sessão.'); return;
+  }
+
+  const coupon = (typeof WEKZ_COUPONS!=='undefined' && WEKZ_COUPONS[code])
+              || (typeof SELLER_COUPONS!=='undefined' && SELLER_COUPONS[code]);
+
+  if(!coupon){ showToast('❌ Cupom inválido ou expirado.'); return; }
+
+  // Validade
+  if(coupon.validade && new Date(coupon.validade) < new Date()){
+    showToast('❌ Cupom expirado em '+ new Date(coupon.validade).toLocaleDateString('pt-BR')+'.'); return;
+  }
+
+  // Usos globais esgotados
+  if(coupon.usos > 0 && (coupon._used||0) >= coupon.usos){
+    showToast('❌ Cupom esgotado. Todos os usos foram utilizados.'); return;
+  }
+
+  // [v2.9.30] Bloqueia cupons de %/valor fixo quando todo o carrinho já tem
+  // desconto anunciado (produto em promoção, Flash Sale ou Live Shopping).
+  // Frete grátis continua válido, pois não conflita com o desconto do preço.
+  if(coupon.type !== 'frete' && _wkzCouponEligibleSubtotal() <= 0){
+    showToast(_wkzCouponBlockedMsg()); return;
+  }
+
+  // Calcula subtotal aplicável para validação de mínimo
+  const selectedNormal = cartItemsData.filter(c=>c._selected!==false && !c._isFlash);
+  const selectedAll    = cartItemsData.filter(c=>c._selected!==false);
+  const applicableSub  = coupon.type==='frete'
+    ? selectedAll.reduce((s,c)=>s+c.rawPrice*c.qty,0)
+    : selectedNormal.reduce((s,c)=>s+c.rawPrice*c.qty,0);
+
+  if(coupon.minimo > 0 && applicableSub < coupon.minimo){
+    const fmtV = v=>'R$ '+v.toFixed(2).replace('.',',');
+    showToast('⚠️ Mínimo de '+fmtV(coupon.minimo)+' para este cupom. Você tem '+fmtV(applicableSub)+'.'); return;
+  }
+
+  // Registra uso
+  coupon._used = (coupon._used||0) + 1;
+  window._usedCoupons[code] = true;
+
+  // Ativa cupom
+  window._activeCoupon = { code, ...coupon };
+  inp.value = '';
+
+  const fmtV = v=>'R$ '+v.toFixed(2).replace('.',',');
+  let msg = '';
+  if(coupon.type==='%')       msg = '🏷️ Cupom '+code+' — '+coupon.disc+'% OFF aplicado!';
+  else if(coupon.type==='fixed') msg = '🏷️ Cupom '+code+' — −'+fmtV(coupon.disc)+' aplicado!';
+  else if(coupon.type==='frete') msg = '🚚 Frete Grátis activado pelo cupom '+code+'!';
+  showToast(msg || '🏷️ Cupom '+code+' aplicado!');
+
+  if(typeof updateCartUI==='function') updateCartUI();
+}
+
+function removeCoupon(){
+  // Limpar _usedCoupons para permitir reaplicação
+  if(window._activeCoupon && window._activeCoupon.code){
+    if(window._usedCoupons) delete window._usedCoupons[window._activeCoupon.code];
+  }
+  window._activeCoupon = null;
+  showToast('🗑️ Cupom removido.');
+  if(typeof updateCartUI==='function') updateCartUI();
+}
+
+function renderBoostOffers(){
+  const g = document.getElementById('wkzBoostOffersGrid');
+  if(!g) return;
+
+  /* Pull up to 5 items: first 3 from flashItems, last 2 from products */
+  const offerSrc = [
+    ...(typeof flashItems !== 'undefined' ? flashItems.slice(0,3).map((f, fi)=>({
+      e: f.e, n: f.n,
+      price: f.p,
+      old:   f.o,
+      off:   f.off + '%',
+      src:   'flash',
+      flashIdx: fi  // FIX: índice real no array flashItems
+    })) : []),
+    ...(typeof products !== 'undefined' ? products.slice(0,2).map(p=>({
+      e: p.e, n: p.n,
+      price: 'R$ ' + p.p.toLocaleString('pt-BR',{minimumFractionDigits:2}),
+      old:   'R$ ' + (p.op||p.p).toLocaleString('pt-BR',{minimumFractionDigits:2}),
+      off:   p.off + '%',
+      src:   'product',
+      idx:   products.indexOf(p)
+    })) : [])
+  ];
+
+  g.innerHTML = offerSrc.map((o,i) => `
+    <div class="wkz-offer-card" onclick="${o.src==='flash'?'closeWekzBoost();setTimeout(()=>showPage(\'pg-flash\'),200)':'closeWekzBoost();setTimeout(()=>openProduct('+o.idx+'),200)'}">
+      <div class="wkz-offer-emoji">${o.e}</div>
+      <div class="wkz-offer-info">
+        <div class="wkz-offer-name">${o.n}</div>
+        <div class="wkz-offer-price-row">
+          <span class="wkz-offer-price">${o.price}</span>
+          <span class="wkz-offer-old">${o.old}</span>
+          <span class="wkz-offer-off">-${o.off}</span>
+        </div>
+      </div>
+      <button class="wkz-offer-add" onclick="event.stopPropagation();${
+        o.src==='flash'
+          // FIX: usar o.flashIdx (índice real em flashItems) em vez de i (índice no array combinado)
+          ? 'if(typeof addFlashToCart===\'function\')btnFeedback(this,()=>addFlashToCart('+o.flashIdx+'))'
+          : 'if(typeof addToCart===\'function\')btnFeedback(this,()=>addToCart('+o.idx+'))'
+      }" title="Adicionar ao carrinho">+</button>
+    </div>`).join('');
+}
+
+/* Close overlay on Escape */
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && _boostOpen) closeWekzBoost();
+});
+
+/* ══════════════════════════════════════════════════════
+   KZ — O LINCE CIBERNÉTICO  ·  Identidade & Inteligência
+   ══════════════════════════════════════════════════════ */
+
+/**
+ * getKzSVG(size)
+ * Retorna SVG inline estilizado de um lince com traços neon --teal/--purple.
+ */
+function getKzSVG(size = 52) {
+  /* v2.8.0 — SVG Sprite: usa <use href="#kz-mascot-full"> em vez de
+     inline completo. Elimina duplicação de defs/gradientes no DOM
+     e reduz drasticamente o tamanho da árvore DOM em cada instância.
+     O símbolo #kz-mascot-full está definido no sprite oculto no <head>. */
+  const s = size;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 100 100" fill="none"
+    xmlns="http://www.w3.org/2000/svg" class="kz-svg" role="img"
+    aria-label="Kz, o Lince Cibernético">
+    <use href="#kz-mascot-full"/>
+  </svg>`;
+}
+
+/**
+ * getKzWisdom(context)
+ * Retorna uma mensagem contextual do Kz baseada no comportamento do utilizador.
+ * context: 'empty_cart' | 'boost' | 'dashboard' | 'flash' | 'items_in_cart'
+ */
+const KZ_WISDOM = {
+  empty_cart: [
+    'O teu carrinho está vazio... Os meus sensores detetaram <strong>ofertas incríveis</strong> na Home. Vamos lá?',
+    'Nada no carrinho? Os meus olhos de lince viram produtos incríveis <strong>com até 50% OFF</strong>. Explora!',
+    'Carrinho vazio detetado! Tenho coordenadas de <em>ofertas relâmpago</em> que não podes perder.',
+  ],
+  boost: [
+    'Olhos de lince! Encontrei <strong>3 cupões</strong> para ti hoje. Qual vais usar?',
+    'Os meus sensores detetaram descontos a piscar! Usa <strong>WEKZ10</strong> e poupa já.',
+    'Missão ativa: economizar o máximo! Já analisei as melhores <strong>ofertas do dia</strong> para ti.',
+    'Alerta de preço! O meu radar detetou uma queda de preço em <strong>5 produtos</strong> da tua lista.',
+    'Cupão <strong>FLASH50</strong> ainda está ativo. O meu sexto sentido diz que vai expirar em breve!',
+    'Sistema de caça a descontos: <em>ONLINE</em>. Pronto para te guiar às melhores ofertas! 🎯',
+  ],
+  dashboard: [
+    'Painel Inteligente: as tuas vendas cresceram <strong>+12%</strong> esta semana. Bom trabalho!',
+    'Os meus olhos de lince veem oportunidades! <em>Adiciona mais fotos</em> ao teu produto e converte +30%.',
+    'Alerta estratégico: o horário <strong>19h–22h</strong> tem o maior pico de compras. Ativa a Flash Sale!',
+    'Sensores ativos: tens <strong>3 pedidos</strong> aguardando envio. Despacha antes das 18h para bónus de rating!',
+    'Dica do Kz: vendedores com <em>resposta em < 5 min</em> vendem 2× mais. O teu chat está pronto?',
+  ],
+  flash: [
+    'Flash Sale ativa! Os meus sensores detectaram <strong>preços históricos</strong>. Age rápido — o contador corre!',
+    'Oferta relâmpago detetada! Só restam poucos minutos. <em>Adiciona ao carrinho já!</em>',
+  ],
+  items_in_cart: [
+    'Excelente escolha! Os meus olhos de lince aprovam. Usa o cupão <strong>WEKZ10</strong> antes de finalizar!',
+    'Carrinho ativo! Sensor de melhor preço: encontrei frete <strong>GRÁTIS</strong> para o teu CEP. Verifica!',
+    'Ótimo! Mais <em>R$ {x}</em> e ganhas frete grátis. O meu radar já encontrou produtos complementares!',
+  ],
+};
+
+function getKzWisdom(context) {
+  const list = KZ_WISDOM[context] || KZ_WISDOM.dashboard;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+/**
+ * Injeta ou atualiza o banner de sabedoria do Kz no Dashboard.
+ */
+function renderKzWisdomBanner() {
+  const main = document.querySelector('.dashboard-main');
+  if (!main) return;
+
+  const hasItems = window.cartItemsData && window.cartItemsData.length > 0;
+  const ctx = hasItems ? 'items_in_cart' : 'dashboard';
+  const msg = getKzWisdom(ctx);
+
+  /* ── Saudação por hora do dia ── */
+  const hour = new Date().getHours();
+  let greetWord, greetContext;
+  if (hour >= 5 && hour < 12) {
+    greetWord = 'Bom dia';
+    greetContext = 'Sensores detetaram novas ofertas de tecnologia esta manhã';
+  } else if (hour >= 12 && hour < 18) {
+    greetWord = 'Boa tarde';
+    greetContext = 'Radar ativo — Flash Sales no pico de conversão agora';
+  } else if (hour >= 18 && hour < 22) {
+    greetWord = 'Boa noite';
+    greetContext = 'Horário prime: 19h–22h tem o maior pico de compras';
+  } else {
+    greetWord = 'Olá, insone';
+    greetContext = 'Modo noturno ativo — ofertas exclusivas para quem não dorme';
+  }
+
+  let banner = document.getElementById('kzWisdomBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'kzWisdomBanner';
+    banner.className = 'kz-wisdom-banner';
+    main.insertBefore(banner, main.firstChild);
+  }
+
+  /* Re-trigger pop-in animation on refresh */
+  banner.style.animation = 'none';
+  banner.offsetHeight; /* reflow */
+  banner.style.animation = '';
+
+  banner.innerHTML = `
+    <div class="kz-wisdom-float-widget">
+      <div class="kz-wisdom-float-mascot">${getKzSVG(52)}</div>
+      <div class="kz-wisdom-float-label-chip">Kz · IA</div>
+    </div>
+    <div class="kz-wisdom-body">
+      <div class="kz-wisdom-label">✦ Lince Cibernético · Painel Inteligente</div>
+      <div class="kz-wisdom-greeting"><span>${greetWord}!</span> ${greetContext}.</div>
+      <div class="kz-wisdom-text">${msg}</div>
+    </div>
+    <button class="kz-wisdom-refresh" onclick="renderKzWisdomBanner()" title="Nova mensagem">↻ Novo</button>
+  `;
+
+  /* Trigger Kz sound on new message */
+  kzPlaySound('message');
+}
+
+/* ══════════════════════════════════════════════════════
+   KZ — SISTEMA DE SOM DIGITAL  (estrutura para futuros bips)
+   ══════════════════════════════════════════════════════
+   Para ativar sons reais no futuro:
+   1. Substitui kzAudioBuffers[name] por um AudioBuffer decodificado via
+      audioCtx.decodeAudioData(await fetch(url).then(r=>r.arrayBuffer()))
+   2. Os sons são tocados via kzPlaySound(name) — já está wired em todos os
+      pontos de trigger (mensagens, boost, carrinho vazio).
+   ══════════════════════════════════════════════════════ */
+const kzAudio = (function() {
+  let ctx = null;
+  function getCtx() {
+    if (!ctx) {
+      try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+    return ctx;
+  }
+  /* Gera um bip digital sintético (sem ficheiro externo necessário) */
+  function syntheticBip(freq = 880, duration = 0.08, type = 'sine', volume = 0.18) {
+    const c = getCtx();
+    if (!c) return;
+    try {
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain); gain.connect(c.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, c.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.7, c.currentTime + duration);
+      gain.gain.setValueAtTime(volume, c.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
+      osc.start(c.currentTime);
+      osc.stop(c.currentTime + duration + 0.02);
+    } catch(e) {}
+  }
+  return { syntheticBip, getCtx };
+})();
+
+/* Som map: cada evento tem um perfil sonoro próprio */
+const KZ_SOUNDS = {
+  message:    () => { kzAudio.syntheticBip(1047, 0.06, 'sine', 0.14); setTimeout(()=>kzAudio.syntheticBip(1319, 0.05, 'sine', 0.10), 70); },
+  boost_open: () => { kzAudio.syntheticBip(660, 0.07, 'triangle', 0.12); setTimeout(()=>kzAudio.syntheticBip(880, 0.06, 'sine', 0.09), 90); },
+  cart_empty: () => kzAudio.syntheticBip(523, 0.1, 'sine', 0.10),
+};
+
+/**
+ * kzPlaySound(name)
+ * Toca o som associado ao evento, se os sons estiverem ativos.
+ * Para silenciar globalmente: window.kzSoundEnabled = false;
+ */
+function kzPlaySound(name) {
+  if (window.kzSoundEnabled === false) return;
+  const fn = KZ_SOUNDS[name];
+  if (fn) {
+    try { fn(); } catch(e) {}
+  }
+}
+
+/**
+ * Injeta a bolha de diálogo do Kz no topo do WeKz Boost overlay.
+ * Chamado dentro de openWekzBoost() (sobrescrita abaixo).
+ */
+function injectKzBoostBubble() {
+  const panel = document.querySelector('.wkz-boost-sheet');
+  if (!panel) return;
+
+  let bubble = document.getElementById('kzBoostBubble');
+  if (!bubble) {
+    bubble = document.createElement('div');
+    bubble.id = 'kzBoostBubble';
+    // Insert before the header block (.wkz-boost-header)
+    const header = panel.querySelector('.wkz-boost-header');
+    if (header) panel.insertBefore(bubble, header);
+    else panel.insertBefore(bubble, panel.firstChild);
+  }
+
+  const msg = getKzWisdom('boost');
+  bubble.className = 'kz-boost-bubble';
+  bubble.innerHTML = `
+    <div class="kz-boost-bubble-icon">${getKzSVG(44)}</div>
+    <div class="kz-boost-bubble-text">
+      <div class="kz-boost-bubble-name">✦ Kz · Lince Cibernético</div>
+      <div class="kz-boost-bubble-msg">${msg}</div>
+    </div>
+  `;
+  kzPlaySound('boost_open');
+}
+
+/* Patch openWekzBoost to inject Kz bubble every time */
+(function patchOpenBoost() {
+  const _origOpen = openWekzBoost;
+  openWekzBoost = function() {
+    _origOpen();
+    setTimeout(injectKzBoostBubble, 60);
+  };
+})();
+
+/* ── Dashboard hook: renderKzWisdomBanner já registrado em MapsTo step 7 ──
+   FIX: wrapper removido — era redundante e contribuía para loop de re-wrap. */
+
+/* ── Animação do ícone do carrinho ao adicionar — origem 36538–36551 ── */
+// WeKz Icon System: animate cart icon on add
+(function() {
+  const _origAddToCart = window.addToCart;
+  if (typeof _origAddToCart === 'function') {
+    window.addToCart = function() {
+      _origAddToCart.apply(this, arguments);
+      // Animate SVG cart icons
+      document.querySelectorAll('.wkz-icon-cart').forEach(function(el) {
+        el.classList.add('cart-anim');
+        setTimeout(function() { el.classList.remove('cart-anim'); }, 600);
+      });
+    };
+  }
+})();
+
+/* ── Ícones SVG de categoria (patch de renderização) — origem 36554–36574 ── */
+// WeKz: patch category rendering to use SVG icons
+(function() {
+  // Override .cat-emoji innerHTML to use SVG
+  const origRender = document.createElement;
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (node.nodeType === 1) {
+          node.querySelectorAll('.cat-emoji').forEach(function(el) {
+            const txt = el.textContent.trim();
+            if (txt && WKZ_CAT_ICONS[txt]) {
+              el.innerHTML = wkzCatIconSVG(txt);
+              el.style.fontSize = '0';
+            }
+          });
+        }
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
+
+/* ── Mascote do footer — origem 46288–46303 ── */
+(function initFooterKzMascot() {
+  function inject() {
+    var el = document.getElementById('footer-kz-mascot');
+    if (el && typeof getKzSVG === 'function') {
+      el.innerHTML = getKzSVG(40);
+    } else if (el) {
+      // fallback delay se getKzSVG ainda não carregou
+      setTimeout(inject, 120);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inject);
+  } else {
+    inject();
+  }
+})();
+
+/* ── wkzToggleFiscalDetails + patch de ckoutNext — origem 46986–47058 ── */
+// Função global para toggle do breakdown fiscal
+window.wkzToggleFiscalDetails = function() {
+  var el = document.getElementById('ckoutFiscalBreakdown');
+  if (el) {
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// Hook: Quando checkout carrega totais, atualizar split
+// (Integração futura com ckoutNext() ou similar)
+window._wkzOrigCheckoutFinal = window.ckoutNext;
+window.ckoutNext = function(step) {
+  /* v2.9.21: passa categoria e flag crossBorder para o engine fiscal */
+  if (step === 3) {
+    var total = (typeof cartState !== 'undefined' && cartState.total) ? cartState.total : 0;
+    if (!total) {
+      /* tenta inferir do produto atual (express checkout) */
+      var pCurr = (typeof products !== 'undefined' && typeof currentPdpIndex !== 'undefined')
+                  ? products[currentPdpIndex] : null;
+      if (pCurr && pCurr.p) total = typeof pCurr.p === 'number' ? pCurr.p : 0;
+    }
+    if (total > 0) {
+      var pForCat = (typeof products !== 'undefined' && typeof currentPdpIndex !== 'undefined')
+                    ? products[currentPdpIndex] : null;
+      var cat          = pForCat ? (pForCat.cat || '') : '';
+      var isCrossBorder = pForCat ? !!pForCat.crossBorder : false;
+      var rcOpts        = pForCat && pForCat.crossBorder
+        ? { fxRate: (typeof window._kzFxRateUSD === 'number' ? window._kzFxRateUSD : 6.00) }
+        : {};
+      WkzFiscalSplit.updateCheckout(total, cat, isCrossBorder, rcOpts);
+    }
+  }
+  /* Chamar original */
+  if (typeof _wkzOrigCheckoutFinal === 'function') {
+    _wkzOrigCheckoutFinal(step);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// Integração com WkzApp.state
+if (typeof WkzApp !== 'undefined') {
+  WkzApp.state.fiscal = {
+    lastSplit: null,
+    nfeHistory: [],
+    commissionHistory: []
+  };
+
+  WkzApp.recordSplit = function(split) {
+    WkzApp.state.fiscal.lastSplit = split;
+    WkzApp.state.fiscal.nfeHistory.push({ 
+      nfe: split.nfe, 
+      timestamp: Date.now(),
+      valor: split.produto
+    });
+    if (WkzApp.state.fiscal.nfeHistory.length > 100) {
+      WkzApp.state.fiscal.nfeHistory.shift();
+    }
+  };
+
+  WkzApp.getFiscalState = function() {
+    return WkzApp.state.fiscal;
+  };
+}
+
+wkzLog('[WkzShop v2.9.21] ✓ Fiscal/Split carregado (IBS/CBS por categoria + Módulo 11 + Remessa Conforme)');
+
+/* ═════════════════════════════════════════════════════════════════
+   MÓDULO: LGPD Direitos do Titular — Modais Funcionais (v2.9.21)
+   Art. 18 LGPD: acesso, correção, exclusão, portabilidade, DPO
+   ═════════════════════════════════════════════════════════════════ */
+
+/* ── Abertura / fechamento de modais ── */
+
+/* ── PDP Bottom Sheets controller — origem 48014–48129 ── */
+
+/* ═══════════════════════════════════════════════════════════════
+   PDP BOTTOM SHEETS — JS Controller — v2.9.20
+   openPdpSheet / closePdpSheet / closePdpSheetOnBg
+═══════════════════════════════════════════════════════════════ */
+(function() {
+  /* Track currently open sheet */
+  var _activePdpSheet = null;
+
+  /* Open a specific bottom sheet by id */
+  window.openPdpSheet = function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+
+    /* Close any already open sheet */
+    if (_activePdpSheet && _activePdpSheet !== id) {
+      var prev = document.getElementById(_activePdpSheet);
+      if (prev) prev.classList.remove('active');
+    }
+    _activePdpSheet = id;
+    el.classList.add('active');
+
+    /* Prevent background scroll */
+    document.body.style.overflow = 'hidden';
+
+    /* Lazy-init chart when price history opens */
+    if (id === 'bsHistorico') {
+      setTimeout(function() {
+        if (typeof _phRender === 'function') {
+          _phRender();
+        } else if (typeof initPriceHistory === 'function' && window.currentPdpIndex !== undefined) {
+          initPriceHistory(window.currentPdpIndex);
+        }
+      }, 80); /* wait for sheet animation to finish */
+    }
+
+    /* Re-render reviews when sheet opens to ensure list is populated */
+    if (id === 'bsAvaliacoes') {
+      setTimeout(function() {
+        if (typeof renderReviewsMain === 'function') renderReviewsMain();
+      }, 80);
+    }
+
+    /* Re-render Q&A when sheet opens */
+    if (id === 'bsQA') {
+      setTimeout(function() {
+        if (typeof renderQA === 'function') renderQA();
+        else if (typeof renderQALegacy === 'function') renderQALegacy();
+      }, 80);
+    }
+  };
+
+  /* Close a specific bottom sheet */
+  window.closePdpSheet = function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('active');
+    if (_activePdpSheet === id) _activePdpSheet = null;
+    /* Restore body scroll */
+    document.body.style.overflow = '';
+  };
+
+  /* Close on background (overlay) click */
+  window.closePdpSheetOnBg = function(evt, id) {
+    if (evt.target === evt.currentTarget) {
+      closePdpSheet(id);
+    }
+  };
+
+  /* ESC key closes active sheet */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && _activePdpSheet) {
+      closePdpSheet(_activePdpSheet);
+    }
+  });
+
+  /* Touch swipe-down to close */
+  (function() {
+    var sheets = document.querySelectorAll('.pdp-bs-sheet');
+    sheets.forEach(function(sheet) {
+      var startY = 0;
+      sheet.addEventListener('touchstart', function(e) {
+        startY = e.touches[0].clientY;
+      }, {passive: true});
+      sheet.addEventListener('touchend', function(e) {
+        var dy = e.changedTouches[0].clientY - startY;
+        if (dy > 80 && sheet.scrollTop <= 0) {
+          /* Swipe down on top of sheet → close */
+          var overlay = sheet.closest('.pdp-bs-overlay');
+          if (overlay) closePdpSheet(overlay.id);
+        }
+      }, {passive: true});
+    });
+  })();
+
+  /* Update trigger subtitles dynamically after PDP loads */
+  window._pdpBsUpdateTriggers = function(product) {
+    if (!product) return;
+    var revSub = document.getElementById('revTriggerSub');
+    if (revSub && product.rating) {
+      var stars = '★'.repeat(Math.round(product.rating)) + '☆'.repeat(5 - Math.round(product.rating));
+      revSub.textContent = product.rating + ' ' + stars + ' · ' + (product.reviewCount || '0') + ' avaliações verificadas';
+    }
+    var qaSub = document.getElementById('qaTriggerSub');
+    if (qaSub && product.qaCount !== undefined) {
+      qaSub.textContent = product.qaCount + ' pergunta' + (product.qaCount !== 1 ? 's' : '') + ' · Clique para ver e perguntar';
+    }
+    var phSub = document.getElementById('phTriggerSub');
+    if (phSub && product.currentPrice) {
+      phSub.textContent = 'Preço atual: ' + (product.currentPrice) + ' · Ver histórico completo';
+    }
+  };
+
+  wkzLog('[WkzShop v2.9.20] ✓ PDP Bottom Sheets controller loaded');
+})();
+
+
+/* ── Kz Live Shopping engine (countdowns, chat, viewers) — origem 45971–46280 ── */
+(function() {
+  'use strict';
+
+  /* ─── Live products data ─── */
+  var _LIVE_PRODUCTS = [
+    { id:0, name:'Fone TWS AirPods Pro Clone Alta Fidelidade', emoji:'🎧',
+      price:'R$ 189,90', orig:'R$ 379,90', disc:'-50%', priceVal:189.90,
+      countdown:600, stock:15, stockPct:22, active:true },
+    { id:1, name:'Smartphone Redmi Note 14 Pro 256GB 5G', emoji:'📱',
+      price:'R$ 1.299,90', orig:'R$ 1.799,90', disc:'-28%', priceVal:1299.90,
+      countdown:1200, stock:8, stockPct:10, active:false },
+    { id:2, name:'Smartwatch Ultra X9 AMOLED + GPS', emoji:'⌚',
+      price:'R$ 319,90', orig:'R$ 599,90', disc:'-47%', priceVal:319.90,
+      countdown:900, stock:22, stockPct:38, active:false },
+    { id:3, name:'Carregador Turbo 65W Wireless MagSafe', emoji:'🔋',
+      price:'R$ 89,90', orig:'R$ 159,90', disc:'-44%', priceVal:89.90,
+      countdown:450, stock:48, stockPct:62, active:false },
+    { id:4, name:'Mini Câmera Segurança 4K WiFi Visão Noturna', emoji:'📷',
+      price:'R$ 229,90', orig:'R$ 399,90', disc:'-43%', priceVal:229.90,
+      countdown:720, stock:5, stockPct:7, active:false },
+    { id:5, name:'Fone Over-Ear Bluetooth 5.3 ANC 40h', emoji:'🎵',
+      price:'R$ 349,90', orig:'R$ 599,90', disc:'-42%', priceVal:349.90,
+      countdown:1500, stock:34, stockPct:48, active:false },
+  ];
+
+  /* ─── Chat messages pool ─── */
+  var _CHAT_POOL = [
+    { t:'u', n:'Ana Lima',    c:'#7C3AED', m:'que produto incrível!! 😍' },
+    { t:'u', n:'Pedro Zk',   c:'#2563EB', m:'comprei o smartwatch mês passado, chegou em 3 dias!' },
+    { t:'u', n:'Carol F.',   c:'#EC4899', m:'o frete grátis ainda tá ativo? 🚚' },
+    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'✅ Frete grátis para todo o Brasil por mais 30 min!' },
+    { t:'u', n:'Lucas M.',   c:'#F59E0B', m:'que desconto absurdo nesses airpods 🔥' },
+    { t:'u', n:'Gi Santos',  c:'#10B981', m:'tô amando essa live! 🔥🔥🔥' },
+    { t:'p', n:'🔴 DESTAQUE', c:'#EF4444', m:'⚡ ÚLTIMAS 15 UNIDADES! Preço volta em 10 minutos' },
+    { t:'u', n:'Rob Alves',  c:'#8B5CF6', m:'já coloquei no carrinho, confiável essa loja?' },
+    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'✅ Verificada WeKz com garantia de 1 ano e devolução fácil!' },
+    { t:'u', n:'Mari J.',    c:'#F97316', m:'uau que preço no smartwatch 😲' },
+    { t:'u', n:'Teo K.',     c:'#06B6D4', m:'pode parcelar no cartão?' },
+    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'💳 Sim! Até 12x sem juros no cartão WeKz' },
+    { t:'u', n:'Fernanda C.', c:'#A855F7', m:'a câmera 4K é boa pro negócio mesmo?' },
+    { t:'u', n:'Diego O.',   c:'#3B82F6', m:'já comprei 3 vezes aqui, recomendo 100%' },
+    { t:'p', n:'🔔 AVISO',   c:'#EF4444', m:'🛒 Produto em destaque: só mais 8 minutos nesse preço!' },
+    { t:'u', n:'Beatriz H.', c:'#EC4899', m:'obrigada pela live!! ❤️❤️' },
+    { t:'u', n:'Victor S.',  c:'#14B8A6', m:'esse carregador 65W vale muito mesmo' },
+    { t:'u', n:'Nana R.',    c:'#F59E0B', m:'comprando pra meu pai de presente 🎁' },
+    { t:'u', n:'Kaio P.',    c:'#6366F1', m:'melhor live de tech do WeKz! 🏆🏆🏆' },
+    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'🎉 Próximo produto em 2 minutos! Vão adorar o preço' },
+    { t:'u', n:'Luisa W.',   c:'#EC4899', m:'comprei! chegou antes do prazo 👏' },
+    { t:'u', n:'Mateus B.',  c:'#2563EB', m:'a qualidade do fone é surreal pelo preço' },
+    { t:'p', n:'💎 FLASH',   c:'#EF4444', m:'⏱ ÚLTIMOS 3 MINUTOS nesse preço! Garante o seu!' },
+    { t:'u', n:'Camila X.',  c:'#7C3AED', m:'já adicionei no carrinho antes que acabe!' },
+    { t:'u', n:'Paulo D.',   c:'#10B981', m:'esse lince cibernético do WeKz é muito fofinho lol 😺' },
+  ];
+
+  /* ─── State ─── */
+  var _chatIdx = 0;
+  var _chatTimer = null;
+  var _viewerTimer = null;
+  var _cdTimers = [];
+  var _activeCdTimer = null;
+  var _isFollowing = false;
+  var _viewers = 1247;
+
+  /* ─── Format countdown ─── */
+  function _fmtCd(secs) {
+    var m = Math.floor(secs / 60);
+    var s = secs % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  /* ─── Render products grid ─── */
+  function _renderGrid() {
+    var grid = document.getElementById('kzliveGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    _LIVE_PRODUCTS.forEach(function(p, i) {
+      var card = document.createElement('div');
+      card.className = 'kzlive-pcard' + (p.active ? ' kzlive-pcard-active' : '');
+      card.style.animationDelay = (i * 60) + 'ms';
+      var stockTxt = p.stock < 10
+        ? '<div class="kzlive-pcard-stock-txt">🔥 Apenas ' + p.stock + ' restam!</div>'
+        : '<div class="kzlive-pcard-stock-ok">' + p.stock + ' unidades disponíveis</div>';
+      card.innerHTML =
+        '<div class="kzlive-pcard-img">' +
+          (p.active ? '<div class="kzlive-pcard-now-badge"><span class="kzlive-dot" style="width:5px;height:5px;"></span> AGORA</div>' : '') +
+          '<span>' + p.emoji + '</span>' +
+        '</div>' +
+        '<div class="kzlive-pcard-body">' +
+          '<div class="kzlive-pcard-name">' + p.name + '</div>' +
+          '<div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:3px;margin-bottom:2px;">' +
+            '<span class="kzlive-pcard-price">' + p.price + '</span>' +
+            '<span class="kzlive-pcard-orig">' + p.orig + '</span>' +
+            '<span class="kzlive-pcard-disc">' + p.disc + '</span>' +
+          '</div>' +
+          '<div class="kzlive-pcard-cd">' +
+            '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>' +
+            'Oferta em: <span class="kzlive-cd-val" id="kzlivecd_' + p.id + '">--:--</span>' +
+          '</div>' +
+          '<div class="kzlive-pcard-stock-bar">' +
+            '<div class="kzlive-pcard-stock-fill" style="width:' + (100 - p.stockPct) + '%"></div>' +
+          '</div>' +
+          stockTxt +
+          '<button class="kzlive-pcard-cta" onclick="kzliveAddToCart(' + p.id + ')">🛒 Comprar Agora</button>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  /* ─── Countdown timers ─── */
+  function _startCountdowns() {
+    _cdTimers.forEach(clearInterval);
+    _cdTimers = [];
+    if (_activeCdTimer) { clearInterval(_activeCdTimer); _activeCdTimer = null; }
+
+    _LIVE_PRODUCTS.forEach(function(p) {
+      var rem = p.countdown;
+      var timer = setInterval(function() {
+        if (rem > 0) rem--;
+        var el = document.getElementById('kzlivecd_' + p.id);
+        if (el) {
+          el.textContent = _fmtCd(rem);
+          el.style.color = rem < 60 ? '#EF4444' : '#FF6B35';
+        }
+        if (rem === 0) clearInterval(timer);
+      }, 1000);
+      _cdTimers.push(timer);
+    });
+
+    /* Active product countdown (in highlight card) */
+    var activeRem = _LIVE_PRODUCTS[0].countdown;
+    _activeCdTimer = setInterval(function() {
+      if (activeRem > 0) activeRem--;
+      var el = document.getElementById('kzliveActiveCd');
+      if (el) el.textContent = _fmtCd(activeRem);
+      if (activeRem === 0) clearInterval(_activeCdTimer);
+    }, 1000);
+  }
+
+  /* ─── Chat message injection ─── */
+  function _injectMsg(msg) {
+    var body = document.getElementById('kzliveChatBody');
+    if (!body) return;
+    var div = document.createElement('div');
+    div.className = 'kzlive-msg';
+    var initials = msg.n.replace(/[^A-Za-záéíóúÁÉÍÓÚãõâêîôû ]/g,'').trim().slice(0, 2).toUpperCase();
+    var isPromo = (msg.t === 'p');
+    var isHost  = (msg.t === 'h');
+    div.innerHTML =
+      '<div class="kzlive-msg-avatar" style="background:' + msg.c + ';min-width:26px;">' + initials + '</div>' +
+      '<div class="kzlive-msg-body">' +
+        '<div class="kzlive-msg-name" style="color:' + msg.c + ';">' + msg.n +
+          (isHost ? ' <span style="font-size:9px;background:rgba(0,180,171,0.12);border:1px solid rgba(0,180,171,0.25);color:var(--teal);border-radius:50px;padding:1px 5px;font-weight:700;">HOST</span>' : '') +
+        '</div>' +
+        (isPromo
+          ? '<div class="kzlive-msg-promo-inner">' + msg.m + '</div>'
+          : '<div class="kzlive-msg-text">' + msg.m + '</div>') +
+      '</div>';
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+    while (body.children.length > 45) body.removeChild(body.firstChild);
+  }
+
+  function _startChat() {
+    if (_chatTimer) clearInterval(_chatTimer);
+    /* Initial batch */
+    var batch = _CHAT_POOL.slice(0, 6);
+    batch.forEach(function(m) { _injectMsg(m); });
+    _chatIdx = 6;
+    /* Streaming interval */
+    function _nextMsg() {
+      _injectMsg(_CHAT_POOL[_chatIdx % _CHAT_POOL.length]);
+      _chatIdx++;
+      _chatTimer = setTimeout(_nextMsg, 1800 + Math.random() * 2200);
+    }
+    _chatTimer = setTimeout(_nextMsg, 2000);
+  }
+
+  /* ─── Viewer count fluctuation (apenas com stream real ativo) ─── */
+  function _startViewers() {
+    // FIX BUG-N02: flutuação de audiência só ativa quando IS_LIVE_REAL = true;
+    // nunca simular contadores para não enganar utilizadores.
+    if (typeof IS_LIVE_REAL === 'undefined' || !IS_LIVE_REAL) return;
+    if (_viewerTimer) clearInterval(_viewerTimer);
+    _viewerTimer = setInterval(function() {
+      var delta = Math.round((Math.random() - 0.42) * 18);
+      _viewers = Math.max(850, Math.min(2100, _viewers + delta));
+      var fmt = _viewers.toLocaleString('pt-BR');
+      ['kzliveViewerCount','kzliveViewerBadge','kzliveChatCount'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = fmt;
+      });
+    }, 3500);
+  }
+
+  /* ─── Public API ─── */
+  window.kzliveStartPlayer = function() {
+    var ph = document.getElementById('kzlivePlaceholder');
+    var ifr = document.getElementById('kzliveIframe');
+    if (!ph || !ifr) return;
+    ph.style.display = 'none';
+    /* FIX BUG-N02: vídeo de demonstração — não é stream ao vivo real.
+       Ao integrar: substituir URL pelo streamUrl real vindo de /api/live/current
+       e ativar IS_LIVE_REAL = true para mostrar badges e contadores reais. */
+    ifr.src = 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&controls=1&modestbranding=1&rel=0&color=white';
+    ifr.style.display = 'block';
+    // Manter badge de demonstração — não trocar para "AO VIVO"
+    
+    // FIX: Ocultar navegação quando KZ Live ativo
+    document.body.classList.add('kzlive-active');
+    showPage('live');
+  };
+  
+  // Função para fechar KZ Live e restaurar navegação
+  window.kzliveClose = function() {
+    document.body.classList.remove('kzlive-active');
+    showPage('home');
+  };
+
+  window.kzliveToggleFollow = function() {
+    _isFollowing = !_isFollowing;
+    var btn = document.getElementById('kzliveFollowBtn');
+    if (!btn) return;
+    if (_isFollowing) {
+      btn.textContent = '✓ Seguindo';
+      btn.classList.add('kzlive-following');
+      if (typeof showToast === 'function') showToast('✅ Seguindo TechStore BR! Você será notificado nas próximas lives.');
+    } else {
+      btn.textContent = '+ Seguir';
+      btn.classList.remove('kzlive-following');
+    }
+  };
+
+  // [BUG-N04 fix] Unificado: usa cartItemsData canónico em vez do array paralelo _wkzCartItems
+  window.kzliveAddToCart = function(productId) {
+    var p = null;
+    for (var i = 0; i < _LIVE_PRODUCTS.length; i++) {
+      if (_LIVE_PRODUCTS[i].id === productId) { p = _LIVE_PRODUCTS[i]; break; }
+    }
+    if (!p) return;
+    var itemId = 'live_' + p.id;
+    var existing = cartItemsData.find(function(x){ return x.id === itemId; });
+    if (existing) {
+      existing.qty++;
+      if (typeof showToast === 'function') showToast('➕ +1 "' + p.name.slice(0, 32) + '" no carrinho!');
+    } else {
+      // [v2.9.30] op = preço original (campo p.orig) — mesma lógica de addToCart/addFlashToCart.
+      var liveOp = parseFloat(String(p.orig||'0').replace(/[^0-9,]/g,'').replace(',','.')) || p.priceVal;
+      cartItemsData.push({
+        id: itemId,
+        e: p.emoji || '📦',
+        n: p.name,
+        s: p.store || 'Kz Live',
+        v: 'Live Shopping',
+        rawPrice: p.priceVal,
+        op: liveOp,
+        qty: 1,
+        _isLive: true
+      });
+      if (typeof showToast === 'function') showToast('🛒 "' + p.name.slice(0, 32) + '" adicionado ao carrinho!');
+    }
+    if (typeof updateCartUI === 'function') updateCartUI();
+  };
+
+  window.kzliveSendMsg = function() {
+    var input = document.getElementById('kzliveChatInput');
+    if (!input) return;
+    var txt = input.value.trim();
+    if (!txt) return;
+    _injectMsg({ t:'u', n:'Você', c:'#00B4AB', m: txt });
+    input.value = '';
+    input.focus();
+  };
+
+  /* ─── Init on page open ─── */
+  window.initKzLive = function() {
+    _renderGrid();
+    _startCountdowns();
+    _startChat();
+    _startViewers();
+    /* Reset iframe / placeholder state */
+    var ifr = document.getElementById('kzliveIframe');
+    var ph  = document.getElementById('kzlivePlaceholder');
+    if (ifr) { ifr.src = ''; ifr.style.display = 'none'; }
+    if (ph)  { ph.style.display = 'flex'; }
+  };
+
+  /* ─── Cleanup on page leave ─── */
+  function _cleanupLive() {
+    if (_chatTimer)  { clearTimeout(_chatTimer); clearInterval(_chatTimer); _chatTimer = null; }
+    if (_viewerTimer){ clearInterval(_viewerTimer); _viewerTimer = null; }
+    if (_activeCdTimer){ clearInterval(_activeCdTimer); _activeCdTimer = null; }
+    _cdTimers.forEach(clearInterval); _cdTimers = [];
+    /* Stop iframe audio/video */
+    var ifr = document.getElementById('kzliveIframe');
+    if (ifr) { ifr.src = ''; ifr.style.display = 'none'; }
+    var ph = document.getElementById('kzlivePlaceholder');
+    if (ph) ph.style.display = 'flex';
+  }
+
+  /* ─── Nav hook ─── */
+  if (!window._wkzNavHooks) window._wkzNavHooks = [];
+  window._wkzNavHooks.push(function(sectionId) {
+    if (sectionId === 'live') {
+      setTimeout(window.initKzLive, 80);
+    } else {
+      _cleanupLive();
+    }
+  });
+
+})(); /* end KZ LIVE SHOPPING IIFE */
