@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WeKz Shop — Admin Matrix</title>
+  <link rel="stylesheet" href="../core/wkz-styles-base.css" />
+  <link rel="stylesheet" href="../shared/wkz-styles-full.css" />
+</head>
+<body class="adm-mode">
+<!-- Sprint M4 — sem topbar/bottomnav aqui de propósito: o CSS original já
+     esconde esses elementos via body.adm-mode (adm-mode.topbar/footer/
+     #bottomNav {display:none}), e este módulo só tem UMA página
+     (page-admin-dashboard), sempre com adm-mode ativo — incluir o navbar
+     geraria trabalho de correção (mesmos 12+ onclicks órfãos do Seller,
+     ver CHANGELOG_SPRINT_M3.md) para algo que nunca ficaria visível. -->
+<main class='main-content'>
+<div id="page-admin-dashboard" class="page">
+
+  <!-- ── MOBILE-ONLY TOPBAR with WeKz logo ── -->
+  <div class="adm-mobile-topbar">
+    <div class="adm-mobile-topbar-inner">
+      <!-- Logo WeKz idêntico ao site principal -->
+      <div class="adm-mobile-logo">
+        <img src="data:image/png;base64,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" width="34" height="34" alt="WeKz Shop" style="flex-shrink:0;object-fit:contain;">
+        <div class="adm-mobile-logo-text">
+          <span class="adm-mobile-logo-name">WeKz Shop</span>
+          <span class="adm-mobile-logo-sub">Global Marketplace</span>
+        </div>
+      </div>
+      <!-- Badge admin -->
+      <div class="adm-mobile-badge">
+        <span class="adm-mobile-badge-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span class="adm-mobile-badge-label">Admin</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="adm-layout">
+
+    <!-- ── SIDEBAR ADMIN ── -->
+    <div class="adm-sidebar">
+      <div class="adm-sidebar-brand">
+        <div class="adm-brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#admShieldGrad)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="admShieldGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00B4AB"/><stop offset="100%" stop-color="#7C3AED"/></linearGradient></defs><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div>
+          <div class="adm-brand-name">WeKz Admin</div>
+          <div class="adm-brand-role">Painel de Gestão</div>
+        </div>
+      </div>
+      <div class="adm-user-card" id="admUserCard">
+        <div class="adm-user-avatar" id="admUserAvatar">A</div>
+        <div class="adm-user-info">
+          <div class="adm-user-name" id="admUserName">Administrador</div>
+          <div class="adm-user-badge"><svg class="adm-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Super Admin</div>
+        </div>
+      </div>
+      <div class="adm-nav-track" id="admNavTrack">
+      <nav class="adm-nav" id="admNav" onscroll="admNavScroll(this)">
+        <div class="adm-nav-item active" data-tab="overview" onclick="switchAdminTab('overview', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Visão Geral
+        </div>
+        <div class="adm-nav-item" data-tab="store-approval" onclick="switchAdminTab('store-approval', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Aprovação de Lojas
+          <span class="adm-nav-badge" id="navBadgeStores">7</span>
+        </div>
+        <div class="adm-nav-item" data-tab="kyc" onclick="switchAdminTab('kyc', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> KYC/KYB
+          <span class="adm-nav-badge adm-badge-orange" id="navBadgeKyc">4</span>
+        </div>
+        <div class="adm-nav-item" data-tab="product-reports" onclick="switchAdminTab('product-reports', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Moderação de Produtos
+          <span class="adm-nav-badge adm-badge-red" id="navBadgeReports">3</span>
+        </div>
+        <div class="adm-nav-item" data-tab="billing" onclick="switchAdminTab('billing', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Faturamento
+        </div>
+        <div class="adm-nav-item" data-tab="users" onclick="switchAdminTab('users', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Usuários
+        </div>
+        <div class="adm-nav-item" data-tab="comunicados" onclick="switchAdminTab('comunicados', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Comunicados
+        </div>
+        <div class="adm-nav-item" data-tab="seguranca" onclick="switchAdminTab('seguranca', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Segurança
+          <span class="adm-nav-badge adm-badge-red">2</span>
+        </div>
+        <div class="adm-nav-item" data-tab="configuracoes" onclick="switchAdminTab('configuracoes', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config
+        </div>
+        <div class="adm-nav-item" data-tab="kz-ia" onclick="switchAdminTab('kz-ia', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Kz IA
+        </div>
+        <div class="adm-nav-item" data-tab="disputas" onclick="switchAdminTab('disputas', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Disputas
+          <span class="adm-nav-badge adm-badge-orange" id="navBadgeDisputas">5</span>
+        </div>
+        <div class="adm-nav-item" data-tab="saques" onclick="switchAdminTab('saques', this)">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Saques / Payouts
+          <span class="adm-nav-badge" id="navBadgeSaques">8</span>
+        </div>
+        <div class="adm-nav-sep"></div>
+        <div class="adm-nav-item adm-nav-danger" onclick="window.location.href='../buyer/wkz-buyer.html'">
+          <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar ao Site
+        </div>
+      </nav>
+    </div><!-- /adm-nav-track -->
+    </div><!-- /adm-sidebar -->
+
+    <!-- ── MAIN AREA ADMIN ── -->
+    <div class="adm-main" id="admMain">
+
+      <!-- ══ KZ WELCOME BANNER ADMIN ══ -->
+      <div class="adm-kz-banner" id="admKzBanner">
+        <div class="adm-kz-float">
+          <div class="adm-kz-mascot" id="admKzMascot"></div>
+          <div class="adm-kz-chip">Kz · Admin IA</div>
+        </div>
+        <div class="adm-kz-body">
+          <div class="adm-kz-label">✦ Lince Cibernético · Centro de Comando WeKz</div>
+          <div class="adm-kz-greeting" id="admKzGreeting">Olá, Gestor!</div>
+          <div class="adm-kz-msg" id="admKzMsg">Carregando análise da plataforma...</div>
+        </div>
+        <button class="adm-kz-refresh" onclick="refreshAdminKzMsg()" title="Nova análise">↻ Analisar</button>
+      </div>
+
+      <!-- ══ PAINEL: VISÃO GERAL ══ -->
+      <div id="adm-overview" class="adm-panel active">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Visão Geral da Plataforma</h1>
+          <div class="adm-page-sub">Saúde do ecossistema WeKz em tempo real</div>
+        </div>
+
+        <!-- Métricas de Faturamento -->
+        <div class="adm-section-label"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Faturamento — Maio 2025</div>
+        <div class="adm-metrics-grid">
+          <div class="adm-metric-card adm-metric-gross">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Faturamento Bruto (GMV)</div>
+              <div class="adm-metric-value" id="admGrossRevenue">R$ 4.872.340</div>
+              <div class="adm-metric-change adm-up">↑ +23,4% vs abril</div>
+              <div class="adm-metric-sub">Valor total transacionado antes de taxas e devoluções</div>
+            </div>
+            <div class="adm-metric-sparkline">
+              <svg viewBox="0 0 80 30" fill="none" stroke="rgba(0,180,171,0.6)" stroke-width="2">
+                <polyline points="0,25 12,20 24,22 36,12 48,15 60,8 72,4 80,6"/>
+              </svg>
+            </div>
+          </div>
+          <div class="adm-metric-card adm-metric-net">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Faturamento Líquido (Net Revenue)</div>
+              <div class="adm-metric-value" id="admNetRevenue">R$ 389.787</div>
+              <div class="adm-metric-change adm-up">↑ +19,1% vs abril</div>
+              <div class="adm-metric-sub">Receita real WeKz após repasses, taxas e estornos</div>
+            </div>
+            <div class="adm-metric-sparkline">
+              <svg viewBox="0 0 80 30" fill="none" stroke="rgba(124,58,237,0.6)" stroke-width="2">
+                <polyline points="0,26 12,22 24,20 36,16 48,14 60,10 72,7 80,5"/>
+              </svg>
+            </div>
+          </div>
+          <div class="adm-metric-card adm-metric-orders">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Total de Pedidos</div>
+              <div class="adm-metric-value">38.491</div>
+              <div class="adm-metric-change adm-up">↑ +2.143 esta semana</div>
+              <div class="adm-metric-sub">Pedidos confirmados no período</div>
+            </div>
+            <div class="adm-metric-sparkline">
+              <svg viewBox="0 0 80 30" fill="none" stroke="rgba(37,99,235,0.6)" stroke-width="2">
+                <polyline points="0,28 12,24 24,26 36,18 48,20 60,14 72,10 80,8"/>
+              </svg>
+            </div>
+          </div>
+          <div class="adm-metric-card adm-metric-stores">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Lojas Ativas</div>
+              <div class="adm-metric-value">12.847</div>
+              <div class="adm-metric-change adm-up">↑ +341 novo mês</div>
+              <div class="adm-metric-sub">Lojas com pelo menos 1 venda no período</div>
+            </div>
+            <div class="adm-metric-sparkline">
+              <svg viewBox="0 0 80 30" fill="none" stroke="rgba(6,182,212,0.6)" stroke-width="2">
+                <polyline points="0,24 12,22 24,20 36,18 48,16 60,13 72,11 80,9"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs secundários -->
+        <div class="adm-section-label"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Indicadores Críticos</div>
+        <div class="adm-kpi-row">
+          <div class="adm-kpi">
+            <div class="adm-kpi-num adm-kpi-warn" id="kpiStoresNum">7</div>
+            <div class="adm-kpi-label">Lojas aguardando aprovação</div>
+            <button class="adm-kpi-btn" onclick="switchAdminTab('store-approval', document.querySelector('[data-tab=\'store-approval\']'))">Revisar →</button>
+          </div>
+          <div class="adm-kpi" id="kpiCardKyc">
+            <div class="adm-kpi-num adm-kpi-warn" id="kpiKycNum">4</div>
+            <div class="adm-kpi-label">Verificações KYC/KYB pendentes</div>
+            <div class="adm-kpi-sublabel" id="kpiKycRisco" style="font-size:10px;color:#EF4444;margin-top:2px;min-height:14px;"></div>
+            <button class="adm-kpi-btn" onclick="switchAdminTab('kyc', document.querySelector('[data-tab=\'kyc\']'))">Revisar →</button>
+          </div>
+          <div class="adm-kpi">
+            <div class="adm-kpi-num adm-kpi-danger" id="kpiReportsNum">3</div>
+            <div class="adm-kpi-label">Produtos com denúncias ativas</div>
+            <button class="adm-kpi-btn" onclick="switchAdminTab('product-reports', document.querySelector('[data-tab=\'product-reports\']'))">Moderar →</button>
+          </div>
+          <div class="adm-kpi">
+            <div class="adm-kpi-num adm-kpi-ok">98.7%</div>
+            <div class="adm-kpi-label">Uptime da plataforma (30d)</div>
+            <button class="adm-kpi-btn">Status →</button>
+          </div>
+          <div class="adm-kpi">
+            <div class="adm-kpi-num adm-kpi-ok">4.89</div>
+            <div class="adm-kpi-label">NPS médio da plataforma</div>
+            <button class="adm-kpi-btn">Detalhes →</button>
+          </div>
+        </div>
+
+        <!-- KPIs dinâmicos: Disputas & Volume Retido -->
+        <div class="adm-section-label" style="margin-top:20px;">
+          <svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Alertas em Tempo Real
+        </div>
+        <div class="adm-kpi-row" id="kpiLiveRow">
+          <div class="adm-kpi" id="kpiCardDisputas">
+            <div class="adm-kpi-num adm-kpi-danger" id="kpiDisputasAtivas">–</div>
+            <div class="adm-kpi-label">Disputas abertas</div>
+            <div class="adm-kpi-sublabel" id="kpiDisputasEsc" style="font-size:10px;color:#F59E0B;margin-top:2px;min-height:14px;"></div>
+            <button class="adm-kpi-btn" onclick="switchAdminTab('disputas', document.querySelector('[data-tab=\'disputas\']'))">Mediar →</button>
+          </div>
+          <div class="adm-kpi" id="kpiCardRetido">
+            <div class="adm-kpi-num adm-kpi-warn" id="kpiVolumeRetido">–</div>
+            <div class="adm-kpi-label">Volume retido em saques</div>
+            <div class="adm-kpi-sublabel" id="kpiSaquesCount" style="font-size:10px;color:var(--muted);margin-top:2px;min-height:14px;"></div>
+            <button class="adm-kpi-btn" onclick="switchAdminTab('saques', document.querySelector('[data-tab=\'saques\']'))">Liberar →</button>
+          </div>
+        </div>
+
+        <!-- Faturamento Bruto vs Líquido — Gráfico de barras simulado -->
+        <div class="adm-section-label"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Evolução: Bruto vs Líquido (6 meses)</div>
+        <div class="adm-chart-card">
+          <div class="adm-chart-legend">
+            <span class="adm-legend-dot" style="background:var(--teal)"></span> Bruto (GMV)
+            <span class="adm-legend-dot" style="background:var(--purple);margin-left:16px;"></span> Líquido (Net)
+          </div>
+          <div class="adm-bar-chart">
+            <div class="adm-bar-group">
+              <div class="adm-bar adm-bar-gross" style="height:55%"></div>
+              <div class="adm-bar adm-bar-net"   style="height:44%"></div>
+              <div class="adm-bar-label">Dez</div>
+            </div>
+            <div class="adm-bar-group">
+              <div class="adm-bar adm-bar-gross" style="height:62%"></div>
+              <div class="adm-bar adm-bar-net"   style="height:49%"></div>
+              <div class="adm-bar-label">Jan</div>
+            </div>
+            <div class="adm-bar-group">
+              <div class="adm-bar adm-bar-gross" style="height:58%"></div>
+              <div class="adm-bar adm-bar-net"   style="height:46%"></div>
+              <div class="adm-bar-label">Fev</div>
+            </div>
+            <div class="adm-bar-group">
+              <div class="adm-bar adm-bar-gross" style="height:74%"></div>
+              <div class="adm-bar adm-bar-net"   style="height:59%"></div>
+              <div class="adm-bar-label">Mar</div>
+            </div>
+            <div class="adm-bar-group">
+              <div class="adm-bar adm-bar-gross" style="height:80%"></div>
+              <div class="adm-bar adm-bar-net"   style="height:63%"></div>
+              <div class="adm-bar-label">Abr</div>
+            </div>
+            <div class="adm-bar-group adm-bar-current">
+              <div class="adm-bar adm-bar-gross" style="height:100%"></div>
+              <div class="adm-bar adm-bar-net"   style="height:80%"></div>
+              <div class="adm-bar-label" style="color:var(--teal)">Mai ✦</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: APROVAÇÃO DE LOJAS ══ -->
+      <div id="adm-store-approval" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Aprovação de Lojas</h1>
+          <div class="adm-page-sub" id="storeApprovalSub">7 solicitações aguardando revisão</div>
+        </div>
+        <div class="adm-filter-track">
+          <div class="adm-filter-scroll">
+          <button class="adm-filter active" id="filterStoresAllBtn" onclick="filterAdminStores('all',this)">Todas (<span id="countStoresAll">7</span>)</button>
+          <button class="adm-filter" onclick="filterAdminStores('pending',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes (<span id="countStoresPending">5</span>)</button>
+          <button class="adm-filter" onclick="filterAdminStores('docs',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Docs (<span id="countStoresDocs">2</span>)</button>
+          </div>
+        </div>
+        <div id="admStoreList" class="adm-store-list">
+          <!-- Renderizado por JS -->
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: KYC/KYB — VERIFICAÇÃO DE VENDEDORES (NEW v2.9.5) ══ -->
+      <div id="adm-kyc" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Verificação KYC/KYB de Vendedores</h1>
+          <div class="adm-page-sub" id="kycSub">— carregando —</div>
+        </div>
+        <div class="adm-filter-track">
+          <div class="adm-filter-scroll">
+          <button class="adm-filter active" id="filterKycAllBtn" onclick="filterAdminKyc('all',this)">Todas (<span id="countKycAll">6</span>)</button>
+          <button class="adm-filter" onclick="filterAdminKyc('pending',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes (<span id="countKycPending">2</span>)</button>
+          <button class="adm-filter" onclick="filterAdminKyc('under-review',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Em Análise (<span id="countKycReview">2</span>)</button>
+          <button class="adm-filter" onclick="filterAdminKyc('approved',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Aprovados (<span id="countKycApproved">1</span>)</button>
+          <button class="adm-filter" onclick="filterAdminKyc('rejected',this)">✕ Recusados (<span id="countKycRejected">1</span>)</button>
+          </div>
+        </div>
+        <div id="admKycList" class="adm-store-list">
+          <!-- Renderizado por JS -->
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: MODERAÇÃO DE PRODUTOS ══ -->
+      <div id="adm-product-reports" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Moderação de Produtos com Denúncias</h1>
+          <div class="adm-page-sub" id="reportsApprovalSub">3 produtos requerem ação imediata · 12 em análise</div>
+        </div>
+        <div class="adm-filter-track">
+          <div class="adm-filter-scroll">
+          <button class="adm-filter active" id="filterReportsAllBtn" onclick="filterAdminReports('all',this)">Todas (<span id="countReportsAll">15</span>)</button>
+          <button class="adm-filter" id="filterReportsUrgentBtn" onclick="filterAdminReports('urgent',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Urgente (<span id="countReportsUrgent">3</span>)</button>
+          <button class="adm-filter" onclick="filterAdminReports('review',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Em Análise (<span id="countReportsReview">12</span>)</button>
+          <button class="adm-filter" onclick="filterAdminReports('resolved',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Resolvidas</button>
+          </div>
+        </div>
+        <div id="admReportList" class="adm-report-list">
+          <!-- Renderizado por JS -->
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: FATURAMENTO ══ -->
+      <div id="adm-billing" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Faturamento Detalhado</h1>
+          <div class="adm-page-sub">Visão completa de receitas, repasses e comissões</div>
+        </div>
+        <div class="adm-billing-grid">
+          <div class="adm-billing-card">
+            <div class="adm-billing-period">Maio 2025</div>
+            <div class="adm-billing-row"><span>GMV (Bruto)</span><strong style="color:var(--teal)">R$ 4.872.340</strong></div>
+            <div class="adm-billing-row"><span>Repasses a Vendedores</span><strong style="color:#EF4444">- R$ 4.138.409</strong></div>
+            <div class="adm-billing-row"><span>Devoluções / Estornos</span><strong style="color:#F59E0B">- R$ 344.144</strong></div>
+            <div class="adm-billing-sep"></div>
+            <div class="adm-billing-row adm-billing-total"><span>Receita Líquida WeKz</span><strong style="color:var(--purple)">R$ 389.787</strong></div>
+            <div class="adm-billing-row"><span>Taxa Média de Comissão</span><strong>8,0%</strong></div>
+            <div class="adm-billing-row"><span>Margem Líquida</span><strong>7,99%</strong></div>
+          </div>
+          <div class="adm-billing-card">
+            <div class="adm-billing-period">Top 5 Categorias por GMV</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+              <div class="adm-cat-bar-item"><span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--teal)"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> Eletrônicos</span><div class="adm-cat-bar"><div class="adm-cat-bar-fill" style="width:72%;background:var(--teal)"></div></div><strong>R$ 3,5M</strong></div>
+              <div class="adm-cat-bar-item"><span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--purple)"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg> Moda</span><div class="adm-cat-bar"><div class="adm-cat-bar-fill" style="width:41%;background:var(--purple)"></div></div><strong>R$ 2,0M</strong></div>
+              <div class="adm-cat-bar-item"><span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Casa &amp; Deco</span><div class="adm-cat-bar"><div class="adm-cat-bar-fill" style="width:28%;background:var(--blue)"></div></div><strong>R$ 1,4M</strong></div>
+              <div class="adm-cat-bar-item"><span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#F472B6"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85z"/><path d="M17 1l.85 2 2 .85-2 .85L17 7l-.85-2-2-.85 2-.85z"/></svg> Beleza</span><div class="adm-cat-bar"><div class="adm-cat-bar-fill" style="width:21%;background:var(--cyan)"></div></div><strong>R$ 1,0M</strong></div>
+              <div class="adm-cat-bar-item"><span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#F59E0B"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg> Games</span><div class="adm-cat-bar"><div class="adm-cat-bar-fill" style="width:16%;background:#F59E0B"></div></div><strong>R$ 780K</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: USUÁRIOS ══ -->
+      <div id="adm-users" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Gestão de Usuários</h1>
+          <div class="adm-page-sub">318.492 usuários registrados · 42.140 ativos hoje</div>
+        </div>
+        <div class="adm-metrics-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+          <div class="adm-metric-card adm-metric-orders">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Compradores</div>
+              <div class="adm-metric-value">305.645</div>
+              <div class="adm-metric-change adm-up">↑ +1.240 hoje</div>
+            </div>
+          </div>
+          <div class="adm-metric-card adm-metric-stores">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Vendedores Ativos</div>
+              <div class="adm-metric-value">12.847</div>
+              <div class="adm-metric-change adm-up">↑ +341 este mês</div>
+            </div>
+          </div>
+          <div class="adm-metric-card adm-metric-net">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 002 2h16a2 2 0 002-2V8l-7 5V8l-7 5V4H2v16z"/><line x1="17" y1="18" x2="17.01" y2="18" stroke-width="3"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/><line x1="7" y1="18" x2="7.01" y2="18" stroke-width="3"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Fornecedores Verificados</div>
+              <div class="adm-metric-value">247</div>
+              <div class="adm-metric-change adm-up">↑ +18 este mês</div>
+            </div>
+          </div>
+          <div class="adm-metric-card adm-metric-gross">
+            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div class="adm-metric-body">
+              <div class="adm-metric-label">Contas Suspensas</div>
+              <div class="adm-metric-value" style="color:#EF4444">48</div>
+              <div class="adm-metric-change adm-down">↑ +3 esta semana</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);text-align:center;color:var(--muted);font-size:14px;">
+          <svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Módulo de gestão avançada de usuários disponível na versão Enterprise.
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: COMUNICADOS ══ -->
+      <div id="adm-comunicados" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Central de Comunicados</h1>
+          <div class="adm-page-sub">Envie mensagens para compradores, vendedores ou toda a plataforma</div>
+        </div>
+
+        <!-- Composer -->
+        <div class="adm-comm-composer">
+          <div class="adm-comm-composer-header">
+            <span class="adm-section-label" style="margin:0;"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Novo Comunicado</span>
+          </div>
+
+          <!-- Audience selector -->
+          <div class="adm-comm-field">
+            <label class="adm-comm-label">Destinatários</label>
+            <div class="adm-comm-audience">
+              <button class="adm-aud-btn active" id="audAll" onclick="setAudience('all',this)"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Todos (318K)</button>
+              <button class="adm-aud-btn" id="audSellers" onclick="setAudience('sellers',this)"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Vendedores (12,8K)</button>
+              <button class="adm-aud-btn" id="audBuyers" onclick="setAudience('buyers',this)"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Compradores (305K)</button>
+            </div>
+          </div>
+
+          <!-- Canal -->
+          <div class="adm-comm-field">
+            <label class="adm-comm-label">Canal de envio</label>
+            <div class="adm-comm-channels">
+              <label class="adm-ch-toggle"><input type="checkbox" id="chPush" checked> <span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Push Notification</span></label>
+              <label class="adm-ch-toggle"><input type="checkbox" id="chEmail"> <span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> E-mail</span></label>
+              <label class="adm-ch-toggle"><input type="checkbox" id="chBanner"> <span><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Banner no app</span></label>
+            </div>
+          </div>
+
+          <!-- Templates rápidos -->
+          <div class="adm-comm-field">
+            <label class="adm-comm-label">Templates rápidos</label>
+            <div class="adm-tpl-row">
+              <button class="adm-tpl-btn" onclick="applyTemplate('manutencao')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Manutenção</button>
+              <button class="adm-tpl-btn" onclick="applyTemplate('promoçao')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promoção</button>
+              <button class="adm-tpl-btn" onclick="applyTemplate('novidade')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Novidade</button>
+              <button class="adm-tpl-btn" onclick="applyTemplate('alerta')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Alerta</button>
+            </div>
+          </div>
+
+          <!-- Título e mensagem -->
+          <div class="adm-comm-field">
+            <label class="adm-comm-label">Título</label>
+            <input type="text" id="commTitle" class="adm-comm-input wkz-input" placeholder="Ex: Manutenção programada — 23/05 às 02h" maxlength="80">
+          </div>
+          <div class="adm-comm-field">
+            <label class="adm-comm-label">Mensagem</label>
+            <textarea id="commBody" class="adm-comm-textarea wkz-input" rows="3" placeholder="Descreva o comunicado de forma clara e objetiva..."></textarea>
+            <div class="adm-comm-chars" id="commChars">0 / 280</div>
+          </div>
+
+          <!-- Preview dinâmico -->
+          <div class="adm-comm-field">
+            <label class="adm-comm-label">Preview — Push Notification</label>
+            <div class="adm-push-preview" id="commPreview">
+              <div class="adm-push-icon">W</div>
+              <div class="adm-push-content">
+                <div class="adm-push-title" id="prevTitle">Título do comunicado</div>
+                <div class="adm-push-msg" id="prevMsg">Sua mensagem aparecerá aqui...</div>
+              </div>
+              <div class="adm-push-time">agora</div>
+            </div>
+          </div>
+
+          <button class="adm-comm-send" onclick="sendBroadcast()" id="commSendBtn">
+            <svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Comunicado
+          </button>
+        </div>
+
+        <!-- Histórico -->
+        <div class="adm-section-label" style="margin-top:28px;"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Últimos Comunicados</div>
+        <div class="adm-comm-history" id="commHistory">
+          <!-- Preenchido por JS -->
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: SEGURANÇA ══ -->
+      <div id="adm-seguranca" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Segurança &amp; Auditoria</h1>
+          <div class="adm-page-sub">Ameaças detectadas, log de ações e contas suspeitas</div>
+        </div>
+
+        <!-- ══ RADAR DE RISCOS KZ AI ══ -->
+        <div id="kzRiskRadar" style="
+          background:linear-gradient(135deg,rgba(124,58,237,0.07),rgba(239,68,68,0.06));
+          border:1px solid rgba(124,58,237,0.25);
+          border-radius:var(--radius);
+          padding:16px 20px;
+          margin-bottom:20px;
+          position:relative;
+          overflow:hidden;
+        ">
+          <!-- Scan line decoration -->
+          <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(124,58,237,0.025) 3px,rgba(124,58,237,0.025) 4px);border-radius:var(--radius);"></div>
+          <!-- Header -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="position:relative;">
+              <svg width="22" height="22" viewBox="0 0 40 40" fill="none" style="filter:drop-shadow(0 0 6px rgba(124,58,237,0.8))">
+                <ellipse cx="20" cy="26" rx="13" ry="10" fill="#0F172A" stroke="rgba(124,58,237,0.4)" stroke-width="1"/>
+                <ellipse cx="20" cy="21" rx="11" ry="13" fill="#1A2540"/>
+                <polygon points="13,10 17,2 20,7 23,2 27,10" fill="#7C3AED" opacity="0.9"/>
+                <ellipse cx="16" cy="18" rx="2.5" ry="3" fill="#EF4444"/>
+                <ellipse cx="24" cy="18" rx="2.5" ry="3" fill="#EF4444"/>
+              </svg>
+              <div style="position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:#EF4444;border-radius:50%;animation:kzRadarPulse 1.2s ease-in-out infinite;"></div>
+            </div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:800;letter-spacing:0.5px;">🛡️ Radar de Riscos em Tempo Real — <span style="background:linear-gradient(90deg,#7C3AED,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Kz AI</span></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:1px;">Análise preditiva · Atualiza a cada 30s · Motor Lince Cibernético v3</div>
+            </div>
+            <div id="kzRadarLastUpdate" style="margin-left:auto;font-size:10px;color:var(--muted);text-align:right;">Última análise: <span id="kzRadarTime">agora</span></div>
+          </div>
+
+          <!-- Alertas preditivos -->
+          <div id="kzRadarAlerts" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+        <!-- Métricas rápidas de segurança -->
+        <div class="adm-sec-kpi-row">
+          <div class="adm-sec-kpi adm-sec-danger">
+            <div class="adm-sec-kpi-num">2</div>
+            <div class="adm-sec-kpi-label">Ameaças ativas</div>
+          </div>
+          <div class="adm-sec-kpi adm-sec-warn">
+            <div class="adm-sec-kpi-num">14</div>
+            <div class="adm-sec-kpi-label">Logins bloqueados (24h)</div>
+          </div>
+          <div class="adm-sec-kpi adm-sec-ok">
+            <div class="adm-sec-kpi-num">99,1%</div>
+            <div class="adm-sec-kpi-label">Requests legítimas</div>
+          </div>
+          <div class="adm-sec-kpi adm-sec-info">
+            <div class="adm-sec-kpi-num">8</div>
+            <div class="adm-sec-kpi-label">Ações de admin (hoje)</div>
+          </div>
+        </div>
+
+        <!-- Alertas ativos -->
+        <div class="adm-section-label"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Alertas Ativos</div>
+        <div class="adm-sec-alerts">
+          <div class="adm-sec-alert adm-sec-alert-red">
+            <div class="adm-sec-alert-dot"></div>
+            <div class="adm-sec-alert-body">
+              <div class="adm-sec-alert-title">Padrão de fraude detectado — Vendedor #V8821</div>
+              <div class="adm-sec-alert-detail">23 pedidos criados e cancelados em 40 min · IP: 187.23.xx.xx</div>
+              <div class="adm-sec-alert-time">há 12 min</div>
+            </div>
+            <div class="adm-sec-alert-actions">
+              <button class="adm-sec-btn adm-sec-btn-block" onclick="secAction('block','V8821')">Bloquear</button>
+              <button class="adm-sec-btn adm-sec-btn-view" onclick="secAction('view','V8821')">Ver</button>
+            </div>
+          </div>
+          <div class="adm-sec-alert adm-sec-alert-red">
+            <div class="adm-sec-alert-dot"></div>
+            <div class="adm-sec-alert-body">
+              <div class="adm-sec-alert-title">Tentativas de acesso ao painel admin — IP suspeito</div>
+              <div class="adm-sec-alert-detail">47 tentativas falhas · IP: 103.55.xx.xx (origem: AS estrangeiro)</div>
+              <div class="adm-sec-alert-time">há 3 min</div>
+            </div>
+            <div class="adm-sec-alert-actions">
+              <button class="adm-sec-btn adm-sec-btn-block" onclick="secAction('blockip','103.55')">Bloquear IP</button>
+              <button class="adm-sec-btn adm-sec-btn-view" onclick="secAction('view','ip')">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reportes de fraude enviados por usuários (Central Anti-Fraude) -->
+        <div class="adm-section-label" style="margin-top:24px;"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a2 2 0 010 4m-4-4v-2l-8 4 8 4v-2M5 8H3a1 1 0 00-1 1v2a1 1 0 001 1h2"/></svg> Reportes de Fraude de Usuários <span id="fraudReportsCount" style="background:rgba(239,68,68,0.2);color:#EF4444;border-radius:50px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:4px;">0</span></div>
+        <div class="adm-sec-alerts" id="admFraudReportsList">
+          <!-- Preenchido por JS -->
+        </div>
+
+        <!-- Log de auditoria -->
+        <div class="adm-section-label" style="margin-top:24px;"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Log de Auditoria — Hoje</div>
+        <div class="adm-audit-log" id="admAuditLog">
+          <!-- Preenchido por JS -->
+        </div>
+
+        <!-- Contas suspeitas -->
+        <div class="adm-section-label" style="margin-top:24px;"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Contas em Monitoramento</div>
+        <div class="adm-suspect-list" id="admSuspectList">
+          <!-- Preenchido por JS -->
+        </div>
+      </div>
+
+      <!-- ══ PAINEL: CONFIGURAÇÕES ══ -->
+      <div id="adm-configuracoes" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Configurações da Plataforma</h1>
+          <div class="adm-page-sub">Taxas, funcionalidades ativas e limites operacionais</div>
+        </div>
+
+        <!-- Feature Flags -->
+        <div class="adm-section-label"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Funcionalidades da Plataforma</div>
+        <div class="adm-config-card">
+          <div class="adm-toggle-row">
+            <div class="adm-toggle-info">
+              <div class="adm-toggle-label"><svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--teal)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Flash Sales</div>
+              <div class="adm-toggle-desc">Permite que vendedores criem ofertas relâmpago</div>
+            </div>
+            <label class="adm-switch"><input type="checkbox" checked onchange="cfgToggle('flash',this)"><span class="adm-switch-slider"></span></label>
+          </div>
+          <div class="adm-toggle-row">
+            <div class="adm-toggle-info">
+              <div class="adm-toggle-label"><svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--purple)"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> WeKz Boost</div>
+              <div class="adm-toggle-desc">Sistema de destaque pago para produtos</div>
+            </div>
+            <label class="adm-switch"><input type="checkbox" checked onchange="cfgToggle('boost',this)"><span class="adm-switch-slider"></span></label>
+          </div>
+          <div class="adm-toggle-row">
+            <div class="adm-toggle-info">
+              <div class="adm-toggle-label"><svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cyan)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Novos Cadastros de Lojas</div>
+              <div class="adm-toggle-desc">Permite novos vendedores se registrarem</div>
+            </div>
+            <label class="adm-switch"><input type="checkbox" checked onchange="cfgToggle('newstores',this)"><span class="adm-switch-slider"></span></label>
+          </div>
+          <div class="adm-toggle-row">
+            <div class="adm-toggle-info">
+              <div class="adm-toggle-label"><svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#22C55E"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pagamento via PIX</div>
+              <div class="adm-toggle-desc">Gateway PIX habilitado para transações</div>
+            </div>
+            <label class="adm-switch"><input type="checkbox" checked onchange="cfgToggle('pix',this)"><span class="adm-switch-slider"></span></label>
+          </div>
+          <div class="adm-toggle-row">
+            <div class="adm-toggle-info">
+              <div class="adm-toggle-label"><svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--teal)"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Kz — IA do Painel</div>
+              <div class="adm-toggle-desc">Assistente Kz visível para vendedores e compradores</div>
+            </div>
+            <label class="adm-switch"><input type="checkbox" checked onchange="cfgToggle('kz',this)"><span class="adm-switch-slider"></span></label>
+          </div>
+          <div class="adm-toggle-row adm-toggle-danger">
+            <div class="adm-toggle-info">
+              <div class="adm-toggle-label"><svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#EF4444"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Modo Manutenção</div>
+              <div class="adm-toggle-desc">Exibe página de manutenção para todos os usuários</div>
+            </div>
+            <label class="adm-switch"><input type="checkbox" id="cfgMaintenance" onchange="cfgToggle('maintenance',this)"><span class="adm-switch-slider adm-switch-danger"></span></label>
+          </div>
+        </div>
+
+        <!-- Taxas de comissão -->
+        <div class="adm-section-label" style="margin-top:24px;"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Taxas de Comissão por Categoria</div>
+        <div class="adm-config-card">
+          <div class="adm-rate-row" id="rateEletronicos">
+            <span class="adm-rate-cat"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--teal)"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> Eletrônicos</span>
+            <input type="range" class="adm-rate-slider" min="3" max="20" value="8" oninput="updateRate('Eletrônicos',this)">
+            <span class="adm-rate-val">8%</span>
+          </div>
+          <div class="adm-rate-row">
+            <span class="adm-rate-cat"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--purple)"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg> Moda</span>
+            <input type="range" class="adm-rate-slider" min="3" max="20" value="12" oninput="updateRate('Moda',this)">
+            <span class="adm-rate-val">12%</span>
+          </div>
+          <div class="adm-rate-row">
+            <span class="adm-rate-cat"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Casa &amp; Deco</span>
+            <input type="range" class="adm-rate-slider" min="3" max="20" value="10" oninput="updateRate('Casa & Deco',this)">
+            <span class="adm-rate-val">10%</span>
+          </div>
+          <div class="adm-rate-row">
+            <span class="adm-rate-cat"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#F472B6"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85z"/><path d="M17 1l.85 2 2 .85-2 .85L17 7l-.85-2-2-.85 2-.85z"/></svg> Beleza</span>
+            <input type="range" class="adm-rate-slider" min="3" max="20" value="14" oninput="updateRate('Beleza',this)">
+            <span class="adm-rate-val">14%</span>
+          </div>
+          <div class="adm-rate-row">
+            <span class="adm-rate-cat"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#F59E0B"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg> Games</span>
+            <input type="range" class="adm-rate-slider" min="3" max="20" value="6" oninput="updateRate('Games',this)">
+            <span class="adm-rate-val">6%</span>
+          </div>
+          <div class="adm-rate-row">
+            <span class="adm-rate-cat"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cyan)"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Livros</span>
+            <input type="range" class="adm-rate-slider" min="3" max="20" value="5" oninput="updateRate('Livros',this)">
+            <span class="adm-rate-val">5%</span>
+          </div>
+          <button class="adm-config-save" onclick="saveRates()">💾 Salvar Taxas</button>
+        </div>
+
+        <!-- Limites operacionais -->
+        <div class="adm-section-label" style="margin-top:24px;"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Limites Operacionais</div>
+        <div class="adm-config-card">
+          <div class="adm-limit-row">
+            <span class="adm-limit-label">Máx. produtos por loja</span>
+            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="500" min="10" max="5000">
+          </div>
+          <div class="adm-limit-row">
+            <span class="adm-limit-label">Máx. imagens por produto</span>
+            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="8" min="1" max="20">
+          </div>
+          <div class="adm-limit-row">
+            <span class="adm-limit-label">Prazo mín. de entrega (dias)</span>
+            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="1" min="1" max="30">
+          </div>
+          <div class="adm-limit-row">
+            <span class="adm-limit-label">Valor mínimo de pedido (R$)</span>
+            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="10" min="0" max="1000">
+          </div>
+          <div class="adm-limit-row">
+            <span class="adm-limit-label">Taxa de chargeback máx. (%)</span>
+            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="1.5" min="0.5" max="5" step="0.1">
+          </div>
+          <button class="adm-config-save" onclick="saveLimits()">💾 Salvar Limites</button>
+        </div>
+
+        <!-- ── 📈 KZ FX GUARD — Proteção Cambial ── -->
+        <div class="adm-section-label" style="margin-top:24px;">
+          <svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Kz FX Guard — Proteção Cambial
+        </div>
+        <div class="kz-fxguard-card">
+          <div class="kz-fxguard-header">
+            <div>
+              <div class="kz-fxguard-title">📈 Kz FX Guard — Proteção Cambial</div>
+              <div class="kz-fxguard-sub">Margem de spread/risco aplicada sobre cada moeda na conversão internacional exibida na PDP</div>
+            </div>
+            <div class="kz-fxguard-badge"><span class="kz-fxguard-badge-dot"></span>ATIVO</div>
+          </div>
+          <div class="kz-fxguard-grid">
+            <div class="kz-fxguard-row">
+              <span class="kz-fxguard-flag">🇪🇺</span>
+              <div class="kz-fxguard-info"><div class="kz-fxguard-curr">EUR — Euro</div><div class="kz-fxguard-desc">Zona Euro</div></div>
+              <div class="kz-fxguard-input-wrap">
+                <input type="number" class="kz-fxguard-input" id="fxSpreadEUR" value="1.5" min="0" max="10" step="0.1" oninput="kzFxGuardPreview()">
+                <span class="kz-fxguard-pct">%</span>
+              </div>
+            </div>
+            <div class="kz-fxguard-row">
+              <span class="kz-fxguard-flag">🇺🇸</span>
+              <div class="kz-fxguard-info"><div class="kz-fxguard-curr">USD — Dólar</div><div class="kz-fxguard-desc">Estados Unidos</div></div>
+              <div class="kz-fxguard-input-wrap">
+                <input type="number" class="kz-fxguard-input" id="fxSpreadUSD" value="1.5" min="0" max="10" step="0.1" oninput="kzFxGuardPreview()">
+                <span class="kz-fxguard-pct">%</span>
+              </div>
+            </div>
+            <div class="kz-fxguard-row">
+              <span class="kz-fxguard-flag">🇧🇷</span>
+              <div class="kz-fxguard-info"><div class="kz-fxguard-curr">BRL — Real</div><div class="kz-fxguard-desc">Brasil (base)</div></div>
+              <div class="kz-fxguard-input-wrap">
+                <input type="number" class="kz-fxguard-input" id="fxSpreadBRL" value="0" min="0" max="10" step="0.1" oninput="kzFxGuardPreview()">
+                <span class="kz-fxguard-pct">%</span>
+              </div>
+            </div>
+            <div class="kz-fxguard-row">
+              <span class="kz-fxguard-flag">🇯🇵</span>
+              <div class="kz-fxguard-info"><div class="kz-fxguard-curr">JPY — Iene</div><div class="kz-fxguard-desc">Japão</div></div>
+              <div class="kz-fxguard-input-wrap">
+                <input type="number" class="kz-fxguard-input" id="fxSpreadJPY" value="2.0" min="0" max="10" step="0.1" oninput="kzFxGuardPreview()">
+                <span class="kz-fxguard-pct">%</span>
+              </div>
+            </div>
+            <div class="kz-fxguard-row">
+              <span class="kz-fxguard-flag">🇨🇳</span>
+              <div class="kz-fxguard-info"><div class="kz-fxguard-curr">CNY — Yuan</div><div class="kz-fxguard-desc">China</div></div>
+              <div class="kz-fxguard-input-wrap">
+                <input type="number" class="kz-fxguard-input" id="fxSpreadCNY" value="2.0" min="0" max="10" step="0.1" oninput="kzFxGuardPreview()">
+                <span class="kz-fxguard-pct">%</span>
+              </div>
+            </div>
+            <div class="kz-fxguard-row">
+              <span class="kz-fxguard-flag">🇮🇳</span>
+              <div class="kz-fxguard-info"><div class="kz-fxguard-curr">INR — Rupia</div><div class="kz-fxguard-desc">Índia</div></div>
+              <div class="kz-fxguard-input-wrap">
+                <input type="number" class="kz-fxguard-input" id="fxSpreadINR" value="2.5" min="0" max="10" step="0.1" oninput="kzFxGuardPreview()">
+                <span class="kz-fxguard-pct">%</span>
+              </div>
+            </div>
+            <div class="kz-fxguard-row">
+              <span class="kz-fxguard-flag">🇷🇺</span>
+              <div class="kz-fxguard-info"><div class="kz-fxguard-curr">RUB — Rublo</div><div class="kz-fxguard-desc">Rússia</div></div>
+              <div class="kz-fxguard-input-wrap">
+                <input type="number" class="kz-fxguard-input" id="fxSpreadRUB" value="3.0" min="0" max="10" step="0.1" oninput="kzFxGuardPreview()">
+                <span class="kz-fxguard-pct">%</span>
+              </div>
+            </div>
+          </div>
+          <div class="kz-fxguard-footer">
+            <button class="kz-fxguard-save" onclick="kzFxGuardSave()">💾 Aplicar Spreads</button>
+            <div class="kz-fxguard-note">O spread é somado à taxa base antes de exibir o preço na PDP. Ex: R$ 1.249,90 × <strong>taxa JPY × (1 + 2%)</strong> = proteção contra volatilidade cambial.</div>
+          </div>
+        </div>
+      </div><!-- /adm-configuracoes -->
+
+      <!-- ══ PAINEL: KZ IA · CENTRO DE COMANDO ══ -->
+      <div id="adm-kz-ia" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <h1 class="adm-page-title"><svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Kz IA · Centro de Comando</h1>
+          <div class="adm-page-sub">Assistente inteligente de gestão — análises, alertas e insights em tempo real</div>
+        </div>
+
+        <!-- Kz identity card -->
+        <div class="adm-kzia-header">
+          <div class="adm-kzia-avatar-wrap">
+            <div class="adm-kzia-avatar" id="admKzIaAvatar"></div>
+            <div class="adm-kzia-chip">Kz · Admin IA</div>
+          </div>
+          <div class="adm-kzia-info">
+            <div class="adm-kzia-name">Kz · Lince Cibernético</div>
+            <div class="adm-kzia-status">
+              <span class="adm-kzia-dot"></span> Online · Painel de Gestão WeKz
+            </div>
+            <div class="adm-kzia-desc">Monitorando plataforma em tempo real · Maio 2025</div>
+          </div>
+        </div>
+
+        <!-- Quick action chips -->
+        <div class="adm-kzia-chips">
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Como está o faturamento hoje?')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Faturamento
+          </button>
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Quais lojas precisam de atenção imediata?')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Lojas Pendentes
+          </button>
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Há alertas de segurança ativos?')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Segurança
+          </button>
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Gera uma análise completa da plataforma')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Análise Geral
+          </button>
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Produtos com mais denúncias esta semana?')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Moderação
+          </button>
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Como estão as disputas e mediações em aberto?')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Disputas
+          </button>
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Quais saques estão pendentes e qual o risco?')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Saques
+          </button>
+          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Há indicadores de fraude ou risco alto no momento?')">
+            <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Fraude
+          </button>
+        </div>
+
+        <!-- Messages area -->
+        <div class="adm-kzia-messages" id="admKzIaMessages"></div>
+
+        <!-- Input -->
+        <div class="adm-kzia-input-row">
+          <input type="text" class="adm-kzia-input wkz-input" id="admKzIaInput"
+            placeholder="Pergunte algo ao Kz... (ex: 'Como está o GMV?')"
+            onkeydown="if(event.key==='Enter')admKzIaSend()">
+          <button class="adm-kzia-send" onclick="admKzIaSend()">
+            <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Enviar
+          </button>
+        </div>
+      </div><!-- /adm-kz-ia -->
+
+      <!-- ══════════════════════════════════════════════════════════
+           ABA: MEDIAÇÃO DE DISPUTAS
+           ══════════════════════════════════════════════════════════ -->
+      <div id="adm-disputas" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <div>
+            <h1 class="adm-page-title">
+              <svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Central de Mediação de Disputas
+            </h1>
+            <div class="adm-page-sub" id="disputasSubtitle">— carregando —</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <div class="adm-kz-monitor-chip" id="disputasKzChip">
+              <span id="disputasKzChipIcon"></span>
+              <span id="disputasKzChipMsg">Kz monitorando disputas...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="adm-filter-row">
+          <button class="adm-filter active" onclick="filterDisputas('all',this)">Todas <span id="dFilterAll"></span></button>
+          <button class="adm-filter" onclick="filterDisputas('open',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;margin-right:4px;"></span>Abertas
+          </button>
+          <button class="adm-filter" onclick="filterDisputas('escalated',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;display:inline-block;margin-right:4px;"></span>Escaladas
+          </button>
+          <button class="adm-filter" onclick="filterDisputas('resolved',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;display:inline-block;margin-right:4px;"></span>Resolvidas
+          </button>
+        </div>
+
+        <!-- Lista de disputas -->
+        <div id="disputasList" style="display:flex;flex-direction:column;gap:14px;"></div>
+
+        <!-- Modal de chat tripartite -->
+        <div id="disputaChatModal" class="adm-modal-overlay" style="display:none;" onclick="if(event.target===this)closeDisputaChat()">
+          <div class="adm-modal-box adm-disputa-modal">
+            <div class="adm-modal-header">
+              <div>
+                <div class="adm-modal-title" id="disputaChatTitle">Disputa #WKZ—...</div>
+                <div class="adm-modal-sub" id="disputaChatSub">Comprador vs Lojista — Mediação ativa</div>
+              </div>
+              <button class="adm-modal-close" onclick="closeDisputaChat()">✕</button>
+            </div>
+
+            <!-- Partes envolvidas -->
+            <div class="adm-disputa-parties" id="disputaChatParties"></div>
+
+            <!-- Chat tripartite -->
+            <div class="adm-disputa-chat" id="disputaChatMessages"></div>
+
+            <!-- Kz Dispute Copilot Panel -->
+            <div id="kzCopilotPanelWrap" style="display:none;"></div>
+
+            <!-- Input admin -->
+            <div class="adm-disputa-input-row" style="flex-wrap:wrap;gap:8px;">
+              <div style="display:flex;gap:8px;width:100%;align-items:center;flex-wrap:wrap;">
+                <button class="kz-copilot-btn" onclick="activateKzDisputeCopilot()" id="kzCopilotTriggerBtn">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  ✨ Consultar Parecer do Kz
+                </button>
+                <span style="font-size:11px;color:var(--muted);">Lince Cibernético analisa o histórico e sugere a resolução ideal</span>
+              </div>
+              <select class="adm-disputa-as wkz-select wkz-select--sm" id="disputaSendAs">
+                <option value="admin">🛡️ Como Admin WeKz</option>
+                <option value="buyer">👤 Simular Comprador</option>
+                <option value="seller">🏪 Simular Lojista</option>
+              </select>
+              <!-- Anexo de prova visual (oculto) -->
+              <input type="file" id="disputaAttachInput" accept="image/*" style="display:none;" onchange="handleDisputaAttach(this)">
+              <button class="adm-attach-btn" onclick="document.getElementById('disputaAttachInput').click()" title="Anexar prova visual (foto do produto)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <input type="text" class="adm-disputa-input wkz-input" id="disputaChatInput"
+                placeholder="Escreva uma mensagem de mediação..."
+                onkeydown="if(event.key==='Enter')sendDisputaMsg()">
+              <button class="adm-disputa-send" onclick="sendDisputaMsg()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+
+            <!-- Ações de resolução -->
+            <div class="adm-disputa-actions" id="disputaChatActions"></div>
+          </div>
+        </div>
+      </div><!-- /adm-disputas -->
+
+      <!-- ══════════════════════════════════════════════════════════
+           ABA: SAQUES / PAYOUTS
+           ══════════════════════════════════════════════════════════ -->
+      <div id="adm-saques" class="adm-panel" style="display:none;">
+        <div class="adm-page-header">
+          <div>
+            <h1 class="adm-page-title">
+              <svg class="adm-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              Solicitações de Saque · Payouts
+            </h1>
+            <div class="adm-page-sub" id="saquesSubtitle">— carregando —</div>
+          </div>
+          <div class="adm-saques-summary" id="saquesSummary"></div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="adm-filter-row">
+          <button class="adm-filter active" onclick="filterSaques('all',this)">Todos</button>
+          <button class="adm-filter" onclick="filterSaques('pending',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;margin-right:4px;"></span>Pendentes
+          </button>
+          <button class="adm-filter" onclick="filterSaques('hold',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;display:inline-block;margin-right:4px;"></span>Retidos
+          </button>
+          <button class="adm-filter" onclick="filterSaques('approved',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;display:inline-block;margin-right:4px;"></span>Aprovados
+          </button>
+        </div>
+
+        <!-- Tabela de saques -->
+        <div class="adm-saques-table-wrap">
+          <table class="adm-saques-table" id="saquesTable">
+            <thead>
+              <tr>
+                <th>Lojista</th>
+                <th>Saldo Total</th>
+                <th>Valor Solicitado</th>
+                <th>Comissão WeKz</th>
+                <th>Líquido a Pagar</th>
+                <th>⚡ Antecipação Express</th>
+                <th>Solicitado em</th>
+                <th>Status</th>
+                <th style="text-align:center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="saquesTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Modal de detalhe do saque -->
+        <div id="saqueDetailModal" class="adm-modal-overlay" style="display:none;" onclick="if(event.target===this)closeSaqueDetail()">
+          <div class="adm-modal-box" style="max-width:520px;">
+            <div class="adm-modal-header">
+              <div>
+                <div class="adm-modal-title" id="saqueDetailTitle">Saque #SW001</div>
+                <div class="adm-modal-sub">Detalhes da solicitação de saque</div>
+              </div>
+              <button class="adm-modal-close" onclick="closeSaqueDetail()">✕</button>
+            </div>
+            <div id="saqueDetailBody" style="padding:20px 24px;"></div>
+            <div style="padding:0 24px 20px;display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="adm-btn-approve" id="saqueDetailApprove" style="flex:1;">✅ Aprovar Saque</button>
+              <button class="adm-btn-reject"  id="saqueDetailHold"    style="flex:1;">🔒 Reter para Análise</button>
+              <button class="adm-btn-view"    onclick="closeSaqueDetail()" style="flex:1;">Fechar</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /adm-saques -->
+
+    </div><!-- /adm-main -->
+  </div><!-- /adm-layout -->
+</div><!-- /page-admin-dashboard -->
+</main>
+<script src="../core/wkz-bus.js"></script>
+<script src="../core/wkz-core.js"></script>
+<script src="wkz-admin.js"></script>
+<script>
+  /* Bootstrap: Admin não tem outra página pra onde navegar por hash (só
+     existe page-admin-dashboard aqui), então sempre ativa ela e renderiza
+     tudo. currentAdminUser já é um placeholder (ver wkz-admin.js, topo). */
+  document.addEventListener('DOMContentLoaded', function () {
+    MapsTo('admin-dashboard');
+    if (typeof renderAdminStores === 'function') renderAdminStores();
+    if (typeof renderAdminKyc === 'function') renderAdminKyc();
+    if (typeof renderAdminReports === 'function') renderAdminReports();
+    if (typeof renderAdminKzBanner === 'function') renderAdminKzBanner();
+    if (typeof renderDisputas === 'function') renderDisputas();
+    if (typeof renderSaques === 'function') renderSaques();
+    if (typeof renderSecurityPanel === 'function') renderSecurityPanel();
+    if (typeof renderCommHistory === 'function') renderCommHistory();
+    if (typeof initAdmKzIaPanel === 'function') initAdmKzIaPanel();
+    if (typeof syncOverviewKPIs === 'function') syncOverviewKPIs(false);
+    if (window.WkzBus) window.WkzBus.emit('module:ready', { module: 'admin' });
+  });
+</script>
+</body>
+</html>
