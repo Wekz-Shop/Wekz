@@ -13,7 +13,9 @@
     "test:m2": "node buyer/harness-buyer-test.js",
     "check:buyer": "node --check buyer/wkz-buyer.js",
     "test:m3": "node seller/harness-seller-test.js",
-    "check:seller": "node --check seller/wkz-seller.js"
+    "check:seller": "node --check seller/wkz-seller.js",
+    "test:m4": "node admin/harness-admin-test.js",
+    "check:admin": "node --check admin/wkz-admin.js"
   },
   "repository": {
     "type": "git",

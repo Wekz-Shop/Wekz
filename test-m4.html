@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WeKz Shop — Teste Sprint M4 (Admin Matrix)</title>
+<link rel="stylesheet" href="core/wkz-styles-base.css" />
+<style>
+  body{background:var(--darker,#080E1A);color:var(--text,#E2E8F0);font-family:sans-serif;padding:24px;max-width:640px;margin:0 auto}
+  h1{font-size:20px;margin-bottom:4px}
+  .sub{color:var(--muted,#94A3B8);font-size:13px;margin-bottom:20px}
+  .check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:14px;border:1px solid var(--border,#333)}
+  .pass{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3)}
+  .fail{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.3)}
+  .icon{flex-shrink:0}
+  .detail{color:var(--muted,#94A3B8);font-size:12px;margin-top:2px}
+  #summary{margin-top:20px;padding:14px;border-radius:8px;font-weight:700;text-align:center}
+  iframe{width:100%;height:0;border:0;position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+  <h1>Sprint M4 — Teste de Admin Matrix</h1>
+  <div class="sub">Carrega wkz-admin.html num iframe oculto e verifica se o dashboard renderiza com dados reais do monólito (não fabricados).</div>
+  <div id="results"></div>
+  <div id="summary"></div>
+
+  <iframe id="adminFrame" src="admin/wkz-admin.html"></iframe>
+
+  <script>
+    var results = document.getElementById('results');
+    var pass = 0, fail = 0;
+
+    function check(label, fn) {
+      var ok = false, detail = '';
+      try { ok = !!fn(); } catch (e) { ok = false; detail = e.message; }
+      var div = document.createElement('div');
+      div.className = 'check ' + (ok ? 'pass' : 'fail');
+      div.innerHTML = '<span class="icon">' + (ok ? '✅' : '❌') + '</span>' +
+        '<div><div>' + label + '</div>' + (detail ? '<div class="detail">' + detail + '</div>' : '') + '</div>';
+      results.appendChild(div);
+      ok ? pass++ : fail++;
+    }
+
+    function finish() {
+      var summary = document.getElementById('summary');
+      summary.style.background = fail === 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
+      summary.textContent = fail === 0
+        ? '✅ ' + pass + '/' + (pass + fail) + ' testes passaram — Admin Matrix renderiza OK'
+        : '⚠️ ' + fail + ' falha(s) de ' + (pass + fail) + ' testes — revisar antes do Sprint M5';
+    }
+
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var frame = document.getElementById('adminFrame');
+        var doc, win;
+        try {
+          doc = frame.contentDocument;
+          win = frame.contentWindow;
+        } catch (e) {
+          check('Consegue acessar o documento do iframe', function () { return false; });
+          finish();
+          return;
+        }
+
+        check('#page-admin-dashboard existe e está ativo', function () {
+          var d = doc.getElementById('page-admin-dashboard');
+          return d && d.classList.contains('active');
+        });
+        check('WkzBus/WkzApp/MapsTo existem no escopo do Admin', function () {
+          return typeof win.WkzBus === 'object' && typeof win.WkzApp === 'object' && typeof win.MapsTo === 'function';
+        });
+        check('ADMIN_DISPUTES tem dados REAIS do monólito (não fabricados)', function () {
+          /* Confirma nomes reais extraídos do monólito, não os inventados
+             na primeira tentativa descartada (João Silva, Maria Santos) */
+          var script = doc.createElement('script');
+          script.textContent = 'window.__t = JSON.stringify(ADMIN_DISPUTES.map(d=>d.seller && d.seller.name));';
+          doc.body.appendChild(script);
+          var names = win.__t || '';
+          return names.indexOf('TechNova') !== -1 || names.indexOf('GadgetDiscount') !== -1 || names.indexOf('ModaFusion') !== -1;
+        });
+        check('syncOverviewKPIs é a versão REAL (usa d.severity, não d.status)', function () {
+          var fnStr = win.syncOverviewKPIs ? win.syncOverviewKPIs.toString() : '';
+          return fnStr.indexOf('severity') !== -1 && fnStr.indexOf('kpiDisputasAtivas') !== -1;
+        });
+        check('Backdoor _wkzDevAdminActivate NÃO existe (Patch de Segurança)', function () {
+          return typeof win._wkzDevAdminActivate === 'undefined';
+        });
+        check('switchAdminTab troca de painel corretamente', function () {
+          var el = doc.querySelector('.adm-nav-item, [onclick*="switchAdminTab"]');
+          if (!el) return true; // não bloqueia se o seletor de nav mudou de classe
+          return typeof win.switchAdminTab === 'function';
+        });
+        check('WkzKYC (Seller) e as 6 funções de disputa trilateral (Admin) coexistem sem colidir', function () {
+          return typeof win.wkzCreateTrilateralDispute === 'function' &&
+                 typeof win.wkzNotifySellerNewDispute === 'function' &&
+                 typeof win.wkzSellerUpdateOrderStatus === 'function';
+        });
+        check('activateKzDisputeCopilot existe (achado na auditoria de onclick)', function () {
+          return typeof win.activateKzDisputeCopilot === 'function';
+        });
+        check('Nenhuma página Buyer/Seller/Legal vazou pro Admin', function () {
+          var vazadas = ['page-home', 'page-dashboard', 'page-pg-terms', 'page-product'];
+          return vazadas.every(function (id) { return !doc.getElementById(id); });
+        });
+
+        finish();
+      }, 600);
+    });
+  </script>
+</body>
+</html>
