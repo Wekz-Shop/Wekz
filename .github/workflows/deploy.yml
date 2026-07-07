@@ -23,9 +23,11 @@ jobs:
       - run: npm run check
       - run: npm run check:buyer
       - run: npm run check:seller
+      - run: npm run check:admin
       - run: npm run test:m1
       - run: npm run test:m2
       - run: npm run test:m3
+      - run: npm run test:m4
 
   deploy:
     needs: validate
