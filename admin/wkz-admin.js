@@ -766,6 +766,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function sendBroadcast() {
+  /* FIX Sprint M5 (Hardening): rate limit de 3 broadcasts por 5 minutos.
+     Este é o ponto mais sensível a spam de todo o app — um broadcast
+     atinge a base inteira de usuários (até "318K" pela estimativa de
+     alcance abaixo), então o limite é bem mais rígido que o de login. */
+  if (typeof wkzRateLimit === 'function' && !wkzRateLimit('admin_broadcast', 3, 300000)) {
+    showToast('⚠️ Limite de comunicados atingido (3 a cada 5 min). Aguarde antes de enviar outro.');
+    return;
+  }
+
   const ti = document.getElementById('commTitle');
   const bi = document.getElementById('commBody');
   const btn = document.getElementById('commSendBtn');
@@ -1626,11 +1635,15 @@ function renderDisputaChat(d) {
     const cls     = isKz ? 'msg-kz' : `msg-${m.who}`;
     const avMap   = { buyer: d.buyer.avatar, seller: d.seller.avatar, admin: '🛡', kz: '' };
     const av      = isKz ? (typeof getKzSVG === 'function' ? getKzSVG(18) : '🐱') : avMap[m.who];
+    /* FIX XSS (auditoria M5): m.text vem direto de um <textarea> (ver
+       sendDisputaMsg) sem nenhuma sanitização — sem escapeHtml(), um
+       comprador ou vendedor mal-intencionado poderia injetar HTML/JS
+       que executaria na sessão do Admin ao abrir a disputa. */
     return `
       <div class="adm-chat-msg ${cls}">
         <div class="adm-chat-avatar">${av}</div>
         <div>
-          <div class="adm-chat-bubble">${m.text}</div>
+          <div class="adm-chat-bubble">${escapeHtml(m.text)}</div>
           <div class="adm-chat-meta">${isKz ? '🤖 Kz IA' : isAdmin ? '🛡️ Admin WeKz' : m.who === 'buyer' ? '👤 ' + d.buyer.name : '🏪 ' + d.seller.name} · ${m.time}</div>
         </div>
       </div>`;
@@ -1639,6 +1652,14 @@ function renderDisputaChat(d) {
 }
 
 function sendDisputaMsg() {
+  /* FIX Sprint M5 (Hardening): rate limit de 20 mensagens por minuto —
+     generoso o bastante para uma conversa real, mas barra flood/spam
+     automatizado no chat de disputas. */
+  if (typeof wkzRateLimit === 'function' && !wkzRateLimit('disputa_msg', 20, 60000)) {
+    showToast('⚠️ Muitas mensagens em pouco tempo. Aguarde um instante.');
+    return;
+  }
+
   const input  = document.getElementById('disputaChatInput');
   const sendAs = document.getElementById('disputaSendAs');
   if (!input || !_activeDisputaId) return;
@@ -2082,8 +2103,12 @@ function handleDisputaAttach(input) {
     const time    = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const fname   = file.name.length > 24 ? file.name.slice(0, 21) + '…' : file.name;
 
-    /* Insere mensagem com imgSrc */
-    d.msgs.push({ who, text: `📎 Prova visual: <em>${fname}</em>`, imgSrc, time });
+    /* Insere mensagem com imgSrc. FIX XSS (auditoria M5): sem tags HTML
+       embutidas aqui — fname vem de file.name (nome do arquivo), também
+       é entrada controlada pelo usuário. Como renderDisputaChat agora
+       escapa m.text sempre, manter <em> aqui só mostraria a tag literal
+       em vez de itálico — texto plano evita o conflito. */
+    d.msgs.push({ who, text: `📎 Prova visual: ${fname}`, imgSrc, time });
 
     /* Re-renderiza chat */
     renderDisputaChat(d);
@@ -2140,7 +2165,7 @@ function handleDisputaAttach(input) {
         <div class="adm-chat-msg ${cls}">
           <div class="adm-chat-avatar">${av}</div>
           <div>
-            <div class="adm-chat-bubble">${m.text}${imgHtml}</div>
+            <div class="adm-chat-bubble">${escapeHtml(m.text)}${imgHtml}</div>
             <div class="adm-chat-meta">${authorLabel} · ${m.time}</div>
           </div>
         </div>`;

@@ -3,6 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Sprint M5 — Hardening: CSP estrita, viável aqui porque o Admin já foi
+       isolado num arquivo próprio no Sprint M4 (o plano original já
+       apontava que CSP real era inviável enquanto Admin dividia HTML com
+       Buyer/1000+ onclick — separado, dá pra aplicar aqui mesmo antes do
+       resto do app terminar o M5).
+       'unsafe-inline' em script-src/style-src ainda é necessário (71
+       onclick inline + muitos style="" inline, ver auditoria M5) — uma
+       remoção completa é um refactor maior, arriscado de fazer sem
+       regressão num módulo recém-validado, fica para um M5.1 dedicado.
+       Ainda assim, isto já bloqueia a classe de ataque mais comum de XSS
+       bem-sucedido: injeção de <script src="dominio-externo"> — só
+       'self' é permitido. object-src 'none' bloqueia plugins legados.
+       frame-ancestors 'none' impede clickjacking (Admin nunca deve
+       rodar dentro de um <iframe> de outro site). -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    font-src 'self';
+    connect-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+  " />
   <title>WeKz Shop — Admin Matrix</title>
   <link rel="stylesheet" href="../core/wkz-styles-base.css" />
   <link rel="stylesheet" href="../shared/wkz-styles-full.css" />
