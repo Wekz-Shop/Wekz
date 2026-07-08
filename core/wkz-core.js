@@ -6850,3 +6850,78 @@ function formatPrice(input) {
     return `${symbols[currentCurrency]} ${converted.toFixed(2)}`;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Sprint M5 (Hardening) — wkzStore + wkzRateLimit
+   NOTA: estes NÃO existem no monólito original — o plano de arquitetura
+   (Seção 5, Bloco 2) já previa esses dois utilitários como alvo, mas eles
+   nunca foram implementados na v2.9.36. São infraestrutura nova, não
+   extração. Adicionados agora porque o M5 exige verificar que estão
+   ativos nos formulários de submit e que localStorage com TTL substitui
+   sets diretos.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── wkzStore: wrapper de localStorage com expiração (TTL) ────────────────
+   Uso: wkzStore.set('chave', valor, 60000)  // expira em 60s
+        wkzStore.get('chave')                 // null se expirado/ausente
+        wkzStore.remove('chave')
+   Serializa como JSON; falha graciosamente se localStorage não estiver
+   disponível (modo privado, quota excedida, etc.) — nunca lança erro para
+   quem chama, só retorna null/false. */
+var wkzStore = {
+  set: function (key, value, ttlMs) {
+    try {
+      var entry = { v: value, exp: ttlMs ? (Date.now() + ttlMs) : null };
+      localStorage.setItem('wkz_ttl_' + key, JSON.stringify(entry));
+      return true;
+    } catch (e) {
+      wkzLog('[wkzStore] Falha ao salvar "' + key + '": ' + e.message);
+      return false;
+    }
+  },
+  get: function (key) {
+    try {
+      var raw = localStorage.getItem('wkz_ttl_' + key);
+      if (!raw) return null;
+      var entry = JSON.parse(raw);
+      if (entry.exp && Date.now() > entry.exp) {
+        localStorage.removeItem('wkz_ttl_' + key);
+        return null;
+      }
+      return entry.v;
+    } catch (e) {
+      return null;
+    }
+  },
+  remove: function (key) {
+    try { localStorage.removeItem('wkz_ttl_' + key); } catch (e) {}
+  }
+};
+window.wkzStore = wkzStore;
+
+/* ── wkzRateLimit: limitador de tentativas do lado do cliente ────────────
+   Uso: if (!wkzRateLimit('login', 5, 60000)) { showToast('Muitas tentativas, aguarde.'); return; }
+   Retorna true se a ação PODE prosseguir (dentro do limite), false se
+   deve ser bloqueada. Usa wkzStore (TTL) para guardar os timestamps das
+   tentativas dentro da janela de tempo — a lista é limpa automaticamente
+   após 'windowMs' sem nenhuma tentativa nova (TTL do próprio registro).
+   IMPORTANTE: isto é uma camada de UX/mitigação básica do lado do
+   cliente (evita clique acidental duplo, spam grosseiro de formulário).
+   NÃO substitui rate limiting real do lado do servidor — um atacante
+   pode sempre limpar o localStorage ou chamar a API diretamente. Ver
+   nota de segurança no changelog do M5. */
+function wkzRateLimit(actionKey, maxAttempts, windowMs) {
+  maxAttempts = maxAttempts || 5;
+  windowMs = windowMs || 60000;
+  var key = 'ratelimit_' + actionKey;
+  var now = Date.now();
+  var attempts = wkzStore.get(key) || [];
+  attempts = attempts.filter(function (ts) { return now - ts < windowMs; });
+  if (attempts.length >= maxAttempts) {
+    return false;
+  }
+  attempts.push(now);
+  wkzStore.set(key, attempts, windowMs);
+  return true;
+}
+window.wkzRateLimit = wkzRateLimit;
