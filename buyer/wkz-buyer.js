@@ -6223,6 +6223,14 @@ function wishToggle(btn, productIndex, evt){
 // Agora valida e-mail, senha obrigatória e informa que
 // a integração com servidor está pendente.
 function doLogin() {
+  /* FIX Sprint M5 (Hardening): rate limit client-side — máx. 5 tentativas
+     por minuto. Mitigação básica de UX contra tentativas grosseiras
+     repetidas; não substitui rate limiting real do servidor. */
+  if (typeof wkzRateLimit === 'function' && !wkzRateLimit('login', 5, 60000)) {
+    showToast('⚠️ Muitas tentativas de login. Aguarde um minuto e tente novamente.');
+    return;
+  }
+
   var email = (document.getElementById('loginEmail') || {}).value || '';
   var pw    = (document.getElementById('loginPassword') || {}).value || '';
   email = email.trim();
