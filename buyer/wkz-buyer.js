@@ -12040,3 +12040,14 @@ wkzLog('[WkzShop v2.9.21] ✓ Fiscal/Split carregado (IBS/CBS por categoria + M�
   });
 
 })(); /* end KZ LIVE SHOPPING IIFE */
+
+/* ── Sprint M5 (fechamento de gap documentado no M2): openGlobalShippingModal
+   Chamada pelo hero-card "Logística Global" da Home (onclick já presente
+   no HTML desde a extração, função nunca tinha sido movida pro JS).
+   openGlobalShippingModalLegacy() NÃO foi extraída — confirmado via grep
+   no monólito que nunca é chamada em lugar nenhum (código morto real,
+   superseded por esta versão que só navega pra página dedicada).
+   Origem monólito: linhas 31295–31297. */
+function openGlobalShippingModal(){
+  MapsTo('logistica-global');
+}

@@ -533,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<main class='main-content'>
+<main id="main-content" class='main-content'>
 <div id="page-home" class="page active">
 
   <!-- HERO -->
@@ -5073,10 +5073,548 @@ body.kzlive-active .bottom-nav {
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" style="display:none;" class="toast">
-  <span class="toast-icon" id="toastIcon">✅</span>
-  <span id="toastMsg">Mensagem</span>
+<!-- Sprint M5: markup do toast V1 removido daqui — confirmado morto, sem
+     nenhuma referência real em JS (showToast V2, em wkz-core.js, cria seu
+     próprio elemento #wkz-toast-v2 dinamicamente, não reaproveita isto). -->
+
+<!-- ═══════════════════════ MODAIS/OVERLAYS GLOBAIS (achados na auditoria) ═══════════════════════ -->
+<!-- Origem monólito: linhas 35012-48661 (região entre o router e o CSS do
+     cookie banner) — nunca haviam sido extraídos em nenhum módulo. -->
+<div id="wkzHeroBanner" style="display:none;"></div>
+<div id="wkzReturnModalOv" onclick="if(event.target===this)closeReturnModal()">
+  <div class="wkz-ret-shell">
+
+    <div class="wkz-ret-header">
+      <div class="wkz-ret-header-icon">📦</div>
+      <div>
+        <div class="wkz-ret-title">Solicitar Devolução</div>
+        <div class="wkz-ret-subtitle">Retirada sempre grátis num ponto parceiro WeKz</div>
+      </div>
+      <button class="wkz-ret-close" onclick="closeReturnModal()">✕</button>
+    </div>
+
+    <div class="wkz-ret-body" id="wkzRetBody">
+      <!-- Conteúdo preenchido via JS -->
+    </div>
+
+    <div class="wkz-ret-footer" id="wkzRetFooter">
+      <!-- Botões preenchidos via JS -->
+    </div>
+
+  </div>
+</div>
+<div id="revLightbox" onclick="if(event.target===this)closeLightbox()">
+  <div class="lb-inner">
+    <div class="lb-close" onclick="closeLightbox()">✕</div>
+    <img id="lbImg" src="" alt="Foto da avaliação">
+    <div class="lb-caption" id="lbCaption"></div>
+    <div class="lb-nav">
+      <button onclick="lbNav(-1)">← Anterior</button>
+      <button onclick="lbNav(1)">Próxima →</button>
+    </div>
+  </div>
+</div>
+<div id="kzcBar" role="region" aria-label="Comparador de Produtos">
+  <div class="kzc-bar-slots" id="kzcBarSlots">
+    <!-- Gerado por JS -->
+  </div>
+  <div class="kzc-bar-label">comparar</div>
+  <button class="kzc-bar-btn" id="kzcBarCompareBtn" onclick="kzcOpenDrawer()" disabled>
+    Ver comparação
+  </button>
+  <button class="kzc-bar-clear" onclick="kzcClearAll()" title="Limpar comparação">✕</button>
+</div>
+<div id="kzcDrawer" role="dialog" aria-modal="true" aria-label="Comparação de Produtos">
+  <div id="kzcDrawerOverlay" onclick="kzcCloseDrawer()"></div>
+  <div id="kzcDrawerPanel">
+    <div class="kzc-drawer-head">
+      <div class="kzc-drawer-title">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="8" height="18" rx="2"/><rect x="14" y="3" width="8" height="18" rx="2"/></svg>
+        Comparação Side-by-Side
+      </div>
+      <button class="kzc-drawer-close" onclick="kzcCloseDrawer()" aria-label="Fechar comparação">✕</button>
+    </div>
+    <div class="kzc-drawer-body">
+      <div id="kzcDrawerContent">
+        <!-- Gerado por JS -->
+      </div>
+    </div>
+  </div>
+</div>
+<div id="kzTourOverlay" role="dialog" aria-modal="true" aria-label="Tour de boas-vindas WeKz">
+  <svg id="kzTourSvg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <mask id="kzTourMask">
+        <rect width="100%" height="100%" fill="white"/>
+        <rect id="kzTourHole" x="0" y="0" width="0" height="0" rx="12" fill="black"/>
+      </mask>
+    </defs>
+    <rect width="100%" height="100%" fill="rgba(8,14,26,0.8)" mask="url(#kzTourMask)"/>
+  </svg>
+</div>
+<div id="kzTourTooltip" role="status" aria-live="polite">
+  <div class="kzt-tip-head">
+    <div class="kzt-tip-icon" id="kzTourIcon">
+      <!-- SVG injetado por JS -->
+    </div>
+    <div class="kzt-tip-meta">
+      <div class="kzt-tip-step" id="kzTourStepLabel">Passo 1 de 5</div>
+      <div class="kzt-tip-title" id="kzTourTitle">Bem-vindo à WeKz!</div>
+    </div>
+  </div>
+  <div class="kzt-tip-desc" id="kzTourDesc">—</div>
+  <div class="kzt-tip-foot">
+    <div class="kzt-dots" id="kzTourDots"></div>
+    <button class="kzt-btn-skip" onclick="kzTourSkip()">Pular</button>
+    <button class="kzt-btn-next" id="kzTourNextBtn" onclick="kzTourNext()">Próximo →</button>
+  </div>
+</div>
+<div id="kzPriceAlertOverlay" role="dialog" aria-modal="true" aria-label="Alerta de Preço" onclick="if(event.target===this)kzClosePriceAlert()">
+  <div class="kzpa-modal">
+
+    <!-- Header -->
+    <div class="kzpa-modal-head">
+      <div class="kzpa-modal-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+      <div>
+        <div class="kzpa-modal-title">Alerta de Queda de Preço</div>
+        <div class="kzpa-modal-sub">A Kz IA monitora o preço e te avisa quando atingir o valor desejado.</div>
+      </div>
+    </div>
+
+    <!-- Produto preview -->
+    <div class="kzpa-product-preview">
+      <div class="kzpa-prod-emoji"><wkz-product-image id="kzpaModalEmoji" style="width:1em;height:1em;display:inline-flex;" alt=""></wkz-product-image></div>
+      <div>
+        <div class="kzpa-prod-name" id="kzpaModalName">Produto</div>
+        <div class="kzpa-prod-price">Preço atual: <strong id="kzpaModalPrice">—</strong></div>
+      </div>
+    </div>
+
+    <!-- Threshold input -->
+    <div class="kzpa-threshold-wrap">
+      <span class="kzpa-threshold-label">Avisa-me quando o preço chegar a</span>
+      <div class="kzpa-threshold-row">
+        <div class="kzpa-prefix">R$</div>
+        <input type="number" id="kzpaThresholdInput" class="kzpa-input" placeholder="0,00" min="1" step="0.01">
+      </div>
+      <!-- Atalhos rápidos -->
+      <div class="kzpa-quick-chips" id="kzpaChips">
+        <!-- Gerado por JS com base no preço atual -->
+      </div>
+    </div>
+
+    <!-- Notificação por -->
+    <span class="kzpa-notify-label">Notificar por</span>
+    <div class="kzpa-notify-opts">
+      <div class="kzpa-notify-opt sel" id="kzpaNotifPush" onclick="kzpaSelectNotif('push')">
+        <span class="kzpa-notify-opt-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>Push
+      </div>
+      <div class="kzpa-notify-opt" id="kzpaNotifEmail" onclick="kzpaSelectNotif('email')">
+        <span class="kzpa-notify-opt-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span>E-mail
+      </div>
+      <div class="kzpa-notify-opt" id="kzpaNotifSms" onclick="kzpaSelectNotif('sms')">
+        <span class="kzpa-notify-opt-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span>SMS
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="kzpa-modal-actions">
+      <button class="kzpa-btn-cancel" onclick="kzClosePriceAlert()">Cancelar</button>
+      <button class="kzpa-btn-confirm" onclick="kzConfirmPriceAlert()">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-0.1em;margin-right:4px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Ativar Alerta
+      </button>
+    </div>
+
+    <!-- Remover (visível só quando alerta já está ativo) -->
+    <div class="kzpa-remove-hint" id="kzpaRemoveHint" style="display:none;">
+      Alerta já ativo para este produto.
+      <span class="kzpa-remove-link" onclick="kzRemovePriceAlert()">Remover alerta</span>
+    </div>
+
+  </div>
+</div>
+<div id="stockToast">
+  <div class="stk-toast-accent" id="stkAccent"></div>
+  <div class="stk-toast-body">
+    <div class="stk-toast-icon" id="stkIcon"></div>
+    <div class="stk-toast-text">
+      <div class="stk-toast-title" id="stkTitle"></div>
+      <div class="stk-toast-sub" id="stkSub"></div>
+    </div>
+    <button class="stk-toast-close" onclick="hideStockToast()">✕</button>
+  </div>
+  <div class="stk-toast-progress"><div class="stk-toast-progress-fill" id="stkProgress"></div></div>
+</div>
+        <div id="phDealBadge" style="margin-top:12px;"></div>
+          <div id="phAiText"></div>
+        <div id="writeReviewForm" style="display:none;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">✍️ Sua avaliação</div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Sua nota:</div>
+            <div class="star-picker" id="starPicker">
+              <span class="star-pick" onclick="pickStar(1)">☆</span>
+              <span class="star-pick" onclick="pickStar(2)">☆</span>
+              <span class="star-pick" onclick="pickStar(3)">☆</span>
+              <span class="star-pick" onclick="pickStar(4)">☆</span>
+              <span class="star-pick" onclick="pickStar(5)">☆</span>
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Título da avaliação:</div>
+            <input type="text" class="wkz-input" placeholder="Resumo da sua experiência">
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Comentário:</div>
+            <textarea class="wkz-input" placeholder="Descreva sua experiência com o produto..." rows="3"></textarea>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">📸 Adicionar fotos/vídeos (opcional — até 6 arquivos):</div>
+            <div class="rev-upload-area" id="revUploadArea">
+              <label class="rev-upload-btn" for="revFileInput" title="Adicionar foto ou vídeo">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Foto</span>
+              </label>
+              <label class="rev-upload-btn" for="revFileInput" title="Adicionar vídeo" style="border-color:rgba(124,58,237,0.35);color:var(--purple);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                <span>Vídeo</span>
+              </label>
+            </div>
+            <input type="file" id="revFileInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleRevUpload(this)">
+            <div style="font-size:10px;color:var(--muted);margin-top:5px;">JPG, PNG, WEBP, MP4 · Máx. 10MB por arquivo · Fotos reais aumentam a utilidade da avaliação em 3x</div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button onclick="toggleReviewForm()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;">Cancelar</button>
+            <button onclick="submitReview()" style="background:var(--grad1);border:none;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Publicar Avaliação</button>
+          </div>
+        </div>
+        <div id="reviewsListMain"></div>
+        <div id="qaList"></div>
+
+<!-- ── Modais/overlays compartilhados (core) ── -->
+<div id="wkzAlertBar" style="display:none;" role="alert" aria-live="polite"></div>
+<div id="wkzPushNotif" aria-live="polite" aria-atomic="true"></div>
+<div id="wkzInboxPanel" class="wkz-inbox-panel" style="display:none;" role="dialog" aria-label="Notificações">
+  <div class="wkz-inbox-header">
+    <div class="wkz-inbox-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      Notificações WeKz
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="wkz-inbox-markall" onclick="wkzMarkAllRead()">Marcar tudo lido</button>
+      <button class="wkz-inbox-close" onclick="wkzCloseInbox()" aria-label="Fechar">✕</button>
+    </div>
+  </div>
+  <div class="wkz-inbox-list" id="wkzInboxList">
+    <div class="wkz-inbox-empty">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <p>Nenhuma notificação ainda</p>
+    </div>
+  </div>
+</div>
+<div id="wkzInboxOverlay" onclick="wkzCloseInbox()" style="display:none;position:fixed;inset:0;z-index:8998;"></div>
+<div id="lgpdModalBackdrop"
+     style="display:none;position:fixed;inset:0;z-index:101000;background:rgba(8,14,26,0.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"
+     onclick="lgpdCloseAll(event,this)"></div>
+<div id="lgpdModalAcessar" role="dialog" aria-modal="true" aria-labelledby="lgpdAcessarTitle"
+     style="display:none;position:fixed;inset:0;z-index:101001;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:540px;max-height:88vh;overflow-y:auto;padding:28px 26px 24px;box-shadow:0 24px 60px rgba(0,0,0,0.5);position:relative;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div id="lgpdAcessarTitle" style="font-size:16px;font-weight:800;color:var(--text);">Meus Dados Pessoais</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Art. 18, II — Lei 13.709/2018 (LGPD)</div>
+      </div>
+      <button onclick="lgpdClose('lgpdModalAcessar')" aria-label="Fechar" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;">✕</button>
+    </div>
+    <!-- Tabela de categorias -->
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Categorias de dados coletados e tratados pela WeKz Shop:</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);">
+            <th style="text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;">Categoria</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;">Dados</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;">Finalidade</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--muted);font-weight:600;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="lgpdDataTable">
+          <!-- Preenchido por lgpdBuildDataTable() -->
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:12px;padding:8px 10px;background:rgba(124,58,237,0.06);border-radius:6px;border-left:3px solid rgba(124,58,237,0.3);">
+      ℹ️ Dados mostrados são simulação (mock). Em produção, este relatório reflete os dados reais armazenados em conformidade com a LGPD e a Portaria ANPD nº 11/2024.
+    </div>
+    <!-- Ações -->
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+      <button onclick="lgpdDownloadJson()" style="flex:1;padding:11px;background:var(--grad1);border:none;color:#fff;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:5px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar relatório .json
+      </button>
+      <button onclick="lgpdClose('lgpdModalAcessar')" style="padding:11px 20px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Fechar</button>
+    </div>
+  </div>
+</div>
+<div id="lgpdModalCorrigir" role="dialog" aria-modal="true" aria-labelledby="lgpdCorrigirTitle"
+     style="display:none;position:fixed;inset:0;z-index:101001;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:28px 26px 24px;box-shadow:0 24px 60px rgba(0,0,0,0.5);position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div id="lgpdCorrigirTitle" style="font-size:16px;font-weight:800;color:var(--text);">Corrigir Dados do Perfil</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Art. 18, III — Lei 13.709/2018 (LGPD)</div>
+      </div>
+      <button onclick="lgpdClose('lgpdModalCorrigir')" aria-label="Fechar" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Corrija os dados abaixo. A solicitação será enviada ao nosso DPO em até <strong style="color:var(--text);">15 dias úteis</strong> (prazo legal LGPD).</div>
+    <!-- Formulário pré-preenchido -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Nome completo</label>
+        <input id="lgpdCorrNome" type="text" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;" />
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">E-mail</label>
+        <input id="lgpdCorrEmail" type="email" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;" />
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">CPF (apenas para conferência)</label>
+        <input id="lgpdCorrCpf" type="text" placeholder="000.000.000-00" maxlength="14" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;" />
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Telefone</label>
+        <input id="lgpdCorrTel" type="tel" placeholder="(11) 99999-9999" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;" />
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">O que precisa ser corrigido? <span style="color:#EF4444;">*</span></label>
+        <textarea id="lgpdCorrObs" rows="3" placeholder="Descreva a correção necessária..." style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;resize:vertical;box-sizing:border-box;font-family:inherit;"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+      <button onclick="lgpdEnviarCorrecao()" style="flex:1;padding:11px;background:var(--grad1);border:none;color:#fff;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enviar solicitação</button>
+      <button onclick="lgpdClose('lgpdModalCorrigir')" style="padding:11px 20px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
+    </div>
+  </div>
+</div>
+<div id="lgpdModalExcluir" role="dialog" aria-modal="true" aria-labelledby="lgpdExcluirTitle"
+     style="display:none;position:fixed;inset:0;z-index:101001;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+  <div style="background:var(--card);border:1px solid rgba(239,68,68,0.25);border-radius:18px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;padding:28px 26px 24px;box-shadow:0 24px 60px rgba(239,68,68,0.15);position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div>
+        <div id="lgpdExcluirTitle" style="font-size:16px;font-weight:800;color:#EF4444;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Excluir minha conta
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Art. 18, VI — Lei 13.709/2018 (LGPD)</div>
+      </div>
+      <button onclick="lgpdClose('lgpdModalExcluir')" aria-label="Fechar" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;">✕</button>
+    </div>
+    <!-- Aviso legal de retenção -->
+    <div style="margin:16px 0;padding:12px 14px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;font-size:12px;color:var(--text);line-height:1.7;">
+      <strong style="color:#EF4444;">⚠ Atenção — Prazo legal de retenção de dados</strong><br>
+      Mesmo após a exclusão da conta, a WeKz Shop é obrigada por lei a reter determinados dados por prazos específicos:<br>
+      <ul style="margin:8px 0 0 16px;padding:0;color:var(--muted);">
+        <li><strong style="color:var(--text);">Dados fiscais / NF-e:</strong> 5 anos (Art. 195 CTN)</li>
+        <li><strong style="color:var(--text);">Registros de acesso (Marco Civil):</strong> 6 meses (Art. 15 MCI)</li>
+        <li><strong style="color:var(--text);">Dados de compra (CDC):</strong> 5 anos (Art. 27 CDC)</li>
+        <li><strong style="color:var(--text);">Dados de crédito:</strong> até 5 anos (Lei 12.414/2011)</li>
+      </ul>
+    </div>
+    <!-- Etapa 1 -->
+    <div id="lgpdExcStep1">
+      <div style="font-size:13px;color:var(--text);margin-bottom:14px;">Para confirmar a exclusão, marque as opções abaixo:</div>
+      <label style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:10px;">
+        <input type="checkbox" id="lgpdExcChk1" style="margin-top:2px;accent-color:#EF4444;" />
+        Entendo que meu histórico de pedidos, avaliações e dados de perfil serão removidos permanentemente.
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:16px;">
+        <input type="checkbox" id="lgpdExcChk2" style="margin-top:2px;accent-color:#EF4444;" />
+        Entendo que dados fiscais e registros obrigatórios serão mantidos pelos prazos legais acima.
+      </label>
+      <button onclick="lgpdExcluirStep2()" style="width:100%;padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#EF4444;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Continuar para confirmação final →</button>
+    </div>
+    <!-- Etapa 2 (oculta até confirmar step 1) -->
+    <div id="lgpdExcStep2" style="display:none;">
+      <div style="font-size:13px;color:var(--text);margin-bottom:14px;">Digite sua senha para confirmar a exclusão definitiva:</div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Senha atual <span style="color:#EF4444;">*</span></label>
+        <input id="lgpdExcSenha" type="password" placeholder="••••••••" autocomplete="current-password"
+               style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;" />
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Digite <strong style="color:#EF4444;">EXCLUIR CONTA</strong> para confirmar</label>
+        <input id="lgpdExcConfirmText" type="text" placeholder="EXCLUIR CONTA"
+               style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;" />
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="lgpdExcluirFinal()" style="flex:1;padding:12px;background:#EF4444;border:none;color:#fff;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:5px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6m5 0V4h4v2"/></svg>
+          Excluir conta permanentemente
+        </button>
+        <button onclick="lgpdClose('lgpdModalExcluir')" style="padding:12px 16px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="lgpdModalPortabilidade" role="dialog" aria-modal="true" aria-labelledby="lgpdPortTitle"
+     style="display:none;position:fixed;inset:0;z-index:101001;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:440px;padding:28px 26px 24px;box-shadow:0 24px 60px rgba(0,0,0,0.5);position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div id="lgpdPortTitle" style="font-size:16px;font-weight:800;color:var(--text);">Portabilidade de Dados</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Art. 18, V — Lei 13.709/2018 (LGPD)</div>
+      </div>
+      <button onclick="lgpdClose('lgpdModalPortabilidade')" aria-label="Fechar" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Solicite a transferência dos seus dados para outro fornecedor de serviço em formato estruturado e interoperável.</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Formato desejado</label>
+        <select id="lgpdPortFormato" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;">
+          <option value="json">JSON (recomendado)</option>
+          <option value="csv">CSV</option>
+          <option value="xml">XML</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Destinatário (opcional)</label>
+        <input id="lgpdPortDest" type="text" placeholder="Nome da plataforma de destino" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;" />
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:12px;padding:8px 10px;background:rgba(0,180,171,0.06);border-radius:6px;border-left:3px solid rgba(0,180,171,0.3);">
+      Prazo de resposta: até <strong style="color:var(--teal);">15 dias úteis</strong> conforme Art. 18 §3º LGPD.
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button onclick="lgpdEnviarPortabilidade()" style="flex:1;padding:11px;background:var(--grad1);border:none;color:#fff;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Solicitar portabilidade</button>
+      <button onclick="lgpdClose('lgpdModalPortabilidade')" style="padding:11px 16px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
+    </div>
+  </div>
+</div>
+<div id="lgpdModalDpo" role="dialog" aria-modal="true" aria-labelledby="lgpdDpoTitle"
+     style="display:none;position:fixed;inset:0;z-index:101001;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:420px;padding:28px 26px 24px;box-shadow:0 24px 60px rgba(0,0,0,0.5);position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div id="lgpdDpoTitle" style="font-size:16px;font-weight:800;color:var(--text);">Encarregado (DPO)</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Art. 41 — Lei 13.709/2018 (LGPD)</div>
+      </div>
+      <button onclick="lgpdClose('lgpdModalDpo')" aria-label="Fechar" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:14px;background:var(--card2);border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Encarregado de Proteção de Dados</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">WeKz Shop — DPO</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">WeKz Intermediação de Negócios Ltda.</div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+          <a href="mailto:lgpd@wekzshop.com" style="font-size:12px;color:var(--teal);text-decoration:none;display:flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            lgpd@wekzshop.com
+          </a>
+          <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Hortolândia/SP — Brasil
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:8px 10px;background:rgba(124,58,237,0.06);border-radius:6px;border-left:3px solid rgba(124,58,237,0.3);">
+        Respostas em até <strong style="color:var(--text);">15 dias úteis</strong> (Art. 18 §3º LGPD). Para exercer seus direitos, você também pode protocolar solicitação diretamente na <a href="https://www.gov.br/anpd" target="_blank" rel="noopener" style="color:var(--teal);">ANPD</a>.
+      </div>
+    </div>
+    <button onclick="lgpdClose('lgpdModalDpo')" style="width:100%;margin-top:20px;padding:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Fechar</button>
+  </div>
+</div>
+<div id="wkzCookieBanner" role="region" aria-label="Aviso de cookies" aria-live="polite" style="display:none;">
+  <div class="wkz-cb-inner">
+    <div class="wkz-cb-left">
+      <div class="wkz-cb-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-4-4 4 4 0 0 1-4-4"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/></svg>
+      </div>
+      <div class="wkz-cb-copy">
+        <p class="wkz-cb-title">Sua privacidade, suas regras</p>
+        <p class="wkz-cb-desc">Usamos cookies para garantir o funcionamento da plataforma, melhorar sua experiência e, com seu consentimento, personalizar anúncios. Conforme a <strong>LGPD (Lei 13.709/2018)</strong>, você controla quais categorias aceita. <a href="#" class="wkz-cb-link" onclick="closeCookieBanner();MapsTo('pg-privacy');return false;" style="cursor:pointer;">Política de Privacidade</a></p>
+      </div>
+    </div>
+    <div class="wkz-cb-actions">
+      <button class="wkz-cb-btn wkz-cb-reject"  onclick="wkzConsentReject()"     aria-label="Rejeitar cookies opcionais">Rejeitar opcionais</button>
+      <button class="wkz-cb-btn wkz-cb-custom"  onclick="wkzConsentOpenModal()"  aria-label="Personalizar preferências de cookies">Personalizar</button>
+      <button class="wkz-cb-btn wkz-cb-accept"  onclick="wkzConsentAcceptAll()"  aria-label="Aceitar todos os cookies">Aceitar todos</button>
+    </div>
+  </div>
+</div>
+<div id="wkzCookieModal" class="wkz-cm-overlay" role="dialog" aria-modal="true" aria-labelledby="wkzCmTitle" style="display:none;" onclick="wkzCmOverlayClick(event)">
+  <div class="wkz-cm-sheet">
+
+    <!-- Handle pill (mobile swipe hint) -->
+    <div class="wkz-cm-pill" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <div class="wkz-cm-header">
+      <div class="wkz-cm-header-left">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h2 id="wkzCmTitle" class="wkz-cm-title">Preferências de Privacidade</h2>
+      </div>
+      <button class="wkz-cm-close" onclick="wkzConsentCloseModal()" aria-label="Fechar modal de preferências">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Intro -->
+    <p class="wkz-cm-intro">Gerencie suas preferências por categoria. Cookies <strong>essenciais</strong> não podem ser desativados — são necessários para o funcionamento da plataforma.</p>
+
+    <!-- Categoria 1: Essencial (sempre ON, desabilitado) -->
+    <div class="wkz-cm-category">
+      <div class="wkz-cm-cat-header">
+        <div class="wkz-cm-cat-info">
+          <span class="wkz-cm-cat-badge wkz-cm-badge-required">Obrigatório</span>
+          <strong class="wkz-cm-cat-name">Essencial</strong>
+        </div>
+        <!-- Toggle sempre ON e desabilitado -->
+        <label class="wkz-toggle wkz-toggle-disabled" aria-label="Cookies essenciais — sempre ativos">
+          <input type="checkbox" id="wkzCat_essential" checked disabled>
+          <span class="wkz-toggle-track"><span class="wkz-toggle-thumb"></span></span>
+        </label>
+      </div>
+      <p class="wkz-cm-cat-desc">Autenticação, carrinho, segurança de sessão, preferências de idioma/moeda e funcionamento básico da plataforma. Base legal: legítimo interesse (LGPD Art. 7º, IX).</p>
+    </div>
+
+    <!-- Categoria 2: Analítico -->
+    <div class="wkz-cm-category">
+      <div class="wkz-cm-cat-header">
+        <div class="wkz-cm-cat-info">
+          <span class="wkz-cm-cat-badge wkz-cm-badge-optional">Opcional</span>
+          <strong class="wkz-cm-cat-name">Analítico</strong>
+        </div>
+        <label class="wkz-toggle" aria-label="Cookies analíticos — ativar ou desativar">
+          <input type="checkbox" id="wkzCat_analytics">
+          <span class="wkz-toggle-track"><span class="wkz-toggle-thumb"></span></span>
+        </label>
+      </div>
+      <p class="wkz-cm-cat-desc">Métricas de uso, análise de desempenho de páginas e relatórios agregados (ex: Google Analytics). Nos ajudam a melhorar a experiência. Base legal: consentimento (LGPD Art. 7º, I).</p>
+    </div>
+
+    <!-- Categoria 3: Marketing -->
+    <div class="wkz-cm-category">
+      <div class="wkz-cm-cat-header">
+        <div class="wkz-cm-cat-info">
+          <span class="wkz-cm-cat-badge wkz-cm-badge-optional">Opcional</span>
+          <strong class="wkz-cm-cat-name">Marketing</strong>
+        </div>
+        <label class="wkz-toggle" aria-label="Cookies de marketing — ativar ou desativar">
+          <input type="checkbox" id="wkzCat_marketing">
+          <span class="wkz-toggle-track"><span class="wkz-toggle-thumb"></span></span>
+        </label>
+      </div>
+      <p class="wkz-cm-cat-desc">Personalização de anúncios, remarketing e rastreamento de conversões (ex: Meta Pixel, Google Ads). Permite anúncios relevantes ao seu perfil. Base legal: consentimento (LGPD Art. 7º, I).</p>
+    </div>
+
+    <!-- Footer do modal -->
+    <div class="wkz-cm-footer">
+      <button class="wkz-cb-btn wkz-cb-reject"  onclick="wkzConsentReject()"          aria-label="Rejeitar cookies opcionais">Rejeitar opcionais</button>
+      <button class="wkz-cb-btn wkz-cb-custom wkz-cm-save" onclick="wkzConsentSaveCustom()" aria-label="Salvar preferências selecionadas">Salvar preferências</button>
+      <button class="wkz-cb-btn wkz-cb-accept"  onclick="wkzConsentAcceptAll()"        aria-label="Aceitar todos os cookies">Aceitar todos</button>
+    </div>
+
+  </div>
 </div>
 
 <!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
