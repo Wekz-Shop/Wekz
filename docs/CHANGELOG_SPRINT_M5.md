@@ -55,6 +55,33 @@ O plano de arquitetura (Seção 5, Bloco 2) já previa esses dois utilitários d
 
 - CSS scoping por módulo (`wkz-styles-full.css` continua monolítico)
 - CSP para Buyer/Seller/Legal (bloqueada pela mesma limitação de onclick inline)
-- Auditoria de acessibilidade (ARIA, skip links, focus visible)
-- Gaps documentados: aba Denúncias do Seller sem dados, `openGlobalShippingModal()`, markup morto do `#toast` V1
 - Teste real em navegador (Playwright) — ainda sem acesso de rede neste ambiente
+
+## Fase 2: Gaps documentados + Acessibilidade
+
+### Gaps fechados
+
+1. **`openGlobalShippingModal()`** — chamada pelo hero-card "Logística Global" da Home desde o M2, mas a função nunca tinha sido movida pro JS (só o `onclick` existia). Adicionada (3 linhas, só navega pra página já extraída). Confirmado via grep que `openGlobalShippingModalLegacy()` nunca é chamada em lugar nenhum do monólito — código morto real, não extraída.
+
+2. **Markup morto do `#toast` V1** removido de `wkz-buyer.html` — confirmado sem nenhuma referência real em JS (`showToast` V2 cria seu próprio elemento `#wkz-toast-v2` dinamicamente).
+
+3. **Aba "Denúncias" do Seller sem dados** — reavaliado, decisão mantida (não fabricar). Confirmei que `reportsStore` (Buyer) e `ADMIN_REPORTS` (Admin) são estruturas de dados genuinamente diferentes (uma é ticket individual do comprador, outra é fila agregada de moderação) — não são duplicatas que dá pra simplesmente consolidar. Busquei no monólito por uma terceira estrutura "visão do vendedor sobre denúncias" e **não existe** — inventar uma agora seria fabricação, o mesmo erro da primeira tentativa descartada do M4. Fica como limitação arquitetural documentada até existir um backend real.
+
+### 🐛 Bug real de acessibilidade encontrado e corrigido: skip link quebrado em 3 dos 4 módulos
+
+O mecanismo de skip-link (`initSkipLink()`, extraído corretamente no M1) cria um link `<a href="#main-content">Ir para o conteúdo principal</a>` no topo da página — mas seu fallback (para quando `#main-content` não existe) procurava especificamente por `#page-home`, que **só existe no Buyer**. Resultado: em Seller, Admin e Legal, o skip link aparecia visualmente (ao dar Tab) mas **não levava a lugar nenhum** — uma barreira real de acessibilidade pra quem navega só por teclado, justamente nos módulos que mais precisam (Admin lida com disputas/saques/KYC).
+
+**Fix:** adicionado `id="main-content"` diretamente no `<main>` de Buyer/Seller/Admin, e no `<body>` do Legal (que não tem `<main>`). Zero dependência do fallback específico do Buyer.
+
+### ✅ Confirmado já correto (nenhuma ação necessária)
+
+- `:focus-visible` universal (não escopado a classes específicas), com outline teal 2px + offset — já cobre todo elemento focável nos 4 módulos, extraído corretamente no M1.
+- `@media (prefers-reduced-motion: reduce)` já respeita a preferência do sistema.
+- Skip-link em si (a criação do link, não o alvo) já funcionava nos 4 módulos via `wkzMaintenanceInit()`.
+
+## 🧪 Validação
+
+- `node --check` limpo nos 5 arquivos tocados nesta fase
+- Harnesses M1-M4 rodando de ponta a ponta sem erro
+- Parser HTML sem erros nos 4 módulos (`buyer`, `seller`, `admin`, `legal`)
+
