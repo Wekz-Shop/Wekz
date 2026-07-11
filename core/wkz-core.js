@@ -1468,6 +1468,19 @@ window.MapsTo = function(sectionId) {
   if (!document.getElementById('page-' + sectionId)) {
     if (typeof showToast === 'function') showToast('⚠️ Página não encontrada');
     console.warn('[WeKz][MapsTo] Página inexistente solicitada:', sectionId);
+    /* FIX [tela-em-branco] — 'home' só existe no módulo Buyer (page-home).
+       Nos módulos Seller/Admin/Legal esse fallback também falha, e como o
+       passo 1 abaixo esconde TODAS as .page incondicionalmente, o app
+       ficava com a tela inteira em branco (nenhuma .page ativa) sempre que
+       qualquer botão/link chamasse MapsTo()/showPage() com um ID que não
+       existisse no módulo atual. Isso é exatamente o bug relatado: "cliquei
+       num tópico do menu e a tela ficou em branco". Agora, se nem o
+       fallback 'home' existir aqui, abortamos ANTES de esconder qualquer
+       coisa — a tela permanece como estava, em vez de apagar tudo. */
+    if (!document.getElementById('page-home')) {
+      console.warn('[WeKz][MapsTo] Fallback "home" também não existe neste módulo — navegação cancelada para não apagar a tela.');
+      return;
+    }
     sectionId = 'home';
   }
 
