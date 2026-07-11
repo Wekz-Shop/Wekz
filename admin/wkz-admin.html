@@ -31,7 +31,12 @@
   " />
   <title>WeKz Shop — Admin Matrix</title>
   <link rel="stylesheet" href="../core/wkz-styles-base.css" />
-  <link rel="stylesheet" href="../shared/wkz-styles-full.css" />
+  <link rel="stylesheet" href="wkz-admin-styles.css" />
+  <!-- Sprint M5 (Hardening): antes carregava shared/wkz-styles-full.css
+       (14.911 linhas) — agora carrega só o CSS que o Admin realmente usa
+       (2.643 linhas, ~18% do tamanho). Ver cabeçalho de
+       wkz-admin-styles.css para a análise completa de segurança desta
+       extração. -->
 </head>
 <body class="adm-mode">
 <!-- Sprint M4 — sem topbar/bottomnav aqui de propósito: o CSS original já
