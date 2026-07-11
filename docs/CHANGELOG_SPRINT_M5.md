@@ -53,8 +53,27 @@ O plano de arquitetura (Seção 5, Bloco 2) já previa esses dois utilitários d
 
 ## ⏭️ Pendente pro resto do Sprint M5
 
-- CSP para Buyer/Seller/Legal (bloqueada pela mesma limitação de onclick inline)
 - Teste real em navegador (Playwright) — ainda sem acesso de rede neste ambiente
+
+## Fase 4: CSP em Buyer/Seller/Legal (fecha o Sprint M5)
+
+Mesmo nível aplicado no Admin — `unsafe-inline` mantido (460/221/poucos onclick inline respectivamente, remoção completa é refactor grande demais pra fazer sem navegador real), mas bloqueando scripts externos não previstos, plugins legados e clickjacking.
+
+**Antes de aplicar, mapeei as dependências externas REAIS de cada módulo** (não uma lista arbitrária):
+
+- **Buyer**: usa de verdade `fetch()` pra `viacep.com.br` e `api.zippopotam.us` (busca de CEP), imagens de `picsum.photos` (mock de produto/avaliação), e embed do `youtube.com` (Kz Live Shopping). Todos declarados explicitamente na CSP (`connect-src`/`img-src`/`frame-src`). Links pra `gov.br`/`correios.com.br` são só `<a href target="_blank">`, não precisam de allowlist.
+- **Seller**: zero dependências externas reais — as menções a `amazon.com`/`sua-api.com` encontradas por grep são placeholder de `<input placeholder="">` e uma linha de código **comentada** (`// const response = await fetch(...)`), nunca executam.
+- **Legal**: zero dependências externas — `gov.br` é só link.
+
+## 🧪 Validação final do Sprint M5
+
+- Parser HTML: zero erros nos 4 módulos após todas as CSPs aplicadas
+- Harnesses M1-M4 rodando de ponta a ponta sem erro
+- Nenhuma CSP quebra funcionalidade real confirmada (busca de CEP, imagens mock, embed de vídeo) — todos os domínios necessários explicitamente permitidos
+
+## ✅ Sprint M5 encerrado
+
+Segurança (XSS real corrigido + CSP nos 4 módulos + rate limiting), gaps documentados fechados, acessibilidade (skip link corrigido), e CSS scoping do Admin. Item que segue genuinamente pendente: teste real em navegador via Playwright, bloqueado pela falta de acesso de rede neste ambiente — recomendo esse teste ficar com o Weslan antes de considerar o roteiro de 5 sprints 100% fechado.
 
 ## Fase 3: CSS scoping por módulo
 
