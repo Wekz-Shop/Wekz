@@ -53,9 +53,44 @@ O plano de arquitetura (Seção 5, Bloco 2) já previa esses dois utilitários d
 
 ## ⏭️ Pendente pro resto do Sprint M5
 
-- CSS scoping por módulo (`wkz-styles-full.css` continua monolítico)
 - CSP para Buyer/Seller/Legal (bloqueada pela mesma limitação de onclick inline)
 - Teste real em navegador (Playwright) — ainda sem acesso de rede neste ambiente
+
+## Fase 3: CSS scoping por módulo
+
+### Análise antes de qualquer corte
+
+Extraí todas as classes usadas no HTML estático de cada módulo e cruzei:
+
+| | Total de classes | Exclusivas do módulo |
+|---|---|---|
+| Buyer | 923 | 699 (76%) |
+| Seller | 279 | 94 (34%) |
+| **Admin** | **217** | **211 (97%)** |
+| Legal | 122 | 38 (31%) |
+
+**Admin é o único candidato seguro.** 97% das suas classes não aparecem em nenhum outro módulo — risco mínimo de "roubar" uma regra que Buyer/Seller/Legal precisam. Seller/Legal têm sobreposição substancial com Buyer (178 e 77 classes compartilhadas, respectivamente); fatiar esses exigiria validação visual real que não está disponível neste ambiente. **Só o Admin foi fatiado nesta fase.**
+
+### Achado importante durante a extração: análise de HTML estático não bastava
+
+A maior parte da UI real do Admin (cards de disputa, revisão de KYC, aprovação de loja, saques) é **renderizada dinamicamente via JS** (`renderDisputas()`, `renderAdminKyc()`, etc.), não existe como HTML estático. Uma primeira extração baseada só nas classes do HTML estático teria deixado ~90 classes de fora (praticamente toda a UI de cartões/disputas/KYC) — descoberto e corrigido antes de finalizar, cruzando também os literais `class="..."` dentro das template strings do JS.
+
+Também descobri e adicionei separadamente (não capturado pela extração por seletor `.classe`/`#id`):
+- 12 blocos `@keyframes` (animações usadas via `animation:` mas não referenciadas como seletor)
+- Sistema base `.page`/`.page.active` (visibilidade de página) + `.wkz-input`/`.wkz-select` (inputs/selects) — Admin precisa mesmo só tendo uma página própria
+- `.btn-primary` e `.order-status`/`.status-paid` — genuinamente compartilhados com o Seller, duplicados aqui em segurança (mesmo padrão de `FRAUD_REPORTS`/`formatLogTime` no core)
+
+### Resultado
+
+`admin/wkz-admin-styles.css` criado (2.643 linhas, ~18% do tamanho do arquivo completo). `admin/wkz-admin.html` agora carrega esse arquivo em vez de `shared/wkz-styles-full.css`. **`shared/wkz-styles-full.css` não foi alterado** — Buyer/Seller/Legal continuam usando ele exatamente como antes; esta foi uma adição pura, sem remoção, então o "pior caso" de qualquer erro fica isolado ao Admin.
+
+### 🧪 Validação
+
+- Balanceamento de chaves `{}`: 651/651
+- Parser HTML: zero erros em `wkz-admin.html` após a troca
+- Nenhum `url()` com caminho relativo que quebraria pela nova localização do arquivo (só uma `data:image/svg+xml` inline)
+- Harness Node: `wkz-admin.js` continua rodando de ponta a ponta sem erro (CSS não afeta isso, mas confirma que nada mais quebrou)
+- **Validação visual real ainda pendente** — esta é a fase de maior risco do M5 por não ter navegador disponível aqui; recomendo testar com atenção especial: abas do dashboard, modais (disputa/saque/KYC/etiqueta), cards renderizados dinamicamente.
 
 ## Fase 2: Gaps documentados + Acessibilidade
 
