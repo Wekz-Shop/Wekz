@@ -3,6 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Sprint M5 — Hardening: CSP moderada, mesmo nível aplicado no Admin.
+       'unsafe-inline' ainda necessário (460 onclick inline + muitos
+       style="" inline) — remoção completa é um refactor grande demais
+       pra fazer com segurança sem navegador real disponível. Mesmo
+       assim, já bloqueia scripts externos não previstos, plugins
+       legados e clickjacking. Domínios externos abaixo são usos reais
+       confirmados (não é lista arbitrária): viacep.com.br/zippopotam.us
+       (busca de CEP), picsum.photos (imagens de produto/avaliação
+       mock), youtube.com (embed do Kz Live Shopping). -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: https://picsum.photos;
+    font-src 'self';
+    connect-src 'self' https://viacep.com.br https://api.zippopotam.us;
+    frame-src https://www.youtube.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+  " />
   <title>WeKz Shop — Marketplace Global</title>
   <link rel="stylesheet" href="../core/wkz-styles-base.css" />
   <link rel="stylesheet" href="../shared/wkz-styles-full.css" />
