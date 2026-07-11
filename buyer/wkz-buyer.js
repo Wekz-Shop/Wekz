@@ -12,6 +12,56 @@
    TRANSLATIONS (pt/en/es), REVIEWS_DATA, bundles, lightbox, chat bot.
    Origem monólito: linhas 19820–23188
    ─────────────────────────────────────────────────────────────────────── */
+/* ── CORREÇÃO (bug "botão WeKz estático"): KZ_WISDOM/getKzWisdom precisam
+   estar definidos ANTES de renderAll()/renderCart(), pois são chamados
+   durante a própria inicialização da página. Antes, este bloco estava lá
+   embaixo (~linha 11288), depois do ponto onde já era usado — isso gerava
+   um ReferenceError de TDZ ("Cannot access 'KZ_WISDOM' before
+   initialization") logo no load, que abortava a inicialização e deixava
+   variáveis como `_boostOpen` nunca atribuídas, quebrando o clique do
+   botão central WeKz. Movido para o topo do arquivo. ── */
+/**
+ * getKzWisdom(context)
+ * Retorna uma mensagem contextual do Kz baseada no comportamento do utilizador.
+ * context: 'empty_cart' | 'boost' | 'dashboard' | 'flash' | 'items_in_cart'
+ */
+const KZ_WISDOM = {
+  empty_cart: [
+    'O teu carrinho está vazio... Os meus sensores detetaram <strong>ofertas incríveis</strong> na Home. Vamos lá?',
+    'Nada no carrinho? Os meus olhos de lince viram produtos incríveis <strong>com até 50% OFF</strong>. Explora!',
+    'Carrinho vazio detetado! Tenho coordenadas de <em>ofertas relâmpago</em> que não podes perder.',
+  ],
+  boost: [
+    'Olhos de lince! Encontrei <strong>3 cupões</strong> para ti hoje. Qual vais usar?',
+    'Os meus sensores detetaram descontos a piscar! Usa <strong>WEKZ10</strong> e poupa já.',
+    'Missão ativa: economizar o máximo! Já analisei as melhores <strong>ofertas do dia</strong> para ti.',
+    'Alerta de preço! O meu radar detetou uma queda de preço em <strong>5 produtos</strong> da tua lista.',
+    'Cupão <strong>FLASH50</strong> ainda está ativo. O meu sexto sentido diz que vai expirar em breve!',
+    'Sistema de caça a descontos: <em>ONLINE</em>. Pronto para te guiar às melhores ofertas! 🎯',
+  ],
+  dashboard: [
+    'Painel Inteligente: as tuas vendas cresceram <strong>+12%</strong> esta semana. Bom trabalho!',
+    'Os meus olhos de lince veem oportunidades! <em>Adiciona mais fotos</em> ao teu produto e converte +30%.',
+    'Alerta estratégico: o horário <strong>19h–22h</strong> tem o maior pico de compras. Ativa a Flash Sale!',
+    'Sensores ativos: tens <strong>3 pedidos</strong> aguardando envio. Despacha antes das 18h para bónus de rating!',
+    'Dica do Kz: vendedores com <em>resposta em < 5 min</em> vendem 2× mais. O teu chat está pronto?',
+  ],
+  flash: [
+    'Flash Sale ativa! Os meus sensores detectaram <strong>preços históricos</strong>. Age rápido — o contador corre!',
+    'Oferta relâmpago detetada! Só restam poucos minutos. <em>Adiciona ao carrinho já!</em>',
+  ],
+  items_in_cart: [
+    'Excelente escolha! Os meus olhos de lince aprovam. Usa o cupão <strong>WEKZ10</strong> antes de finalizar!',
+    'Carrinho ativo! Sensor de melhor preço: encontrei frete <strong>GRÁTIS</strong> para o teu CEP. Verifica!',
+    'Ótimo! Mais <em>R$ {x}</em> e ganhas frete grátis. O meu radar já encontrou produtos complementares!',
+  ],
+};
+
+function getKzWisdom(context) {
+  const list = KZ_WISDOM[context] || KZ_WISDOM.dashboard;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
 // ─── RENDER ───
 function renderAll(){
   renderCats();renderProducts();renderStores();renderFlash();renderFlashHero();renderWishlist();
@@ -11020,7 +11070,8 @@ const WEKZ_COUPONS = {
   'NOVO15' : { disc: 15, type:'%', label:'Bem-vindo! 15% OFF na 1ª compra.' },
 };
 
-let _boostOpen = false;
+var _boostOpen = false; // 'var' (não 'let'): fica hoisted como 'undefined' desde o início do script,
+                         // então o botão WeKz nunca mais quebra com TDZ mesmo se algo antes falhar
 
 function toggleWekzBoost(){
   _boostOpen ? closeWekzBoost() : openWekzBoost();
@@ -11278,48 +11329,6 @@ function getKzSVG(size = 52) {
     aria-label="Kz, o Lince Cibernético">
     <use href="#kz-mascot-full"/>
   </svg>`;
-}
-
-/**
- * getKzWisdom(context)
- * Retorna uma mensagem contextual do Kz baseada no comportamento do utilizador.
- * context: 'empty_cart' | 'boost' | 'dashboard' | 'flash' | 'items_in_cart'
- */
-const KZ_WISDOM = {
-  empty_cart: [
-    'O teu carrinho está vazio... Os meus sensores detetaram <strong>ofertas incríveis</strong> na Home. Vamos lá?',
-    'Nada no carrinho? Os meus olhos de lince viram produtos incríveis <strong>com até 50% OFF</strong>. Explora!',
-    'Carrinho vazio detetado! Tenho coordenadas de <em>ofertas relâmpago</em> que não podes perder.',
-  ],
-  boost: [
-    'Olhos de lince! Encontrei <strong>3 cupões</strong> para ti hoje. Qual vais usar?',
-    'Os meus sensores detetaram descontos a piscar! Usa <strong>WEKZ10</strong> e poupa já.',
-    'Missão ativa: economizar o máximo! Já analisei as melhores <strong>ofertas do dia</strong> para ti.',
-    'Alerta de preço! O meu radar detetou uma queda de preço em <strong>5 produtos</strong> da tua lista.',
-    'Cupão <strong>FLASH50</strong> ainda está ativo. O meu sexto sentido diz que vai expirar em breve!',
-    'Sistema de caça a descontos: <em>ONLINE</em>. Pronto para te guiar às melhores ofertas! 🎯',
-  ],
-  dashboard: [
-    'Painel Inteligente: as tuas vendas cresceram <strong>+12%</strong> esta semana. Bom trabalho!',
-    'Os meus olhos de lince veem oportunidades! <em>Adiciona mais fotos</em> ao teu produto e converte +30%.',
-    'Alerta estratégico: o horário <strong>19h–22h</strong> tem o maior pico de compras. Ativa a Flash Sale!',
-    'Sensores ativos: tens <strong>3 pedidos</strong> aguardando envio. Despacha antes das 18h para bónus de rating!',
-    'Dica do Kz: vendedores com <em>resposta em < 5 min</em> vendem 2× mais. O teu chat está pronto?',
-  ],
-  flash: [
-    'Flash Sale ativa! Os meus sensores detectaram <strong>preços históricos</strong>. Age rápido — o contador corre!',
-    'Oferta relâmpago detetada! Só restam poucos minutos. <em>Adiciona ao carrinho já!</em>',
-  ],
-  items_in_cart: [
-    'Excelente escolha! Os meus olhos de lince aprovam. Usa o cupão <strong>WEKZ10</strong> antes de finalizar!',
-    'Carrinho ativo! Sensor de melhor preço: encontrei frete <strong>GRÁTIS</strong> para o teu CEP. Verifica!',
-    'Ótimo! Mais <em>R$ {x}</em> e ganhas frete grátis. O meu radar já encontrou produtos complementares!',
-  ],
-};
-
-function getKzWisdom(context) {
-  const list = KZ_WISDOM[context] || KZ_WISDOM.dashboard;
-  return list[Math.floor(Math.random() * list.length)];
 }
 
 /**
