@@ -3,6 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Sprint M5 — Hardening: CSP moderada, mesmo nível dos outros módulos.
+       Sem dependências externas reais (gov.br é só link <a>, não recurso
+       carregado). -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    font-src 'self';
+    connect-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+  " />
   <title>WeKz Shop — Institucional & Legal</title>
   <link rel="stylesheet" href="../core/wkz-styles-base.css" />
   <link rel="stylesheet" href="../shared/wkz-styles-full.css" />
