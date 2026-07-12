@@ -1980,7 +1980,7 @@ function applyTranslations() {
 
   /* ── 4. Nav links (categorias de rolamento) ────────────────────────── */
   const navKeys = [
-    'navHome','navElec','navFashion','navHome2','navBeauty',
+    'navElec','navFashion','navHome2','navBeauty',
     'navGames','navSports','navBaby','navPet','navAuto',
     'navBooks','navStores','navLive','navTrack','navHelp'
   ];
@@ -8400,7 +8400,13 @@ function confirmReturnRequest() {
    Origem monólito: linhas 28106–30242
    ─────────────────────────────────────────────────────────────────────── */
 // ─── COUNTDOWN (FUNC-07: timestamp fixo, não-aleatório) ───
-const FLASH_END = new Date('2025-06-15T23:59:59');
+// FIX [countdown-expirado]: FLASH_END estava fixo em uma data de calendário
+// (2025-06-15), que já passou — diff sempre <= 0, travando TODOS os
+// countdowns do site (hero, página de Flash Sale e a nova info-bar) em
+// 00:00:00. Agora ancoramos em Date.now() + duração fixa, então a cada
+// carregamento de página o contador reinicia "fresco" a partir de agora.
+const FLASH_DURATION_MS = 3 * 60 * 60 * 1000; // 3h, igual ao mock da info-bar
+const FLASH_END = new Date(Date.now() + FLASH_DURATION_MS);
 function tick(){
   let diff = FLASH_END - new Date();
   if (diff <= 0) diff = 0;
@@ -8432,20 +8438,16 @@ function tick(){
 }
 setInterval(tick,1000);
 
-/* Menu "Todas as Categorias" (hambúrguer) da nav-strip [header refactor] */
-function toggleAllCategoriesMenu(){
-  const panel = document.getElementById('wkzCatAllPanel');
-  if (!panel) return;
-  const isOpen = panel.style.display === 'block';
-  panel.style.display = isOpen ? 'none' : 'block';
+/* "Todas as Categorias" [ajuste solicitado]: em vez de dropdown, o botão
+   rola a nav-strip horizontalmente até o início das categorias
+   (Eletrônicos). Como o item "Home" foi removido do nav-strip (o logo já
+   cumpre esse papel), basta rolar para o início do container. */
+function wkzScrollNavToCategories(){
+  const inner = document.querySelector('.nav-strip-inner');
+  const firstCat = document.querySelector('.nav-strip-inner .nav-link');
+  if (!inner || !firstCat) return;
+  inner.scrollTo({ left: firstCat.offsetLeft, behavior: 'smooth' });
 }
-document.addEventListener('click', function(e){
-  const panel = document.getElementById('wkzCatAllPanel');
-  const btn = document.querySelector('.wkz-cat-all-btn');
-  if (!panel || panel.style.display !== 'block') return;
-  if (panel.contains(e.target) || (btn && btn.contains(e.target))) return;
-  panel.style.display = 'none';
-});
   _patchCartForPoints();
   _patchCartUIForCoupon();
   // _patchCkoutNextForPickup() — removido: validação de pickup integrada em ckoutNext() (BUG-02 fix)
