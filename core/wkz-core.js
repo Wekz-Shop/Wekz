@@ -5940,11 +5940,30 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   window.wkzBuyerLoggedIn = readState();
 
-  /* Aplica o estado atual a todos os elementos marcados como buyer-only */
+  /* Aplica o estado atual a todos os elementos marcados como buyer-only
+     (data-wkz-auth-gate="buyer") ou guest-only (data-wkz-auth-gate="guest").
+     FIX [header-duplicado] — antes só existia o gate "buyer" (ex.: botão de
+     Favoritos). O componente de autenticação do header ("Meu Perfil" vs.
+     "Entrar/Cadastrar") não estava ligado a NENHUM gate, por isso os dois
+     apareciam simultaneamente sempre, independente do estado de login —
+     sintoma relatado nos prints (botão duplicado no topbar mobile e
+     desktop). Agora "Meu Perfil" usa data-wkz-auth-gate="buyer" (mesmo
+     comportamento de Favoritos) e "Entrar/Cadastrar" usa o gate inverso
+     data-wkz-auth-gate="guest", tornando os dois mutuamente exclusivos. */
   window.wkzSyncBuyerOnlyUI = function() {
     var show = !!window.wkzBuyerLoggedIn;
+    /* FIX: usamos toggle de classe (.wkz-gate-hidden), não style.display
+       inline — alguns elementos (ex.: .btn-login-mobile) já têm regras
+       CSS com !important para o próprio responsivo (mobile x desktop) e
+       um display inline "solto" nunca venceria esse !important. A classe
+       .wkz-gate-hidden é definida com seletor de maior especificidade
+       ([data-wkz-auth-gate].wkz-gate-hidden{display:none!important}),
+       então sempre prevalece, em qualquer breakpoint. */
     document.querySelectorAll('[data-wkz-auth-gate="buyer"]').forEach(function(el) {
-      el.style.display = show ? '' : 'none';
+      el.classList.toggle('wkz-gate-hidden', !show);
+    });
+    document.querySelectorAll('[data-wkz-auth-gate="guest"]').forEach(function(el) {
+      el.classList.toggle('wkz-gate-hidden', show);
     });
   };
 
