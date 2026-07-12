@@ -142,7 +142,7 @@
       <button class="btn-icon btn-icon-compact" onclick="MapsTo('wishlist')" title="Favoritos" aria-label="Favoritos" data-wkz-auth-gate="buyer" id="topbarFavBtn"><span class="wkz-icon wkz-icon-heart"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span> <span class="badge" id="wishBadge" style="display:none;">0</span></button>
       <!-- Carrinho -->
       <button class="btn-icon btn-icon-compact" onclick="MapsTo('cart')" title="Carrinho" aria-label="Carrinho"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> <span class="badge" id="cartBadge">0</span></button>
-      <!-- Meu Perfil — [FIX header-auth-gate] só existe para quem está logado -->
+      <!-- Meu Perfil -->
       <div class="cp-btn-wrap" id="cpBtnWrap" data-wkz-auth-gate="buyer">
         <button class="btn-client-profile" onclick="cpToggleHeaderDropdown(event)" title="Meu Perfil" aria-label="Meu Perfil" id="btnClientProfile">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -168,7 +168,10 @@
             </button>
             <div class="cp-hdr-dd-sep"></div>
             <button class="cp-hdr-dd-link" onclick="cpHdrDdGo('tracking')">
-              <span class="dd-ico wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Rastrear Encomendas
+              <span class="dd-ico wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Meus Pedidos
+            </button>
+            <button class="cp-hdr-dd-link" onclick="cpHdrDdGo('client-profile')">
+              <span class="dd-ico wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Configurações
             </button>
             <button class="cp-hdr-dd-link" onclick="cpHdrDdGo('wishlist')">
               <span class="dd-ico wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span> Lista de Desejos
@@ -189,53 +192,58 @@
       <!-- Vender / Painel Vendedor — desktop only [v2.5.3 patch] -->
       <button class="btn-icon btn-icon-desktop" onclick="MapsTo('dashboard')" title="Painel Vendedor" aria-label="Painel Vendedor"><span class="wkz-icon wkz-icon-barchart"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> <span data-i18n="sell" class="btn-icon-label">Vender</span></button>
       <!-- Login — desktop only; mobile vira ícone de perfil -->
-      <button class="btn-primary btn-login-desktop" onclick="MapsTo('auth')" data-i18n="login" data-wkz-auth-gate="guest">Entrar / Cadastrar</button>
+      <!-- FIX [header-duplicado]: agora com data-wkz-auth-gate="guest" (some quando
+           logado), evitando exibição simultânea com "Meu Perfil". Rótulo/estrutura
+           atualizados para "Entre ou cadastre-se" + ícone clássico, seguindo o
+           padrão de grandes marketplaces pedido no refactor de header. -->
+      <button class="btn-primary btn-login-desktop wkz-auth-guest-desktop" onclick="MapsTo('auth')" data-wkz-auth-gate="guest" data-i18n="login">
+        <span class="wkz-icon wkz-icon-user"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        <span class="wkz-auth-guest-text"><small>Entre ou</small><strong>cadastre-se</strong></span>
+      </button>
       <button class="btn-icon btn-icon-compact btn-login-mobile" onclick="MapsTo('auth')" title="Entrar" aria-label="Entrar" data-wkz-auth-gate="guest" style="display:none;"><span class="wkz-icon wkz-icon-user"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span></button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════ HEADER BENEFITS BAR ═══════════════════════
-     [Adaptação estratégica] Sinais de confiança globais e sempre visíveis
-     — antes só existiam lá embaixo na Home (.trust-strip, 4 itens, sem
-     Pix/Parcelamento/Cupons/countdown). Ícones reaproveitados do design
-     system existente (wkz-icon-truck, -zap, -creditcard, -tag) para não
-     criar um segundo idioma visual. Countdown reaproveita o MESMO
-     tick()/FLASH_END do Flash Sale (wkz-buyer.js) — 3 IDs novos (hbCh/
-     hbCm/hbCs), sem criar um segundo timer. ═══════════════════════ -->
-<div class="wkz-hbar" id="wkzHeaderBenefitsBar">
-  <div class="wkz-hbar-inner">
-    <div class="wkz-hbar-item">
-      <span class="wkz-icon wkz-icon-truck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16 16,8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
-      <span class="wkz-hbar-txt"><strong>Frete Grátis</strong><em>Acima de R$150</em></span>
+<!-- ═══════════════════════ INFO BAR — benefícios / gatilhos de venda ═══════════════════════ -->
+<div class="wkz-info-bar">
+  <div class="wkz-info-bar-inner">
+    <div class="wkz-info-item">
+      <span class="wkz-info-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><path d="M17 8h4l2 5v5H1"/><path d="M1 16V8"/><circle cx="5.5" cy="19.5" r="2.5"/><circle cx="18.5" cy="19.5" r="2.5"/></svg></span>
+      <span class="wkz-info-text"><span class="wkz-info-title">Frete Grátis</span><span class="wkz-info-sub">Acima de R$150</span></span>
     </div>
-    <div class="wkz-hbar-item">
-      <span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span>
-      <span class="wkz-hbar-txt"><strong>Entrega Rápida</strong><em>Para todo o Brasil</em></span>
+    <span class="wkz-info-sep"></span>
+    <div class="wkz-info-item">
+      <span class="wkz-info-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span>
+      <span class="wkz-info-text"><span class="wkz-info-title">Entrega Rápida</span><span class="wkz-info-sub">Para todo o Brasil</span></span>
     </div>
-    <div class="wkz-hbar-item">
-      <span class="wkz-icon wkz-icon-pix"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="7.5,12.5 10.5,15.5 16.5,8.5"/></svg></span>
-      <span class="wkz-hbar-txt"><strong>Pague com Pix</strong><em>Aprovação imediata</em></span>
+    <span class="wkz-info-sep"></span>
+    <div class="wkz-info-item">
+      <span class="wkz-info-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+      <span class="wkz-info-text"><span class="wkz-info-title">Pague com Pix</span><span class="wkz-info-sub">Aprovação imediata</span></span>
     </div>
-    <div class="wkz-hbar-item">
-      <span class="wkz-icon wkz-icon-creditcard"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
-      <span class="wkz-hbar-txt"><strong>Parcelamento</strong><em>Até 12x sem juros</em></span>
+    <span class="wkz-info-sep"></span>
+    <div class="wkz-info-item">
+      <span class="wkz-info-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+      <span class="wkz-info-text"><span class="wkz-info-title">Parcelamento</span><span class="wkz-info-sub">Até 12x sem juros</span></span>
     </div>
-    <div class="wkz-hbar-item">
-      <span class="wkz-icon wkz-icon-cashback"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="8" y1="16" x2="16" y2="8"/><circle cx="8.7" cy="8.7" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.3" cy="15.3" r="1.4" fill="currentColor" stroke="none"/></svg></span>
-      <span class="wkz-hbar-txt"><strong>Cashback</strong><em>Dinheiro de volta</em></span>
+    <span class="wkz-info-sep"></span>
+    <div class="wkz-info-item">
+      <span class="wkz-info-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></span>
+      <span class="wkz-info-text"><span class="wkz-info-title">Cashback</span><span class="wkz-info-sub">Dinheiro de volta</span></span>
     </div>
-    <div class="wkz-hbar-item" onclick="showPage('pg-flash')" role="button" tabindex="0">
-      <span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
-      <span class="wkz-hbar-txt"><strong>Cupons do Dia</strong><em>Descontos exclusivos</em></span>
+    <span class="wkz-info-sep"></span>
+    <div class="wkz-info-item">
+      <span class="wkz-info-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.6a2 2 0 01-2.83 0L2.59 12.6a2 2 0 010-2.83l7.17-7.18a2 2 0 012.83 0l7.17 7.19a2 2 0 010 2.83z"/><line x1="7.5" y1="7.5" x2="7.51" y2="7.5"/></svg></span>
+      <span class="wkz-info-text"><span class="wkz-info-title">Cupons do Dia</span><span class="wkz-info-sub">Descontos exclusivos</span></span>
     </div>
-    <div class="wkz-hbar-countdown" onclick="showPage('pg-flash')" role="button" tabindex="0" title="Ver Flash Sale">
-      <span class="wkz-hbar-countdown-label">Encerra em:</span>
-      <span class="wkz-hbar-cbox"><span id="hbCh">02</span><small>h</small></span>
-      <span class="wkz-hbar-csep">:</span>
-      <span class="wkz-hbar-cbox"><span id="hbCm">47</span><small>min</small></span>
-      <span class="wkz-hbar-csep">:</span>
-      <span class="wkz-hbar-cbox"><span id="hbCs">33</span><small>seg</small></span>
+    <div class="wkz-info-timer">
+      <span class="wkz-info-timer-label">Encerra em:</span>
+      <div class="count-block"><span class="count-num" id="ibCh">02</span><span class="count-label">h</span></div>
+      <span class="count-sep">:</span>
+      <div class="count-block"><span class="count-num" id="ibCm">47</span><span class="count-label">min</span></div>
+      <span class="count-sep">:</span>
+      <div class="count-block"><span class="count-num" id="ibCs">33</span><span class="count-label">seg</span></div>
     </div>
   </div>
 </div>
@@ -243,6 +251,10 @@
 <!-- NAV STRIP -->
 <div class="nav-strip">
   <div class="nav-strip-inner">
+    <button class="wkz-cat-all-btn" onclick="toggleAllCategoriesMenu&&toggleAllCategoriesMenu()" title="Todas as Categorias" aria-label="Todas as Categorias">
+      <span class="wkz-cat-all-hamburger"><span></span><span></span><span></span></span>
+      Todas as Categorias
+    </button>
     <div class="nav-link active" data-page="home" onclick="MapsTo('home')"><span class="wkz-icon wkz-icon-home"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span> Home</div>
     <div class="nav-link" data-page="category" onclick="openCategory('Eletrônicos','📱')"><span class="wkz-icon wkz-icon-phone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span> Eletrônicos</div>
     <div class="nav-link" data-page="category" onclick="openCategory('Moda','👗')"><span class="wkz-icon wkz-icon-shirt"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></span> Moda</div>
@@ -258,6 +270,22 @@
     <div class="nav-link kzlive-nav-link" data-page="live" onclick="MapsTo('live')" style="color:#EF4444;font-weight:700;" title="Kz Live Shopping — Ao Vivo!"><span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:7px;height:7px;background:#EF4444;border-radius:50%;animation:kzlive-pulse 1.2s infinite;"></span> Kz Live</span></div>
     <div class="nav-link" data-page="tracking" onclick="MapsTo('tracking')"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 9.4l-9-5.19"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Rastrear Pedido</div>
     <div class="nav-link" data-page="help" onclick="MapsTo('help')"><span class="wkz-icon wkz-icon-headphones"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></span> Ajuda</div>
+  </div>
+</div>
+
+<!-- Painel "Todas as Categorias" (menu hambúrguer) -->
+<div id="wkzCatAllPanel" class="wkz-cat-all-panel" style="display:none;">
+  <div class="wkz-cat-all-panel-inner">
+    <div class="wkz-cat-all-item" onclick="openCategory('Eletrônicos','📱')">📱 Eletrônicos</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Moda','👗')">👗 Moda</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Casa &amp; Deco','🏠')">🏠 Casa &amp; Decoração</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Beleza','💄')">💄 Beleza &amp; Saúde</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Games','🎮')">🎮 Games</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Esportes','⚽')">⚽ Esportes</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Bebê &amp; Kids','👶')">👶 Bebê &amp; Kids</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Pet Shop','🐾')">🐾 Pet Shop</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Automotivo','🚗')">🚗 Automotivo</div>
+    <div class="wkz-cat-all-item" onclick="openCategory('Livros','📚')">📚 Livros</div>
   </div>
 </div>
 
@@ -583,19 +611,8 @@ window.showPage._wkzDelegated = true;
 
 /* ── Inicialização no DOMContentLoaded ── */
 document.addEventListener('DOMContentLoaded', function() {
-  /* FIX [nav-cross-modulo] — Buyer era o único módulo (Seller e Legal já
-     faziam isso) que ignorava o hash da URL e sempre forçava 'home'. Isso
-     quebrava qualquer link chegando de fora com destino específico
-     (ex.: ../legal/wkz-legal.html → 'Home' → wkz-buyer.html#client-profile,
-     bnav do Seller → wkz-buyer.html#cart/#wishlist/#help/#tracking/#stores/
-     #live, ou o botão "Entrar/Cadastrar" → wkz-buyer.html#auth): o
-     navegador carregava wkz-buyer.html, este handler ignorava o #hash e
-     MapsTo('home') sempre vencia — a página pedida nunca ficava visível
-     (sintoma relatado: "clica no link e não faz nada" / "dá erro ao
-     voltar"). Agora lemos o hash, com 'home' como fallback quando não
-     houver hash (acesso direto à raiz do módulo). */
-  var target = (window.location.hash || '').replace('#', '') || 'home';
-  MapsTo(target);
+  /* Estado inicial: Home ativa */
+  MapsTo('home');
 
   /* Badge do carrinho: oculto se vazio */
   var mb = document.getElementById('bnavCartBadge');
@@ -608,8 +625,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
     if (typeof window.updateCartUI === 'function') window.updateCartUI();
   }, 150);
-
-  if (window.WkzBus) window.WkzBus.emit('module:ready', { module: 'buyer' });
 });
 </script>
 
