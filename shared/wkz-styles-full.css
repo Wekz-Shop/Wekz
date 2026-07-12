@@ -3495,14 +3495,6 @@ img, svg, video, canvas, iframe {
 .btn-icon-desktop,.btn-login-desktop{display:flex;}
 .btn-login-mobile{display:none!important;}
 
-/* [FIX header-auth-gate] Utilitário de gate por estado de login.
-   Usa !important de propósito: alguns elementos gateados (ex.: #wkzBellBtn,
-   .btn-login-mobile) já têm display:flex!important nos breakpoints mobile
-   — um style.display inline comum NÃO venceria essas regras. Por isso
-   wkzSyncBuyerOnlyUI() (wkz-core.js) alterna esta classe via classList,
-   em vez de setar style.display diretamente. */
-.wkz-gate-hide{display:none!important;}
-
 /* ── Desktop: search bar tem espaço generoso ── */
 @media(min-width:769px){
   .search-wrap-top{
@@ -3627,48 +3619,6 @@ img, svg, video, canvas, iframe {
   object-fit:contain;
   display:block;
   flex-shrink:0;
-}
-
-/* ─── HEADER BENEFITS BAR ───
-   Adaptação estratégica: sinais de confiança sempre visíveis, logo abaixo
-   do topbar (padrão comum a grandes marketplaces). Reaproveita os tokens
-   de cor do resto do projeto (--card2/--border/--muted/--text/--teal) para
-   não introduzir uma paleta nova. */
-.wkz-hbar{background:var(--card2);border-bottom:1px solid var(--border);}
-.wkz-hbar-inner{
-  max-width:1400px;margin:0 auto;padding:9px 32px;
-  display:flex;align-items:center;gap:26px;
-}
-.wkz-hbar-item{display:flex;align-items:center;gap:8px;color:var(--muted);flex-shrink:0;}
-.wkz-hbar-item[role="button"]{cursor:pointer;transition:var(--transition);}
-.wkz-hbar-item[role="button"]:hover{color:var(--teal);}
-.wkz-hbar-item .wkz-icon{color:var(--teal);flex-shrink:0;display:flex;}
-.wkz-hbar-txt{display:flex;flex-direction:column;line-height:1.25;}
-.wkz-hbar-txt strong{font-size:12px;font-weight:700;color:var(--text);}
-.wkz-hbar-txt em{font-size:10.5px;font-style:normal;color:var(--muted);}
-.wkz-hbar-countdown{
-  margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:6px;
-  cursor:pointer;padding:4px 12px;border-radius:8px;
-  border:1px solid rgba(255,107,53,0.3);background:rgba(255,107,53,0.06);
-  transition:var(--transition);
-}
-.wkz-hbar-countdown:hover{border-color:rgba(255,107,53,0.6);}
-.wkz-hbar-countdown-label{font-size:11px;color:var(--muted);}
-.wkz-hbar-cbox{display:flex;align-items:baseline;gap:2px;}
-.wkz-hbar-cbox span{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:800;color:#FF6B35;}
-.wkz-hbar-cbox small{font-size:9px;color:var(--muted);}
-.wkz-hbar-csep{color:rgba(255,107,53,0.4);font-size:11px;}
-
-@media(max-width:768px){
-  .wkz-hbar-inner{
-    padding:8px 14px;gap:18px;overflow-x:auto;white-space:nowrap;
-    -webkit-overflow-scrolling:touch;scroll-behavior:smooth;
-    scrollbar-width:none;-ms-overflow-style:none;
-  }
-  .wkz-hbar-inner::-webkit-scrollbar{display:none;}
-  .wkz-hbar-txt em{display:none;} /* mobile: só título, mantém a linha compacta */
-  .wkz-hbar-countdown{margin-left:0;} /* participa do scroll, não fica "preso" à direita */
-  .wkz-hbar-countdown-label{display:none;}
 }
 
 /* ─── NAV STRIP ─── */
@@ -14958,4 +14908,75 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
       "seller  seller";
     grid-template-rows: auto 1fr auto;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HEADER REFACTOR (Sprint UI-Header) — auth gate class + info bar de
+   benefícios + botão "Todas as Categorias". Mantém a paleta dark/gradiente
+   original (var(--teal), var(--grad1), var(--card), var(--border), etc.),
+   só reorganiza estrutura conforme referência de grande marketplace.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Gate de login: vence qualquer !important de responsivo (ex.: .btn-login-mobile) */
+[data-wkz-auth-gate].wkz-gate-hidden{display:none!important;}
+
+/* Componente "Entre ou cadastre-se" (estado deslogado) — ícone clássico + 2 linhas */
+.wkz-auth-guest-desktop{display:flex;align-items:center;gap:8px;}
+.wkz-auth-guest-desktop .wkz-auth-guest-text{display:flex;flex-direction:column;line-height:1.15;text-align:left;}
+.wkz-auth-guest-desktop .wkz-auth-guest-text small{font-size:10.5px;color:var(--muted);font-weight:500;}
+.wkz-auth-guest-desktop .wkz-auth-guest-text strong{font-size:12.5px;color:var(--text);font-weight:700;}
+
+/* Info Bar de benefícios/gatilhos de venda */
+.wkz-info-bar{background:var(--card);border-bottom:1px solid var(--border);padding:0 32px;}
+.wkz-info-bar-inner{
+  max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:22px;
+  padding:9px 0;overflow-x:auto;scrollbar-width:none;
+}
+.wkz-info-bar-inner::-webkit-scrollbar{display:none;}
+.wkz-info-item{display:flex;align-items:center;gap:8px;flex-shrink:0;white-space:nowrap;}
+.wkz-info-item .wkz-info-icon{
+  width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,180,171,0.12);color:var(--teal);flex-shrink:0;
+}
+.wkz-info-item .wkz-info-text{display:flex;flex-direction:column;line-height:1.2;}
+.wkz-info-item .wkz-info-title{font-size:11.5px;font-weight:700;color:var(--text);}
+.wkz-info-item .wkz-info-sub{font-size:10.5px;color:var(--muted);}
+.wkz-info-sep{width:1px;height:26px;background:var(--border);flex-shrink:0;}
+.wkz-info-timer{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;}
+.wkz-info-timer .wkz-info-timer-label{font-size:10.5px;color:var(--muted);}
+.wkz-info-timer .count-block{display:flex;flex-direction:column;align-items:center;}
+.wkz-info-timer .count-num{font-size:13px;font-weight:800;color:var(--teal);font-family:'DM Sans',sans-serif;}
+.wkz-info-timer .count-label{font-size:8.5px;color:var(--muted);text-transform:uppercase;}
+.wkz-info-timer .count-sep{color:var(--muted);font-weight:700;}
+@media (max-width:768px){
+  .wkz-info-bar{padding:0 14px;}
+  .wkz-info-item .wkz-info-sub{display:none;}
+}
+
+/* Botão "Todas as Categorias" com menu hambúrguer, no início da nav-strip */
+.wkz-cat-all-btn{
+  display:flex;align-items:center;gap:6px;flex-shrink:0;background:var(--grad1);color:#fff;
+  padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;
+  margin-right:10px;transition:var(--transition);border:none;
+}
+.wkz-cat-all-btn:hover{filter:brightness(1.08);}
+.wkz-cat-all-btn .wkz-cat-all-hamburger{display:flex;flex-direction:column;gap:3px;}
+.wkz-cat-all-btn .wkz-cat-all-hamburger span{width:15px;height:2px;background:#fff;border-radius:1px;}
+
+/* Painel dropdown "Todas as Categorias" */
+.wkz-cat-all-panel{
+  position:sticky;top:70px;z-index:999;background:var(--card);border-bottom:1px solid var(--border);
+  box-shadow:0 8px 20px rgba(0,0,0,0.35);
+}
+.wkz-cat-all-panel-inner{
+  max-width:1400px;margin:0 auto;padding:14px 32px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;
+}
+.wkz-cat-all-item{
+  padding:10px 12px;border-radius:8px;font-size:13px;color:var(--text);cursor:pointer;transition:var(--transition);
+}
+.wkz-cat-all-item:hover{background:rgba(0,180,171,0.12);color:var(--teal);}
+@media (max-width:768px){
+  .wkz-cat-all-panel{top:0;}
+  .wkz-cat-all-panel-inner{padding:12px 14px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
 }
