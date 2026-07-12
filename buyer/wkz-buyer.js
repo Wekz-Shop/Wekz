@@ -8425,8 +8425,27 @@ function tick(){
   const fhCh=document.getElementById('fhCh'); if(fhCh) fhCh.textContent=String(h).padStart(2,'0');
   const fhCm=document.getElementById('fhCm'); if(fhCm) fhCm.textContent=String(m).padStart(2,'0');
   const fhCs=document.getElementById('fhCs'); if(fhCs) fhCs.textContent=String(s).padStart(2,'0');
+  // Sync info bar (benefícios) countdown [header refactor]
+  const ibCh=document.getElementById('ibCh'); if(ibCh) ibCh.textContent=String(h).padStart(2,'0');
+  const ibCm=document.getElementById('ibCm'); if(ibCm) ibCm.textContent=String(m).padStart(2,'0');
+  const ibCs=document.getElementById('ibCs'); if(ibCs) ibCs.textContent=String(s).padStart(2,'0');
 }
 setInterval(tick,1000);
+
+/* Menu "Todas as Categorias" (hambúrguer) da nav-strip [header refactor] */
+function toggleAllCategoriesMenu(){
+  const panel = document.getElementById('wkzCatAllPanel');
+  if (!panel) return;
+  const isOpen = panel.style.display === 'block';
+  panel.style.display = isOpen ? 'none' : 'block';
+}
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('wkzCatAllPanel');
+  const btn = document.querySelector('.wkz-cat-all-btn');
+  if (!panel || panel.style.display !== 'block') return;
+  if (panel.contains(e.target) || (btn && btn.contains(e.target))) return;
+  panel.style.display = 'none';
+});
   _patchCartForPoints();
   _patchCartUIForCoupon();
   // _patchCkoutNextForPickup() — removido: validação de pickup integrada em ckoutNext() (BUG-02 fix)
