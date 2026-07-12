@@ -538,8 +538,19 @@ window.showPage._wkzDelegated = true;
 
 /* ── Inicialização no DOMContentLoaded ── */
 document.addEventListener('DOMContentLoaded', function() {
-  /* Estado inicial: Home ativa */
-  MapsTo('home');
+  /* FIX [nav-cross-modulo] — Buyer era o único módulo (Seller e Legal já
+     faziam isso) que ignorava o hash da URL e sempre forçava 'home'. Isso
+     quebrava qualquer link chegando de fora com destino específico
+     (ex.: ../legal/wkz-legal.html → 'Home' → wkz-buyer.html#client-profile,
+     bnav do Seller → wkz-buyer.html#cart/#wishlist/#help/#tracking/#stores/
+     #live, ou o botão "Entrar/Cadastrar" → wkz-buyer.html#auth): o
+     navegador carregava wkz-buyer.html, este handler ignorava o #hash e
+     MapsTo('home') sempre vencia — a página pedida nunca ficava visível
+     (sintoma relatado: "clica no link e não faz nada" / "dá erro ao
+     voltar"). Agora lemos o hash, com 'home' como fallback quando não
+     houver hash (acesso direto à raiz do módulo). */
+  var target = (window.location.hash || '').replace('#', '') || 'home';
+  MapsTo(target);
 
   /* Badge do carrinho: oculto se vazio */
   var mb = document.getElementById('bnavCartBadge');
@@ -552,6 +563,8 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
     if (typeof window.updateCartUI === 'function') window.updateCartUI();
   }, 150);
+
+  if (window.WkzBus) window.WkzBus.emit('module:ready', { module: 'buyer' });
 });
 </script>
 
