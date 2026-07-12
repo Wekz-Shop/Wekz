@@ -2205,12 +2205,21 @@ function wkzInjectBellBtn() {
   btn.id = 'wkzBellBtn';
   btn.className = 'btn-icon btn-icon-compact';
   btn.setAttribute('aria-label', 'Notificações');
+  /* [FIX header-auth-gate] sino só faz sentido para quem está logado —
+     antes não tinha NENHUM gate e ficava sempre visível, inclusive lado
+     a lado com "Entrar/Cadastrar" no mobile. */
+  btn.setAttribute('data-wkz-auth-gate', 'buyer');
   btn.onclick = wkzOpenInbox;
   btn.innerHTML = `
     <span class="wkz-icon wkz-icon-bell"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
     <span id="wkzBellBadge"></span>`;
   /* Anexa ao final — o CSS order reposiciona no mobile */
   actions.appendChild(btn);
+  /* O sino nasce DEPOIS do DOMContentLoaded (chamado por outro fluxo de
+     init) — sem isto, ele escapa da primeira passada de
+     wkzSyncBuyerOnlyUI() e fica visível mesmo deslogado até a próxima
+     mudança de estado. */
+  if (typeof window.wkzSyncBuyerOnlyUI === 'function') window.wkzSyncBuyerOnlyUI();
 }
 
 /* ── Injetar sino na bottom-nav mobile ── */
@@ -5940,30 +5949,26 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   window.wkzBuyerLoggedIn = readState();
 
-  /* Aplica o estado atual a todos os elementos marcados como buyer-only
-     (data-wkz-auth-gate="buyer") ou guest-only (data-wkz-auth-gate="guest").
-     FIX [header-duplicado] — antes só existia o gate "buyer" (ex.: botão de
-     Favoritos). O componente de autenticação do header ("Meu Perfil" vs.
-     "Entrar/Cadastrar") não estava ligado a NENHUM gate, por isso os dois
-     apareciam simultaneamente sempre, independente do estado de login —
-     sintoma relatado nos prints (botão duplicado no topbar mobile e
-     desktop). Agora "Meu Perfil" usa data-wkz-auth-gate="buyer" (mesmo
-     comportamento de Favoritos) e "Entrar/Cadastrar" usa o gate inverso
-     data-wkz-auth-gate="guest", tornando os dois mutuamente exclusivos. */
+  /* Aplica o estado atual a todos os elementos gateados por login.
+     [FIX header-auth-gate — v2.9.37] Antes só existia o grupo "buyer"
+     (visível apenas logado) e usava style.display direto. Isso deixava
+     "Meu Perfil", "Entrar/Cadastrar" e o sino de notificações (#wkzBellBtn)
+     sem NENHUM gate — os três ficavam sempre visíveis ao mesmo tempo,
+     inclusive contradizendo-se entre si (perfil logado + botão de login
+     lado a lado). Agora existem dois grupos:
+       data-wkz-auth-gate="buyer" → visível só quando LOGADO (perfil, sino)
+       data-wkz-auth-gate="guest" → visível só quando DESLOGADO (login)
+     E a alternância usa classList (.wkz-gate-hide) em vez de style.display,
+     porque alguns desses elementos têm display:flex!important em
+     breakpoints mobile — um style.display inline sem !important perderia
+     para essa regra. Ver .wkz-gate-hide em wkz-styles-full.css. */
   window.wkzSyncBuyerOnlyUI = function() {
-    var show = !!window.wkzBuyerLoggedIn;
-    /* FIX: usamos toggle de classe (.wkz-gate-hidden), não style.display
-       inline — alguns elementos (ex.: .btn-login-mobile) já têm regras
-       CSS com !important para o próprio responsivo (mobile x desktop) e
-       um display inline "solto" nunca venceria esse !important. A classe
-       .wkz-gate-hidden é definida com seletor de maior especificidade
-       ([data-wkz-auth-gate].wkz-gate-hidden{display:none!important}),
-       então sempre prevalece, em qualquer breakpoint. */
+    var loggedIn = !!window.wkzBuyerLoggedIn;
     document.querySelectorAll('[data-wkz-auth-gate="buyer"]').forEach(function(el) {
-      el.classList.toggle('wkz-gate-hidden', !show);
+      el.classList.toggle('wkz-gate-hide', !loggedIn);
     });
     document.querySelectorAll('[data-wkz-auth-gate="guest"]').forEach(function(el) {
-      el.classList.toggle('wkz-gate-hidden', show);
+      el.classList.toggle('wkz-gate-hide', loggedIn);
     });
   };
 
