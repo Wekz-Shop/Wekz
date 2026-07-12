@@ -14962,21 +14962,3 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
 .wkz-cat-all-btn:hover{filter:brightness(1.08);}
 .wkz-cat-all-btn .wkz-cat-all-hamburger{display:flex;flex-direction:column;gap:3px;}
 .wkz-cat-all-btn .wkz-cat-all-hamburger span{width:15px;height:2px;background:#fff;border-radius:1px;}
-
-/* Painel dropdown "Todas as Categorias" */
-.wkz-cat-all-panel{
-  position:sticky;top:70px;z-index:999;background:var(--card);border-bottom:1px solid var(--border);
-  box-shadow:0 8px 20px rgba(0,0,0,0.35);
-}
-.wkz-cat-all-panel-inner{
-  max-width:1400px;margin:0 auto;padding:14px 32px;display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;
-}
-.wkz-cat-all-item{
-  padding:10px 12px;border-radius:8px;font-size:13px;color:var(--text);cursor:pointer;transition:var(--transition);
-}
-.wkz-cat-all-item:hover{background:rgba(0,180,171,0.12);color:var(--teal);}
-@media (max-width:768px){
-  .wkz-cat-all-panel{top:0;}
-  .wkz-cat-all-panel-inner{padding:12px 14px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
-}
