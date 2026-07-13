@@ -701,7 +701,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   <!-- ⚡ FLASH SALE DESTAQUE PRINCIPAL -->
-  <div id="flashHeroSection" style="background:linear-gradient(135deg,#0D0D0D 0%,#1a0a00 40%,#0D0D0D 100%);border-bottom:2px solid rgba(255,107,53,0.4);padding:28px 32px;position:relative;overflow:hidden;">
+  <div id="flashHeroSection" style="background:linear-gradient(135deg,var(--dark) 0%,var(--card) 40%,var(--dark) 100%);border-bottom:2px solid rgba(255,107,53,0.4);padding:28px 32px;position:relative;overflow:hidden;">
     <!-- animated bg lines -->
     <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,107,53,0.03) 60px,rgba(255,107,53,0.03) 61px);pointer-events:none;"></div>
     <div style="max-width:1400px;margin:0 auto;position:relative;z-index:1;">
@@ -712,13 +712,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span>
             <span style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:1px;">FLASH SALE</span>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,107,53,0.3);border-radius:10px;padding:8px 14px;">
-            <span style="font-size:12px;color:rgba(255,255,255,0.6);">Encerra em:</span>
-            <span style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#FF6B35;" id="fhCh">02</span><span style="color:rgba(255,255,255,0.5);font-size:13px;">h</span>
-            <span style="color:rgba(255,255,255,0.3);">:</span>
-            <span style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#FF6B35;" id="fhCm">47</span><span style="color:rgba(255,255,255,0.5);font-size:13px;">min</span>
-            <span style="color:rgba(255,255,255,0.3);">:</span>
-            <span style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#FF6B35;" id="fhCs">33</span><span style="color:rgba(255,255,255,0.5);font-size:13px;">seg</span>
+          <div style="display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid rgba(255,107,53,0.3);border-radius:10px;padding:8px 14px;">
+            <span style="font-size:12px;color:var(--muted);">Encerra em:</span>
+            <span style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#FF6B35;" id="fhCh">02</span><span style="color:var(--muted);font-size:13px;">h</span>
+            <span style="color:var(--muted);">:</span>
+            <span style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#FF6B35;" id="fhCm">47</span><span style="color:var(--muted);font-size:13px;">min</span>
+            <span style="color:var(--muted);">:</span>
+            <span style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#FF6B35;" id="fhCs">33</span><span style="color:var(--muted);font-size:13px;">seg</span>
           </div>
         </div>
         <button onclick="showPage('pg-flash')" style="background:none;border:1px solid rgba(255,107,53,0.5);color:#FF6B35;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.1)'" onmouseout="this.style.background='none'">Ver todas as ofertas →</button>
