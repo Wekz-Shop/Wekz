@@ -56,6 +56,23 @@
      não depende de cor de marca isolada pra não sumir em nenhum dos 2 temas. */
   --focus-ring: 0 0 0 3px rgba(37,99,235,0.55);
 
+  /* ── Cores semânticas de status (Sprint UI-Theming-Fix) ──
+     Consolidam o que antes eram hexadecimais soltos e repetidos (com
+     variações inconsistentes: 2 roxos diferentes — #c4b5fd e #a78bfa —
+     pra dizer a mesma coisa "premium/admin", um azul pastel #60a5fa sem
+     contraste sobre fundo claro) espalhados por wkz-admin-styles.css e
+     wkz-styles-full.css. Um único ponto de verdade agora, tonalidade
+     ajustada por tema: mais escura/saturada no claro (legibilidade sobre
+     branco), mais pastel no escuro (não estourar contraste sobre fundo
+     escuro). Nenhuma muda a intenção semântica (verde=sucesso,
+     vermelho=erro, âmbar=alerta, azul=info, roxo=premium/admin). */
+  --c-success: #16A34A;
+  --c-error: #DC2626;
+  --c-warning: #B45309;
+  --c-info: #2563EB;
+  --c-premium: #7C3AED;
+  --c-accent-cyan: #0E7490;
+
   /* ── v2.9.25 — ESCALA TIPOGRÁFICA OFICIAL (DM Sans, pós-Syne) ──
      7 passos fixos. Display/H1 usam peso 800 + letter-spacing negativo
      pra compensar o que a Syne fazia "de graça" com as formas geométricas
@@ -83,6 +100,13 @@ html[data-theme="dark"] {
   --glow-teal: 0 0 40px rgba(0,180,171,0.3);
   --glow-purple: 0 0 40px rgba(124,58,237,0.3);
   --focus-ring: 0 0 0 3px rgba(6,182,212,0.6);
+
+  --c-success: #22C55E;
+  --c-error: #EF4444;
+  --c-warning: #F59E0B;
+  --c-info: #60A5FA;
+  --c-premium: #C4B5FD;
+  --c-accent-cyan: #06B6D4;
 }
 
 /* ── Acessibilidade global ──────────────────────────────────────────── */
