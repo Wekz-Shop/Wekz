@@ -5982,6 +5982,50 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   }
 })();
 
+/* ── 1.1 TEMA CLARO/ESCURO (Sprint UI-Theming) ─────────────────────
+   Compartilhado pelos 4 módulos (wkz-core.js é carregado por todos).
+   O <head> de cada módulo já roda um script inline síncrono que aplica
+   o tema salvo ANTES do primeiro paint (evita FOUC); aqui só cuidamos
+   da troca interativa via botão e da sincronização do ícone. */
+(function() {
+  var THEME_KEY = 'wkz-theme';
+
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+
+  function syncThemeIcons() {
+    var isDark = currentTheme() === 'dark';
+    document.querySelectorAll('.wkz-icon-theme-light').forEach(function(el) {
+      el.style.display = isDark ? 'none' : '';
+    });
+    document.querySelectorAll('.wkz-icon-theme-dark').forEach(function(el) {
+      el.style.display = isDark ? '' : 'none';
+    });
+    document.querySelectorAll('[id^="wkzThemeToggleBtn"]').forEach(function(btn) {
+      btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    });
+  }
+
+  /* Troca o tema, persiste em localStorage e atualiza os ícones dos
+     botões de toggle em qualquer módulo aberto. */
+  window.wkzToggleTheme = function() {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    if (next === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    syncThemeIcons();
+  };
+
+  document.addEventListener('DOMContentLoaded', syncThemeIcons);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    syncThemeIcons();
+  }
+})();
+
 /* ── 2. MISSÕES DO DIA ──────────────────────────────────────────── */
 (function() {
   var CP_MISSOES = [
