@@ -73,6 +73,16 @@
   --c-premium: #7C3AED;
   --c-accent-cyan: #0E7490;
 
+  /* ── FIX [glass-panels-nao-adaptam] — vários componentes de "vidro
+     fosco" (banner de boas-vindas do Kz IA, bolha de cupons, cards de
+     Prova Social, painel de notificações) tinham o fundo escondido em
+     rgba(15,23,42,X) direto no CSS, sem depender de tema — por isso
+     ficavam cinza-escuro mesmo no claro, com o texto (var(--text), agora
+     escuro) quase ilegível em cima. --glass-rgb guarda só os componentes
+     RGB (sem alpha), pra cada regra manter seu próprio nível de
+     transparência via rgba(var(--glass-rgb), X). */
+  --glass-rgb: 255,255,255;
+
   /* ── v2.9.25 — ESCALA TIPOGRÁFICA OFICIAL (DM Sans, pós-Syne) ──
      7 passos fixos. Display/H1 usam peso 800 + letter-spacing negativo
      pra compensar o que a Syne fazia "de graça" com as formas geométricas
@@ -107,6 +117,7 @@ html[data-theme="dark"] {
   --c-info: #60A5FA;
   --c-premium: #C4B5FD;
   --c-accent-cyan: #06B6D4;
+  --glass-rgb: 15,23,42;
 }
 
 /* ── Acessibilidade global ──────────────────────────────────────────── */
