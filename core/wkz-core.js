@@ -6400,12 +6400,12 @@ function toggleFaq(i){
   position: relative;
   width: 100%;
   max-width: 400px;
-  background: #151E2E;
+  background: var(--card);
   border-radius: 22px;
   overflow: hidden;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.07),
-    0 24px 64px rgba(0,0,0,0.6),
+    0 0 0 1px var(--border),
+    0 24px 64px rgba(0,0,0,0.35),
     0 0 40px rgba(0,180,171,0.08);
   animation: wkzConfirmIn 0.38s cubic-bezier(0.34,1.4,0.64,1) forwards;
 }
@@ -6454,19 +6454,19 @@ function toggleFaq(i){
   font-family: 'DM Sans', sans-serif;
   font-size: 17px;
   font-weight: 800;
-  color: #E2E8F0;
+  color: var(--text);
   text-align: center;
   margin-bottom: 10px;
   line-height: 1.3;
 }
 .wkz-confirm-msg {
   font-size: 13px;
-  color: #94A3B8;
+  color: var(--muted);
   text-align: center;
   line-height: 1.65;
   margin-bottom: 24px;
 }
-.wkz-confirm-msg strong { color: #E2E8F0; font-weight: 600; }
+.wkz-confirm-msg strong { color: var(--text); font-weight: 600; }
 .wkz-confirm-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -6486,14 +6486,14 @@ function toggleFaq(i){
 }
 .wkz-confirm-btn:focus-visible { outline: 2px solid rgba(0,180,171,0.6); outline-offset: 2px; }
 .wkz-confirm-btn-cancel {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #94A3B8;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--muted);
 }
 .wkz-confirm-btn-cancel:hover {
-  background: rgba(255,255,255,0.09);
-  color: #E2E8F0;
-  border-color: rgba(255,255,255,0.18);
+  background: var(--border);
+  color: var(--text);
+  border-color: var(--teal);
 }
 /* Confirm button — muda por variant */
 .variant-danger  .wkz-confirm-btn-ok { background: linear-gradient(135deg,#EF4444,#DC2626); color:#fff; }
@@ -6508,13 +6508,13 @@ function toggleFaq(i){
   justify-content: center;
   gap: 6px;
   padding: 10px 26px 18px;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid var(--border);
   font-size: 10px;
   font-family: 'DM Sans', sans-serif;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: rgba(148,163,184,0.4);
+  color: var(--muted);
 }
 .wkz-confirm-footer svg { opacity: 0.35; }
 @media (max-width: 420px) {
