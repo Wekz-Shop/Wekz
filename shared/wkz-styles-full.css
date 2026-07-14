@@ -1089,7 +1089,7 @@ body{background:var(--darker);color:var(--text);font-family:'DM Sans',sans-serif
 }
 .kz-copilot-close {
   background: var(--card2);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
   color: var(--muted);
   width: 24px; height: 24px;
   border-radius: 6px;
@@ -2215,7 +2215,7 @@ body{background:var(--darker);color:var(--text);font-family:'DM Sans',sans-serif
 }
 .kz-neg-close {
   background: var(--card2);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
   color: var(--muted);
   width: 28px; height: 28px;
   border-radius: 8px;
@@ -3674,7 +3674,7 @@ img, svg, video, canvas, iframe {
 .btn-hero{padding:14px 28px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition);}
 .btn-hero-primary{background:var(--grad1);border:none;color:#fff;}
 .btn-hero-primary:hover{transform:translateY(-2px);box-shadow:var(--glow-teal);}
-.btn-hero-outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;}
+.btn-hero-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
 .btn-hero-outline:hover{border-color:var(--teal);color:var(--teal);}
 
 /* HERO SIDE */
@@ -4929,7 +4929,7 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:48px 32
   display:flex;align-items:center;
   background: var(--card2);
   backdrop-filter:blur(20px);
-  border:1.5px solid rgba(255,255,255,0.13);
+  border:1.5px solid var(--border);
   border-radius:18px;
   overflow:hidden;
   transition:var(--transition);
@@ -7840,7 +7840,7 @@ body.kzlive-active .bottom-nav {
 }
 .kzloc-btn {
   background: var(--card2);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
   color: var(--muted);
   font-family: 'DM Sans', sans-serif;
   font-size: clamp(8px, 0.6rem, 10px);
@@ -9612,7 +9612,7 @@ h2.section-title .wkz-icon svg {
 .cp-progress-fill { height: 100%; border-radius: 4px; background: var(--grad1); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
 .cp-progress-steps { display: flex; justify-content: space-between; }
 .cp-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-.cp-step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--card2); border: 1.5px solid rgba(255,255,255,0.08); transition: var(--transition); }
+.cp-step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--card2); border: 1.5px solid var(--border); transition: var(--transition); }
 .cp-step.done   .cp-step-dot { background: var(--teal); border-color: var(--teal); box-shadow: 0 0 6px rgba(0,180,171,0.6); }
 .cp-step.active .cp-step-dot { background: var(--c-premium); border-color: var(--c-premium); box-shadow: 0 0 8px rgba(124,58,237,0.7); animation: kzBadgePulse 1.5s ease-in-out infinite; }
 .cp-step-label { font-size: 9px; color: var(--muted); text-align: center; line-height: 1.2; max-width: 50px; transition: var(--transition); }
@@ -12196,7 +12196,7 @@ body.kzlive-active .bottom-nav {
 .adm-chat-img-preview {
   max-width: 180px; max-height: 180px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
   display: block;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s;
@@ -12310,7 +12310,7 @@ body.kzlive-active .bottom-nav {
   padding: 16px;
 }
 .adm-modal-box {
-  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
+  background: var(--card); border: 1px solid var(--border);
   border-radius: 20px; width: 100%;
   box-shadow: 0 24px 80px rgba(0,0,0,0.8);
   animation: wkzInboxIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
@@ -14022,7 +14022,7 @@ body.adm-mode .flash-back-btn {
   background: rgba(var(--glass-rgb),0.97);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
   border-radius: 20px;
   z-index: 9100;
   overflow: hidden;
@@ -14527,7 +14527,7 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 100100;
-  background: rgba(15, 24, 39, 0.98);
+  background: rgba(var(--glass-rgb), 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid rgba(0, 180, 171, 0.28);
@@ -14614,7 +14614,7 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
 }
 .wkz-cb-reject {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.14);
+  border: 1px solid var(--border);
   color: var(--muted);
 }
 .wkz-cb-reject:hover {
@@ -14788,7 +14788,7 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
   width: 40px; height: 22px;
   border-radius: 11px;
   background: var(--card2);
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid var(--border);
   transition: background 0.22s ease, border-color 0.22s ease;
   display: flex; align-items: center;
   padding: 0 3px;
