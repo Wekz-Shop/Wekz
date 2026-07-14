@@ -6047,10 +6047,10 @@ html, body {
 .trk-hero-text{flex:1;}
 .trk-hero-status{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#fff;}
 .trk-hero-sub{font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px;}
-.trk-hero-eta{background: var(--card2);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:8px 14px;text-align:right;white-space:nowrap;}
-.trk-hero-eta-label{font-size:10px;color:rgba(255,255,255,0.6);font-weight:600;text-transform:uppercase;letter-spacing:.7px;}
-.trk-hero-eta-date{font-size:16px;font-weight:800;color:#fff;margin-top:1px;}
-.trk-hero-eta-countdown{font-size:11px;color:rgba(255,255,255,0.7);margin-top:1px;}
+.trk-hero-eta{background: var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:right;white-space:nowrap;}
+.trk-hero-eta-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.7px;}
+.trk-hero-eta-date{font-size:16px;font-weight:800;color:var(--text);margin-top:1px;}
+.trk-hero-eta-countdown{font-size:11px;color:var(--muted);margin-top:1px;}
 
 /* Progress bar */
 .trk-progress-bar{height:4px;background: var(--card2);}
