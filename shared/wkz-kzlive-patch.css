@@ -1,0 +1,158 @@
+/* ══════════════════════════════════════════════════════════════════════
+   WKZ-KZLIVE-PATCH.CSS
+   Correção + hardening da página Kz Live Shopping.
+   Carregar DEPOIS de wkz-styles-base.css e wkz-styles-full.css,
+   e DEPOIS do <style> inline de wkz-buyer.html (linhas ~4188-4900),
+   para que estas regras tenham prioridade de cascata sem !important
+   generalizado.
+
+   Convenção: como o componente já usa o prefixo "kzlive-" e "bnav-",
+   mantemos o prefixo (evita reescrever HTML/JS existentes) mas
+   passamos a documentar Bloco__Elemento--Modificador nos comentários,
+   e migramos o layout crítico para custom properties + grid moderno.
+   ══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Paleta "Live Commerce" — extensão dos tokens de wkz-styles-base.css ── */
+  --live-accent: #ef4444;       /* selo AO VIVO / urgência */
+  --live-accent-2: #ff6b35;     /* contraste de desconto/oferta */
+  --live-brand-a: #00b4ab;      /* teal de marca (já existente) */
+  --live-brand-b: #7c3aed;      /* roxo de marca (já existente) */
+  --live-surface: #080e1a;      /* fundo do player/estúdio */
+  --live-surface-2: #0c1827;
+  --live-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-h: 65px;                /* altura real do bottom-nav */
+  --nav-fab-overflow: 34px;     /* quanto o botão central "vaza" para cima do bottom-nav */
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   1) CORREÇÃO DO BUG: bottom-nav sobrepondo o player de vídeo
+   ──────────────────────────────────────────────────────────────────────
+   Causa raiz (2 fatores que se somam):
+   a) .bnav-center-wrap usa margin-top:-22px e o botão tem 56px + ring,
+      ou seja, ~34-40px do FAB ficam ACIMA da caixa de 65px do
+      .bottom-nav. Como .bottom-nav tem z-index:1000, esse pedaço
+      "vazado" também herda esse z-index e passa a flutuar sobre
+      QUALQUER conteúdo com z-index menor — inclusive o player/iframe
+      do Kz Live, que não define z-index (fica em 0/auto).
+   b) Em Chrome mobile, a barra de endereço recolhe/expande durante o
+      scroll e durante o carregamento de <iframe> (o vídeo do YouTube
+      força reflow). Como .bottom-nav é position:fixed e a página usa
+      unidades de viewport "clássicas", o navegador pode repintar o
+      elemento fixo em uma posição intermediária por 1-2 frames,
+      dando a impressão de que a nav "pulou" para o meio da tela
+      durante o carregamento do vídeo — exatamente o que aparece nos
+      prints enviados.
+   Correção: isolar os dois elementos em stacking contexts próprios,
+   promover a bottom-nav a uma composite layer estável, e usar dvh/
+   safe-area para não depender de recomputo tardio da viewport.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.bottom-nav {
+  /* mantém position:fixed, mas fixa a stacking context e evita repaint
+     tardio quando iframes/vídeos disparam layout thrashing */
+  transform: translateZ(0);
+  will-change: transform;
+  isolation: isolate;              /* nada do conteúdo interno "vaza" o z-index para fora */
+  padding-bottom: var(--live-safe-bottom);
+  height: calc(var(--nav-h) + var(--live-safe-bottom));
+}
+
+/* O wrap do botão central continua subindo visualmente, mas agora
+   dentro do MESMO stacking context isolado da nav (não mais do
+   documento), então nunca fica acima do vídeo/página. */
+.bnav-center-wrap {
+  z-index: 1;               /* relativo apenas ao .bottom-nav (isolado acima) */
+  position: relative;
+}
+
+/* Página Kz Live: garante que o player tenha seu próprio stacking
+   context, imune a qualquer reflow/paint disparado pelo iframe. */
+.kzlive-player-outer,
+.kzlive-video-side {
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+/* Reserva de espaço real para a bottom-nav (incluindo safe-area),
+   evitando que o fim da página fique colado/atrás da barra. */
+@media (max-width: 768px) {
+  #page-live {
+    padding-bottom: calc(var(--nav-h) + var(--live-safe-bottom) + 12px);
+  }
+}
+
+/* Fallback de altura de viewport dinâmica (Android/iOS Chrome/Safari) */
+@supports (height: 100dvh) {
+  #page-live { min-height: auto; } /* já flui no documento — não força 100vh */
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   2) VIDEO CONTAINER — responsivo, mobile-first
+   ══════════════════════════════════════════════════════════════════════ */
+.kzlive-main-wrap {
+  display: grid;
+  grid-template-columns: 1fr;             /* mobile-first: 1 coluna */
+  gap: 0;
+}
+
+@media (min-width: 901px) {
+  .kzlive-main-wrap {
+    grid-template-columns: minmax(0, 1fr) 320px; /* desktop: vídeo + chat */
+  }
+}
+
+.kzlive-player-outer {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  contain: layout paint;   /* evita que o iframe force reflow do resto da página */
+}
+
+.kzlive-iframe,
+.kzlive-player-placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   3) BOTTOM-NAV — comportamento estável em qualquer página
+   ══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .bottom-nav { display: flex; }
+  body { padding-bottom: calc(var(--nav-h) + var(--live-safe-bottom) + 10px); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   4) GRID DE PRODUTOS DA LIVE — mobile-first
+   ══════════════════════════════════════════════════════════════════════ */
+.kzlive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* mobile: 2 colunas fixas, sem “achatar” cards */
+  gap: 12px;
+}
+
+@media (min-width: 481px) {
+  .kzlive-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+}
+
+@media (min-width: 901px) {
+  .kzlive-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   5) TIPOGRAFIA / ESPAÇAMENTO — leitura "clean" em telas pequenas
+   ══════════════════════════════════════════════════════════════════════ */
+.kzlive-products-hd-title { font-size: clamp(14px, 4vw, 18px); }
+.kzlive-active-pname      { font-size: clamp(12px, 3.6vw, 14px); }
+.kzlive-pcard-name        { font-size: clamp(12.5px, 3.4vw, 13.5px); line-height: 1.35; }
+.kzlive-pcard-price       { font-size: clamp(14px, 4vw, 16px); }
+
+/* Selo "AO VIVO"/urgência com paleta consistente em toda a página */
+.kzlive-live-pill,
+.kzlive-exclusive-badge {
+  background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(255,107,53,0.10));
+  border-color: rgba(239,68,68,0.3);
+  color: var(--live-accent);
+}
