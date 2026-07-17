@@ -48,12 +48,27 @@
    última declaração declarada vence).
    ══════════════════════════════════════════════════════════════════════ */
 
-body.kzlive-active .bottom-nav {
-  position: fixed !important;
-  bottom: 0 !important;
-  top: auto !important;
-  left: 0 !important;
-  right: 0 !important;
+@media (max-width: 768px) {
+  body.kzlive-active .bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    top: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+}
+
+/* ── Novo bug reportado: kzliveStartPlayer() adiciona a classe
+   "kzlive-active" ao body só no clique do play, e a regra original
+   (display:flex !important) não tem media query — então força a
+   bottom-nav MOBILE a aparecer mesmo em telas desktop assim que o
+   vídeo é iniciado. Bloqueamos isso explicitamente acima do breakpoint,
+   não importa qual classe o JS adicione ao body. ── */
+@media (min-width: 769px) {
+  body.kzlive-active .bottom-nav,
+  .bottom-nav {
+    display: none !important;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════
