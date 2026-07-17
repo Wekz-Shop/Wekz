@@ -5884,14 +5884,20 @@ let qty=1;
 // de sempre) e "Cálculo de Frete" (mostra o cep-block inline, que já existia
 // e só ganhou uma casca de aba no desktop). Nenhuma das duas funções mudou.
 function pdpSwitchTab(tab, btnEl){
-  document.querySelectorAll('.pdp-tabs-nav .pdp-tab-btn').forEach(b=>b.classList.remove('active'));
-  if (btnEl) btnEl.classList.add('active');
+  /* v2.9.38 — 'historico' abre um bottom sheet (modal), não troca o
+     conteúdo inline do card. Antes, o forEach abaixo desmarcava a aba
+     "Cálculo de Frete" e marcava "Histórico" como ativa sem nunca
+     esconder #cepBlock nem mostrar nada no lugar — ao fechar o sheet,
+     a aba "Histórico" ficava com o sublinhado ativo mas o conteúdo
+     exibido embaixo continuava sendo o de Frete. */
   if (tab === 'historico') {
     openPdpSheet('bsHistorico');
-  } else {
-    const cb = document.getElementById('cepBlock');
-    if (cb) cb.classList.add('active');
+    return;
   }
+  document.querySelectorAll('.pdp-tabs-nav .pdp-tab-btn').forEach(b=>b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  const cb = document.getElementById('cepBlock');
+  if (cb) cb.classList.add('active');
 }
 function changeQty(d){
   const el=document.getElementById('qtyNum');
@@ -7639,7 +7645,18 @@ function renderQA() {
         '</div>' +
       '</div>';
     } else {
-      answerHtml = '<div class="qa-no-answer"><div class="qa-no-answer-dot"></div>Ainda sem resposta — vendedor normalmente responde em até 24h</div>';
+      answerHtml = '<div class="qa-no-answer">' +
+          '<div class="qa-no-answer-dot"></div>' +
+          '<span>Ainda sem resposta — vendedor normalmente responde em até 24h.</span>' +
+          '<button class="qa-helpful-btn" style="margin-left:auto;white-space:nowrap;" onclick="qaToggleAnswerBox(\'' + q.id + '\')">💬 Responder</button>' +
+        '</div>' +
+        '<div class="qa-ask-form" id="qaAnswerBox_' + q.id + '" style="display:none;margin-top:8px;">' +
+          '<textarea class="qa-ask-textarea" id="qaAnswerInput_' + q.id + '" placeholder="Compartilhe sua resposta com a comunidade..."></textarea>' +
+          '<div class="qa-ask-footer">' +
+            '<span class="qa-ask-hint">Qualquer visitante pode responder a esta pergunta</span>' +
+            '<button class="qa-ask-submit" onclick="qaSubmitAnswer(\'' + q.id + '\')">Enviar resposta</button>' +
+          '</div>' +
+        '</div>';
     }
 
     return '<div class="qa-item' + (q.highlighted ? ' highlighted' : '') + '" id="qaItem_' + q.id + '">' +
@@ -7734,6 +7751,38 @@ function qaSubmitQuestion() {
     setTimeout(function(){if(el) el.style.boxShadow='';}, 2000);
   }, 100);
   showToast('✅ Pergunta enviada! O vendedor responde em até 24h.');
+}
+
+/* v2.9.37 — Qualquer visitante (não só o vendedor) pode responder a
+   uma pergunta sem resposta. Mantém o modelo de dados original
+   (q.answer é um único objeto), só passa a aceitar isSeller:false. */
+function qaToggleAnswerBox(id) {
+  var box = document.getElementById('qaAnswerBox_' + id);
+  if (!box) return;
+  var opening = box.style.display === 'none' || !box.style.display;
+  box.style.display = opening ? 'block' : 'none';
+  if (opening) {
+    var inp = document.getElementById('qaAnswerInput_' + id);
+    if (inp) inp.focus();
+  }
+}
+
+function qaSubmitAnswer(id) {
+  var inp = document.getElementById('qaAnswerInput_' + id);
+  var text = (inp ? inp.value : '').trim();
+  if (!text) return showToast('⚠️ Digite uma resposta antes de enviar');
+  if (text.length < 5) return showToast('⚠️ Resposta muito curta — adicione mais detalhes');
+  var q = _qaData.find(function(x){ return x.id === id; });
+  if (!q) return;
+  q.answer = {
+    by: (window.currentUser && window.currentUser.name) || 'Você',
+    isSeller: false,
+    date: new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    text: text,
+    helpful: 0
+  };
+  renderQA();
+  showToast('✅ Resposta publicada! Obrigado por ajudar a comunidade.');
 }
 
 
@@ -11757,6 +11806,248 @@ wkzLog('[WkzShop v2.9.21] ✓ Fiscal/Split carregado (IBS/CBS por categoria + M�
 
   wkzLog('[WkzShop v2.9.20] ✓ PDP Bottom Sheets controller loaded');
 })();
+
+/* ═══════════════════════════════════════════════════════════════
+   PDP INLINE TABS — v2.9.37
+   Controla as abas "Avaliações" e "Perguntas e Respostas", que
+   agora vivem inline dentro de #page-product/.pdp-below (acima do
+   footer) em vez dos antigos bottom sheets #bsAvaliacoes/#bsQA,
+   que nunca existiram no DOM (openPdpSheet ficava inerte). Os
+   próprios botões de trigger funcionam como abas: clicar abre o
+   painel de conteúdo correspondente logo abaixo; clicar de novo
+   na aba já aberta a fecha. Por estarem dentro de #page-product,
+   showPage() já cuida de escondê-las ao trocar de página. ─────── */
+function switchPdpTab(tab) {
+  var other = tab === 'avaliacoes' ? 'qa' : 'avaliacoes';
+  var panel = document.getElementById('pdpTabContent-' + tab);
+  var panelOther = document.getElementById('pdpTabContent-' + other);
+  var btn = document.getElementById('pdpTabBtn-' + tab);
+  var btnOther = document.getElementById('pdpTabBtn-' + other);
+  if (!panel || !btn) return;
+
+  var alreadyOpen = panel.style.display === 'block';
+
+  if (panelOther) panelOther.style.display = 'none';
+  if (btnOther) {
+    btnOther.classList.remove('pdp-tab-expanded');
+    btnOther.setAttribute('aria-expanded', 'false');
+  }
+
+  if (alreadyOpen) {
+    /* Clicar na aba já aberta → recolhe */
+    panel.style.display = 'none';
+    btn.classList.remove('pdp-tab-expanded');
+    btn.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  panel.style.display = 'block';
+  btn.classList.add('pdp-tab-expanded');
+  btn.setAttribute('aria-expanded', 'true');
+
+  if (tab === 'avaliacoes' && typeof renderReviewsMain === 'function') {
+    renderReviewsMain();
+  } else if (tab === 'qa' && typeof renderQA === 'function') {
+    renderQA();
+  }
+
+  setTimeout(function() {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
+}
+window.switchPdpTab = switchPdpTab;
+
+/* ═══════════════════════════════════════════════════════════════
+   KZ NEGOTIATOR — v2.9.39
+   Antes, o botão "🤝 Negociar c/ IA" chamava onclick="openKzNegotiator()"
+   e essa função não existia em lugar nenhum — clique 100% morto
+   (ReferenceError silencioso). Diferente dos outros bugs corrigidos
+   nesta sessão (Avaliações/QA/Histórico/Reportar), aqui não havia
+   motor pronto — é feature nova, implementada do zero.
+
+   Regra de negociação: simples, baseada na margem máxima de desconto
+   que o VENDEDOR daquele produto configurou no seu painel (Configurações
+   → Kz Smart Negotiator → kzNegSaveSettings(), em wkz-seller.js). Essa
+   margem é lida via kzNegGetSellerConfig() (função compartilhada
+   definida em wkz-core.js, persistida em localStorage — mesma origem
+   entre wkz-seller.html e wkz-buyer.html).
+
+   Fluxo: comprador propõe um valor → se estiver dentro da margem
+   máxima, Kz aceita na hora; se estiver abaixo do mínimo aceitável,
+   Kz faz UMA contraproposta no teto da margem (comprador aceita ou
+   recusa). Ao fechar acordo, gera um cupom de uso único em
+   SELLER_COUPONS — o MESMO mecanismo que já valida/aplica cupons no
+   carrinho hoje (applyCartCoupon), então o cupom negociado funciona
+   de verdade, sem precisar de nenhuma lógica nova de aplicação.
+   ─────────────────────────────────────────────────────────────── */
+var _kzNeg = { productIdx: null, listPrice: 0, sellerName: '', maxPct: 0, round: 0, resolved: false, counterPrice: 0, code: null };
+
+function kzNegAddMsg(who, html) {
+  var log = document.getElementById('kzNegChatLog');
+  if (!log) return;
+  var div = document.createElement('div');
+  div.className = 'kz-neg-msg ' + (who === 'kz' ? 'kz-neg-msg-kz' : 'kz-neg-msg-buyer');
+  div.innerHTML = html;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function openKzNegotiator() {
+  var idx = (typeof currentPdpIndex !== 'undefined' && currentPdpIndex >= 0) ? currentPdpIndex : 0;
+  var p = products[idx];
+  if (!p) return;
+
+  var cfg = (typeof kzNegGetSellerConfig === 'function')
+    ? kzNegGetSellerConfig(p.s)
+    : { active: true, maxPct: 12 };
+
+  _kzNeg = { productIdx: idx, listPrice: p.p, sellerName: p.s || 'esta loja', maxPct: cfg.maxPct, round: 0, resolved: false, counterPrice: 0, code: null };
+
+  var overlay = document.getElementById('kzNegotiatorOverlay');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  var log = document.getElementById('kzNegChatLog');
+  var quick = document.getElementById('kzNegQuickActions');
+  var inputRow = document.getElementById('kzNegInputRow');
+  var offerInput = document.getElementById('kzNegOfferInput');
+  if (log) log.innerHTML = '';
+  if (quick) { quick.style.display = 'none'; quick.innerHTML = ''; }
+  if (offerInput) { offerInput.value = ''; offerInput.disabled = false; }
+  if (inputRow) inputRow.style.display = 'flex';
+
+  if (!cfg.active) {
+    kzNegAddMsg('kz', 'No momento, <strong>' + _kzNeg.sellerName + '</strong> não está com a negociação automática do Kz ativada para este produto. Volte mais tarde! 🙏');
+    if (inputRow) inputRow.style.display = 'none';
+    _kzNeg.resolved = true;
+    return;
+  }
+
+  kzNegAddMsg('kz', 'Olá! Sou o <strong>Kz</strong>, assistente de negociação de <strong>' + _kzNeg.sellerName + '</strong>. O preço atual deste produto é ' + formatPrice(_kzNeg.listPrice) + '. Quanto você gostaria de pagar?');
+}
+
+function kzNegSendOffer() {
+  if (_kzNeg.resolved) return;
+  var input = document.getElementById('kzNegOfferInput');
+  var offer = parseFloat(input && input.value);
+  if (!offer || offer <= 0) { if (typeof showToast === 'function') showToast('⚠️ Digite um valor válido.'); return; }
+
+  kzNegAddMsg('buyer', formatPrice(offer));
+  input.value = '';
+  _kzNeg.round++;
+
+  if (offer >= _kzNeg.listPrice) {
+    kzNegAddMsg('kz', 'Esse já é (ou passa de) o preço atual do produto — não seria bem uma negociação! 😄 Tente um valor mais baixo.');
+    return;
+  }
+
+  var minAcceptable = _kzNeg.listPrice * (1 - _kzNeg.maxPct / 100);
+
+  if (offer >= minAcceptable) {
+    kzNegCloseDeal(offer);
+    return;
+  }
+
+  if (_kzNeg.round >= 2) {
+    kzNegAddMsg('kz', 'Sinto muito, não consigo ir além do que já ofereci. Se quiser, pode aceitar minha última proposta abaixo.');
+    return;
+  }
+
+  _kzNeg.counterPrice = minAcceptable;
+  kzNegAddMsg('kz', 'Esse valor está um pouco fora do que consigo aprovar automaticamente. Minha melhor proposta é <strong>' + formatPrice(minAcceptable) + '</strong> (' + _kzNeg.maxPct + '% OFF). Fechamos nesse valor?');
+  kzNegShowCounterActions();
+}
+
+function kzNegShowCounterActions() {
+  var quick = document.getElementById('kzNegQuickActions');
+  if (!quick) return;
+  quick.style.display = 'flex';
+  quick.innerHTML =
+    '<button type="button" class="kz-neg-quick-btn primary" onclick="kzNegAcceptCounter()">✅ Aceitar ' + formatPrice(_kzNeg.counterPrice) + '</button>' +
+    '<button type="button" class="kz-neg-quick-btn" onclick="kzNegDeclineCounter()">Recusar</button>';
+}
+
+function kzNegAcceptCounter() {
+  kzNegAddMsg('buyer', 'Aceito! 🤝');
+  kzNegCloseDeal(_kzNeg.counterPrice);
+}
+
+function kzNegDeclineCounter() {
+  kzNegAddMsg('buyer', 'Vou pensar, obrigado.');
+  kzNegAddMsg('kz', 'Sem problemas! Se mudar de ideia, volte a negociar quando quiser. 👋');
+  var quick = document.getElementById('kzNegQuickActions');
+  var inputRow = document.getElementById('kzNegInputRow');
+  if (quick) quick.style.display = 'none';
+  if (inputRow) inputRow.style.display = 'none';
+  _kzNeg.resolved = true;
+}
+
+function kzNegCloseDeal(finalPrice) {
+  _kzNeg.resolved = true;
+  var pct = Math.max(0, Math.min(90, Math.round((1 - finalPrice / _kzNeg.listPrice) * 10000) / 100));
+  var code = 'KZNEG' + Math.random().toString(36).slice(2, 7).toUpperCase();
+  var validade = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  if (typeof SELLER_COUPONS !== 'undefined') {
+    SELLER_COUPONS[code] = {
+      disc: pct,
+      type: 'percent',
+      label: 'Negociação Kz — ' + pct + '% OFF exclusivo (' + _kzNeg.sellerName + ')',
+      validade: validade,
+      usos: 1,
+      minimo: 0,
+      _used: 0,
+      seller: _kzNeg.sellerName
+    };
+  }
+  _kzNeg.code = code;
+
+  kzNegAddMsg('kz', '🎉 Negócio fechado em <strong>' + formatPrice(finalPrice) + '</strong>! Gerei o cupom <strong>' + code + '</strong> (' + pct + '% OFF, uso único, válido por 24h) para compras em ' + _kzNeg.sellerName + '. Aplique-o no carrinho para garantir esse preço.');
+
+  var quick = document.getElementById('kzNegQuickActions');
+  var inputRow = document.getElementById('kzNegInputRow');
+  if (inputRow) inputRow.style.display = 'none';
+  if (quick) {
+    quick.style.display = 'flex';
+    quick.innerHTML =
+      '<button type="button" class="kz-neg-quick-btn primary" onclick="kzNegCopyCode()">📋 Copiar cupom ' + code + '</button>' +
+      '<button type="button" class="kz-neg-quick-btn" onclick="closeKzNegotiator()">Fechar</button>';
+  }
+  if (typeof showToast === 'function') showToast('🎉 Cupom ' + code + ' gerado!');
+}
+
+function kzNegCopyCode() {
+  if (!_kzNeg.code) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(_kzNeg.code).then(function () {
+      if (typeof showToast === 'function') showToast('📋 Cupom copiado: ' + _kzNeg.code);
+    }).catch(function () {
+      if (typeof showToast === 'function') showToast('Cupom: ' + _kzNeg.code);
+    });
+  } else if (typeof showToast === 'function') {
+    showToast('Cupom: ' + _kzNeg.code);
+  }
+}
+
+function closeKzNegotiator() {
+  var overlay = document.getElementById('kzNegotiatorOverlay');
+  if (overlay) overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function closeKzNegotiatorOnBg(e) {
+  var overlay = document.getElementById('kzNegotiatorOverlay');
+  if (e.target === overlay) closeKzNegotiator();
+}
+
+window.openKzNegotiator = openKzNegotiator;
+window.kzNegSendOffer = kzNegSendOffer;
+window.kzNegAcceptCounter = kzNegAcceptCounter;
+window.kzNegDeclineCounter = kzNegDeclineCounter;
+window.kzNegCopyCode = kzNegCopyCode;
+window.closeKzNegotiator = closeKzNegotiator;
+window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
 
 
 /* ── Kz Live Shopping engine (countdowns, chat, viewers) — origem 45971–46280 ── */

@@ -1156,43 +1156,134 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="pdp-below">
 
 
-      <!-- [v2.9.18] Removido o card "Perguntas & Respostas" antigo —
-           tinha id="qaList" duplicado com a secção "Perguntas e Respostas"
-           abaixo, o que é HTML inválido. Como getElementById sempre
-           resolve para o PRIMEIRO elemento, renderQA() só preenchia este
-           card antigo, deixando o #qaList da secção moderna (com busca,
-           paginação e filtros por status) permanentemente vazio. A
-           secção moderna abaixo já cobre tudo isto (e mais: busca,
-           "Mais votadas", "Pelo vendedor") — agora funciona corretamente
-           por ter o único #qaList da página. -->
+      <!-- [v2.9.37 — BUGFIX CRÍTICO] Antes, estes triggers chamavam
+           openPdpSheet('bsAvaliacoes') / openPdpSheet('bsQA'), mas os
+           elementos #bsAvaliacoes / #bsQA NUNCA existiam no HTML — logo
+           openPdpSheet() sempre caía no "if(!el)return;" e não fazia nada.
+           Enquanto isso, o conteúdo real (#writeReviewForm, #reviewsListMain,
+           #qaList) estava solto no fim do body, DEPOIS do </footer> — por
+           isso aparecia sempre visível, abaixo do rodapé, em toda página
+           (a estrutura não fazia parte de nenhum .page, então showPage()
+           nunca a escondia). Correção: as duas abas agora vivem inline,
+           aqui dentro de #page-product/.pdp-below (acima do footer), e os
+           próprios botões funcionam como abas — clicar abre o painel
+           correspondente logo abaixo. Por estarem dentro de #page-product,
+           o showPage() já cuida de escondê-las ao trocar de página. -->
 
-      <!-- ══ AVALIAÇÕES — Trigger → Bottom Sheet ══ -->
-      <button class="pdp-section-trigger" onclick="openPdpSheet('bsAvaliacoes')" aria-label="Ver avaliações do produto">
-        <div class="pst-left">
-          <div class="pst-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
-          </div>
-          <div class="pst-text">
-            <div class="pst-title">Avaliações</div>
-            <div class="pst-sub" id="revTriggerSub">4.9 ★★★★★ · 2.847 avaliações verificadas</div>
-          </div>
-        </div>
-        <span class="pst-arrow">›</span>
-      </button>
+      <div class="product-tabs-container" id="pdpReviewsQaTabs">
 
-      <!-- ══ Q&A — Trigger → Bottom Sheet ══ -->
-      <button class="pdp-section-trigger" onclick="openPdpSheet('bsQA')" aria-label="Ver perguntas e respostas">
-        <div class="pst-left">
-          <div class="pst-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <!-- ══ ABA: Avaliações ══ -->
+        <button type="button" class="pdp-section-trigger" id="pdpTabBtn-avaliacoes" onclick="switchPdpTab('avaliacoes')" aria-label="Ver avaliações do produto" aria-expanded="false" aria-controls="pdpTabContent-avaliacoes">
+          <div class="pst-left">
+            <div class="pst-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            </div>
+            <div class="pst-text">
+              <div class="pst-title">Avaliações</div>
+              <div class="pst-sub" id="revTriggerSub">4.9 ★★★★★ · 2.847 avaliações verificadas</div>
+            </div>
           </div>
-          <div class="pst-text">
-            <div class="pst-title">Perguntas e Respostas</div>
-            <div class="pst-sub" id="qaTriggerSub">Ver perguntas da comunidade e do vendedor</div>
+          <span class="pst-arrow">›</span>
+        </button>
+
+        <!-- Painel de conteúdo — Avaliações (fechado por padrão) -->
+        <div id="pdpTabContent-avaliacoes" class="pdp-tab-content" style="display:none;">
+          <div class="qa-filters">
+            <button type="button" class="rev-filter active" onclick="filterReviews('all',this)">Todas</button>
+            <button type="button" class="rev-filter" onclick="filterReviews(5,this)">5★</button>
+            <button type="button" class="rev-filter" onclick="filterReviews(4,this)">4★</button>
+            <button type="button" class="rev-filter" onclick="filterReviews(3,this)">3★</button>
+            <button type="button" class="rev-filter" onclick="filterReviews('photo',this)">📸 Com foto</button>
+            <button type="button" class="rev-filter" onclick="filterReviews('video',this)">▶ Com vídeo</button>
+            <button type="button" class="rev-filter" onclick="filterReviews('verified',this)">✅ Verificadas</button>
           </div>
+          <button type="button" onclick="toggleReviewForm()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:16px;">✍️ Escrever avaliação</button>
+
+          <div id="writeReviewForm" style="display:none;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
+            <div style="font-size:14px;font-weight:700;margin-bottom:14px;">✍️ Sua avaliação</div>
+            <div style="margin-bottom:12px;">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Sua nota:</div>
+              <div class="star-picker" id="starPicker">
+                <span class="star-pick" onclick="pickStar(1)">☆</span>
+                <span class="star-pick" onclick="pickStar(2)">☆</span>
+                <span class="star-pick" onclick="pickStar(3)">☆</span>
+                <span class="star-pick" onclick="pickStar(4)">☆</span>
+                <span class="star-pick" onclick="pickStar(5)">☆</span>
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Título da avaliação:</div>
+              <input type="text" class="wkz-input" placeholder="Resumo da sua experiência">
+            </div>
+            <div style="margin-bottom:12px;">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Comentário:</div>
+              <textarea class="wkz-input" placeholder="Descreva sua experiência com o produto..." rows="3"></textarea>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">📸 Adicionar fotos/vídeos (opcional — até 6 arquivos):</div>
+              <div class="rev-upload-area" id="revUploadArea">
+                <label class="rev-upload-btn" for="revFileInput" title="Adicionar foto ou vídeo">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span>Foto</span>
+                </label>
+                <label class="rev-upload-btn" for="revFileInput" title="Adicionar vídeo" style="border-color:rgba(124,58,237,0.35);color:var(--purple);">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                  <span>Vídeo</span>
+                </label>
+              </div>
+              <input type="file" id="revFileInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleRevUpload(this)">
+              <div style="font-size:10px;color:var(--muted);margin-top:5px;">JPG, PNG, WEBP, MP4 · Máx. 10MB por arquivo · Fotos reais aumentam a utilidade da avaliação em 3x</div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;">
+              <button onclick="toggleReviewForm()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;">Cancelar</button>
+              <button onclick="submitReview()" style="background:var(--grad1);border:none;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Publicar Avaliação</button>
+            </div>
+          </div>
+
+          <div id="reviewsListMain"></div>
+          <button type="button" id="revLoadMoreBtn" class="qa-load-more" onclick="loadMoreReviews()" style="display:none;">Ver mais avaliações</button>
         </div>
-        <span class="pst-arrow">›</span>
-      </button>
+
+        <!-- ══ ABA: Perguntas e Respostas ══ -->
+        <button type="button" class="pdp-section-trigger" id="pdpTabBtn-qa" onclick="switchPdpTab('qa')" aria-label="Ver perguntas e respostas" aria-expanded="false" aria-controls="pdpTabContent-qa">
+          <div class="pst-left">
+            <div class="pst-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <div class="pst-text">
+              <div class="pst-title">Perguntas e Respostas</div>
+              <div class="pst-sub" id="qaTriggerSub">Ver perguntas da comunidade e do vendedor</div>
+            </div>
+          </div>
+          <span class="pst-arrow">›</span>
+        </button>
+
+        <!-- Painel de conteúdo — Perguntas e Respostas (fechado por padrão) -->
+        <div id="pdpTabContent-qa" class="pdp-tab-content" style="display:none;">
+          <div class="qa-search-bar">
+            <input type="text" id="qaSectionSearch" placeholder="Buscar nas perguntas e respostas..." oninput="qaSearch(this.value)">
+            <span class="qa-count" id="qaCount">0 perguntas</span>
+          </div>
+          <div class="qa-filters">
+            <button type="button" class="qa-filter active" onclick="qaSetFilter('all',this)">Todas</button>
+            <button type="button" class="qa-filter" onclick="qaSetFilter('answered',this)">Respondidas</button>
+            <button type="button" class="qa-filter" onclick="qaSetFilter('unanswered',this)">Sem resposta</button>
+            <button type="button" class="qa-filter" onclick="qaSetFilter('seller',this)">Pelo vendedor</button>
+            <button type="button" class="qa-filter" onclick="qaSetFilter('top',this)">🔥 Mais votadas</button>
+          </div>
+          <div class="qa-ask-form">
+            <div class="qa-ask-title">💬 Faça sua pergunta</div>
+            <textarea class="qa-ask-textarea" id="qaAskInput" placeholder="Digite sua pergunta sobre o produto..."></textarea>
+            <div class="qa-ask-footer">
+              <span class="qa-ask-hint">Qualquer visitante pode responder — o vendedor costuma responder em até 24h</span>
+              <button type="button" class="qa-ask-submit" onclick="qaSubmitQuestion()">Perguntar</button>
+            </div>
+          </div>
+          <div id="qaList"></div>
+          <button type="button" id="qaLoadMore" class="qa-load-more" onclick="qaLoadMore()" style="display:none;">Ver mais perguntas</button>
+        </div>
+
+      </div><!-- /product-tabs-container -->
 
     </div><!-- /pdp-below —
          v2.9.24-fix: bundle-section e pdp-related-wrap saíram de aqui.
@@ -1626,7 +1717,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">R$ 0,00</span></div>
         <div class="summary-row"><span>Frete</span><span style="color:#22C55E;">Grátis</span></div>
-        <div class="summary-row"><span>Desconto</span><span style="color:#FF6B35;">-R$ 0,00</span></div>
+        <div class="summary-row" id="cartDiscountRow"><span>Desconto</span><span id="cartDiscountVal" style="color:#FF6B35;">-R$ 0,00</span></div>
         <div class="summary-row"><span>Proteção WeKz</span><span style="color:var(--muted);">Inclusa</span></div>
         <!-- ══ CUPOM v2 ══ -->
         <div id="couponActiveBanner" style="display:none;"></div>
@@ -5334,53 +5425,132 @@ body.kzlive-active .bottom-nav {
   </div>
   <div class="stk-toast-progress"><div class="stk-toast-progress-fill" id="stkProgress"></div></div>
 </div>
-        <div id="phDealBadge" style="margin-top:12px;"></div>
-          <div id="phAiText"></div>
-        <div id="writeReviewForm" style="display:none;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
-          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">✍️ Sua avaliação</div>
-          <div style="margin-bottom:12px;">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Sua nota:</div>
-            <div class="star-picker" id="starPicker">
-              <span class="star-pick" onclick="pickStar(1)">☆</span>
-              <span class="star-pick" onclick="pickStar(2)">☆</span>
-              <span class="star-pick" onclick="pickStar(3)">☆</span>
-              <span class="star-pick" onclick="pickStar(4)">☆</span>
-              <span class="star-pick" onclick="pickStar(5)">☆</span>
+        <!-- [v2.9.38] Bottom sheet do "Histórico de Preço" — o elemento
+             #bsHistorico nunca existia no HTML, então openPdpSheet('bsHistorico')
+             (chamado pela aba "Histórico de Preços" do .pdp-tabs-card no
+             desktop, e pelo pill .pdp-trigger-historico no mobile) sempre
+             caía no "if(!el)return;" e não abria nada. O controller JS
+             (openPdpSheet/closePdpSheet/swipe-to-close/ESC) e todo o CSS
+             (.pdp-bs-*, .ph-*) já existiam prontos — só faltava esta casca.
+             initPriceHistory()/_phRender() já populam #phKpis, #phDealBadge,
+             #phAiText e desenham o gráfico em #phCanvas assim que o sheet
+             abre (ver setTimeout dentro de openPdpSheet). -->
+        <div class="pdp-bs-overlay" id="bsHistorico" onclick="closePdpSheetOnBg(event,'bsHistorico')">
+          <div class="pdp-bs-sheet">
+            <div class="pdp-bs-handle">
+              <div class="pdp-bs-handle-pill"></div>
+              <div class="pdp-bs-title">📈 Histórico de Preço</div>
+              <button class="pdp-bs-close" onclick="closePdpSheet('bsHistorico')" aria-label="Fechar histórico de preço">✕</button>
             </div>
-          </div>
-          <div style="margin-bottom:12px;">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Título da avaliação:</div>
-            <input type="text" class="wkz-input" placeholder="Resumo da sua experiência">
-          </div>
-          <div style="margin-bottom:12px;">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Comentário:</div>
-            <textarea class="wkz-input" placeholder="Descreva sua experiência com o produto..." rows="3"></textarea>
-          </div>
-          <div style="margin-bottom:14px;">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">📸 Adicionar fotos/vídeos (opcional — até 6 arquivos):</div>
-            <div class="rev-upload-area" id="revUploadArea">
-              <label class="rev-upload-btn" for="revFileInput" title="Adicionar foto ou vídeo">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <span>Foto</span>
-              </label>
-              <label class="rev-upload-btn" for="revFileInput" title="Adicionar vídeo" style="border-color:rgba(124,58,237,0.35);color:var(--purple);">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                <span>Vídeo</span>
-              </label>
+            <div class="pdp-bs-body">
+              <div class="ph-header">
+                <div class="ph-title">Evolução do preço</div>
+                <div class="ph-periods">
+                  <button type="button" class="ph-period active" onclick="phSetPeriod(30,this)">30d</button>
+                  <button type="button" class="ph-period" onclick="phSetPeriod(90,this)">90d</button>
+                  <button type="button" class="ph-period" onclick="phSetPeriod(180,this)">180d</button>
+                  <button type="button" class="ph-period" onclick="phSetPeriod(365,this)">1 ano</button>
+                </div>
+              </div>
+              <div class="ph-canvas-wrap" id="phCanvasWrap">
+                <canvas id="phCanvas"></canvas>
+              </div>
+              <div id="phKpis" class="ph-kpis"></div>
+              <div id="phDealBadge" style="margin-top:12px;"></div>
+              <div id="phAiText" style="margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6;"></div>
             </div>
-            <input type="file" id="revFileInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleRevUpload(this)">
-            <div style="font-size:10px;color:var(--muted);margin-top:5px;">JPG, PNG, WEBP, MP4 · Máx. 10MB por arquivo · Fotos reais aumentam a utilidade da avaliação em 3x</div>
-          </div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;">
-            <button onclick="toggleReviewForm()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 18px;border-radius:8px;font-size:13px;cursor:pointer;">Cancelar</button>
-            <button onclick="submitReview()" style="background:var(--grad1);border:none;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Publicar Avaliação</button>
           </div>
         </div>
-        <div id="reviewsListMain"></div>
-        <div id="qaList"></div>
 
 <!-- ── Modais/overlays compartilhados (core) ── -->
 <div id="wkzAlertBar" style="display:none;" role="alert" aria-live="polite"></div>
+
+<!-- [v2.9.39] Modal "Negociar com Kz IA" — antes, o botão "🤝 Negociar c/ IA"
+     chamava onclick="openKzNegotiator()", mas essa função não existia em
+     lugar nenhum do JS (ReferenceError silencioso, botão 100% morto).
+     Diferente de Avaliações/QA/Histórico/Reportar, aqui não havia motor
+     nenhum pronto — é feature nova. Lê a margem máxima de desconto
+     configurada pelo VENDEDOR daquele produto (painel do vendedor →
+     Configurações → Kz Smart Negotiator) via kzNegGetSellerConfig()
+     (wkz-core.js), negocia dentro desse limite e, ao fechar acordo,
+     gera um cupom de uso único em SELLER_COUPONS (mesmo mecanismo que
+     já valida/aplica cupons no carrinho hoje). -->
+<div class="pdp-bs-overlay" id="kzNegotiatorOverlay" onclick="closeKzNegotiatorOnBg(event)">
+  <div class="pdp-bs-sheet" onclick="event.stopPropagation()">
+    <div class="pdp-bs-handle">
+      <div class="pdp-bs-handle-pill"></div>
+      <div class="pdp-bs-title">🤝 Negociar com Kz IA</div>
+      <button class="pdp-bs-close" onclick="closeKzNegotiator()" aria-label="Fechar negociação">✕</button>
+    </div>
+    <div class="pdp-bs-body" style="padding-bottom:18px;">
+      <div id="kzNegChatLog" class="kz-neg-chat-log"></div>
+      <div id="kzNegQuickActions" class="kz-neg-quick-actions" style="display:none;"></div>
+      <div id="kzNegInputRow" class="kz-neg-input-row">
+        <span style="font-size:13px;color:var(--muted);font-weight:700;">R$</span>
+        <input type="number" id="kzNegOfferInput" class="kz-neg-offer-input" placeholder="Quanto você quer pagar?" min="1" step="0.01" onkeydown="if(event.key==='Enter'){event.preventDefault();kzNegSendOffer();}">
+        <button type="button" class="kz-neg-send-btn" onclick="kzNegSendOffer()">Enviar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- [v2.9.38] Modal "Reportar Produto/Vendedor" — #report-modal-overlay
+     nunca existia no HTML, então openReportModal() (chamado pelo botão
+     "⚑ Reportar Produto" da PDP) fazia document.getElementById(...).classList
+     em um elemento null e quebrava silenciosamente (TypeError no console,
+     nada visível pro usuário). JS (openReportModal/confirmReport/
+     handleEvidenceUpload/rmOverlayClick) e CSS (#report-modal-overlay,
+     .rm-*) já existiam prontos — só faltava esta casca. -->
+<div id="report-modal-overlay" onclick="rmOverlayClick(event)">
+  <div id="report-modal" onclick="event.stopPropagation()">
+    <div class="rm-header">
+      <div class="rm-title" id="rm-title-text">⚑ Reportar Produto</div>
+      <button class="rm-close" onclick="closeReportModal()" aria-label="Fechar">✕</button>
+    </div>
+    <div class="rm-body">
+      <div class="rm-product-preview">
+        <wkz-product-image class="rm-product-emoji" id="rmProductEmoji" emoji="📦"></wkz-product-image>
+        <div>
+          <div class="rm-product-name" id="rmProductName">Produto</div>
+          <div class="rm-product-store" id="rmProductStore">Loja</div>
+        </div>
+      </div>
+
+      <div class="rm-label">Motivo da denúncia</div>
+      <select class="wkz-select wkz-select--lg wkz-select--danger rm-select" id="rmReason">
+        <option value="">Selecione o motivo...</option>
+        <option value="produto_falsificado">🚫 Produto falsificado</option>
+        <option value="anuncio_enganoso">⚠️ Anúncio enganoso</option>
+        <option value="preco_abusivo">💸 Preço abusivo</option>
+        <option value="produto_proibido">🔞 Produto proibido</option>
+        <option value="nao_entregue">📦 Produto não entregue</option>
+        <option value="diferente_anuncio">↩️ Produto diferente do anunciado</option>
+        <option value="violacao_propriedade">©️ Violação de propriedade intelectual</option>
+        <option value="vendedor_fraudulento">👤 Vendedor fraudulento</option>
+        <option value="outro">❓ Outro</option>
+      </select>
+
+      <div class="rm-label">Descreva o problema (mínimo 10 caracteres)</div>
+      <textarea class="wkz-input wkz-input--danger rm-textarea" id="rmDetails" placeholder="Conte com detalhes o que aconteceu..." maxlength="500"></textarea>
+      <div style="font-size:10px;color:var(--muted);margin-top:-10px;margin-bottom:16px;text-align:right;"><span id="rmDetailsCount">0</span>/500</div>
+
+      <div class="rm-label">Evidências (opcional)</div>
+      <label class="rm-evidence-area" for="rmEvidenceInput">
+        <div style="font-size:24px;margin-bottom:6px;">📎</div>
+        <div style="font-size:12px;color:var(--muted);">Clique para anexar fotos ou prints (máx. 5MB cada)</div>
+        <input type="file" id="rmEvidenceInput" accept="image/*" multiple onchange="handleEvidenceUpload(event)">
+      </label>
+      <div class="rm-evidence-grid" id="rmEvidenceGrid"></div>
+    </div>
+    <div class="rm-footer">
+      <button class="rm-btn-cancel" onclick="closeReportModal()">Cancelar</button>
+      <button class="rm-btn-submit" id="rmSubmitBtn" onclick="confirmReport()">
+        <span id="rmSubmitIcon">⚑</span>
+        <span id="rmSubmitText">Enviar Denúncia</span>
+      </button>
+    </div>
+  </div>
+</div>
 <div id="wkzPushNotif" aria-live="polite" aria-atomic="true"></div>
 <div id="wkzInboxPanel" class="wkz-inbox-panel" style="display:none;" role="dialog" aria-label="Notificações">
   <div class="wkz-inbox-header">
