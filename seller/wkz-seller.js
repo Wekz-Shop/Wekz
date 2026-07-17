@@ -43,6 +43,7 @@ function switchDashTab(tab, el){
   if(tab==='reviews') initDashReviews();
   if(tab==='add-product') initAddProductPage();
   if(tab==='affiliates') initAffiliates();
+  if(tab==='settings') initDashSettings();
   document.documentElement.scrollTop = 0; window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -396,6 +397,16 @@ function initDashReviews(forceRefresh){
     </div>`;
   }).join('');
 }
+
+// ═══════════════════════════════════════
+// ─── IDENTIDADE DA LOJA LOGADA ─────────
+// [v2.9.39] Antes, salvarMarketing('cupom') referenciava
+// `currentSeller?.store`, mas essa variável nunca existia —
+// os cupons criados ficavam sempre atribuídos a "Loja" (fallback
+// genérico). Agora existe de verdade e é mantida em sincronia com
+// o campo "Nome da Loja" em Configurações (ver salvarConfiguracoes).
+// ═══════════════════════════════════════
+var currentSeller = { store: 'Minha Loja Pro', id: '#SPRO01' };
 
 // ═══════════════════════════════════════
 // ─── ADD PRODUCT PAGE ──────────────────
@@ -2801,6 +2812,13 @@ function salvarConfiguracoes(btn){
   const inputs = document.querySelectorAll('#dash-settings input, #dash-settings select, #dash-settings textarea');
   const saved = {};
   inputs.forEach(inp => { if(inp.id) saved[inp.id] = inp.value; });
+  // [v2.9.39] Mantém currentSeller.store em sincronia com o nome digitado —
+  // é essa referência que salvarMarketing('cupom') e o Kz Negotiator usam
+  // para saber a qual loja um cupom/margem pertence.
+  const nameInput = document.getElementById('sellerStoreNameInput');
+  if (nameInput && nameInput.value.trim()) {
+    currentSeller.store = nameInput.value.trim();
+  }
   setTimeout(()=>{
     // SEC-01 [negócio — TODO]: configurações de vendedor a migrar para /api/seller/settings
     try { if(typeof wkzSecureStorage!=='undefined'){wkzSecureStorage.set('wkz_seller_settings',saved);}else{localStorage.setItem('wkz_seller_settings',JSON.stringify(saved));} } catch(e){}
@@ -3568,28 +3586,64 @@ wkzLog('[WkzShop v2.9.3] ✓ KYC/KYB Verificação carregado (Upload + OCR mock 
    STUBS DE SEGURANÇA (auditoria M3) — previnem ReferenceError em botões
    ESTÁTICOS do HTML (sempre presentes no DOM, sem guard de nulo possível
    do lado do onclick) cujas funções reais pertencem a outro módulo ainda
-   não construído. Não implementam a funcionalidade real — só evitam o
-   crash com uma mensagem honesta. Substituir quando o módulo dono existir.
+   não construído. [v2.9.39] kzNegSetMargin/kzNegSaveSettings deixaram de
+   ser stub (implementação real abaixo) — resta apenas filterDenuncias.
    ════════════════════════════════════════════════════════════════════════ */
 
-/* kzNegSetMargin/kzNegSaveSettings: botões dentro do modal de editar
-   produto (HTML estático, sempre no DOM). No monólito original, as
-   próprias funções (linha ~34210) se descreviam como "Kz Negotiator
-   admin helpers" e chamavam admAuditAdd(...,'Admin WeKz') — ou seja, são
-   controles de política administrada centralmente, não configuração por
-   vendedor. Pertencem ao Admin (Sprint M4), não ao Seller. */
+/* [v2.9.39] Removida a nota antiga que descrevia a margem do Kz
+   Negotiator como "política administrada centralmente pela WeKz,
+   pertencente ao Admin (Sprint M4)". Por decisão do fundador, o
+   Negociador passou a ser configurável por CADA vendedor — ver
+   implementação completa logo abaixo. */
+/* kzNegSetMargin/kzNegSaveSettings/kzNegMarginPreview — Kz Smart
+   Negotiator. [v2.9.39] Antes eram apenas STUBS (a margem era descrita
+   como "administrada centralmente pela WeKz", e kzNegSaveSettings só
+   mostrava um toast dizendo "em breve no painel Admin", sem salvar
+   nada). Por decisão do fundador, o Negociador agora é configurável
+   por CADA vendedor: a margem salva aqui é lida pelo Kz Negotiator do
+   comprador (wkz-buyer.js → openKzNegotiator()) via as funções
+   compartilhadas kzNegGetSellerConfig()/kzNegSetSellerConfig()
+   (definidas em wkz-core.js, mesma origem = mesmo localStorage). */
+window.kzNegMarginPreview = function (val) {
+  var pct = Math.max(1, Math.min(50, parseFloat(val) || 0));
+  var previewEl = document.getElementById('kzNegMarginPreviewEl');
+  if (!previewEl) return;
+  var exemploPreco = 1000;
+  var descontoMax = (exemploPreco * pct / 100).toFixed(2).replace('.', ',');
+  previewEl.innerHTML = 'Ex: produto de <strong style="color:var(--text);">R$ 1.000</strong> → desconto máx. <strong style="color:#22C55E;">R$ ' + descontoMax + '</strong>';
+};
+
 window.kzNegSetMargin = function (val) {
   var input = document.getElementById('kzNegMarginInput');
   if (input) input.value = val;
   document.querySelectorAll('#kzNegMarginChips .filter-chip').forEach(function (b) { b.classList.remove('active'); });
   var activeBtn = document.querySelector('#kzNegMarginChips .filter-chip[onclick*="kzNegSetMargin(' + val + ')"]');
   if (activeBtn) activeBtn.classList.add('active');
+  kzNegMarginPreview(val);
 };
+
 window.kzNegSaveSettings = function () {
+  var input = document.getElementById('kzNegMarginInput');
+  var pct = Math.max(1, Math.min(50, parseFloat(input && input.value) || 15));
+  var sellerName = (currentSeller && currentSeller.store) || 'Minha Loja Pro';
+  if (typeof kzNegSetSellerConfig === 'function') {
+    kzNegSetSellerConfig(sellerName, { active: true, maxPct: pct });
+  }
   if (typeof showToast === 'function') {
-    showToast('ℹ️ Margem do Kz Negotiator é administrada centralmente pela WeKz — em breve no painel Admin.');
+    showToast('✅ Margem do Kz Negotiator salva: até ' + pct + '% de desconto automático para ' + sellerName + '.');
   }
 };
+
+/* Preenche os controles do Kz Negotiator com a configuração já salva
+   para esta loja, ao abrir a aba "Configurações". */
+function initDashSettings() {
+  var sellerName = (currentSeller && currentSeller.store) || 'Minha Loja Pro';
+  var nameInput = document.getElementById('sellerStoreNameInput');
+  if (nameInput && !nameInput.value.trim()) nameInput.value = sellerName;
+  if (typeof kzNegGetSellerConfig !== 'function') return;
+  var cfg = kzNegGetSellerConfig(sellerName);
+  if (cfg && cfg.maxPct) kzNegSetMargin(cfg.maxPct);
+}
 
 /* filterDenuncias: botões dentro da aba "Denúncias" do dashboard (HTML
    estático, sempre no DOM). O dado (reportsStore) e a renderização real
