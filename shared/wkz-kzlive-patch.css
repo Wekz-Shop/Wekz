@@ -26,6 +26,37 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════
+   0) CORREÇÃO REAL DO BUG — bottom-nav "flutuando no meio da página"
+   ──────────────────────────────────────────────────────────────────────
+   Causa raiz confirmada em teste real (mobile): existe uma regra no
+   HTML original (comentada como "FIX BUG-N02" no código-fonte) que faz:
+
+     body.kzlive-active .bottom-nav {
+       display: flex !important;
+       position: relative !important;
+     }
+
+   Ou seja: ao entrar no Kz Live, o body ganha a classe "kzlive-active"
+   e essa regra tira a bottom-nav do position:fixed, jogando-a para o
+   fluxo normal do documento — exatamente no ponto do HTML onde ela
+   está declarada (entre a faixa de categorias e o conteúdo da página).
+   Por isso ela aparece "grudada no meio", e não mais fixa no rodapé.
+
+   Esta folha carrega DEPOIS do <style> inline do wkz-buyer.html, então
+   consegue sobrescrever a regra usando o MESMO seletor + !important
+   (empate de especificidade é resolvido pela ordem de carga — a
+   última declaração declarada vence).
+   ══════════════════════════════════════════════════════════════════════ */
+
+body.kzlive-active .bottom-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  top: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
    1) CORREÇÃO DO BUG: bottom-nav sobrepondo o player de vídeo
    ──────────────────────────────────────────────────────────────────────
    Causa raiz (2 fatores que se somam):
