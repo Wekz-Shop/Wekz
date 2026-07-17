@@ -4897,6 +4897,27 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:48px 32
 .pdp-section-trigger:hover .pst-arrow{
   transform:translateX(3px);color:var(--teal);
 }
+/* v2.9.37 — Abas inline de Avaliações / Perguntas e Respostas.
+   Os próprios .pdp-section-trigger funcionam como abas; o painel
+   .pdp-tab-content abre logo abaixo do trigger clicado. */
+.product-tabs-container{display:flex;flex-direction:column;gap:10px;}
+.pdp-section-trigger.pdp-tab-expanded{border-color:var(--teal);background:rgba(0,180,171,0.04);}
+.pdp-section-trigger.pdp-tab-expanded .pst-arrow{transform:rotate(90deg);color:var(--teal);}
+.pdp-tab-content{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-sizing:border-box;}
+
+/* v2.9.39 — Chat do "Negociar com Kz IA" (dentro do .pdp-bs-* já existente) */
+.kz-neg-chat-log{display:flex;flex-direction:column;gap:10px;max-height:48vh;overflow-y:auto;padding:4px 2px 12px;}
+.kz-neg-msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55;}
+.kz-neg-msg-kz{align-self:flex-start;background:var(--card2);border:1px solid var(--border);border-bottom-left-radius:4px;}
+.kz-neg-msg-buyer{align-self:flex-end;background:var(--grad1);color:#fff;border-bottom-right-radius:4px;}
+.kz-neg-msg-kz strong{color:var(--teal);}
+.kz-neg-quick-actions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.kz-neg-quick-btn{flex:1;min-width:130px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card2);color:var(--text);transition:var(--transition);}
+.kz-neg-quick-btn:hover{border-color:var(--teal);}
+.kz-neg-quick-btn.primary{background:var(--grad1);color:#fff;border:none;}
+.kz-neg-input-row{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:12px;padding:9px 14px;background:var(--card2);}
+.kz-neg-offer-input{flex:1;min-width:0;border:none;background:none;color:var(--text);font-size:14px;outline:none;}
+.kz-neg-send-btn{background:var(--grad1);border:none;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
 /* Swipe-to-close hint on mobile */
 @media(max-width:600px){
   .pdp-bs-sheet{max-height:92vh;border-radius:18px 18px 0 0;}
