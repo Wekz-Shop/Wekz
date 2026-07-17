@@ -967,6 +967,63 @@ var SELLER_COUPONS      = {};
 var SPONSORED_PRODUCTS  = [];
 var FRETE_GRATIS_SELLERS= [];
 
+/* ═══════════════════════════════════════════════════════
+   KZ SMART NEGOTIATOR — configuração por vendedor
+   [v2.9.39] Antes, a margem do Negociador era tratada como
+   "política administrada centralmente pela WeKz" (ver stub antigo
+   em wkz-seller.js: kzNegSaveSettings só mostrava um toast e nunca
+   salvava nada). Por decisão do fundador, passa a ser configurável
+   por CADA vendedor — cada loja define sua própria margem máxima
+   de desconto automático. Como o site não tem backend, a
+   configuração é persistida em localStorage (mesma origem —
+   compartilhada entre wkz-seller.html e wkz-buyer.html).
+   ═══════════════════════════════════════════════════════ */
+var KZ_NEG_STORAGE_KEY = 'wkz_kz_negotiator_settings_v1';
+
+/* Margens padrão para os vendedores já existentes no catálogo de
+   produtos, para o Negociador funcionar "de fábrica" com diversos
+   vendedores mesmo antes de qualquer um configurar algo no painel. */
+var KZ_NEG_DEFAULTS = {
+  'TechStore Brasil':   { active: true, maxPct: 15 },
+  'TechStore':          { active: true, maxPct: 15 },
+  'GadgetHub':          { active: true, maxPct: 12 },
+  'SoundWorld':         { active: true, maxPct: 18 },
+  'SportFit':           { active: true, maxPct: 10 },
+  'NoteShop':           { active: true, maxPct: 8  },
+  'PhotoPro':           { active: true, maxPct: 10 },
+  'DisplayZone':        { active: true, maxPct: 12 },
+  'GlowBeauty':         { active: true, maxPct: 20 },
+  'GameWorld':          { active: true, maxPct: 15 },
+  'FurniStyle':         { active: true, maxPct: 14 },
+  'LivrariaKz Oficial': { active: true, maxPct: 10 },
+  'Minha Loja Pro':     { active: true, maxPct: 15 }
+};
+var KZ_NEG_FALLBACK = { active: true, maxPct: 12 };
+
+function kzNegGetAllSettings() {
+  try {
+    var raw = localStorage.getItem(KZ_NEG_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+
+function kzNegGetSellerConfig(sellerName) {
+  var all = kzNegGetAllSettings();
+  if (all && all[sellerName]) return all[sellerName];
+  if (KZ_NEG_DEFAULTS[sellerName]) return KZ_NEG_DEFAULTS[sellerName];
+  return KZ_NEG_FALLBACK;
+}
+
+function kzNegSetSellerConfig(sellerName, config) {
+  var all = kzNegGetAllSettings();
+  all[sellerName] = config;
+  try { localStorage.setItem(KZ_NEG_STORAGE_KEY, JSON.stringify(all)); } catch (e) {}
+  return all[sellerName];
+}
+
+window.kzNegGetSellerConfig = kzNegGetSellerConfig;
+window.kzNegSetSellerConfig = kzNegSetSellerConfig;
+
 // ══════════════════════════════════════════════════════
 //  LOJA OFICIAL / MARCA VERIFICADA v1
 //  Vendedores que atingiram os critérios do plano Premium
