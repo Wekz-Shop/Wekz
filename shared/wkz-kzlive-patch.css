@@ -1,10 +1,11 @@
 /* ══════════════════════════════════════════════════════════════════════
    WKZ-KZLIVE-PATCH.CSS
    Correção + hardening da página Kz Live Shopping.
-   Carregar DEPOIS de wkz-styles-base.css e wkz-styles-full.css,
-   e DEPOIS do <style> inline de wkz-buyer.html (linhas ~4188-4900),
-   para que estas regras tenham prioridade de cascata sem !important
-   generalizado.
+   Recomendado carregar DEPOIS de wkz-styles-base.css e
+   wkz-styles-full.css (boa prática geral de cascata), mas as correções
+   de bottom-nav abaixo agora usam especificidade reforçada e por isso
+   funcionam independente de estarem antes ou depois do <style> inline
+   gigante que existe dentro do próprio wkz-buyer.html.
 
    Convenção: como o componente já usa o prefixo "kzlive-" e "bnav-",
    mantemos o prefixo (evita reescrever HTML/JS existentes) mas
@@ -42,14 +43,17 @@
    está declarada (entre a faixa de categorias e o conteúdo da página).
    Por isso ela aparece "grudada no meio", e não mais fixa no rodapé.
 
-   Esta folha carrega DEPOIS do <style> inline do wkz-buyer.html, então
-   consegue sobrescrever a regra usando o MESMO seletor + !important
-   (empate de especificidade é resolvido pela ordem de carga — a
-   última declaração declarada vence).
+   Esta folha usa o prefixo extra "html" no seletor (html body.kzlive-active
+   .bottom-nav) só para ganhar especificidade um degrau acima da regra
+   original — assim a correção vale INDEPENDENTE de qual dos dois trechos
+   de CSS carrega por último no documento (não dependemos mais de ordem
+   de carga, que é frágil e já se mostrou não confiável neste projeto,
+   já que o wkz-buyer.html tem um <style> gigante embutido bem depois do
+   <head>).
    ══════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
-  body.kzlive-active .bottom-nav {
+  html body.kzlive-active .bottom-nav {
     position: fixed !important;
     bottom: 0 !important;
     top: auto !important;
@@ -65,8 +69,8 @@
    vídeo é iniciado. Bloqueamos isso explicitamente acima do breakpoint,
    não importa qual classe o JS adicione ao body. ── */
 @media (min-width: 769px) {
-  body.kzlive-active .bottom-nav,
-  .bottom-nav {
+  html body.kzlive-active .bottom-nav,
+  html .bottom-nav {
     display: none !important;
   }
 }
