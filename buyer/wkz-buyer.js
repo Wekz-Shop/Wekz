@@ -9981,45 +9981,54 @@ window.registerNavHook(function wkzDynamicPagesHook(id) {
 });
 
 // ─── LOGÍSTICA GLOBAL PAGE INIT ────────────────────────────────────────────
-// ─── CRO-01: TURBINAR PERFIL (progressive profiling pós-cadastro) ─────────
+// ─── CRO-01: EDITAR PERFIL (progressive profiling pós-cadastro) ──────────
+// [v3.1] O card "Editar Perfil" foi fundido dentro do modal único
+// "Editar Perfil" (ver window.cpEditProfile em wkz-core.js). A fonte de
+// verdade dos campos extra passou a ser WKZ_PROFILE_EXTRA — esta função
+// sincroniza os inputs do modal (quando aberto) nesse estado, calcula a
+// % de completude e atualiza a barra dentro do modal + o indicador
+// compacto no cabeçalho da página de perfil.
 function cpUpdateProfileCompletion(){
+  if (typeof WKZ_PROFILE_EXTRA === 'undefined') return 0;
+  const phoneEl = document.getElementById('cpEditPhone');
+  const docEl   = document.getElementById('cpEditDoc');
+  const cepEl   = document.getElementById('cpEditCep');
+  if (phoneEl) WKZ_PROFILE_EXTRA.phone = phoneEl.value.trim();
+  if (docEl)   WKZ_PROFILE_EXTRA.doc   = docEl.value.trim();
+  if (cepEl)   WKZ_PROFILE_EXTRA.cep   = cepEl.value.trim();
+
   const items = [
-    !!(document.getElementById('tpPhone')?.value.trim()),
-    !!(document.getElementById('tpDoc')?.value.trim()),
-    !!(document.getElementById('tpCep')?.value.trim()),
+    !!WKZ_PROFILE_EXTRA.phone,
+    !!WKZ_PROFILE_EXTRA.doc,
+    !!WKZ_PROFILE_EXTRA.cep,
     (typeof WKZ_USER_INTERESTS !== 'undefined' && WKZ_USER_INTERESTS.length > 0)
   ];
   const done = items.filter(Boolean).length;
   const pct = Math.round((done / items.length) * 100);
-  const bar = document.getElementById('tpProgressBar');
-  const label = document.getElementById('tpProgressLabel');
-  if(bar) bar.style.width = pct + '%';
-  if(label) label.textContent = pct + '% completo';
+
+  const bar = document.getElementById('cpEditProgressBar');
+  const label = document.getElementById('cpEditProgressLabel');
+  if (bar) bar.style.width = pct + '%';
+  if (label) label.textContent = pct + '% completo';
+
+  const hintPct = document.getElementById('cpProfileCompletionPct');
+  if (hintPct) hintPct.textContent = pct + '%';
+  const hintWrap = document.getElementById('cpProfileCompletionHint');
+  if (hintWrap) hintWrap.style.display = (pct >= 100) ? 'none' : '';
+
   return pct;
 }
 
+// [v3.1] Mantido só por compatibilidade — "Editar Perfil" deixou de
+// existir como card próprio; qualquer chamada antiga passa a abrir o
+// modal único "Editar Perfil", que já traz estes campos.
 function cpSaveTurbinarProfile(){
-  const pct = cpUpdateProfileCompletion();
-  const msg = pct >= 100
-    ? '🎉 Perfil 100% completo! +100 pts bônus creditados e recomendações turbinadas.'
-    : '💾 Perfil atualizado — ' + pct + '% completo' + (pct >= 50 ? ' · +50 pts Kz!' : '');
-  showToast(msg);
-  // Atualiza hero stat de pontos se perfil 100%
-  if (pct === 100) {
-    var ptsEl = document.getElementById('cpStatHeroPoints');
-    if (ptsEl) ptsEl.textContent = '8.440'; // 8.340 + 100 bônus perfil completo
-    var coPtsEl = document.getElementById('cpStatPoints');
-    if (coPtsEl) coPtsEl.textContent = '8.440 pts';
-  }
+  if (typeof cpEditProfile === 'function') cpEditProfile();
 }
 
-// Sincroniza o grid de interesses do dashboard ao abrir "Meu Perfil" e atualiza a barra de progresso
-window.registerNavHook(function wkzTurbinarPerfilHook(id) {
+// Atualiza o indicador de completude ao abrir "Meu Perfil"
+window.registerNavHook(function wkzEditarPerfilHook(id) {
   if (id !== 'client-profile') return;
-  document.querySelectorAll('#cpInterestsGrid .interest-tag').forEach(t => {
-    const key = t.dataset.interest;
-    t.classList.toggle('active', !!key && WKZ_USER_INTERESTS.includes(key));
-  });
   cpUpdateProfileCompletion();
 });
 
@@ -10138,7 +10147,7 @@ function toggleInterest(el){
   const idx = WKZ_USER_INTERESTS.indexOf(key);
   if(isActive && idx === -1) WKZ_USER_INTERESTS.push(key);
   else if(!isActive && idx !== -1) WKZ_USER_INTERESTS.splice(idx,1);
-  // Mantém grids espelhados (cadastro + Turbinar Perfil) sincronizados
+  // Mantém grids espelhados (cadastro + Editar Perfil) sincronizados
   document.querySelectorAll('.interest-tag[data-interest="'+key+'"]').forEach(t=>{
     t.classList.toggle('active', isActive);
   });
@@ -10148,12 +10157,12 @@ function toggleInterest(el){
 // ─── REGISTER MULTI-STEP ───
 let currentRegStep = 1;
 /* CRO-01: true quando a conta foi criada pelo caminho rápido (Passo 1 apenas) —
-   usado para oferecer "Turbinar Perfil" no dashboard e na tela de sucesso. */
+   usado para oferecer "Editar Perfil" no dashboard e na tela de sucesso. */
 let _regProfileIncomplete = false;
 
 /* CRO-01: cria a conta apenas com Nome/E-mail/Senha + consentimentos obrigatórios.
    Dados secundários (telefone, CPF, endereço, idioma, moeda, interesses, 2FA)
-   ficam para a seção "Turbinar Perfil" no dashboard do cliente. */
+   ficam para a seção "Editar Perfil" no dashboard do cliente. */
 function regQuickFinish(){
   const nome  = document.getElementById('r1nome')?.value.trim();
   const email = document.getElementById('r1email')?.value.trim();
@@ -10173,7 +10182,7 @@ function regQuickFinish(){
 
   _regProfileIncomplete = true;
 
-  // Esconde todos os passos, mostra sucesso direto (perfil completo depois, em "Turbinar Perfil")
+  // Esconde todos os passos, mostra sucesso direto (perfil completo depois, em "Editar Perfil")
   for(let i = 1; i <= 4; i++){
     const s = document.getElementById('reg-step'+i);
     if(s) s.style.display = 'none';
@@ -10222,9 +10231,9 @@ function regGoStep(step){
       }
     }
     if(currentRegStep === 2){
-      // CRO-01: telefone tornou-se opcional no fluxo completo — pode ser preenchido depois em "Turbinar Perfil"
+      // CRO-01: telefone tornou-se opcional no fluxo completo — pode ser preenchido depois em "Editar Perfil"
       const phone = document.getElementById('phoneNumberInput')?.value.trim();
-      if(!phone){ showToast('ℹ️ Telefone não informado — você pode adicionar depois em "Turbinar Perfil"'); }
+      if(!phone){ showToast('ℹ️ Telefone não informado — você pode adicionar depois em "Editar Perfil"'); }
     }
     if(currentRegStep === 3){
       // CRO-01: endereço tornou-se opcional no fluxo completo — pode ser preenchido no checkout ou depois
