@@ -1,0 +1,338 @@
+/* ════════════════════════════════════════════════════════════════════════
+   wkz-flashsale-modal.css — WKZ Flash Sale Modal
+   Extensão ISOLADA (Princípio Zero Rewrite): nenhuma regra de
+   wkz-styles-base.css / wkz-styles-full.css é sobrescrita ou duplicada.
+   Carregar DEPOIS de wkz-styles-full.css em wkz-buyer.html.
+
+   Usa exclusivamente os Design Tokens estruturais já existentes
+   (--card, --card2, --text, --muted, --border, --radius, --glass-rgb,
+   --fs-*, --focus-ring) + a paleta laranja/rosa (#FF6B35 → #FF2D7A) já
+   consolidada em todo o resto do recurso "Flash Sale" (.flash-item,
+   .btn-flash-buy, showFlashProductModal) para o modal soar como o MESMO
+   recurso, não um popup genérico à parte. Raios/glow usam --teal/--purple/
+   --cyan (cores de marca), ecoando o neon dos óculos do mascote.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Overlay: herda display:none/flex de .modal-overlay (wkz-styles-full.css).
+   Esta camada só adiciona fade/scale suaves por cima, sem tocar a base. ── */
+.wkz-fsm-overlay{
+  z-index: 3200;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+.wkz-fsm-overlay.wkz-fsm-visible{ opacity: 1; }
+
+.wkz-fsm-box{
+  position: relative;
+  width: 900px;
+  max-width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: center;
+  padding: 34px 32px 28px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(var(--glass-rgb),0.88), rgba(var(--glass-rgb),0.96)),
+    var(--card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 0 60px rgba(255,107,53,0.12);
+  transform: scale(0.92) translateY(14px);
+  opacity: 0;
+  transition: transform 0.34s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+}
+.wkz-fsm-overlay.wkz-fsm-visible .wkz-fsm-box{
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Borda superior iluminada — assinatura premium do componente */
+.wkz-fsm-box::before{
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(90deg, #FF6B35, #7C3AED, #06B6D4, #FF2D7A);
+  background-size: 300% 100%;
+  animation: wkzFsmBorderFlow 6s linear infinite;
+}
+@keyframes wkzFsmBorderFlow{
+  0%{ background-position: 0% 0; }
+  100%{ background-position: 300% 0; }
+}
+
+@media (max-width: 640px){
+  .wkz-fsm-box{ padding: 26px 18px 22px; width: 95%; }
+}
+
+/* ── Botão fechar ── */
+.wkz-fsm-close{
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card2);
+  color: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 2;
+}
+.wkz-fsm-close:hover{ background: rgba(255,107,53,0.14); color: #FF6B35; transform: rotate(90deg); }
+.wkz-fsm-close:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
+
+/* ── Palco do mascote (KZ + placa + raios) ── */
+.wkz-fsm-stage{
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  height: 176px;
+  margin-bottom: 14px;
+}
+
+.wkz-fsm-bolts{ position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+.wkz-fsm-bolt{ position: absolute; filter: drop-shadow(0 0 8px currentColor); }
+.wkz-fsm-bolt-1{ top: 4px; right: 26%; transform: rotate(-8deg); }
+.wkz-fsm-bolt-2{ top: 36px; right: 14%; transform: rotate(14deg); }
+
+.wkz-fsm-mascot{
+  position: relative;
+  flex-shrink: 0;
+  opacity: 0;
+  filter: drop-shadow(0 0 14px rgba(0,180,171,0.45)) drop-shadow(0 0 24px rgba(124,58,237,0.3));
+}
+.wkz-fsm-mascot svg{ display: block; }
+
+/* "brilho percorre os óculos" — varredura de luz sobre o mascote, em loop suave */
+.wkz-fsm-mascot::after{
+  content: '';
+  position: absolute; inset: -6px;
+  background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,0.65) 50%, transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wkz-fsm-placard{
+  position: relative;
+  opacity: 0;
+  transform-origin: bottom left;
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 22px;
+  margin-bottom: 30px;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(6,182,212,0.22), rgba(124,58,237,0.22));
+  border: 1px solid rgba(124,58,237,0.55);
+  box-shadow: 0 0 26px rgba(6,182,212,0.35), 0 0 40px rgba(124,58,237,0.25), inset 0 0 18px rgba(6,182,212,0.12);
+  text-shadow: 0 0 10px rgba(6,182,212,0.7), 0 0 18px rgba(124,58,237,0.5);
+}
+.wkz-fsm-placard-bolt{ display: flex; filter: drop-shadow(0 0 6px rgba(255,209,102,0.8)); }
+
+@media (max-width: 640px){
+  .wkz-fsm-stage{ height: 130px; }
+  .wkz-fsm-mascot svg{ width: 76px !important; height: 76px !important; }
+  .wkz-fsm-placard{ font-size: 14px; padding: 10px 14px; margin-bottom: 18px; }
+}
+
+/* ── Sequência de animação: disparada por JS ao acrescentar .wkz-fsm-run
+   em #wkzFsmStage (animateKzEntrance). Passos 1–7 do documento. ── */
+.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-mascot{
+  animation:
+    wkzFsmRunIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0ms both,
+    wkzFsmMascotBob 2.6s ease-in-out 700ms infinite;
+}
+.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-mascot::after{
+  animation: wkzFsmGlint 4s ease-in-out 950ms infinite;
+}
+.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-placard{
+  animation:
+    wkzFsmPlacardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 520ms both,
+    wkzFsmPlacardSway 3.2s ease-in-out 1020ms infinite;
+}
+.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-bolts{
+  animation:
+    wkzFsmBoltsIn 0.25s ease 680ms both,
+    wkzFsmBoltFlicker 2.8s ease-in-out 1000ms infinite;
+}
+
+@keyframes wkzFsmRunIn{
+  0%   { transform: translateX(-170%) rotate(-10deg); opacity: 0; }
+  60%  { transform: translateX(6%) rotate(3deg);       opacity: 1; }
+  80%  { transform: translateX(-3%) rotate(-1.5deg); }
+  100% { transform: translateX(0) rotate(0deg);        opacity: 1; }
+}
+@keyframes wkzFsmMascotBob{
+  0%,100%{ transform: translateY(0) rotate(0deg); }
+  50%    { transform: translateY(-4px) rotate(1deg); }
+}
+@keyframes wkzFsmGlint{
+  0%, 82%, 100%{ transform: translateX(-130%); opacity: 0; }
+  90%{ opacity: 1; }
+  96%{ transform: translateX(130%); opacity: 0; }
+}
+@keyframes wkzFsmPlacardIn{
+  0%  { opacity: 0; transform: translateX(-36%) rotate(-7deg) scale(0.85); }
+  70% { transform: translateX(2%) rotate(2deg) scale(1.04); }
+  100%{ opacity: 1; transform: translateX(0) rotate(0deg) scale(1); }
+}
+@keyframes wkzFsmPlacardSway{
+  0%,100%{ transform: rotate(-1.6deg); }
+  50%    { transform: rotate(1.6deg); }
+}
+@keyframes wkzFsmBoltsIn{ from{ opacity: 0; } to{ opacity: 1; } }
+@keyframes wkzFsmBoltFlicker{
+  0%,100%{ opacity: 0.55; }
+  50%    { opacity: 1; }
+}
+
+/* ── Título e subtítulo ── */
+.wkz-fsm-title{
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: var(--fs-h1);
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  background: linear-gradient(90deg, #FF6B35, #FF2D7A, #7C3AED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.wkz-fsm-subtitle{
+  font-size: var(--fs-body);
+  color: var(--muted);
+  max-width: 480px;
+  margin: 0 auto 22px;
+  line-height: 1.55;
+}
+
+/* ── Contador HH MM SS ── */
+.wkz-fsm-countdown{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.wkz-fsm-cd-unit{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 58px;
+  padding: 8px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--card2);
+  border: 1px solid var(--border);
+}
+.wkz-fsm-cd-unit span{
+  font-family: 'DM Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #FF6B35;
+  line-height: 1.1;
+}
+.wkz-fsm-cd-unit small{
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.wkz-fsm-cd-sep{ font-size: 20px; font-weight: 800; color: var(--muted); }
+
+/* ── Benefícios ── */
+.wkz-fsm-benefits{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.wkz-fsm-benefit{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(var(--glass-rgb), 0.5);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+.wkz-fsm-benefit svg{ color: var(--teal); }
+.wkz-fsm-benefit:nth-child(2) svg{ color: var(--purple); }
+.wkz-fsm-benefit:nth-child(3) svg{ color: var(--cyan); }
+
+@media (max-width: 640px){
+  .wkz-fsm-benefits{ grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .wkz-fsm-benefit{ padding: 10px 4px; font-size: 11px; }
+}
+
+/* ── Prova social ── */
+.wkz-fsm-social{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  margin-bottom: 22px;
+  border-radius: 50px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.25);
+  color: var(--muted);
+  font-size: var(--fs-small);
+}
+.wkz-fsm-social span#wkzFsmSocialCount{ font-weight: 800; color: var(--c-success); }
+.wkz-fsm-social-dot{
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c-success);
+  box-shadow: 0 0 0 0 rgba(34,197,94,0.55);
+  animation: wkzFsmSocialPulse 1.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes wkzFsmSocialPulse{
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); }
+  70%  { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
+/* ── CTA ── */
+.wkz-fsm-actions{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wkz-fsm-cta{
+  width: 100%;
+  font-size: 15px;
+  padding: 15px;
+  border-radius: 12px;
+}
+.wkz-fsm-secondary{
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.wkz-fsm-secondary:hover{ background: var(--card2); color: var(--text); }
+.wkz-fsm-secondary:focus-visible,
+.wkz-fsm-cta:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
