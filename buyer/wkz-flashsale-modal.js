@@ -37,8 +37,7 @@ var _wkzFsmFallbackEnd = null;
    Se a imagem falhar (404, offline, placeholder ainda não trocado),
    _wkzFsmMascotImgError() troca automaticamente para o sprite SVG
    #kz-mascot-full — o modal nunca fica quebrado. */
-var WKZ_FSM_MASCOT_IMG_URL = window.WKZ_FSM_MASCOT_IMG_URL || 'URL_DA_IMAGEM_PNG';
-
+var WKZ_FSM_MASCOT_IMG_URL = window.WKZ_FSM_MASCOT_IMG_URL || "./flash-sale.png";
 function _wkzFsmMascotImgError(imgEl) {
   if (!imgEl) return;
   imgEl.onerror = null;
