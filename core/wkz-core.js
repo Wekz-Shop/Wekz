@@ -1274,8 +1274,22 @@ const PRODUCT_INTEREST_MAP = [
   /* 26-27 ferramentas*/ 'ferramentas','ferramentas',
 ];
 
-/* Interesses selecionados pelo usuário (cadastro ou Turbinar Perfil) — em memória, sem backend real neste demo */
+/* Interesses selecionados pelo usuário (cadastro ou Editar Perfil) — em memória, sem backend real neste demo */
 let WKZ_USER_INTERESTS = [];
+
+/* [v3.1] Dados complementares de perfil (Turbinar Perfil foi fundido dentro
+   do modal "Editar Perfil") — vivem aqui, não apenas nos <input>, para que
+   a % de completude e o pré-preenchimento do modal sobrevivam a fechar/
+   reabrir a página de perfil (mesmo princípio de WKZ_USER_INTERESTS). */
+let WKZ_PROFILE_EXTRA = {
+  phone: '',
+  doc: '',
+  cep: '',
+  country: 'PT',
+  countryLabel: '🇵🇹 Portugal',
+  lang: '🇧🇷 Português (Brasil)',
+  curr: '🇧🇷 BRL — Real Brasileiro',
+};
 
 /* Retorna até `limit` produtos relacionados aos interesses do usuário;
    completa com mais vendidos/avaliados caso não haja matches suficientes. */
@@ -4697,18 +4711,26 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       return n==='Silver'?'1,2x': n==='Gold'?'1,5x': n==='Cyber'?'2x': n==='Neon Cyber'?'3x':'1x';
     }
 
+    /* [FIX light-mode] Este bloco usava rgba(255,255,255,X) fixo para texto/
+       bordas/fundos — herdado do tema escuro original. Em tema claro isso
+       resultava em texto quase branco sobre cartão branco (ilegível) e
+       bordas invisíveis entre níveis. Trocado por var(--text)/var(--muted)/
+       var(--border)/var(--card2), que já se adaptam a claro/escuro sozinhos
+       (ver wkz-styles-base.css). Níveis ainda não alcançados usam opacidade
+       0.55 (antes 0.42) — suficiente para "bloqueado" sem ficar ilegível. */
     var levelsHtml = WKZ_REWARDS.levels.map(function(lvl) {
       var isCurrent = (lvl.name === curr.name);
       var isPast    = (pts >= lvl.min);
       var border    = isCurrent
         ? ('2px solid ' + lvl.color)
-        : (isPast ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.06)');
-      var bg = isCurrent ? lvl.bg : (isPast ? 'rgba(255,255,255,0.04)' : 'transparent');
-      var op = (!isPast && !isCurrent) ? '0.42' : '1';
+        : (isPast ? '1px solid var(--border)' : '1px dashed var(--border)');
+      var bg = isCurrent ? lvl.bg : (isPast ? 'var(--card2)' : 'transparent');
+      var op = (!isPast && !isCurrent) ? '0.55' : '1';
+      var shadow = isCurrent ? 'box-shadow:0 3px 14px rgba(0,0,0,0.07);' : '';
       var maxLabel = (lvl.max === Infinity) ? '∞' : lvl.max.toLocaleString('pt-BR');
       var icoSvg = (CP_ICO[lvl.icon] || CP_ICO.award);
       return '<div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;'
-           + 'border-radius:14px;border:'+border+';background:'+bg+';opacity:'+op+';'
+           + 'border-radius:14px;border:'+border+';background:'+bg+';opacity:'+op+';'+shadow
            + 'margin-bottom:8px;position:relative;">'
            + '<div style="font-size:26px;flex-shrink:0;line-height:1;color:'+lvl.color+';">'+icoSvg+'</div>'
            + '<div style="flex:1;min-width:0;">'
@@ -4716,11 +4738,11 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
                + '<span style="font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:800;color:'+lvl.color+';">'+lvl.name+'</span>'
                + (isCurrent ? '<span style="font-family:\'DM Sans\',sans-serif;font-size:9px;font-weight:800;background:'+lvl.color+';color:#000;border-radius:4px;padding:1px 6px;letter-spacing:0.4px;">VOCÊ ESTÁ AQUI</span>' : '')
              + '</div>'
-             + '<div style="font-size:11px;color:rgba(255,255,255,0.42);margin-bottom:6px;">'
+             + '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">'
                + lvl.min.toLocaleString('pt-BR')+' – '+maxLabel+' pts'
              + '</div>'
-             + '<div style="font-size:12px;color:rgba(255,255,255,0.72);line-height:1.55;">'+lvl.perks+'</div>'
-             + '<div style="margin-top:5px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);">'
+             + '<div style="font-size:12px;color:var(--text);line-height:1.55;">'+lvl.perks+'</div>'
+             + '<div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--muted);">'
                + 'Taxa: <span style="color:'+lvl.color+';">'+rateLabel(lvl.name)+'</span> ponto por R$1'
              + '</div>'
            + '</div>'
@@ -4731,14 +4753,14 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       ? '<div style="margin:4px 0 16px;padding:14px 16px;background:rgba(0,180,171,0.07);'
           + 'border:1px solid rgba(0,180,171,0.2);border-radius:14px;">'
           + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-            + '<span style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.65);">Faltam para '+next.name+'</span>'
+            + '<span style="font-size:12px;font-weight:700;color:var(--text);">Faltam para '+next.name+'</span>'
             + '<span style="font-family:\'DM Sans\',sans-serif;font-size:16px;font-weight:800;color:var(--teal);">'+toNext.toLocaleString('pt-BR')+' pts</span>'
           + '</div>'
-          + '<div style="background:rgba(255,255,255,0.07);border-radius:99px;height:6px;overflow:hidden;">'
+          + '<div style="background:var(--border);border-radius:99px;height:6px;overflow:hidden;">'
             + '<div style="height:100%;width:'+Math.min(100,Math.round((pts-curr.min)/(next.min-curr.min)*100))+'%;'
               + 'background:linear-gradient(90deg,'+curr.color+','+next.color+');border-radius:99px;"></div>'
           + '</div>'
-          + '<div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.42);">'
+          + '<div style="margin-top:8px;font-size:11px;color:var(--muted);">'
             + 'No nível <strong style="color:'+curr.color+';">'+curr.name+'</strong> ganhas '
             + '<strong style="color:var(--teal);">'+rateLabel(curr.name)+' ponto por R$1</strong> em cada compra.'
           + '</div>'
@@ -4747,29 +4769,29 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
           + 'border:1px solid rgba(167,139,250,0.3);border-radius:14px;text-align:center;">'
           + '<div style="font-size:20px;margin-bottom:4px;color:#a78bfa;">'+CP_ICO.zap+'</div>'
           + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:#a78bfa;">Nível Máximo Atingido!</div>'
-          + '<div style="font-size:11px;color:rgba(255,255,255,0.42);margin-top:4px;">Aproveita todos os benefícios VIP · 3x pontos por R$1 gasto.</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Aproveita todos os benefícios VIP · 3x pontos por R$1 gasto.</div>'
         + '</div>';
 
     /* [v3.0] CTA directo para a categoria com maior taxa de pontos do momento */
     var ctaHtml = bonus ? (
       '<div style="margin:0 0 18px;padding:14px 16px;background:rgba(245,158,11,0.08);'
         + 'border:1px solid rgba(245,158,11,0.28);border-radius:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
-        + '<div style="font-size:22px;color:#F59E0B;flex-shrink:0;">'+CP_ICO.flame+'</div>'
+        + '<div style="font-size:22px;color:var(--c-warning);flex-shrink:0;">'+CP_ICO.flame+'</div>'
         + '<div style="flex:1;min-width:180px;">'
-          + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:#F59E0B;">'+bonus.rate+' pontos em '+bonus.name+'</div>'
-          + '<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;">'+bonus.note+'</div>'
+          + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:var(--c-warning);">'+bonus.rate+' pontos em '+bonus.name+'</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+bonus.note+'</div>'
         + '</div>'
         + '<button onclick="cpGoToBonusCategory()" style="padding:8px 16px;background:#F59E0B;border:none;border-radius:9px;color:#000;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ver Produtos →</button>'
       + '</div>'
     ) : '';
 
     host.innerHTML =
-        '<p style="font-size:12px;color:rgba(255,255,255,0.42);margin:0 0 16px;line-height:1.6;">'
+        '<p style="font-size:12px;color:var(--muted);margin:0 0 16px;line-height:1.6;">'
           + 'Sobe de nível acumulando pontos em cada compra. A taxa de ganho de pontos aumenta com o nível — quanto mais alto, mais pontos por real gasto.'
         + '</p>'
         + ctaHtml
         + progressHtml
-        + '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Todos os Níveis</div>'
+        + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Todos os Níveis</div>'
         + levelsHtml;
   }
 
@@ -4840,50 +4862,160 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   /* ══════════════════════════════════════════
      EDITAR PERFIL — Modal completo
+     [v3.1] Antes existiam DOIS lugares para a mesma finalidade — este
+     modal (só nome/email/telefone/país) e o card estático "Turbinar
+     Perfil" na página (interesses, CPF, CEP, idioma, moeda). Fundidos
+     num só ponto de entrada: clicar "Editar Perfil" abre este modal já
+     com tudo. O estado dos campos extra vive em WKZ_PROFILE_EXTRA (ver
+     início do ficheiro), não só no DOM, para sobreviver a fechar/abrir.
+     Inclui também uma Zona de Risco com exclusão de conta, que reaproveita
+     o fluxo LGPD já existente (lgpdOpenExcluirConta(), Art.18 VI) em vez
+     de duplicar essa lógica.
   ══════════════════════════════════════════ */
+  function _cpInterestTags() {
+    return [
+      {key:'eletronicos', label:'Eletrônicos', svg:'<rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>'},
+      {key:'moda',        label:'Moda',        svg:'<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>'},
+      {key:'casa',        label:'Casa &amp; Deco', svg:'<path d="M20 9V6a2 2 0 00-2-2H6a2 2 0 00-2 2v3"/><path d="M2 16a2 2 0 002 2h16a2 2 0 002-2v-5a2 2 0 00-4 0v1.5H6V11a2 2 0 00-4 0z"/><line x1="6" y1="19" x2="6" y2="21"/><line x1="18" y1="19" x2="18" y2="21"/>'},
+      {key:'beleza',      label:'Beleza',      svg:'<path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85L5 14z"/>'},
+      {key:'games',       label:'Games',       svg:'<line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/>'},
+      {key:'esportes',    label:'Esportes',    svg:'<circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/>'},
+      {key:'petshop',     label:'Pet Shop',    svg:'<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="15" r="2"/><circle cx="4" cy="8" r="2"/><path d="M9.87 12.42c-.54-.55-1.33-.92-2.18-.92a3.07 3.07 0 00-2.19.9A3.06 3.06 0 004.41 15c0 1.72 1.44 3.13 3.22 3.13H9.5c.76 0 1.4-.43 1.71-1.06.31-.64.31-1.38 0-2.02a3.07 3.07 0 00-1.34-2.63z"/><path d="M14.13 12.42c.54-.55 1.33-.92 2.18-.92a3.07 3.07 0 012.19.9 3.06 3.06 0 011.09 2.6c0 1.72-1.44 3.13-3.22 3.13H14.5c-.76 0-1.4-.43-1.71-1.06-.31-.64-.31-1.38 0-2.02.31-.63.78-1.15 1.34-1.63z"/>'},
+      {key:'automotivo',  label:'Automotivo',  svg:'<rect x="1" y="3" width="15" height="13"/><path d="M17 8h4l2 5v5H1"/><path d="M1 16V8"/><circle cx="5.5" cy="19.5" r="2.5"/><circle cx="18.5" cy="19.5" r="2.5"/>'},
+      {key:'livros',      label:'Livros',      svg:'<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>'},
+      {key:'saude',       label:'Saúde',       svg:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'},
+      {key:'musica',      label:'Música',      svg:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'},
+      {key:'viagens',     label:'Viagens',     svg:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.64 11.2a19.79 19.79 0 01-3.07-8.67A2 2 0 012.55 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.29 6.29l.91-.91a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>'},
+    ];
+  }
+  function _cpInterestsGridHtml() {
+    return _cpInterestTags().map(function(t) {
+      var active = WKZ_USER_INTERESTS.indexOf(t.key) !== -1;
+      return '<span class="interest-tag' + (active ? ' active' : '') + '" data-interest="' + t.key + '" onclick="toggleInterest(this)">'
+        + '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + t.svg + '</svg> ' + t.label
+        + '</span>';
+    }).join('');
+  }
+  function _cpSelectOptionsHtml(id, options, current) {
+    return '<select id="' + id + '" class="form-select wkz-select wkz-select--lg">'
+      + options.map(function(o) { return '<option' + (o === current ? ' selected' : '') + '>' + o + '</option>'; }).join('')
+      + '</select>';
+  }
+
   window.cpEditProfile = function() {
     var name  = document.getElementById('cpUserName')  ? document.getElementById('cpUserName').textContent  : 'Alexandre Kz';
     var email = document.getElementById('cpUserEmail') ? document.getElementById('cpUserEmail').textContent : 'alexandre@wekzshop.com';
+    var ex = WKZ_PROFILE_EXTRA;
     _cpShowModal({
       id: 'cpEditProfileModal',
       title: CP_ICO.pencil + ' Editar Perfil',
-      width: '440px',
-      body: '<div style="display:flex;flex-direction:column;gap:14px;">'
-        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Nome de utilizador</label>'
-        + '<input id="cpEditName" type="text" value="' + name + '" style="width:100%;margin-top:6px;padding:10px 14px;background:var(--card2);border:1px solid rgba(0,180,171,0.3);border-radius:10px;color:var(--text);font-size:14px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor=\'rgba(0,180,171,0.7)\'" onblur="this.style.borderColor=\'rgba(0,180,171,0.3)\'"></div>'
-        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Email</label>'
-        + '<input id="cpEditEmail" type="email" value="' + email + '" style="width:100%;margin-top:6px;padding:10px 14px;background:var(--card2);border:1px solid rgba(0,180,171,0.3);border-radius:10px;color:var(--text);font-size:14px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor=\'rgba(0,180,171,0.7)\'" onblur="this.style.borderColor=\'rgba(0,180,171,0.3)\'"></div>'
-        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Telefone</label>'
-        + '<input id="cpEditPhone" type="tel" placeholder="+351 900 000 000" style="width:100%;margin-top:6px;padding:10px 14px;background:var(--card2);border:1px solid rgba(0,180,171,0.3);border-radius:10px;color:var(--text);font-size:14px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor=\'rgba(0,180,171,0.7)\'" onblur="this.style.borderColor=\'rgba(0,180,171,0.3)\'"></div>'
-        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">País</label>'
-        + '<div id="cpCountryPickerWrap" style="position:relative;margin-top:6px;">'
-        + '<div id="cpCountrySelected" onclick="cpToggleCountryPicker()" style="width:100%;padding:10px 14px;background:var(--card2);border:1px solid rgba(0,180,171,0.3);border-radius:10px;color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;user-select:none;transition:border-color 0.2s;">'
-        + '<span id="cpCountryLabel" style="display:flex;align-items:center;gap:8px;font-size:14px;">🇵🇹 Portugal</span>'
-        + '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(0,180,171,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+      width: '480px',
+      body: ''
+        /* ── Barra de completude (herdada do antigo Turbinar Perfil) ── */
+        + '<div style="margin-bottom:16px;">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+            + '<span style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Completude do perfil</span>'
+            + '<span id="cpEditProgressLabel" style="font-size:11px;color:var(--teal);font-weight:800;">0% completo</span>'
+          + '</div>'
+          + '<div style="background:var(--border);border-radius:99px;height:6px;overflow:hidden;">'
+            + '<div id="cpEditProgressBar" style="height:100%;width:0%;background:var(--grad1);border-radius:99px;transition:width .4s ease;"></div>'
+          + '</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.55;">Quanto mais completo, mais precisas ficam as recomendações e mais rápido o check-out. Tudo aqui é opcional.</div>'
         + '</div>'
-        + '<div id="cpCountryDropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999;background:#151E2E;border:1px solid rgba(0,180,171,0.35);border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.04);max-height:260px;overflow-y:auto;">'
-        + '<div style="padding:8px;"><div style="position:relative;"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:rgba(0,180,171,0.6);">' + CP_ICO.search + '</span><input id="cpCountrySearch" type="text" placeholder="Pesquisar país..." oninput="cpFilterCountries(this.value)" style="width:100%;padding:8px 12px 8px 30px;background:rgba(0,180,171,0.07);border:1px solid rgba(0,180,171,0.2);border-radius:9px;color:var(--text);font-size:12px;outline:none;box-sizing:border-box;" autocomplete="off"></div></div>'
-        + '<div id="cpCountryList" style="padding:0 4px 8px;"></div>'
+        /* ── Dados pessoais ── */
+        + '<div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Dados pessoais</div>'
+        + '<div class="form-group"><label class="form-label">Nome de utilizador</label>'
+          + '<input id="cpEditName" class="form-input wkz-input" type="text" value="' + name + '"></div>'
+        + '<div class="form-group"><label class="form-label">Email</label>'
+          + '<input id="cpEditEmail" class="form-input wkz-input" type="email" value="' + email + '"></div>'
+        + '<div class="form-row">'
+          + '<div class="form-group"><label class="form-label">Telefone / WhatsApp</label>'
+            + '<input id="cpEditPhone" class="form-input wkz-input" type="tel" placeholder="(11) 99999-9999" value="' + ex.phone + '" oninput="cpUpdateProfileCompletion()"></div>'
+          + '<div class="form-group"><label class="form-label">CPF / Documento</label>'
+            + '<input id="cpEditDoc" class="form-input wkz-input" type="text" placeholder="000.000.000-00" value="' + ex.doc + '" oninput="cpUpdateProfileCompletion()"></div>'
         + '</div>'
-        + '<input type="hidden" id="cpEditCountry" value="PT">'
-        + '</div></div>'
+        + '<div class="form-row">'
+          + '<div class="form-group"><label class="form-label">CEP / Endereço</label>'
+            + '<input id="cpEditCep" class="form-input wkz-input" type="text" placeholder="00000-000" value="' + ex.cep + '" oninput="cpUpdateProfileCompletion()"></div>'
+          + '<div class="form-group"><label class="form-label">País</label>'
+            + '<div id="cpCountryPickerWrap" style="position:relative;">'
+            + '<div id="cpCountrySelected" onclick="cpToggleCountryPicker()" class="form-select wkz-select wkz-select--lg" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;">'
+            + '<span id="cpCountryLabel">' + ex.countryLabel + '</span>'
+            + '</div>'
+            + '<div id="cpCountryDropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999;background:var(--card);border:1px solid rgba(0,180,171,0.35);border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3),0 0 0 1px var(--border);max-height:220px;overflow-y:auto;">'
+              + '<div style="padding:8px;"><div style="position:relative;"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:rgba(0,180,171,0.6);">' + CP_ICO.search + '</span><input id="cpCountrySearch" type="text" placeholder="Pesquisar país..." oninput="cpFilterCountries(this.value)" style="width:100%;padding:8px 12px 8px 30px;background:rgba(0,180,171,0.07);border:1px solid rgba(0,180,171,0.2);border-radius:9px;color:var(--text);font-size:12px;outline:none;box-sizing:border-box;" autocomplete="off"></div></div>'
+              + '<div id="cpCountryList" style="padding:0 4px 8px;"></div>'
+            + '</div>'
+            + '<input type="hidden" id="cpEditCountry" value="' + ex.country + '">'
+            + '</div></div>'
+        + '</div>'
+        /* ── Preferências (idioma/moeda) ── */
+        + '<div style="border-top:1px solid var(--border);margin-top:6px;padding-top:14px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Preferências de compra</div>'
+        + '<div class="form-row">'
+          + '<div class="form-group"><label class="form-label">Idioma preferido</label>'
+            + _cpSelectOptionsHtml('cpEditLang', ['🇧🇷 Português (Brasil)','🇺🇸 English','🇪🇸 Español','🇨🇳 中文'], ex.lang) + '</div>'
+          + '<div class="form-group"><label class="form-label">Moeda preferida</label>'
+            + _cpSelectOptionsHtml('cpEditCurr', ['🇧🇷 BRL — Real Brasileiro','🇺🇸 USD — Dólar','🇪🇺 EUR — Euro'], ex.curr) + '</div>'
+        + '</div>'
+        /* ── Interesses (para o Kz Copilot recomendar melhor) ── */
+        + '<div style="border-top:1px solid var(--border);margin-top:6px;padding-top:14px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Interesses <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted);">— melhora as recomendações do Kz Copilot</span></div>'
+        + '<div class="interests-grid" style="margin-bottom:4px;">' + _cpInterestsGridHtml() + '</div>'
+        /* ── Zona de risco ── */
+        + '<div style="border-top:1px solid rgba(239,68,68,0.22);margin-top:16px;padding-top:14px;">'
+          + '<div style="font-size:11px;font-weight:800;color:#EF4444;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Zona de risco</div>'
+          + '<div onclick="cpEditProfileDeleteAccount()" role="button" tabindex="0" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.22);border-radius:12px;cursor:pointer;transition:0.2s;" onmouseover="this.style.background=\'rgba(239,68,68,0.11)\'" onmouseout="this.style.background=\'rgba(239,68,68,0.06)\'">'
+            + '<div><div style="font-size:13px;font-weight:700;color:#EF4444;">Excluir minha conta</div>'
+            + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Remove o teu perfil e dados permanentemente, respeitando os prazos legais de retenção.</div></div>'
+            + '<span style="color:#EF4444;flex-shrink:0;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>'
+          + '</div>'
         + '</div>',
       confirmLabel: CP_ICO.save + ' Guardar Alterações',
       confirmColor: 'var(--grad1)',
       onConfirm: function() {
         var newName  = document.getElementById('cpEditName')  ? document.getElementById('cpEditName').value.trim()  : '';
         var newEmail = document.getElementById('cpEditEmail') ? document.getElementById('cpEditEmail').value.trim() : '';
-        if (newName) {
-          var nameEl = document.getElementById('cpUserName');
-          if (nameEl) nameEl.textContent = newName;
+        if (!newName)  { showToast && showToast('⚠ Informa um nome de utilizador.'); return false; }
+        if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { showToast && showToast('⚠ Informa um email válido.'); return false; }
+        var nameEl = document.getElementById('cpUserName');
+        if (nameEl) nameEl.textContent = newName;
+        var emailEl = document.getElementById('cpUserEmail');
+        if (emailEl) emailEl.textContent = newEmail;
+
+        var f;
+        f = document.getElementById('cpEditPhone');    if (f) WKZ_PROFILE_EXTRA.phone        = f.value.trim();
+        f = document.getElementById('cpEditDoc');      if (f) WKZ_PROFILE_EXTRA.doc           = f.value.trim();
+        f = document.getElementById('cpEditCep');      if (f) WKZ_PROFILE_EXTRA.cep           = f.value.trim();
+        f = document.getElementById('cpEditCountry');  if (f) WKZ_PROFILE_EXTRA.country       = f.value;
+        f = document.getElementById('cpCountryLabel'); if (f) WKZ_PROFILE_EXTRA.countryLabel  = f.textContent.trim();
+        f = document.getElementById('cpEditLang');     if (f) WKZ_PROFILE_EXTRA.lang           = f.value;
+        f = document.getElementById('cpEditCurr');     if (f) WKZ_PROFILE_EXTRA.curr           = f.value;
+
+        var pct = cpUpdateProfileCompletion();
+        var msg = pct >= 100
+          ? '🎉 Perfil 100% completo! +100 pts bônus creditados e recomendações turbinadas.'
+          : 'Perfil atualizado com sucesso' + (pct ? ' — ' + pct + '% completo' : '') + '!';
+        showToast && showToast(msg);
+        if (pct === 100) {
+          var ptsEl = document.getElementById('cpStatHeroPoints');
+          if (ptsEl) ptsEl.textContent = '8.440';
+          var coPtsEl = document.getElementById('cpStatPoints');
+          if (coPtsEl) coPtsEl.textContent = '8.440 pts';
         }
-        if (newEmail) {
-          var emailEl = document.getElementById('cpUserEmail');
-          if (emailEl) emailEl.textContent = newEmail;
-        }
-        showToast && showToast('Perfil actualizado com sucesso!');
       }
     });
+    /* Sincroniza a barra de completude assim que o modal abre */
+    cpUpdateProfileCompletion();
+  };
+
+  /* [v3.1] "Excluir minha conta" dentro do Editar Perfil não reimplementa
+     nada — apenas fecha este modal e delega para o fluxo LGPD (dupla
+     confirmação, Art.18 VI) já usado na Central de Privacidade, mantendo
+     uma única fonte de verdade para essa ação sensível. */
+  window.cpEditProfileDeleteAccount = function() {
+    _cpCloseModal('cpEditProfileModal');
+    setTimeout(function() {
+      if (typeof lgpdOpenExcluirConta === 'function') lgpdOpenExcluirConta();
+    }, 240);
   };
 
   /* ══════════════════════════════════════════
@@ -5730,17 +5862,23 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     overlay.id = opts.id;
     overlay.style.cssText = 'position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(8,14,26,0.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:wkzConfirmOverlayIn 0.22s ease forwards;box-sizing:border-box;';
     overlay.onclick = function(e) { if (e.target === overlay) _cpCloseModal(opts.id); };
+    /* [FIX light-mode] box/topBar/título/botões eram hardcoded para o
+       tema escuro original (#151E2E, #fff, rgba branco) — por isso todo
+       modal desta fábrica (Editar Perfil, Partilhar, Avatar, Disputa,
+       Cartão) aparecia sempre escuro, mesmo com o site em tema claro.
+       Trocado por var(--card)/var(--text)/var(--card2)/var(--border),
+       que já resolvem certo em claro e escuro (wkz-styles-base.css). */
     var box = document.createElement('div');
-    box.style.cssText = 'position:relative;width:100%;max-width:' + (opts.width||'440px') + ';background:#151E2E;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.07),0 24px 64px rgba(0,0,0,0.6),0 0 40px rgba(0,180,171,0.1);animation:wkzConfirmIn 0.38s cubic-bezier(0.34,1.4,0.64,1) forwards;max-height:90vh;overflow-y:auto;';
-    var topBar = '<div style="position:sticky;top:0;z-index:1;background:#151E2E;border-bottom:1px solid rgba(255,255,255,0.06);padding:18px 20px 14px;display:flex;align-items:center;justify-content:space-between;">'
-      + '<div style="font-family:\'DM Sans\',sans-serif;font-size:16px;font-weight:800;color:#fff;">' + opts.title + '</div>'
-      + '<button onclick="_cpCloseModal(\'' + opts.id + '\')" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.12)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.06)\'">' + CP_ICO.close + '</button>'
+    box.style.cssText = 'position:relative;width:100%;max-width:' + (opts.width||'440px') + ';background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px var(--border),0 24px 64px rgba(0,0,0,0.35),0 0 40px rgba(0,180,171,0.08);animation:wkzConfirmIn 0.38s cubic-bezier(0.34,1.4,0.64,1) forwards;max-height:90vh;overflow-y:auto;';
+    var topBar = '<div style="position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);padding:18px 20px 14px;display:flex;align-items:center;justify-content:space-between;">'
+      + '<div style="font-family:\'DM Sans\',sans-serif;font-size:16px;font-weight:800;color:var(--text);">' + opts.title + '</div>'
+      + '<button onclick="_cpCloseModal(\'' + opts.id + '\')" style="width:28px;height:28px;border-radius:50%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;" onmouseover="this.style.borderColor=\'var(--teal)\';this.style.color=\'var(--teal)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'">' + CP_ICO.close + '</button>'
       + '</div>';
     var bodyHtml = '<div style="padding:16px 20px 8px;">' + (opts.body || '') + '</div>';
     var footerHtml = '';
     if (opts.confirmLabel !== null) {
       footerHtml = '<div style="padding:12px 20px 20px;display:flex;gap:10px;justify-content:flex-end;">'
-        + '<button onclick="_cpCloseModal(\'' + opts.id + '\')" style="padding:10px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;cursor:pointer;transition:0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.05)\'">Cancelar</button>';
+        + '<button onclick="_cpCloseModal(\'' + opts.id + '\')" style="padding:10px 20px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:0.2s;" onmouseover="this.style.color=\'var(--text)\'" onmouseout="this.style.color=\'var(--muted)\'">Cancelar</button>';
       if (opts.confirmLabel) {
         footerHtml += '<button onclick="_cpHandleModalConfirm(\'' + opts.id + '\')" style="padding:10px 20px;background:' + (opts.confirmColor||'var(--grad1)') + ';border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:0.2s;white-space:nowrap;" onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">' + opts.confirmLabel + '</button>';
       }
