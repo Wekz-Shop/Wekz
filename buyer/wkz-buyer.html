@@ -34,7 +34,6 @@
   <link rel="stylesheet" href="../core/wkz-styles-base.css" />
   <link rel="stylesheet" href="../shared/wkz-styles-full.css" />
   <link rel="stylesheet" href="../shared/wkz-kzlive-patch.css" />
-  <!-- WKZ Flash Sale Modal — extensão isolada (Zero Rewrite), não altera nenhum CSS acima -->
   <link rel="stylesheet" href="wkz-flashsale-modal.css" />
 </head>
 <body>
@@ -711,7 +710,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <!-- header row -->
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:22px;">
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <div onclick="openFlashSaleModal()" style="cursor:pointer;background:linear-gradient(135deg,#FF6B35,#FF2D7A);border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:8px;">
+          <div style="background:linear-gradient(135deg,#FF6B35,#FF2D7A);border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:8px;">
             <span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span>
             <span style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:1px;">FLASH SALE</span>
           </div>
@@ -753,7 +752,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- FLASH SALE STRIP -->
   <div class="flash-strip">
     <div class="flash-strip-inner">
-      <div class="flash-label" onclick="openFlashSaleModal()" style="cursor:pointer;">
+      <div class="flash-label">
         <span><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> FLASH SALE</span>
       </div>
       <div class="countdown">
@@ -5823,7 +5822,6 @@ body.kzlive-active .bottom-nav {
 <script src="../core/wkz-bus.js"></script>
 <script src="../core/wkz-core.js"></script>
 <script src="wkz-buyer.js"></script>
-<!-- WKZ Flash Sale Modal — extensão isolada (Zero Rewrite), não altera wkz-buyer.js -->
 <script src="wkz-flashsale-modal.js"></script>
 </body>
 </html>

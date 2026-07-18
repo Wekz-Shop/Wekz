@@ -1,338 +1,437 @@
-/* ════════════════════════════════════════════════════════════════════════
-   wkz-flashsale-modal.css — WKZ Flash Sale Modal
-   Extensão ISOLADA (Princípio Zero Rewrite): nenhuma regra de
-   wkz-styles-base.css / wkz-styles-full.css é sobrescrita ou duplicada.
-   Carregar DEPOIS de wkz-styles-full.css em wkz-buyer.html.
+/* ══════════════════════════════════════════════════════════════════════
+   WKZ-FLASHSALE-MODAL.CSS
+   Componente: WKZ Flash Sale Modal
+   Extensão isolada — não altera nenhuma regra de wkz-styles-base.css,
+   wkz-styles-full.css ou wkz-admin-styles.css. Segue o mesmo padrão de
+   "patch file" já usado em wkz-kzlive-patch.css (prefixo próprio,
+   carregado depois dos estilos base, zero sobrescrita).
 
-   Usa exclusivamente os Design Tokens estruturais já existentes
-   (--card, --card2, --text, --muted, --border, --radius, --glass-rgb,
-   --fs-*, --focus-ring) + a paleta laranja/rosa (#FF6B35 → #FF2D7A) já
-   consolidada em todo o resto do recurso "Flash Sale" (.flash-item,
-   .btn-flash-buy, showFlashProductModal) para o modal soar como o MESMO
-   recurso, não um popup genérico à parte. Raios/glow usam --teal/--purple/
-   --cyan (cores de marca), ecoando o neon dos óculos do mascote.
-   ════════════════════════════════════════════════════════════════════════ */
+   Prefixo do componente: "wkz-fsm-" (WKZ Flash Sale Modal).
+   Design Tokens utilizados (exclusivamente):
+     var(--grad1) var(--grad2) var(--grad3)
+     var(--card)  var(--card2)
+     var(--text)  var(--muted) var(--border) var(--radius)
+   Nenhuma cor hexadecimal nova foi introduzida.
+   ══════════════════════════════════════════════════════════════════════ */
 
-/* ── Overlay: herda display:none/flex de .modal-overlay (wkz-styles-full.css).
-   Esta camada só adiciona fade/scale suaves por cima, sem tocar a base. ── */
-.wkz-fsm-overlay{
-  z-index: 3200;
-  padding: 20px;
+/* ── Overlay ─────────────────────────────────────────────────────────── */
+.wkz-fsm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   opacity: 0;
-  transition: opacity 0.28s ease;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
 }
-.wkz-fsm-overlay.wkz-fsm-visible{ opacity: 1; }
+.wkz-fsm-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease, visibility 0s linear 0s;
+}
 
-.wkz-fsm-box{
+/* ── Card / Modal ────────────────────────────────────────────────────── */
+.wkz-fsm-modal {
   position: relative;
-  width: 900px;
-  max-width: 95%;
+  width: min(900px, 95%);
   max-height: 90vh;
   overflow-y: auto;
   overflow-x: hidden;
-  text-align: center;
-  padding: 34px 32px 28px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  background:
-    linear-gradient(180deg, rgba(var(--glass-rgb),0.88), rgba(var(--glass-rgb),0.96)),
-    var(--card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow:
-    0 30px 90px rgba(0,0,0,0.35),
-    0 0 0 1px rgba(255,255,255,0.05) inset,
-    0 0 60px rgba(255,107,53,0.12);
-  transform: scale(0.92) translateY(14px);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--card) 88%, transparent),
+    color-mix(in srgb, var(--card2) 74%, transparent)
+  );
+  backdrop-filter: blur(26px) saturate(160%);
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.45), 0 2px 0 rgba(255, 255, 255, 0.06) inset;
+  transform: scale(0.92) translateY(18px);
+  filter: blur(6px);
   opacity: 0;
-  transition: transform 0.34s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, filter 0.4s ease;
+  outline: none;
 }
-.wkz-fsm-overlay.wkz-fsm-visible .wkz-fsm-box{
+.wkz-fsm-overlay.open .wkz-fsm-modal {
   transform: scale(1) translateY(0);
+  filter: blur(0);
   opacity: 1;
 }
 
-/* Borda superior iluminada — assinatura premium do componente */
-.wkz-fsm-box::before{
-  content: '';
+/* Borda iluminada — anel com gradiente de marca (var(--grad1)), pulsando discretamente */
+.wkz-fsm-modal::before {
+  content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  border-radius: var(--radius) var(--radius) 0 0;
-  background: linear-gradient(90deg, #FF6B35, #7C3AED, #06B6D4, #FF2D7A);
-  background-size: 300% 100%;
-  animation: wkzFsmBorderFlow 6s linear infinite;
-}
-@keyframes wkzFsmBorderFlow{
-  0%{ background-position: 0% 0; }
-  100%{ background-position: 300% 0; }
-}
-
-@media (max-width: 640px){
-  .wkz-fsm-box{ padding: 26px 18px 22px; width: 95%; }
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--grad1);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.7;
+  pointer-events: none;
+  animation: wkzFsmBorderPulse 3.4s ease-in-out infinite;
 }
 
-/* ── Botão fechar ── */
-.wkz-fsm-close{
+/* Glow discreto atrás do card — usa var(--grad2), bem desfocado */
+.wkz-fsm-modal-glow {
   position: absolute;
-  top: 14px; right: 14px;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--card2);
-  color: var(--text);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: var(--transition);
-  z-index: 2;
-}
-.wkz-fsm-close:hover{ background: rgba(255,107,53,0.14); color: #FF6B35; transform: rotate(90deg); }
-.wkz-fsm-close:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
-
-/* ── Palco do mascote (KZ + placa + raios) ── */
-.wkz-fsm-stage{
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 10px;
-  height: 176px;
-  margin-bottom: 14px;
-}
-
-.wkz-fsm-bolts{ position: absolute; inset: 0; pointer-events: none; opacity: 0; }
-.wkz-fsm-bolt{ position: absolute; filter: drop-shadow(0 0 8px currentColor); }
-.wkz-fsm-bolt-1{ top: 4px; right: 26%; transform: rotate(-8deg); }
-.wkz-fsm-bolt-2{ top: 36px; right: 14%; transform: rotate(14deg); }
-
-.wkz-fsm-mascot{
-  position: relative;
-  flex-shrink: 0;
-  opacity: 0;
-  filter: drop-shadow(0 0 14px rgba(0,180,171,0.45)) drop-shadow(0 0 24px rgba(124,58,237,0.3));
-}
-.wkz-fsm-mascot svg{ display: block; }
-
-/* "brilho percorre os óculos" — varredura de luz sobre o mascote, em loop suave */
-.wkz-fsm-mascot::after{
-  content: '';
-  position: absolute; inset: -6px;
-  background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,0.65) 50%, transparent 60%);
-  mix-blend-mode: screen;
-  opacity: 0;
+  inset: -46px;
+  z-index: -1;
+  background: var(--grad2);
+  filter: blur(70px);
+  opacity: 0.32;
+  border-radius: var(--radius);
   pointer-events: none;
 }
 
-.wkz-fsm-placard{
-  position: relative;
-  opacity: 0;
-  transform-origin: bottom left;
-  display: flex; align-items: center; gap: 8px;
-  padding: 14px 22px;
-  margin-bottom: 30px;
-  border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: 0.5px;
-  color: #fff;
-  background: linear-gradient(135deg, rgba(6,182,212,0.22), rgba(124,58,237,0.22));
-  border: 1px solid rgba(124,58,237,0.55);
-  box-shadow: 0 0 26px rgba(6,182,212,0.35), 0 0 40px rgba(124,58,237,0.25), inset 0 0 18px rgba(6,182,212,0.12);
-  text-shadow: 0 0 10px rgba(6,182,212,0.7), 0 0 18px rgba(124,58,237,0.5);
-}
-.wkz-fsm-placard-bolt{ display: flex; filter: drop-shadow(0 0 6px rgba(255,209,102,0.8)); }
-
-@media (max-width: 640px){
-  .wkz-fsm-stage{ height: 130px; }
-  .wkz-fsm-mascot svg{ width: 76px !important; height: 76px !important; }
-  .wkz-fsm-placard{ font-size: 14px; padding: 10px 14px; margin-bottom: 18px; }
+@keyframes wkzFsmBorderPulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.95; }
 }
 
-/* ── Sequência de animação: disparada por JS ao acrescentar .wkz-fsm-run
-   em #wkzFsmStage (animateKzEntrance). Passos 1–7 do documento. ── */
-.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-mascot{
-  animation:
-    wkzFsmRunIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0ms both,
-    wkzFsmMascotBob 2.6s ease-in-out 700ms infinite;
-}
-.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-mascot::after{
-  animation: wkzFsmGlint 4s ease-in-out 950ms infinite;
-}
-.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-placard{
-  animation:
-    wkzFsmPlacardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 520ms both,
-    wkzFsmPlacardSway 3.2s ease-in-out 1020ms infinite;
-}
-.wkz-fsm-stage.wkz-fsm-run .wkz-fsm-bolts{
-  animation:
-    wkzFsmBoltsIn 0.25s ease 680ms both,
-    wkzFsmBoltFlicker 2.8s ease-in-out 1000ms infinite;
-}
-
-@keyframes wkzFsmRunIn{
-  0%   { transform: translateX(-170%) rotate(-10deg); opacity: 0; }
-  60%  { transform: translateX(6%) rotate(3deg);       opacity: 1; }
-  80%  { transform: translateX(-3%) rotate(-1.5deg); }
-  100% { transform: translateX(0) rotate(0deg);        opacity: 1; }
-}
-@keyframes wkzFsmMascotBob{
-  0%,100%{ transform: translateY(0) rotate(0deg); }
-  50%    { transform: translateY(-4px) rotate(1deg); }
-}
-@keyframes wkzFsmGlint{
-  0%, 82%, 100%{ transform: translateX(-130%); opacity: 0; }
-  90%{ opacity: 1; }
-  96%{ transform: translateX(130%); opacity: 0; }
-}
-@keyframes wkzFsmPlacardIn{
-  0%  { opacity: 0; transform: translateX(-36%) rotate(-7deg) scale(0.85); }
-  70% { transform: translateX(2%) rotate(2deg) scale(1.04); }
-  100%{ opacity: 1; transform: translateX(0) rotate(0deg) scale(1); }
-}
-@keyframes wkzFsmPlacardSway{
-  0%,100%{ transform: rotate(-1.6deg); }
-  50%    { transform: rotate(1.6deg); }
-}
-@keyframes wkzFsmBoltsIn{ from{ opacity: 0; } to{ opacity: 1; } }
-@keyframes wkzFsmBoltFlicker{
-  0%,100%{ opacity: 0.55; }
-  50%    { opacity: 1; }
-}
-
-/* ── Título e subtítulo ── */
-.wkz-fsm-title{
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 800;
-  font-size: var(--fs-h1);
-  letter-spacing: -0.02em;
-  margin: 0 0 8px;
-  background: linear-gradient(90deg, #FF6B35, #FF2D7A, #7C3AED);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.wkz-fsm-subtitle{
-  font-size: var(--fs-body);
-  color: var(--muted);
-  max-width: 480px;
-  margin: 0 auto 22px;
-  line-height: 1.55;
-}
-
-/* ── Contador HH MM SS ── */
-.wkz-fsm-countdown{
+/* ── Botão fechar ────────────────────────────────────────────────────── */
+.wkz-fsm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--card) 55%, transparent);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 22px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
-.wkz-fsm-cd-unit{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 58px;
-  padding: 8px 6px;
-  border-radius: var(--radius-sm);
-  background: var(--card2);
-  border: 1px solid var(--border);
-}
-.wkz-fsm-cd-unit span{
-  font-family: 'DM Sans', sans-serif;
-  font-size: 24px;
-  font-weight: 800;
-  color: #FF6B35;
-  line-height: 1.1;
-}
-.wkz-fsm-cd-unit small{
-  font-size: var(--fs-caption);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.wkz-fsm-cd-sep{ font-size: 20px; font-weight: 800; color: var(--muted); }
+.wkz-fsm-close:hover { transform: rotate(90deg); background: color-mix(in srgb, var(--card) 85%, transparent); }
+.wkz-fsm-close svg { width: 16px; height: 16px; }
 
-/* ── Benefícios ── */
-.wkz-fsm-benefits{
+/* ── Palco do mascote ────────────────────────────────────────────────── */
+.wkz-fsm-stage {
+  position: relative;
+  height: 190px;
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--grad3) 14%, transparent), transparent 70%);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Raios elétricos atrás da placa */
+.wkz-fsm-bolts {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 340px;
+  height: 140px;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+}
+.wkz-fsm-bolts svg { width: 100%; height: 100%; }
+.wkz-fsm-bolts .wkz-fsm-bolt-path {
+  stroke: var(--grad3, currentColor);
+  filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.55));
+}
+.wkz-fsm-stage-active .wkz-fsm-bolts {
+  animation: wkzFsmBoltsFlash 2.6s ease-in-out 0.55s infinite;
+}
+@keyframes wkzFsmBoltsFlash {
+  0%, 100% { opacity: 0; }
+  6%  { opacity: 0.9; }
+  10% { opacity: 0.15; }
+  14% { opacity: 0.8; }
+  20% { opacity: 0.1; }
+  55% { opacity: 0.1; }
+  60% { opacity: 0.7; }
+  65% { opacity: 0.1; }
+}
+
+/* Mascote KZ — entra correndo pela esquerda
+   Largura ampliada de 132px para 210px (proporção ~1.6:1) para acomodar
+   a arte rica em <img> (exceção arquitetônica só deste modal — ver
+   wkz-flashsale-modal.js / relatório). Altura e coreografia de entrada
+   permanecem as mesmas. */
+.wkz-fsm-mascot {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  width: 210px;
+  height: 132px;
+  transform: translate(calc(-50% - 420px), 0) scale(0.9);
+  opacity: 0;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
+}
+.wkz-fsm-stage-active .wkz-fsm-mascot {
+  animation: wkzFsmMascotRun 0.62s cubic-bezier(0.22, 0.9, 0.32, 1.28) forwards,
+             wkzFsmMascotBounce 0.5s ease-out 0.62s;
+}
+.wkz-fsm-mascot svg { width: 100%; height: 100%; display: block; }
+
+/* Ativo raster (PNG) do mascote — exceção só para este modal.
+   object-fit: contain preserva a arte sem distorcer; ancorada embaixo
+   para "pisar" na base do palco como o SVG fazia. */
+.wkz-fsm-mascot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+/* Fallback automático (sprite #kz-mascot-full) se a imagem não carregar */
+.wkz-fsm-mascot-fallback { display: block; width: 100%; height: 100%; }
+.wkz-fsm-mascot-fallback svg { width: 100%; height: 100%; display: block; margin: 0 auto; }
+@keyframes wkzFsmMascotRun {
+  0%   { transform: translate(calc(-50% - 420px), 0) scale(0.9); opacity: 0; }
+  55%  { opacity: 1; }
+  100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+}
+@keyframes wkzFsmMascotBounce {
+  0%   { transform: translate(-50%, 0) scale(1); }
+  35%  { transform: translate(-50%, -14px) scale(1.03); }
+  60%  { transform: translate(-50%, 2px) scale(0.99); }
+  100% { transform: translate(-50%, 0) scale(1); }
+}
+
+/* Brilho que percorre os "óculos" (olhos neon) do mascote — varredura de luz */
+.wkz-fsm-mascot-shine {
+  position: absolute;
+  top: 30%;
+  left: -30%;
+  width: 30%;
+  height: 22%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  mix-blend-mode: overlay;
+  opacity: 0;
+  pointer-events: none;
+}
+.wkz-fsm-stage-active .wkz-fsm-mascot-shine {
+  animation: wkzFsmEyeShine 2.8s ease-in-out 1.05s infinite;
+}
+@keyframes wkzFsmEyeShine {
+  0%   { left: -30%; opacity: 0; }
+  8%   { opacity: 0.9; }
+  22%  { left: 115%; opacity: 0; }
+  100% { left: 115%; opacity: 0; }
+}
+
+/* Placa "FLASH SALE" segura pelo mascote — oscila suavemente */
+.wkz-fsm-sign {
+  position: absolute;
+  bottom: 34px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--grad1);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+  transform: translate(28px, 12px) rotate(0deg) scale(0.6);
+  opacity: 0;
+  transform-origin: 18% 0%;
+}
+.wkz-fsm-sign-icon svg { width: 14px; height: 14px; display: block; }
+.wkz-fsm-stage-active .wkz-fsm-sign {
+  animation: wkzFsmSignIn 0.5s ease-out 0.5s forwards, wkzFsmSignSway 3.6s ease-in-out 1s infinite;
+}
+@keyframes wkzFsmSignIn {
+  0%   { transform: translate(28px, 12px) rotate(0deg) scale(0.6); opacity: 0; }
+  100% { transform: translate(28px, 0) rotate(-3deg) scale(1); opacity: 1; }
+}
+@keyframes wkzFsmSignSway {
+  0%, 100% { transform: translate(28px, 0) rotate(-3deg) scale(1); }
+  50%      { transform: translate(28px, 0) rotate(3deg) scale(1); }
+}
+
+/* ── Corpo do modal ──────────────────────────────────────────────────── */
+.wkz-fsm-body {
+  padding: 20px 32px 30px;
+  text-align: center;
+}
+
+.wkz-fsm-title {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  margin: 4px 0 8px;
+  background: var(--grad1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.wkz-fsm-subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto 20px;
+}
+
+/* Contador HH MM SS */
+.wkz-fsm-countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 22px;
+}
+.wkz-fsm-count-block {
+  min-width: 58px;
+  padding: 8px 4px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--card2) 55%, transparent);
+}
+.wkz-fsm-count-block span {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--text);
+}
+.wkz-fsm-count-block label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.wkz-fsm-count-sep { color: var(--muted); font-weight: 700; }
+
+/* Benefícios */
+.wkz-fsm-benefits {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
-.wkz-fsm-benefit{
+.wkz-fsm-benefit-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 14px 8px;
-  border-radius: var(--radius-sm);
-  background: rgba(var(--glass-rgb), 0.5);
+  gap: 8px;
+  padding: 16px 8px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--card2) 45%, transparent);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.wkz-fsm-benefit-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--text) 20%, var(--border)); }
+.wkz-fsm-benefit-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--grad3);
+  color: #fff;
+}
+.wkz-fsm-benefit-icon svg { width: 18px; height: 18px; }
+.wkz-fsm-benefit-card span {
+  font-size: 12px;
+  font-weight: 700;
   color: var(--text);
-  font-size: var(--fs-small);
-  font-weight: 600;
-}
-.wkz-fsm-benefit svg{ color: var(--teal); }
-.wkz-fsm-benefit:nth-child(2) svg{ color: var(--purple); }
-.wkz-fsm-benefit:nth-child(3) svg{ color: var(--cyan); }
-
-@media (max-width: 640px){
-  .wkz-fsm-benefits{ grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .wkz-fsm-benefit{ padding: 10px 4px; font-size: 11px; }
 }
 
-/* ── Prova social ── */
-.wkz-fsm-social{
+/* Prova social */
+.wkz-fsm-social {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  margin-bottom: 22px;
-  border-radius: 50px;
-  background: rgba(34,197,94,0.08);
-  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--card2) 45%, transparent);
   color: var(--muted);
-  font-size: var(--fs-small);
+  font-size: 12px;
+  margin-bottom: 24px;
 }
-.wkz-fsm-social span#wkzFsmSocialCount{ font-weight: 800; color: var(--c-success); }
-.wkz-fsm-social-dot{
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--c-success);
-  box-shadow: 0 0 0 0 rgba(34,197,94,0.55);
-  animation: wkzFsmSocialPulse 1.8s ease-in-out infinite;
-  flex-shrink: 0;
-}
-@keyframes wkzFsmSocialPulse{
-  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); }
-  70%  { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
-  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-}
+.wkz-fsm-social svg { width: 14px; height: 14px; color: var(--text); }
+.wkz-fsm-social strong { color: var(--text); font-family: 'DM Sans', sans-serif; }
 
-/* ── CTA ── */
-.wkz-fsm-actions{
+/* CTA */
+.wkz-fsm-cta-row {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
 }
-.wkz-fsm-cta{
+.wkz-fsm-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
+  max-width: 340px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--grad1);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
   font-size: 15px;
-  padding: 15px;
-  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+  animation: wkzFsmCtaPulse 2.4s ease-in-out infinite;
 }
-.wkz-fsm-secondary{
-  width: 100%;
-  padding: 13px;
-  border-radius: 12px;
-  background: transparent;
-  border: 1px solid var(--border);
+.wkz-fsm-cta-primary svg { width: 16px; height: 16px; }
+.wkz-fsm-cta-primary:hover { animation-play-state: paused; filter: brightness(1.06); }
+@keyframes wkzFsmCtaPulse {
+  0%, 100% { box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25); transform: scale(1); }
+  50%      { box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3); transform: scale(1.015); }
+}
+.wkz-fsm-cta-secondary {
+  border: none;
+  background: none;
   color: var(--muted);
-  font-size: var(--fs-small);
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  padding: 6px 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
-.wkz-fsm-secondary:hover{ background: var(--card2); color: var(--text); }
-.wkz-fsm-secondary:focus-visible,
-.wkz-fsm-cta:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
+.wkz-fsm-cta-secondary:hover { color: var(--text); }
+
+/* ── Responsivo — Mobile ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .wkz-fsm-overlay { padding: 12px; }
+  .wkz-fsm-modal { width: 95%; max-height: 94vh; }
+  .wkz-fsm-stage { height: 160px; }
+  .wkz-fsm-mascot { width: 165px; height: 104px; }
+  .wkz-fsm-body { padding: 16px 18px 24px; }
+  .wkz-fsm-title { font-size: 21px; }
+  .wkz-fsm-benefits { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .wkz-fsm-benefit-card { padding: 10px 4px; }
+  .wkz-fsm-benefit-card span { font-size: 10.5px; }
+  .wkz-fsm-count-block { min-width: 50px; }
+}
+
+/* Foco visível dentro do modal (acessibilidade), reaproveita --focus-ring global */
+.wkz-fsm-modal :focus-visible {
+  outline: none;
+}
