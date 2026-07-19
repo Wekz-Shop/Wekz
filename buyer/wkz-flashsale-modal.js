@@ -17,6 +17,15 @@
      closeFlashSaleModal() -> fecha e limpa listeners/intervals
      startFlashCountdown() -> inicia o contador HH:MM:SS do modal
      animateKzEntrance()   -> dispara a entrada do mascote KZ
+
+   v1.2 — Changelog desta revisão:
+     Tarefa 1: botão fechar agora fica FORA do wrapper com scroll
+               (.wkz-fsm-scroll), então nunca mais "some" ao rolar.
+     Tarefa 2: gatilhos automáticos (scroll 50% / exit intent) com
+               sessionStorage, + seção de Produto Isca configurável.
+     Tarefa 3: paleta neon fixa (exceção de tokens só deste modal,
+               ver bloco "EXCEÇÃO DE TOKENS" abaixo) + placa/raios
+               separados removidos — a arte já traz tudo embutido.
    ══════════════════════════════════════════════════════════════════════ */
 
 /* ── Estado interno do componente (privado, prefixo _wkzFsm) ──────────── */
@@ -24,20 +33,21 @@ var _wkzFsmCountdownInterval = null;
 var _wkzFsmSocialInterval = null;
 var _wkzFsmPrevFocus = null;
 var _wkzFsmFallbackEnd = null;
+var _wkzFsmAutoListenersRemoved = false;
+var _wkzFsmScrollTicking = false;
 
-/* ── EXCEÇÃO ARQUITETÔNICA (só para este modal — ver relatório) ───────
-   O mascote SVG único (#kz-mascot-full / getKzSVG) continua sendo a
+/* ── EXCEÇÃO ARQUITETÔNICA — mascote em <img> (só este modal) ─────────
+   O sprite SVG único (#kz-mascot-full / getKzSVG) continua sendo a
    identidade oficial do Kz em todo o resto do site. Aqui, e SOMENTE
-   aqui, a "arte hero" da campanha Flash Sale (pose com óculos+raios
-   neon+placa, alta-fidelidade, com efeitos de luz/textura que um SVG
-   simplificado não reproduz) é carregada como raster via <img>.
-   Troque WKZ_FSM_MASCOT_IMG_URL pelo asset final hospedado — pode ser
-   sobrescrita ANTES de este script carregar, sem editar o arquivo:
-     <script>window.WKZ_FSM_MASCOT_IMG_URL = "/assets/kz-flash-sale.png";</script>
-   Se a imagem falhar (404, offline, placeholder ainda não trocado),
-   _wkzFsmMascotImgError() troca automaticamente para o sprite SVG
-   #kz-mascot-full — o modal nunca fica quebrado. */
-var WKZ_FSM_MASCOT_IMG_URL = window.WKZ_FSM_MASCOT_IMG_URL || "./flash-sale.png";
+   aqui, a arte "hero" da campanha (alta-fidelidade, com efeitos de
+   luz/textura que um SVG simplificado não reproduz) é carregada via
+   <img>. Troque WKZ_FSM_MASCOT_IMG_URL pelo asset final hospedado —
+   pode ser sobrescrita ANTES de este script carregar, sem editar o
+   arquivo:
+     <script>window.WKZ_FSM_MASCOT_IMG_URL = "./flash-sale.png";</script>
+   Se a imagem falhar, _wkzFsmMascotImgError() troca automaticamente
+   para o sprite SVG #kz-mascot-full — o modal nunca fica quebrado. */
+var WKZ_FSM_MASCOT_IMG_URL = window.WKZ_FSM_MASCOT_IMG_URL || './flash-sale.png';
 function _wkzFsmMascotImgError(imgEl) {
   if (!imgEl) return;
   imgEl.onerror = null;
@@ -50,11 +60,74 @@ function _wkzFsmMascotImgError(imgEl) {
   if (imgEl.parentNode) imgEl.parentNode.replaceChild(fallback, imgEl);
 }
 
+/* ── TAREFA 2 — Produto Isca (Hero Product) ────────────────────────────
+   Edição manual e rápida: troque os campos abaixo a qualquer momento.
+   image: pode ser uma URL do GitHub (mesma pasta do flash-sale.png)
+   ou, para testar agora, um placeholder tipo https://picsum.photos/... */
+var wkzFsmHeroProduct = {
+  name: 'Smartphone Ultra Pro 5G 256GB',
+  image: 'https://picsum.photos/seed/wkz-flash-hero/240/240',
+  oldPrice: 'R$ 5.999,00',
+  flashPrice: 'R$ 3.499,00',
+  discountLabel: '-42%',
+  productUrl: null,      // ex.: "pg-flash" (nome de página do showPage) ou uma URL externa
+  onBuyClick: null       // opcional: function(product){ ... } — se definida, tem prioridade total
+};
+
+/* Rotação automática OPCIONAL por janela de horário (0-23h, 24 = meia-noite).
+   Deixe a lista vazia ([]) para desativar e usar sempre wkzFsmHeroProduct
+   acima. Se preenchida, o primeiro item cuja janela contém a hora atual
+   substitui o produto — dá pra trocar a isca de manhã/tarde/noite sem
+   precisar de backend. */
+var wkzFsmHeroProductSchedule = [
+  // Exemplo (descomente e ajuste para ativar):
+  // { startHour: 0,  endHour: 12, product: { name: 'Fone Bluetooth ANC Pro', image: 'https://picsum.photos/seed/wkz-manha/240/240', oldPrice: 'R$ 399,00', flashPrice: 'R$ 219,00', discountLabel: '-45%' } },
+  // { startHour: 12, endHour: 24, product: { name: 'Smartwatch Ultra 2', image: 'https://picsum.photos/seed/wkz-tarde/240/240', oldPrice: 'R$ 899,00', flashPrice: 'R$ 549,00', discountLabel: '-39%' } }
+];
+
+function _wkzFsmResolveHeroProduct() {
+  if (wkzFsmHeroProductSchedule && wkzFsmHeroProductSchedule.length) {
+    var h = new Date().getHours();
+    for (var i = 0; i < wkzFsmHeroProductSchedule.length; i++) {
+      var slot = wkzFsmHeroProductSchedule[i];
+      if (slot && slot.product && h >= slot.startHour && h < slot.endHour) return slot.product;
+    }
+  }
+  return wkzFsmHeroProduct;
+}
+
+function _wkzFsmBuildHeroProductHTML(product) {
+  if (!product) return '';
+  var discount = product.discountLabel
+    ? '<span class="wkz-fsm-hero-product-discount">' + product.discountLabel + '</span>'
+    : '';
+  return (
+    '<div class="wkz-fsm-hero-product" id="wkzFsmHeroProduct">' +
+      '<div class="wkz-fsm-hero-product-media">' +
+        '<img src="' + product.image + '" alt="' + product.name + '" loading="lazy" ' +
+        'onerror="this.closest(\'.wkz-fsm-hero-product\').classList.add(\'wkz-fsm-hero-product-noimg\')" />' +
+        discount +
+      '</div>' +
+      '<div class="wkz-fsm-hero-product-info">' +
+        '<span class="wkz-fsm-hero-product-tag">' + _wkzFsmIcon('bolt') + ' Oferta Relâmpago</span>' +
+        '<p class="wkz-fsm-hero-product-name">' + product.name + '</p>' +
+        '<div class="wkz-fsm-hero-product-prices">' +
+          '<span class="wkz-fsm-hero-product-old">' + product.oldPrice + '</span>' +
+          '<span class="wkz-fsm-hero-product-flash">' + product.flashPrice + '</span>' +
+        '</div>' +
+        '<button type="button" class="wkz-fsm-hero-product-cta" id="wkzFsmHeroProductBtn">Comprar Agora</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
 /* ── SVG inline (sem emojis, mesmo padrão visual dos demais ícones) ──── */
 function _wkzFsmIcon(name) {
   var icons = {
     close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
     bolt: '<polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>',
+    arrow: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
     truck: '<path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
     cashback: '<path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/>',
     card: '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
@@ -68,11 +141,70 @@ function _wkzFsmIcon(name) {
  * wkzFlashSaleModal()
  * Constrói o markup do modal e injeta no <body> (uma única vez).
  * Não faz nada se o modal já existir — função idempotente e
- * independente das demais (pode ser chamada isoladamente para
- * "pré-aquecer" o DOM antes de abrir).
+ * independente das demais.
+ *
+ * Estrutura (Tarefa 1 — fix do botão fechar):
+ *   #wkzFsmModal (não rola)
+ *     .wkz-fsm-close        <- FORA do wrapper de rolagem: fica fixo
+ *     #wkzFsmScroll (rola)  <- só o conteúdo interno rola
+ *       .wkz-fsm-layout (mascote + conteúdo)
  */
 function wkzFlashSaleModal() {
   if (document.getElementById('wkzFlashSaleOverlay')) return document.getElementById('wkzFlashSaleOverlay');
+
+  var heroProduct = _wkzFsmResolveHeroProduct();
+  var heroProductHTML = _wkzFsmBuildHeroProductHTML(heroProduct);
+
+  var visualHTML =
+    '<div class="wkz-fsm-visual" id="wkzFsmStage">' +
+      '<div class="wkz-fsm-visual-glow" aria-hidden="true"></div>' +
+      '<div class="wkz-fsm-mascot" id="wkzFsmMascot">' +
+        '<img id="wkzFsmMascotImg" class="wkz-fsm-mascot-img" src="' + WKZ_FSM_MASCOT_IMG_URL + '" ' +
+        'alt="Kz, o Lince Cibernético segurando a placa Flash Sale" draggable="false" ' +
+        'onerror="_wkzFsmMascotImgError(this)" />' +
+        '<span class="wkz-fsm-mascot-shine" aria-hidden="true"></span>' +
+      '</div>' +
+    '</div>';
+
+  var contentHTML =
+    '<div class="wkz-fsm-content">' +
+      '<span class="wkz-fsm-kicker">' + _wkzFsmIcon('bolt') + ' FLASH SALE</span>' +
+      '<h2 class="wkz-fsm-title" id="wkzFsmTitle">WKZ</h2>' +
+      '<p class="wkz-fsm-subtitle" id="wkzFsmSubtitle">As melhores ofertas selecionadas pelo KZ estão disponíveis por tempo limitado.</p>' +
+
+      '<div class="wkz-fsm-countdown" aria-live="polite" aria-atomic="true">' +
+        '<div class="wkz-fsm-count-block"><span id="wkzFsmCh">00</span><label>Horas</label></div>' +
+        '<span class="wkz-fsm-count-sep">:</span>' +
+        '<div class="wkz-fsm-count-block"><span id="wkzFsmCm">00</span><label>Minutos</label></div>' +
+        '<span class="wkz-fsm-count-sep">:</span>' +
+        '<div class="wkz-fsm-count-block"><span id="wkzFsmCs">00</span><label>Segundos</label></div>' +
+      '</div>' +
+
+      '<div class="wkz-fsm-social">' + _wkzFsmIcon('users') +
+        '<span><strong id="wkzFsmSocialCount">0</strong> pessoas comprando agora</span>' +
+        '<span class="wkz-fsm-social-pulse" aria-hidden="true"></span>' +
+      '</div>' +
+
+      heroProductHTML +
+
+      '<div class="wkz-fsm-benefits">' +
+        '<div class="wkz-fsm-benefit-card"><span class="wkz-fsm-benefit-icon">' + _wkzFsmIcon('truck') + '</span>' +
+          '<span class="wkz-fsm-benefit-text"><strong>Frete Grátis</strong><em>Acima de R$150</em></span></div>' +
+        '<div class="wkz-fsm-benefit-card"><span class="wkz-fsm-benefit-icon">' + _wkzFsmIcon('cashback') + '</span>' +
+          '<span class="wkz-fsm-benefit-text"><strong>Cashback</strong><em>Dinheiro de volta</em></span></div>' +
+        '<div class="wkz-fsm-benefit-card"><span class="wkz-fsm-benefit-icon">' + _wkzFsmIcon('card') + '</span>' +
+          '<span class="wkz-fsm-benefit-text"><strong>Parcelamento</strong><em>Até 12x sem juros</em></span></div>' +
+      '</div>' +
+
+      '<div class="wkz-fsm-cta-row">' +
+        '<button type="button" class="wkz-fsm-cta-primary" id="wkzFsmPrimaryBtn">Explorar Ofertas ' + _wkzFsmIcon('arrow') + '</button>' +
+        '<button type="button" class="wkz-fsm-cta-secondary" id="wkzFsmSecondaryBtn">Continuar navegando</button>' +
+      '</div>' +
+
+      '<div class="wkz-fsm-trust">' + _wkzFsmIcon('shield') +
+        '<span>Compra segura, transparente e protegida pelo <strong>KZ</strong></span>' +
+      '</div>' +
+    '</div>';
 
   var overlay = document.createElement('div');
   overlay.id = 'wkzFlashSaleOverlay';
@@ -81,55 +213,11 @@ function wkzFlashSaleModal() {
 
   overlay.innerHTML =
     '<div class="wkz-fsm-modal" id="wkzFsmModal" role="dialog" aria-modal="true" ' +
-    'aria-labelledby="wkzFsmTitle" aria-describedby="wkzFsmSubtitle" tabindex="-1">' +
+    'aria-label="Flash Sale WKZ — oferta por tempo limitado" aria-describedby="wkzFsmSubtitle" tabindex="-1">' +
       '<div class="wkz-fsm-modal-glow" aria-hidden="true"></div>' +
       '<button type="button" class="wkz-fsm-close" id="wkzFsmCloseBtn" aria-label="Fechar Flash Sale">' + _wkzFsmIcon('close') + '</button>' +
-
-      '<div class="wkz-fsm-stage" id="wkzFsmStage">' +
-        '<div class="wkz-fsm-bolts" aria-hidden="true">' +
-          '<svg viewBox="0 0 340 140" fill="none">' +
-            '<path class="wkz-fsm-bolt-path" d="M40 20 L70 55 L52 55 L84 100" stroke-width="3" stroke-linecap="round" fill="none"/>' +
-            '<path class="wkz-fsm-bolt-path" d="M300 15 L270 50 L288 50 L256 95" stroke-width="3" stroke-linecap="round" fill="none"/>' +
-          '</svg>' +
-        '</div>' +
-        '<div class="wkz-fsm-sign" id="wkzFsmSign">' +
-          '<span class="wkz-fsm-sign-icon">' + _wkzFsmIcon('bolt') + '</span>' +
-          '<span class="wkz-fsm-sign-text">FLASH SALE</span>' +
-        '</div>' +
-        '<div class="wkz-fsm-mascot" id="wkzFsmMascot">' +
-          '<img id="wkzFsmMascotImg" class="wkz-fsm-mascot-img" src="' + WKZ_FSM_MASCOT_IMG_URL + '" ' +
-          'alt="Kz, o Lince Cibernético segurando a placa Flash Sale" draggable="false" ' +
-          'onerror="_wkzFsmMascotImgError(this)" />' +
-          '<span class="wkz-fsm-mascot-shine" aria-hidden="true"></span>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="wkz-fsm-body">' +
-        '<h2 class="wkz-fsm-title" id="wkzFsmTitle">FLASH SALE WKZ</h2>' +
-        '<p class="wkz-fsm-subtitle" id="wkzFsmSubtitle">As melhores ofertas selecionadas pelo KZ estão disponíveis por tempo limitado.</p>' +
-
-        '<div class="wkz-fsm-countdown" aria-live="polite" aria-atomic="true">' +
-          '<div class="wkz-fsm-count-block"><span id="wkzFsmCh">00</span><label>h</label></div>' +
-          '<span class="wkz-fsm-count-sep">:</span>' +
-          '<div class="wkz-fsm-count-block"><span id="wkzFsmCm">00</span><label>min</label></div>' +
-          '<span class="wkz-fsm-count-sep">:</span>' +
-          '<div class="wkz-fsm-count-block"><span id="wkzFsmCs">00</span><label>seg</label></div>' +
-        '</div>' +
-
-        '<div class="wkz-fsm-benefits">' +
-          '<div class="wkz-fsm-benefit-card"><span class="wkz-fsm-benefit-icon">' + _wkzFsmIcon('truck') + '</span><span>Frete Grátis</span></div>' +
-          '<div class="wkz-fsm-benefit-card"><span class="wkz-fsm-benefit-icon">' + _wkzFsmIcon('cashback') + '</span><span>Cashback</span></div>' +
-          '<div class="wkz-fsm-benefit-card"><span class="wkz-fsm-benefit-icon">' + _wkzFsmIcon('card') + '</span><span>Parcelamento</span></div>' +
-        '</div>' +
-
-        '<div class="wkz-fsm-social">' + _wkzFsmIcon('users') +
-          '<span><strong id="wkzFsmSocialCount">0</strong> pessoas comprando agora</span>' +
-        '</div>' +
-
-        '<div class="wkz-fsm-cta-row">' +
-          '<button type="button" class="wkz-fsm-cta-primary" id="wkzFsmPrimaryBtn">' + _wkzFsmIcon('bolt') + ' Explorar Ofertas</button>' +
-          '<button type="button" class="wkz-fsm-cta-secondary" id="wkzFsmSecondaryBtn">Continuar navegando</button>' +
-        '</div>' +
+      '<div class="wkz-fsm-scroll" id="wkzFsmScroll">' +
+        '<div class="wkz-fsm-layout">' + visualHTML + contentHTML + '</div>' +
       '</div>' +
     '</div>';
 
@@ -155,16 +243,37 @@ function wkzFlashSaleModal() {
     });
   }
 
+  var heroBtn = document.getElementById('wkzFsmHeroProductBtn');
+  if (heroBtn) {
+    heroBtn.addEventListener('click', function () {
+      var product = _wkzFsmResolveHeroProduct();
+      if (typeof product.onBuyClick === 'function') { product.onBuyClick(product); return; }
+      closeFlashSaleModal();
+      setTimeout(function () {
+        if (product.productUrl && typeof showPage === 'function') {
+          showPage(product.productUrl);
+        } else if (product.productUrl) {
+          window.location.href = product.productUrl;
+        } else if (typeof showPage === 'function') {
+          showPage('pg-flash');
+        }
+        if (typeof window.WkzBus !== 'undefined' && window.WkzBus) {
+          window.WkzBus.emit('flashsale:hero-product:buy', { product: product });
+        }
+      }, 260);
+    });
+  }
+
   return overlay;
 }
 
 /**
  * animateKzEntrance()
- * Dispara a sequência de animação do mascote (corrida, bounce,
- * oscilação da placa, raios e brilho nos óculos) apenas ligando a
- * classe de estado — toda a coreografia é resolvida via CSS/keyframes
- * em wkz-flashsale-modal.css. Função independente: pode ser chamada
- * de novo a qualquer momento para "re-tocar" a entrada.
+ * Dispara a entrada do mascote (fade + scale + glow ambiente + brilho
+ * nos óculos) apenas ligando a classe de estado — a coreografia é
+ * resolvida via CSS/keyframes em wkz-flashsale-modal.css. Função
+ * independente: pode ser chamada de novo a qualquer momento para
+ * "re-tocar" a entrada.
  */
 function animateKzEntrance() {
   var stage = document.getElementById('wkzFsmStage');
@@ -180,8 +289,7 @@ function animateKzEntrance() {
  * Liga o contador HH:MM:SS do modal. Reaproveita a âncora FLASH_END
  * já usada por tick() (wkz-buyer.js) quando disponível — mesmo prazo
  * do banner/hero/página Flash Sale, sem duplicar a regra de negócio.
- * Se FLASH_END não existir (módulo carregado isoladamente), cria um
- * fallback local de 3h só para o modal não quebrar.
+ * Se FLASH_END não existir, cria um fallback local de 3h.
  */
 function startFlashCountdown() {
   var end = (typeof FLASH_END !== 'undefined' && FLASH_END)
@@ -204,7 +312,7 @@ function startFlashCountdown() {
   _wkzFsmCountdownInterval = setInterval(tickFsm, 1000);
 }
 
-/* ── Prova social animada (número sobe até 1.284 e depois oscila) ─────── */
+/* ── Prova social animada (número sobe até o alvo e depois oscila) ────── */
 function _wkzFsmStartSocialProof() {
   var el = document.getElementById('wkzFsmSocialCount');
   if (!el) return;
@@ -220,7 +328,6 @@ function _wkzFsmStartSocialProof() {
       current = target;
       el.textContent = current.toLocaleString('pt-BR');
       clearInterval(_wkzFsmSocialInterval);
-      /* fase 2: pequena oscilação contínua, como o padrão já usado em animateViewers() */
       _wkzFsmSocialInterval = setInterval(function () {
         var cur = parseInt((el.textContent || '').replace(/\D/g, ''), 10) || target;
         var delta = Math.floor(Math.random() * 9) - 4;
@@ -253,10 +360,7 @@ function _wkzFsmOverlayClickHandler(e) {
 
 /**
  * openFlashSaleModal()
- * Ponto de entrada público principal. Garante que o DOM existe,
- * escurece a tela, agenda a entrada do mascote (150ms), liga o
- * contador e a prova social, e ativa acessibilidade (ESC, backdrop,
- * focus trap, foco inicial no card).
+ * Ponto de entrada público principal.
  */
 function openFlashSaleModal() {
   var overlay = wkzFlashSaleModal();
@@ -264,7 +368,6 @@ function openFlashSaleModal() {
 
   _wkzFsmPrevFocus = document.activeElement;
 
-  /* 1. Escurecer a tela */
   overlay.setAttribute('aria-hidden', 'false');
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -272,10 +375,8 @@ function openFlashSaleModal() {
   document.addEventListener('keydown', _wkzFsmKeydownHandler);
   overlay.addEventListener('click', _wkzFsmOverlayClickHandler);
 
-  /* 2-7. Entrada do mascote + placa + raios + brilho, após 150ms */
   setTimeout(animateKzEntrance, 150);
 
-  /* 8. O contador inicia */
   startFlashCountdown();
   _wkzFsmStartSocialProof();
 
@@ -290,9 +391,7 @@ function openFlashSaleModal() {
 
 /**
  * closeFlashSaleModal()
- * Fecha o modal e desfaz TUDO que foi ligado em openFlashSaleModal():
- * listeners de teclado/click e os dois intervals (contador e prova
- * social) — sem isso o componente vazaria memória a cada abertura.
+ * Fecha o modal e desfaz TUDO que foi ligado em openFlashSaleModal().
  */
 function closeFlashSaleModal() {
   var overlay = document.getElementById('wkzFlashSaleOverlay');
@@ -322,15 +421,85 @@ function closeFlashSaleModal() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   INTEGRAÇÃO — pontos de disparo
+   TAREFA 2 — GATILHOS AUTOMATIZADOS (scroll 50% / exit intent)
+   Regra de negócio: abre sozinho no máximo 1x por sessão
+   (sessionStorage), e só entra em cena se nenhum outro modal já
+   estiver aberto. Abertura manual (clique no chip Flash/Hero/Strip)
+   continua funcionando sempre, independente deste controle.
+   ══════════════════════════════════════════════════════════════════════ */
+var _wkzFsmSessionKey = 'wkzFsmAutoShown';
+
+function _wkzFsmRemoveAutoTriggers() {
+  if (_wkzFsmAutoListenersRemoved) return;
+  _wkzFsmAutoListenersRemoved = true;
+  window.removeEventListener('scroll', _wkzFsmOnScroll);
+  document.removeEventListener('mouseout', _wkzFsmExitIntentHandler);
+}
+
+function _wkzFsmAutoTrigger(reason) {
+  if (_wkzFsmAutoListenersRemoved) return;
+  try {
+    if (sessionStorage.getItem(_wkzFsmSessionKey)) { _wkzFsmRemoveAutoTriggers(); return; }
+  } catch (e) { /* sessionStorage indisponível (modo privado etc.) — segue sem persistir */ }
+
+  /* não empilha sobre o próprio modal já aberto nem sobre outro overlay
+     que já tenha travado o scroll do body (ex.: WeKz Boost) */
+  var overlay = document.getElementById('wkzFlashSaleOverlay');
+  if (overlay && overlay.classList.contains('open')) return;
+  if (document.body.style.overflow === 'hidden') return;
+
+  _wkzFsmRemoveAutoTriggers();
+  try { sessionStorage.setItem(_wkzFsmSessionKey, '1'); } catch (e) {}
+
+  openFlashSaleModal();
+  if (typeof window.WkzBus !== 'undefined' && window.WkzBus) {
+    window.WkzBus.emit('flashsale:modal:autotrigger', { reason: reason });
+  }
+}
+
+/* Regra 1a — 50% de rolagem da página (com throttle via requestAnimationFrame) */
+function _wkzFsmCheckScroll() {
+  var scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+  var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  if (docHeight <= 0) return;
+  if (scrollTop / docHeight >= 0.5) _wkzFsmAutoTrigger('scroll-50');
+}
+function _wkzFsmOnScroll() {
+  if (_wkzFsmScrollTicking) return;
+  _wkzFsmScrollTicking = true;
+  requestAnimationFrame(function () { _wkzFsmCheckScroll(); _wkzFsmScrollTicking = false; });
+}
+
+/* Regra 1b — Exit Intent (mouse sai pelo topo da janela, só desktop/mouse fino) */
+function _wkzFsmExitIntentHandler(e) {
+  if (e.relatedTarget || e.toElement) return;      // saiu para um elemento interno, não é exit-intent real
+  if (e.clientY > 0) return;                        // só conta quando sai por CIMA da viewport
+  _wkzFsmAutoTrigger('exit-intent');
+}
+
+function _wkzFsmInitAutoTriggers() {
+  var alreadyShown = false;
+  try { alreadyShown = !!sessionStorage.getItem(_wkzFsmSessionKey); } catch (e) {}
+  if (alreadyShown) { _wkzFsmAutoListenersRemoved = true; return; } // nem liga os listeners à toa
+
+  window.addEventListener('scroll', _wkzFsmOnScroll, { passive: true });
+
+  /* Exit intent só faz sentido com mouse (dispositivo "fino"/desktop) */
+  var isDesktopPointer = true;
+  try { isDesktopPointer = window.matchMedia('(pointer: fine)').matches; } catch (e) {}
+  if (isDesktopPointer) {
+    document.addEventListener('mouseout', _wkzFsmExitIntentHandler);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   INTEGRAÇÃO — pontos de disparo manuais
    Apenas ADITIVO: liga onclick/addEventListener em elementos que hoje
-   não têm nenhum comportamento de clique (o chip "FLASH SALE" do
-   header do Hero e da Strip), sem tocar renderFlash()/renderFlashHero().
-   Também expõe um evento de barramento para módulos futuros abrirem o
-   modal sem acoplamento direto (ex.: seller/admin broadcast).
+   não têm nenhum comportamento de clique, sem tocar
+   renderFlash()/renderFlashHero(). Também expõe um evento de barramento
+   para módulos futuros abrirem o modal sem acoplamento direto.
    ══════════════════════════════════════════════════════════════════════ */
 function _wkzFsmWireTriggers() {
-  /* Banner Flash (home) — chip "FLASH SALE" dentro da Flash Sale Strip */
   var stripLabel = document.querySelector('.flash-label');
   if (stripLabel && !stripLabel.hasAttribute('data-wkz-fsm-wired')) {
     stripLabel.setAttribute('data-wkz-fsm-wired', '1');
@@ -338,7 +507,6 @@ function _wkzFsmWireTriggers() {
     stripLabel.addEventListener('click', function () { openFlashSaleModal(); });
   }
 
-  /* Hero — chip "FLASH SALE" no header do bloco flashHeroSection */
   var heroSection = document.getElementById('flashHeroSection');
   if (heroSection && !heroSection.hasAttribute('data-wkz-fsm-wired')) {
     var heroSpans = heroSection.querySelectorAll('span');
@@ -355,7 +523,6 @@ function _wkzFsmWireTriggers() {
     }
   }
 
-  /* Botão Flash Sale — qualquer elemento marcado explicitamente pelo integrador */
   var explicitTriggers = document.querySelectorAll('[data-wkz-flashsale-trigger]');
   explicitTriggers.forEach(function (t) {
     if (t.hasAttribute('data-wkz-fsm-wired')) return;
@@ -364,16 +531,18 @@ function _wkzFsmWireTriggers() {
   });
 }
 
-/* Eventos futuros — qualquer módulo pode pedir a abertura via WkzBus,
-   sem precisar conhecer wkz-buyer.js nem este arquivo diretamente. */
 if (typeof window.WkzBus !== 'undefined' && window.WkzBus) {
   window.WkzBus.on('flashsale:trigger:open', function () { openFlashSaleModal(); });
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', _wkzFsmWireTriggers);
+  document.addEventListener('DOMContentLoaded', function () {
+    _wkzFsmWireTriggers();
+    _wkzFsmInitAutoTriggers();
+  });
 } else {
   _wkzFsmWireTriggers();
+  _wkzFsmInitAutoTriggers();
 }
 
 /* Expõe globalmente (consistente com o restante do wkz-buyer.js) */
