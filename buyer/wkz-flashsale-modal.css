@@ -164,10 +164,10 @@
 }
 @media (min-width: 860px) {
   .wkz-fsm-layout {
-    grid-template-columns: 0.82fr 1.18fr;
+    grid-template-columns: 0.95fr 1.05fr;
     align-items: center;
     padding: 46px 46px 38px;
-    gap: 12px 44px;
+    gap: 12px 40px;
     text-align: left;
   }
 }
@@ -220,14 +220,14 @@
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: 230px;
+  max-height: min(340px, 42vh);
   object-fit: contain;
   display: block;
   pointer-events: none;
   user-select: none;
   filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.55));
 }
-@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: 380px; } }
+@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: min(580px, 64vh); } }
 
 .wkz-fsm-mascot-fallback,
 .wkz-fsm-mascot-fallback svg { display: block; width: 190px; height: 190px; margin: 0 auto; }

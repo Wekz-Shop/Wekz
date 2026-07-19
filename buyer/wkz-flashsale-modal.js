@@ -63,14 +63,30 @@ function _wkzFsmMascotImgError(imgEl) {
 /* ── TAREFA 2 — Produto Isca (Hero Product) ────────────────────────────
    Edição manual e rápida: troque os campos abaixo a qualquer momento.
    image: pode ser uma URL do GitHub (mesma pasta do flash-sale.png)
-   ou, para testar agora, um placeholder tipo https://picsum.photos/... */
+   ou, para testar agora, um placeholder tipo https://picsum.photos/...
+
+   productIndex: ÍNDICE REAL do produto em products[] (array já usado
+   pelo resto do site). Quando definido e válido, nome/imagem/preços
+   passam a vir DIRETO do catálogo real (os campos abaixo viram só
+   fallback caso o índice não exista) — evita a isca mostrar um preço
+   desatualizado. Pra descobrir o índice: abra o DevTools no site e
+   rode `products.findIndex(p => p.n.includes("nome do produto"))`.
+
+   buyAction: o que "Comprar Agora" faz quando productIndex é real:
+     'product' (padrão) → mesmo padrão já usado no botão "Comprar" dos
+                cards de produto: abre a PDP real com openProduct(i)
+                + toast "Redirecionando para compra..."
+     'cart'    → adiciona direto no carrinho com addToCart(i)
+   Sem productIndex válido, cai no fallback productUrl/pg-flash. */
 var wkzFsmHeroProduct = {
+  productIndex: 0,       // 0 = primeiro produto do catálogo — troque pelo índice do produto que quer destacar
+  buyAction: 'product',  // 'product' ou 'cart'
   name: 'Smartphone Ultra Pro 5G 256GB',
   image: 'https://picsum.photos/seed/wkz-flash-hero/240/240',
   oldPrice: 'R$ 5.999,00',
   flashPrice: 'R$ 3.499,00',
   discountLabel: '-42%',
-  productUrl: null,      // ex.: "pg-flash" (nome de página do showPage) ou uma URL externa
+  productUrl: null,      // fallback se productIndex não existir: nome de página (showPage) ou URL externa
   onBuyClick: null       // opcional: function(product){ ... } — se definida, tem prioridade total
 };
 
@@ -81,19 +97,39 @@ var wkzFsmHeroProduct = {
    precisar de backend. */
 var wkzFsmHeroProductSchedule = [
   // Exemplo (descomente e ajuste para ativar):
-  // { startHour: 0,  endHour: 12, product: { name: 'Fone Bluetooth ANC Pro', image: 'https://picsum.photos/seed/wkz-manha/240/240', oldPrice: 'R$ 399,00', flashPrice: 'R$ 219,00', discountLabel: '-45%' } },
-  // { startHour: 12, endHour: 24, product: { name: 'Smartwatch Ultra 2', image: 'https://picsum.photos/seed/wkz-tarde/240/240', oldPrice: 'R$ 899,00', flashPrice: 'R$ 549,00', discountLabel: '-39%' } }
+  // { startHour: 0,  endHour: 12, product: { productIndex: 3, buyAction: 'product', name: 'Fone Bluetooth ANC Pro', image: 'https://picsum.photos/seed/wkz-manha/240/240', oldPrice: 'R$ 399,00', flashPrice: 'R$ 219,00', discountLabel: '-45%' } },
+  // { startHour: 12, endHour: 24, product: { productIndex: 7, buyAction: 'cart', name: 'Smartwatch Ultra 2', image: 'https://picsum.photos/seed/wkz-tarde/240/240', oldPrice: 'R$ 899,00', flashPrice: 'R$ 549,00', discountLabel: '-39%' } }
 ];
 
+/* Resolve o produto ativo (agenda > padrão) e, se productIndex apontar
+   para um item real de products[], sobrepõe nome/imagem/preços com os
+   dados reais do catálogo — a isca nunca fica com preço desatualizado. */
 function _wkzFsmResolveHeroProduct() {
+  var base = wkzFsmHeroProduct;
   if (wkzFsmHeroProductSchedule && wkzFsmHeroProductSchedule.length) {
     var h = new Date().getHours();
     for (var i = 0; i < wkzFsmHeroProductSchedule.length; i++) {
       var slot = wkzFsmHeroProductSchedule[i];
-      if (slot && slot.product && h >= slot.startHour && h < slot.endHour) return slot.product;
+      if (slot && slot.product && h >= slot.startHour && h < slot.endHour) { base = slot.product; break; }
     }
   }
-  return wkzFsmHeroProduct;
+
+  if (typeof base.productIndex === 'number' && typeof products !== 'undefined' && products && products[base.productIndex]) {
+    var p = products[base.productIndex];
+    var hasOldPrice = typeof p.op === 'number' && p.op > p.p;
+    return {
+      productIndex: base.productIndex,
+      buyAction: base.buyAction || 'product',
+      name: p.n || base.name,
+      image: p.img || base.image,
+      oldPrice: hasOldPrice ? (typeof formatPrice === 'function' ? formatPrice(p.op) : ('R$ ' + p.op)) : base.oldPrice,
+      flashPrice: typeof formatPrice === 'function' ? formatPrice(p.p) : ('R$ ' + p.p),
+      discountLabel: p.off ? ('-' + Math.floor(p.off) + '%') : base.discountLabel,
+      productUrl: base.productUrl,
+      onBuyClick: base.onBuyClick
+    };
+  }
+  return base;
 }
 
 function _wkzFsmBuildHeroProductHTML(product) {
@@ -248,14 +284,24 @@ function wkzFlashSaleModal() {
     heroBtn.addEventListener('click', function () {
       var product = _wkzFsmResolveHeroProduct();
       if (typeof product.onBuyClick === 'function') { product.onBuyClick(product); return; }
+
+      var hasRealProduct = typeof product.productIndex === 'number'
+        && typeof products !== 'undefined' && products && products[product.productIndex];
+
       closeFlashSaleModal();
       setTimeout(function () {
-        if (product.productUrl && typeof showPage === 'function') {
+        if (hasRealProduct && product.buyAction === 'cart') {
+          if (typeof addToCart === 'function') addToCart(product.productIndex);
+        } else if (hasRealProduct) {
+          /* mesmo padrão já usado no botão "Comprar" dos cards de produto */
+          if (typeof openProduct === 'function') openProduct(product.productIndex);
+          if (typeof showToast === 'function') showToast('Redirecionando para compra...');
+        } else if (product.productUrl && typeof showPage === 'function') {
           showPage(product.productUrl);
         } else if (product.productUrl) {
           window.location.href = product.productUrl;
         } else if (typeof showPage === 'function') {
-          showPage('pg-flash');
+          showPage('pg-flash'); // fallback: productIndex ainda não aponta pra um produto real
         }
         if (typeof window.WkzBus !== 'undefined' && window.WkzBus) {
           window.WkzBus.emit('flashsale:hero-product:buy', { product: product });
