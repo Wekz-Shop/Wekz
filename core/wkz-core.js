@@ -5195,10 +5195,27 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     cpRenderCountryList(val);
   };
 
-    window.cpLogout = function() {
+    // [KZ-ILLUS] Fallback seguro do ícone do modal de logout — definida aqui
+  // (dentro do mesmo escopo de CP_ICO) mas exposta em window, então o
+  // atributo onerror="_wkzLogoutIconError(this)" consegue chamá-la de
+  // qualquer lugar e ainda assim acessar CP_ICO via closure.
+  window._wkzLogoutIconError = function(imgEl) {
+    if (!imgEl) return;
+    imgEl.outerHTML = CP_ICO.door;
+  };
+
+  window.cpLogout = function() {
+    // [KZ-ILLUS] mesma exceção já aprovada: ilustração raster no ícone do
+    // modal de logout, com fallback pro ícone de porta original via
+    // _wkzLogoutIconError() se a imagem não carregar. Só afeta ESTA
+    // chamada de _wkzConfirm — o helper genérico continua servindo os
+    // outros confirms do site sem nenhuma alteração.
+    var logoutIcon = '<img src="../shared/assets/mascot/ate-logo.png" alt="Kz acenando um até logo" '
+      + 'style="width:100%;height:100%;object-fit:cover;border-radius:16px;" '
+      + 'onerror="_wkzLogoutIconError(this)">';
     window._wkzConfirm('Tens a certeza que queres encerrar a sessão?', {
       title: 'Sair da conta',
-      icon: CP_ICO.door,
+      icon: logoutIcon,
       variant: 'danger',
       confirmLabel: 'Sair',
       cancelLabel: 'Ficar',
