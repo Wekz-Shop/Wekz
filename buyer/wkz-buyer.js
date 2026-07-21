@@ -507,6 +507,13 @@ function _wkzWishlistEmptyImgError(imgEl){
   imgEl.outerHTML = (typeof getKzSVG === 'function') ? getKzSVG(80) : '❤️';
 }
 
+// [KZ-ILLUS] Fallback seguro: se assets/mascot/notificacao.png não
+// carregar, volta pro sininho SVG original que já existia aqui.
+function _wkzNotifEmptyImgError(imgEl){
+  if(!imgEl) return;
+  imgEl.outerHTML = '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+}
+
 function renderWishlist(){
   const g=document.getElementById('wishlistGrid');
   if(!g) return;
