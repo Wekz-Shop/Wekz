@@ -499,6 +499,14 @@ function switchWishTab(tab, btn){
   if(tab==='stores')   renderWishlistStores();
 }
 
+// [KZ-ILLUS] Fallback seguro: se assets/mascot/favorito.png não carregar,
+// troca pelo sprite SVG oficial do Kz — mesmo princípio já usado no
+// mascote do Flash Sale Modal (_wkzFsmMascotImgError).
+function _wkzWishlistEmptyImgError(imgEl){
+  if(!imgEl) return;
+  imgEl.outerHTML = (typeof getKzSVG === 'function') ? getKzSVG(80) : '❤️';
+}
+
 function renderWishlist(){
   const g=document.getElementById('wishlistGrid');
   if(!g) return;
@@ -526,7 +534,11 @@ function renderWishlist(){
     : wishlistItems;
 
   if(wishlistItems.length === 0){
-    const kzSvg = (typeof getKzSVG === 'function') ? getKzSVG(80) : '❤️';
+    // [KZ-ILLUS] exceção já aprovada: ilustração raster no estado vazio,
+    // com fallback automático pro sprite SVG (#kz-mascot-full) via
+    // _wkzWishlistEmptyImgError() se a imagem não carregar.
+    const kzSvg = '<img src="assets/mascot/favorito.png" alt="Kz sem favoritos ainda" '
+      + 'style="max-height:110px;width:auto;" onerror="_wkzWishlistEmptyImgError(this)">';
     g.innerHTML = `
       <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 24px;text-align:center;">
         <div class="kz-cart-empty-glass" style="max-width:460px;width:100%;">
@@ -3199,7 +3211,17 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg = document.getElementById('page-'+id);
   // FIX MELHORIA-04: fallback seguro para página não encontrada
+  // [KZ-ILLUS] Agora tenta mostrar a página 404 dedicada (com a ilustração
+  // do Kz) antes de cair no fallback antigo (toast + home) — só muda de
+  // comportamento se a página 404 realmente existir no DOM.
   if(!pg){
+    const notFoundPg = document.getElementById('page-404');
+    if(notFoundPg){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      notFoundPg.classList.add('active');
+      window.scrollTo({top:0,behavior:'instant'});
+      return;
+    }
     showToast && showToast('⚠️ Página não encontrada');
     const fallback = document.getElementById('page-home');
     if(fallback) fallback.classList.add('active');
