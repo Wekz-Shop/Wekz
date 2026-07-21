@@ -636,11 +636,24 @@ function refreshAdminKzMsg() {
   }
 }
 
+// [KZ-ILLUS] Fallback seguro: getKzSVG() não existe neste módulo (é
+// específico do wkz-buyer.js), então se a imagem falhar aqui a gente só
+// esconde graciosamente — não pior do que o comportamento original
+// (o div ficava vazio quando getKzSVG não estava disponível).
+function _wkzAdminKzImgError(imgEl) {
+  if (imgEl) imgEl.style.display = 'none';
+}
+
 function renderAdminKzBanner() {
   // Injeta o mascote Kz
+  // [KZ-ILLUS] mesma exceção já aprovada: ilustração raster com fallback
+  // automático pro sprite SVG (#kz-mascot-full) via _wkzAdminKzImgError()
+  // se a imagem não carregar.
   const mascotEl = document.getElementById('admKzMascot');
-  if (mascotEl && typeof getKzSVG === 'function') {
-    mascotEl.innerHTML = getKzSVG(52);
+  if (mascotEl) {
+    mascotEl.innerHTML = '<img src="../shared/assets/mascot/monitoramento.png" '
+      + 'alt="Kz monitorando a plataforma" style="width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:10px;" '
+      + 'onerror="_wkzAdminKzImgError(this)">';
   }
 
   // Saudação por hora do dia
