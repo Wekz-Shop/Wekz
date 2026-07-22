@@ -651,8 +651,11 @@ function renderAdminKzBanner() {
   // se a imagem não carregar.
   const mascotEl = document.getElementById('admKzMascot');
   if (mascotEl) {
+    // FIX: estava width:100%;height:100% — sem um pai com dimensão
+    // definida isso renderiza no tamanho intrínseco da imagem (enorme),
+    // fazendo o mascote "vazar" pela tela. Tamanho fixo resolve.
     mascotEl.innerHTML = '<img src="../shared/assets/mascot/monitoramento.png" '
-      + 'alt="Kz monitorando a plataforma" style="width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:10px;" '
+      + 'alt="Kz monitorando a plataforma" style="display:block;width:44px;height:44px;object-fit:cover;object-position:center top;border-radius:10px;flex-shrink:0;" '
       + 'onerror="_wkzAdminKzImgError(this)">';
   }
 
