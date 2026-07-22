@@ -5210,8 +5210,12 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     // _wkzLogoutIconError() se a imagem não carregar. Só afeta ESTA
     // chamada de _wkzConfirm — o helper genérico continua servindo os
     // outros confirms do site sem nenhuma alteração.
+    // FIX: estava 100%/100% do wrap de 52px (ficava minúsculo). O
+    // wrap não tem overflow:hidden, então uma imagem maior fica
+    // centralizada pelo próprio flex e "vaza" por cima dele de forma
+    // graciosa — resultado: mascote bem maior e visível.
     var logoutIcon = '<img src="../shared/assets/mascot/ate-logo.png" alt="Kz acenando um até logo" '
-      + 'style="width:100%;height:100%;object-fit:cover;border-radius:16px;" '
+      + 'style="width:104px;height:104px;object-fit:cover;border-radius:24px;box-shadow:0 8px 20px rgba(0,0,0,0.35);" '
       + 'onerror="_wkzLogoutIconError(this)">';
     window._wkzConfirm('Tens a certeza que queres encerrar a sessão?', {
       title: 'Sair da conta',
