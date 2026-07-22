@@ -1,38 +1,43 @@
 /* ══════════════════════════════════════════════════════════════════════
-   WKZ-FLASHSALE-MODAL.CSS — v2.0 (Visual Limpo)
+   WKZ-FLASHSALE-MODAL.CSS
    Componente: WKZ Flash Sale Modal
    Extensão isolada — não altera nenhuma regra de wkz-styles-base.css,
    wkz-styles-full.css ou wkz-admin-styles.css. Prefixo próprio
    ("wkz-fsm-"), carregado depois dos estilos base, zero sobrescrita.
 
-   v2.0 — Redesign visual:
-     • Fundo gradiente roxo/azul vibrante (sem navy escuro)
-     • Borda sutil sem animação de pulsar neon
-     • Countdown com estilo mais clean e minimalista
-     • Card do produto com fundo claro (white/glass)
-     • 4 benefícios na linha
-     • Glow reduzido, visual mais moderno e e-commerce
-     • Removidas animações neon excessivas
+   v1.2 — Changelog desta revisão:
+     Tarefa 1: .wkz-fsm-close saiu de dentro do wrapper com scroll —
+               agora é irmão de #wkzFsmScroll, então fica sempre fixo
+               no canto superior direito do card, mesmo rolando.
+     Tarefa 3: visual neon fiel aos mockups de referência.
 
-   ── EXCEÇÃO DE TOKENS (só este componente) ──────────────────────────
-   Variáveis LOCAIS escopadas dentro de .wkz-fsm-overlay:
-     --wkz-fsm-bg / --wkz-fsm-bg2  → gradiente roxo/azul vibrante
+   ── EXCEÇÃO DE TOKENS (só este componente — mesmo espírito da exceção
+      já aprovada para o <img> do mascote) ──────────────────────────────
+   Os mockups de referência pedem um cartão SEMPRE escuro (fundo navy +
+   neon), independente do tema claro/escuro do restante do site — é a
+   mesma lógica de "campanha com identidade própria" que grandes
+   marketplaces usam em popups de Flash Sale. Como var(--card)/
+   var(--card2)/var(--text)/var(--muted) TROCAM de valor conforme o
+   tema (claro↔escuro) do site, usá-los aqui quebraria exatamente o
+   visual pedido nos mockups quando o site estiver no modo claro.
+   Por isso declaro variáveis LOCAIS, escopadas só dentro de
+   .wkz-fsm-overlay (nunca em :root, nunca vazam para fora):
+     --wkz-fsm-bg / --wkz-fsm-bg2  → superfície navy fixa do card
      --wkz-fsm-line                → bordas sutis
      --wkz-fsm-ink / --wkz-fsm-ink-muted → texto
    var(--grad1) var(--grad2) var(--grad3) var(--radius) var(--radius-sm)
-   continuam sendo os ÚNICOS tokens de marca usados.
+   continuam sendo os ÚNICOS tokens de marca usados (título, contador,
+   ícones, CTA, borda iluminada) — a identidade WeKz permanece intacta,
+   só a superfície de fundo é fixa.
    ══════════════════════════════════════════════════════════════════════ */
 
 /* ── Overlay ─────────────────────────────────────────────────────────── */
 .wkz-fsm-overlay {
-  --wkz-fsm-bg: #1a1040;
-  --wkz-fsm-bg2: #2d1b69;
-  --wkz-fsm-bg3: #1e3a5f;
-  --wkz-fsm-line: rgba(255, 255, 255, 0.12);
+  --wkz-fsm-bg: #0A0E27;
+  --wkz-fsm-bg2: #131C3E;
+  --wkz-fsm-line: rgba(255, 255, 255, 0.10);
   --wkz-fsm-ink: #F1F5F9;
-  --wkz-fsm-ink-muted: #A8B4D0;
-  --wkz-fsm-card-bg: rgba(255, 255, 255, 0.08);
-  --wkz-fsm-card-bg-light: rgba(255, 255, 255, 0.95);
+  --wkz-fsm-ink-muted: #93A0C4;
 
   position: fixed;
   inset: 0;
@@ -41,9 +46,9 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.66);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.35s ease, visibility 0s linear 0.35s;
@@ -54,7 +59,10 @@
   transition: opacity 0.35s ease, visibility 0s linear 0s;
 }
 
-/* ── Card / Modal ────────────────────────────────────────────────────── */
+/* ── Card / Modal (não rola — só o conteúdo interno rola) ──────────────
+   Tarefa 1: o segredo é este elemento ser o container FIXO (overflow
+   hidden), com .wkz-fsm-close como filho direto dele (fora do
+   #wkzFsmScroll) — assim o botão nunca acompanha o scroll interno. */
 .wkz-fsm-modal {
   position: relative;
   width: min(1040px, 95%);
@@ -62,13 +70,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, #1a1040 0%, #2d1b69 40%, #1e3a5f 100%);
-  box-shadow:
-    0 40px 110px rgba(0, 0, 0, 0.55),
-    0 0 80px rgba(99, 60, 200, 0.15),
-    0 2px 0 rgba(255, 255, 255, 0.06) inset;
+  border-radius: var(--radius);
+  border: 1px solid var(--wkz-fsm-line);
+  background: linear-gradient(155deg, var(--wkz-fsm-bg), var(--wkz-fsm-bg2));
+  box-shadow: 0 40px 110px rgba(0, 0, 0, 0.55), 0 2px 0 rgba(255, 255, 255, 0.04) inset;
   transform: scale(0.92) translateY(18px);
   filter: blur(6px);
   opacity: 0;
@@ -81,35 +86,43 @@
   opacity: 1;
 }
 
-/* Borda sutil — sem animação de pulsar, apenas glow estático discreto */
+/* Borda iluminada — anel com gradiente de marca (var(--grad1)), pulsando */
 .wkz-fsm-modal::before {
   content: "";
   position: absolute;
-  inset: -1px;
+  inset: -1.5px;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.2));
+  padding: 1.5px;
+  background: var(--grad1);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0.8;
+  opacity: 0.7;
   pointer-events: none;
   z-index: 2;
+  animation: wkzFsmBorderPulse 3.4s ease-in-out infinite;
+}
+@keyframes wkzFsmBorderPulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.95; }
 }
 
-/* Glow atrás do card — mais visível para emoldurar o mascote */
+/* Glow discreto atrás do card — usa var(--grad2), bem desfocado */
 .wkz-fsm-modal-glow {
   position: absolute;
-  inset: -50px;
+  inset: -46px;
   z-index: -1;
-  background: radial-gradient(ellipse at 35% 50%, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.1) 50%, transparent 75%);
-  filter: blur(55px);
-  opacity: 0.6;
+  background: var(--grad2);
+  filter: blur(70px);
+  opacity: 0.38;
   border-radius: var(--radius);
   pointer-events: none;
 }
 
-/* ── Botão fechar ────────────────────────────────────────────────────── */
+/* ── Botão fechar — TAREFA 1: fixo, fora da área de rolagem ────────────
+   É filho direto de .wkz-fsm-modal (não de #wkzFsmScroll), então sua
+   posição absoluta é sempre relativa ao card inteiro, não ao conteúdo
+   que rola por dentro. Nunca mais some ao rolar o modal. */
 .wkz-fsm-close {
   position: absolute;
   top: 16px;
@@ -118,8 +131,8 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--wkz-fsm-line);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(6px);
   color: var(--wkz-fsm-ink);
   display: flex;
@@ -128,13 +141,10 @@
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
 }
-.wkz-fsm-close:hover {
-  transform: rotate(90deg);
-  background: rgba(255, 255, 255, 0.2);
-}
+.wkz-fsm-close:hover { transform: rotate(90deg); background: rgba(255, 255, 255, 0.16); }
 .wkz-fsm-close svg { width: 16px; height: 16px; }
 
-/* ── Wrapper com scroll ──────────────────────────────────────────────── */
+/* ── Wrapper com scroll — só ele rola, o resto do card fica parado ────── */
 .wkz-fsm-scroll {
   overflow-y: auto;
   overflow-x: hidden;
@@ -142,7 +152,9 @@
   min-height: 0;
 }
 
-/* ── Layout — 2 colunas no desktop, empilhado no mobile ──────────────── */
+/* ── Layout — 2 colunas no desktop, empilhado no mobile ────────────────
+   (mockup desktop: mascote à esquerda / conteúdo à direita
+    mockup mobile: mascote em cima / conteúdo abaixo, tudo centralizado) */
 .wkz-fsm-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -152,10 +164,10 @@
 }
 @media (min-width: 860px) {
   .wkz-fsm-layout {
-    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-columns: 0.95fr 1.05fr;
     align-items: center;
-    padding: 40px 40px 34px;
-    gap: 8px 32px;
+    padding: 46px 46px 38px;
+    gap: 12px 40px;
     text-align: left;
   }
 }
@@ -166,16 +178,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 @media (min-width: 860px) { .wkz-fsm-visual { margin-bottom: 0; } }
 
 .wkz-fsm-visual-glow {
   position: absolute;
-  inset: 5%;
+  inset: 12%;
   z-index: -1;
-  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.45), rgba(99, 102, 241, 0.15) 50%, transparent 75%);
-  filter: blur(50px);
+  background: var(--grad2);
+  filter: blur(54px);
   opacity: 0;
   border-radius: 50%;
   pointer-events: none;
@@ -184,8 +196,8 @@
   animation: wkzFsmGlowPulse 3.2s ease-in-out 0.35s infinite;
 }
 @keyframes wkzFsmGlowPulse {
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 0.75; }
+  0%, 100% { opacity: 0.22; }
+  50%      { opacity: 0.48; }
 }
 
 .wkz-fsm-mascot {
@@ -208,20 +220,26 @@
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: min(480px, 60vh);
+  max-height: min(340px, 42vh);
   object-fit: contain;
   display: block;
   pointer-events: none;
   user-select: none;
-  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.55));
 }
-@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: min(660px, 74vh); } }
+@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: min(580px, 64vh); } }
 
 .wkz-fsm-mascot-fallback,
-.wkz-fsm-mascot-fallback svg { display: block; width: 280px; height: 280px; margin: 0 auto; }
+.wkz-fsm-mascot-fallback svg { display: block; width: 190px; height: 190px; margin: 0 auto; }
+
+/* [REMOVIDO A PEDIDO] O "brilho que percorre os óculos" (retângulo
+   branco translúcido varrendo a imagem) ficava com aparência de mancha
+   cinza/esbranquiçada sobre a arte real do mascote — removido. A
+   .wkz-fsm-mascot-shine continua sendo criada no JS (span vazio, sem
+   nenhum estilo/animação aqui), então não faz mais nada visualmente. */
 
 /* ── Coluna de conteúdo ──────────────────────────────────────────────── */
-.wkz-fsm-content { min-width: 0; padding-top: 4px; }
+.wkz-fsm-content { min-width: 0; }
 
 .wkz-fsm-kicker {
   display: inline-flex;
@@ -232,149 +250,140 @@
   font-size: 12.5px;
   letter-spacing: 0.08em;
   color: var(--wkz-fsm-ink);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .wkz-fsm-kicker svg { width: 13px; height: 13px; }
 
 .wkz-fsm-title {
   font-family: 'DM Sans', sans-serif;
   font-weight: 800;
-  font-size: 40px;
+  font-size: 42px;
   line-height: 1;
   letter-spacing: -0.01em;
-  margin: 0 0 10px;
-  background: linear-gradient(135deg, #a78bfa, #60a5fa, #a78bfa);
+  margin: 0 0 12px;
+  background: var(--grad2);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-@media (max-width: 640px) { .wkz-fsm-title { font-size: 32px; } }
+@media (max-width: 640px) { .wkz-fsm-title { font-size: 34px; } }
 
 .wkz-fsm-subtitle {
   color: var(--wkz-fsm-ink-muted);
   font-size: 14px;
   line-height: 1.6;
   max-width: 440px;
-  margin: 0 auto 18px;
+  margin: 0 auto 20px;
 }
-@media (min-width: 860px) { .wkz-fsm-subtitle { margin: 0 0 20px; } }
+@media (min-width: 860px) { .wkz-fsm-subtitle { margin: 0 0 22px; } }
 
-/* ── Contador HH:MM:SS — estilo clean ───────────────────────────────── */
+/* Contador HH:MM:SS — cada bloco com seu próprio acento de marca */
 .wkz-fsm-countdown {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 0 auto 18px;
+  margin: 0 auto 20px;
 }
-@media (min-width: 860px) { .wkz-fsm-countdown { justify-content: flex-start; margin: 0 0 20px; } }
+@media (min-width: 860px) { .wkz-fsm-countdown { justify-content: flex-start; margin: 0 0 22px; } }
 
 .wkz-fsm-count-block {
-  min-width: 72px;
-  padding: 12px 10px 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.07);
-  text-align: center;
-  backdrop-filter: blur(8px);
+  min-width: 68px;
+  padding: 10px 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid transparent;
+  background: linear-gradient(var(--wkz-fsm-bg2), var(--wkz-fsm-bg2)) padding-box, var(--grad3) border-box;
 }
+.wkz-fsm-count-block:nth-child(3) { background: linear-gradient(var(--wkz-fsm-bg2), var(--wkz-fsm-bg2)) padding-box, var(--grad2) border-box; }
+.wkz-fsm-count-block:nth-child(5) { background: linear-gradient(var(--wkz-fsm-bg2), var(--wkz-fsm-bg2)) padding-box, var(--grad1) border-box; }
 
 .wkz-fsm-count-block span {
   display: block;
   font-family: 'DM Sans', sans-serif;
   font-weight: 800;
-  font-size: 24px;
-  color: #fff;
-  line-height: 1.1;
+  font-size: 22px;
+  background: var(--grad3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
+.wkz-fsm-count-block:nth-child(3) span { background: var(--grad2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.wkz-fsm-count-block:nth-child(5) span { background: var(--grad1); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
 .wkz-fsm-count-block label {
   display: block;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--wkz-fsm-ink-muted);
-  margin-top: 3px;
+  margin-top: 2px;
 }
+.wkz-fsm-count-sep { color: var(--wkz-fsm-ink-muted); font-weight: 700; }
 
-.wkz-fsm-count-sep {
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 700;
-  font-size: 20px;
-  margin: 0 2px;
-}
-
-/* ── Prova social ────────────────────────────────────────────────────── */
+/* Prova social */
 .wkz-fsm-social {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--wkz-fsm-line);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--wkz-fsm-ink-muted);
   font-size: 12px;
-  margin: 0 auto 18px;
+  margin: 0 auto 20px;
 }
-@media (min-width: 860px) { .wkz-fsm-social { margin: 0 0 18px; } }
-.wkz-fsm-social svg { width: 14px; height: 14px; color: #a78bfa; }
-.wkz-fsm-social strong { color: #fff; font-family: 'DM Sans', sans-serif; }
+@media (min-width: 860px) { .wkz-fsm-social { margin: 0 0 20px; } }
+.wkz-fsm-social svg { width: 14px; height: 14px; color: var(--wkz-fsm-ink); }
+.wkz-fsm-social strong { color: var(--wkz-fsm-ink); font-family: 'DM Sans', sans-serif; }
 .wkz-fsm-social-pulse {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #34d399;
+  background: var(--grad3);
   animation: wkzFsmSocialPulse 1.6s ease-in-out infinite;
 }
 @keyframes wkzFsmSocialPulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
   50%      { opacity: 1; transform: scale(1.15); }
 }
 
-/* ── Produto Isca (Hero Product) — card com fundo claro ──────────────── */
+/* ── Produto Isca (Hero Product) — Tarefa 2 ─────────────────────────── */
 .wkz-fsm-hero-product {
   display: flex;
   align-items: center;
   gap: 14px;
   text-align: left;
-  padding: 14px;
-  margin: 0 0 18px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  position: relative;
+  padding: 12px;
+  margin: 0 0 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--wkz-fsm-line);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
 }
-
 .wkz-fsm-hero-product-media {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 78px;
+  height: 78px;
   flex: 0 0 auto;
   border-radius: 12px;
   overflow: hidden;
-  background: #f1f5f9;
+  background: var(--wkz-fsm-bg2);
 }
 .wkz-fsm-hero-product-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .wkz-fsm-hero-product-noimg .wkz-fsm-hero-product-media { display: none; }
-
 .wkz-fsm-hero-product-discount {
   position: absolute;
   top: 4px;
   left: 4px;
-  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  background: var(--grad1);
   color: #fff;
   font-size: 10px;
   font-weight: 800;
-  padding: 3px 7px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.3);
+  padding: 2px 6px;
+  border-radius: 6px;
 }
-
 .wkz-fsm-hero-product-info { flex: 1; min-width: 0; }
-
 .wkz-fsm-hero-product-tag {
   display: inline-flex;
   align-items: center;
@@ -383,115 +392,93 @@
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #8b5cf6;
+  color: var(--wkz-fsm-ink-muted);
   margin-bottom: 4px;
 }
 .wkz-fsm-hero-product-tag svg { width: 10px; height: 10px; }
-
 .wkz-fsm-hero-product-name {
   margin: 0 0 6px;
   font-size: 13px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--wkz-fsm-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-
 .wkz-fsm-hero-product-prices {
   display: flex;
   align-items: baseline;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
-
-.wkz-fsm-hero-product-old {
-  font-size: 12px;
-  color: #94a3b8;
-  text-decoration: line-through;
-}
-
+.wkz-fsm-hero-product-old { font-size: 11.5px; color: var(--wkz-fsm-ink-muted); text-decoration: line-through; }
 .wkz-fsm-hero-product-flash {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
-  color: #1e293b;
+  background: var(--grad1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-
 .wkz-fsm-hero-product-cta {
   border: none;
-  border-radius: 10px;
-  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
   font-size: 12px;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  background: var(--grad3);
   cursor: pointer;
   transition: filter 0.2s ease, transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
-.wkz-fsm-hero-product-cta:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
+.wkz-fsm-hero-product-cta:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-/* ── Benefícios — 4 colunas ──────────────────────────────────────────── */
+/* Benefícios */
 .wkz-fsm-benefits {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 22px;
 }
-
 .wkz-fsm-benefit-card {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   text-align: left;
   padding: 12px 8px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--wkz-fsm-line);
+  background: rgba(255, 255, 255, 0.03);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
-.wkz-fsm-benefit-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.22);
-}
-
+.wkz-fsm-benefit-card:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.22); }
 .wkz-fsm-benefit-icon {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  background: var(--grad3);
   color: #fff;
 }
 .wkz-fsm-benefit-icon svg { width: 16px; height: 16px; }
-
 .wkz-fsm-benefit-text { display: flex; flex-direction: column; min-width: 0; }
-.wkz-fsm-benefit-text strong {
-  font-size: 11.5px;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wkz-fsm-benefit-text em {
-  font-style: normal;
-  font-size: 9.5px;
-  color: var(--wkz-fsm-ink-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* [FIX] Texto ficava cortado ("F...", "Ac...") no layout de 2 colunas do
+   desktop (>=860px): a coluna de conteúdo é só ~1.05fr de um modal de
+   1040px, e repeat(3,1fr) deixava pouquíssimo espaço por card enquanto
+   nowrap+ellipsis cortava o texto no meio. Mobile já usava white-space:
+   normal (media query abaixo) e por isso ficava ok — agora o texto
+   sempre quebra normalmente em vez de truncar, em qualquer largura. */
+.wkz-fsm-benefit-text strong { font-size: 12px; color: var(--wkz-fsm-ink); white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
+.wkz-fsm-benefit-text em { font-style: normal; font-size: 10px; color: var(--wkz-fsm-ink-muted); white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
 
-/* ── CTA ─────────────────────────────────────────────────────────────── */
+/* CTA */
 .wkz-fsm-cta-row {
   display: flex;
   flex-direction: column;
@@ -506,10 +493,10 @@
   justify-content: center;
   gap: 8px;
   flex: 1;
-  padding: 15px 24px;
+  padding: 15px 22px;
   border: none;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #8b5cf6, #6366f1, #3b82f6);
+  border-radius: var(--radius);
+  background: var(--grad2);
   color: #fff;
   font-family: 'DM Sans', sans-serif;
   font-weight: 800;
@@ -517,21 +504,20 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
-  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+  animation: wkzFsmCtaPulse 2.6s ease-in-out infinite;
 }
 .wkz-fsm-cta-primary svg { width: 17px; height: 17px; }
-.wkz-fsm-cta-primary:hover {
-  filter: brightness(1.08);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.45);
+.wkz-fsm-cta-primary:hover { animation-play-state: paused; filter: brightness(1.08); }
+@keyframes wkzFsmCtaPulse {
+  0%, 100% { box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35); transform: scale(1); }
+  50%      { box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42); transform: scale(1.012); }
 }
-
 .wkz-fsm-cta-secondary {
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--wkz-fsm-line);
   background: transparent;
   color: var(--wkz-fsm-ink);
-  border-radius: 14px;
+  border-radius: var(--radius);
   padding: 15px 22px;
   font-size: 13.5px;
   font-weight: 700;
@@ -540,12 +526,9 @@
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
-.wkz-fsm-cta-secondary:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.25);
-}
+.wkz-fsm-cta-secondary:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.22); }
 
-/* ── Selo de confiança ───────────────────────────────────────────────── */
+/* Selo de confiança */
 .wkz-fsm-trust {
   display: flex;
   align-items: center;
@@ -556,21 +539,19 @@
 }
 @media (min-width: 860px) { .wkz-fsm-trust { justify-content: flex-start; } }
 .wkz-fsm-trust svg { width: 13px; height: 13px; }
-.wkz-fsm-trust strong { color: #fff; }
+.wkz-fsm-trust strong { color: var(--wkz-fsm-ink); }
 
 /* ── Responsivo — ajustes finos de Mobile ───────────────────────────── */
 @media (max-width: 640px) {
-  .wkz-fsm-overlay { padding: 10px; }
-  .wkz-fsm-modal { width: 96%; max-height: 96vh; border-radius: 16px; }
-  .wkz-fsm-layout { padding: 48px 16px 20px; gap: 0 0; }
-  .wkz-fsm-visual { margin-bottom: 14px; }
-  .wkz-fsm-mascot-img { max-height: min(380px, 48vh); }
-  .wkz-fsm-benefits { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .wkz-fsm-overlay { padding: 12px; }
+  .wkz-fsm-modal { width: 95%; max-height: 94vh; }
+  .wkz-fsm-layout { padding: 52px 18px 24px; }
+  .wkz-fsm-benefits { gap: 8px; }
   .wkz-fsm-benefit-card { padding: 10px 6px; flex-direction: column; text-align: center; gap: 6px; }
   .wkz-fsm-benefit-text { align-items: center; }
   .wkz-fsm-benefit-text strong,
   .wkz-fsm-benefit-text em { white-space: normal; }
-  .wkz-fsm-count-block { min-width: 60px; }
+  .wkz-fsm-count-block { min-width: 58px; }
   .wkz-fsm-hero-product { flex-direction: column; text-align: center; }
   .wkz-fsm-hero-product-info { text-align: center; }
   .wkz-fsm-hero-product-tag,
