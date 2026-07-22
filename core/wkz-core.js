@@ -2200,9 +2200,9 @@ function wkzRenderInbox() {
   const list = document.getElementById('wkzInboxList');
   if (!list) return;
   if (WKZ_NOTIF.inbox.length === 0) {
-    list.innerHTML = `<div class="wkz-inbox-empty">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <p>Nenhuma notificação ainda</p></div>`;
+    list.innerHTML = `<div class="wkz-inbox-empty" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;">
+      <img src="../shared/assets/mascot/notificacao.png" alt="Kz com sino" style="max-height:100px;width:auto;margin-bottom:12px;" onerror="this.outerHTML='<svg width=36 height=36 viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;rgba(148,163,184,0.4)&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9&quot;/><path d=&quot;M13.73 21a2 2 0 0 1-3.46 0&quot;/></svg>'">
+      <p style="margin:0;color:var(--muted);font-size:13px;">Nenhuma notificação ainda</p></div>`;
     return;
   }
   const colorMap = { info:'rgba(6,182,212,0.15)', promo:'rgba(124,58,237,0.15)', warning:'rgba(245,158,11,0.15)', alert:'rgba(239,68,68,0.15)' };
@@ -5212,10 +5212,9 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     // outros confirms do site sem nenhuma alteração.
     // FIX: estava 100%/100% do wrap de 52px (ficava minúsculo). O
     // wrap não tem overflow:hidden, então uma imagem maior fica
-    // centralizada pelo próprio flex e "vaza" por cima dele de forma
-    // graciosa — resultado: mascote bem maior e visível.
+    // FIX v2.1: mascote menor, contain (não corta), centralizado
     var logoutIcon = '<img src="../shared/assets/mascot/ate-logo.png" alt="Kz acenando um até logo" '
-      + 'style="width:104px;height:104px;object-fit:cover;border-radius:24px;box-shadow:0 8px 20px rgba(0,0,0,0.35);" '
+      + 'style="width:80px;height:80px;object-fit:contain;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.35);display:block;margin:0 auto 8px;" '
       + 'onerror="_wkzLogoutIconError(this)">';
     window._wkzConfirm('Tens a certeza que queres encerrar a sessão?', {
       title: 'Sair da conta',
