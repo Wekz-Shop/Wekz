@@ -97,14 +97,14 @@
   z-index: 2;
 }
 
-/* Glow sutil atrás do card — mais discreto */
+/* Glow atrás do card — mais visível para emoldurar o mascote */
 .wkz-fsm-modal-glow {
   position: absolute;
-  inset: -40px;
+  inset: -50px;
   z-index: -1;
-  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.2), transparent 70%);
-  filter: blur(50px);
-  opacity: 0.5;
+  background: radial-gradient(ellipse at 35% 50%, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.1) 50%, transparent 75%);
+  filter: blur(55px);
+  opacity: 0.6;
   border-radius: var(--radius);
   pointer-events: none;
 }
@@ -152,10 +152,10 @@
 }
 @media (min-width: 860px) {
   .wkz-fsm-layout {
-    grid-template-columns: 0.95fr 1.05fr;
+    grid-template-columns: 1.15fr 0.85fr;
     align-items: center;
-    padding: 46px 46px 38px;
-    gap: 12px 40px;
+    padding: 40px 40px 34px;
+    gap: 8px 32px;
     text-align: left;
   }
 }
@@ -166,16 +166,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 @media (min-width: 860px) { .wkz-fsm-visual { margin-bottom: 0; } }
 
 .wkz-fsm-visual-glow {
   position: absolute;
-  inset: 12%;
+  inset: 5%;
   z-index: -1;
-  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.3), transparent 70%);
-  filter: blur(40px);
+  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.45), rgba(99, 102, 241, 0.15) 50%, transparent 75%);
+  filter: blur(50px);
   opacity: 0;
   border-radius: 50%;
   pointer-events: none;
@@ -184,8 +184,8 @@
   animation: wkzFsmGlowPulse 3.2s ease-in-out 0.35s infinite;
 }
 @keyframes wkzFsmGlowPulse {
-  0%, 100% { opacity: 0.3; }
-  50%      { opacity: 0.6; }
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.75; }
 }
 
 .wkz-fsm-mascot {
@@ -208,20 +208,20 @@
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: min(340px, 42vh);
+  max-height: min(480px, 60vh);
   object-fit: contain;
   display: block;
   pointer-events: none;
   user-select: none;
-  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
 }
-@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: min(560px, 62vh); } }
+@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: min(660px, 74vh); } }
 
 .wkz-fsm-mascot-fallback,
-.wkz-fsm-mascot-fallback svg { display: block; width: 190px; height: 190px; margin: 0 auto; }
+.wkz-fsm-mascot-fallback svg { display: block; width: 280px; height: 280px; margin: 0 auto; }
 
 /* ── Coluna de conteúdo ──────────────────────────────────────────────── */
-.wkz-fsm-content { min-width: 0; }
+.wkz-fsm-content { min-width: 0; padding-top: 4px; }
 
 .wkz-fsm-kicker {
   display: inline-flex;
@@ -560,9 +560,11 @@
 
 /* ── Responsivo — ajustes finos de Mobile ───────────────────────────── */
 @media (max-width: 640px) {
-  .wkz-fsm-overlay { padding: 12px; }
-  .wkz-fsm-modal { width: 95%; max-height: 94vh; border-radius: 16px; }
-  .wkz-fsm-layout { padding: 52px 18px 24px; }
+  .wkz-fsm-overlay { padding: 10px; }
+  .wkz-fsm-modal { width: 96%; max-height: 96vh; border-radius: 16px; }
+  .wkz-fsm-layout { padding: 48px 16px 20px; gap: 0 0; }
+  .wkz-fsm-visual { margin-bottom: 14px; }
+  .wkz-fsm-mascot-img { max-height: min(380px, 48vh); }
   .wkz-fsm-benefits { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .wkz-fsm-benefit-card { padding: 10px 6px; flex-direction: column; text-align: center; gap: 6px; }
   .wkz-fsm-benefit-text { align-items: center; }
