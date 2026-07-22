@@ -5195,30 +5195,35 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     cpRenderCountryList(val);
   };
 
-    // [KZ-ILLUS] Fallback seguro do ícone do modal de logout — definida aqui
-  // (dentro do mesmo escopo de CP_ICO) mas exposta em window, então o
-  // atributo onerror="_wkzLogoutIconError(this)" consegue chamá-la de
-  // qualquer lugar e ainda assim acessar CP_ICO via closure.
+    // [KZ-ILLUS] Fallback seguro do mascote flutuante do modal de logout —
+  // definida aqui (dentro do mesmo escopo de CP_ICO) mas exposta em
+  // window, então o atributo onerror="_wkzLogoutIconError(this)" consegue
+  // chamá-la de qualquer lugar e ainda assim acessar CP_ICO via closure.
+  // FIX v2.3.0: fallback agora preenche o slot flutuante (sem moldura),
+  // não mais a caixinha antiga de 52px.
   window._wkzLogoutIconError = function(imgEl) {
     if (!imgEl) return;
-    imgEl.outerHTML = CP_ICO.door;
+    imgEl.outerHTML = '<span style="display:flex;align-items:center;justify-content:center;'
+      + 'width:100%;height:100%;font-size:56px;color:#EF4444;'
+      + 'filter:drop-shadow(0 10px 22px rgba(0,0,0,0.45));">' + CP_ICO.door + '</span>';
   };
 
   window.cpLogout = function() {
-    // [KZ-ILLUS] mesma exceção já aprovada: ilustração raster no ícone do
-    // modal de logout, com fallback pro ícone de porta original via
+    // [KZ-ILLUS] mesma exceção já aprovada: ilustração raster como mascote
+    // do modal de logout, com fallback pro ícone de porta via
     // _wkzLogoutIconError() se a imagem não carregar. Só afeta ESTA
     // chamada de _wkzConfirm — o helper genérico continua servindo os
     // outros confirms do site sem nenhuma alteração.
-    // FIX: estava 100%/100% do wrap de 52px (ficava minúsculo). O
-    // wrap não tem overflow:hidden, então uma imagem maior fica
-    // FIX v2.1: mascote menor, contain (não corta), centralizado
-    var logoutIcon = '<img src="../shared/assets/mascot/ate-logo.png" alt="Kz acenando um até logo" '
-      + 'style="width:80px;height:80px;object-fit:contain;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.35);display:block;margin:0 auto 8px;" '
+    // FIX v2.3.0: removida a "figurinha" com fundo/borda/box-shadow em
+    // caixa — agora é um mascote flutuante "vazado" (sem moldura), maior,
+    // que sangra por cima do topo do card, renderizado via
+    // opts.floatingMascotHTML (ver .wkz-confirm-mascot-float no CSS acima).
+    var logoutMascotHTML = '<img src="../shared/assets/mascot/ate-logo.png" alt="Kz acenando um até logo" '
+      + 'class="wkz-confirm-mascot-img" '
       + 'onerror="_wkzLogoutIconError(this)">';
     window._wkzConfirm('Tens a certeza que queres encerrar a sessão?', {
       title: 'Sair da conta',
-      icon: logoutIcon,
+      floatingMascotHTML: logoutMascotHTML,
       variant: 'danger',
       confirmLabel: 'Sair',
       cancelLabel: 'Ficar',
@@ -6665,6 +6670,52 @@ function toggleFaq(i){
 .variant-danger  .wkz-confirm-icon-wrap { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.25); }
 .variant-warning .wkz-confirm-icon-wrap { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); }
 .variant-info    .wkz-confirm-icon-wrap { background: rgba(0,180,171,0.1);   border: 1px solid rgba(0,180,171,0.25); }
+/* ── FIX v2.3.0 — Mascote flutuante "vazado" no topo do modal ──────────
+   Substitui o .wkz-confirm-icon-wrap (caixinha com fundo/borda) quando
+   opts.floatingMascotHTML é fornecido (hoje só usado por cpLogout()).
+   O wrapper é irmão de #wkzConfirmBox (não filho), então o
+   overflow:hidden do box NÃO corta o mascote — ele pode "sangrar" para
+   fora/por cima do card livremente. Sem fundo, sem border-radius, sem
+   box-shadow em caixa: só drop-shadow acompanhando o recorte real da
+   arte (PNG/SVG com fundo transparente) — igual ao efeito flutuante do
+   mascote do Flash Sale (.wkz-fsm-mascot-img). */
+.wkz-confirm-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.wkz-confirm-mascot-float {
+  position: absolute;
+  top: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: 118px;
+  height: 118px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: wkzConfirmMascotFloat 3.6s ease-in-out infinite;
+}
+@keyframes wkzConfirmMascotFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(-7px); }
+}
+.wkz-confirm-mascot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.45)) drop-shadow(0 0 18px rgba(0,180,171,0.25));
+}
+/* Espaço extra no topo do card para o mascote "sangrar" por cima do
+   título sem tapar o texto */
+.wkz-confirm-inner.has-floating-mascot { padding-top: 52px; }
+@media (max-width: 420px) {
+  .wkz-confirm-mascot-float { width: 98px; height: 98px; top: -36px; }
+}
 .wkz-confirm-title {
   font-family: 'DM Sans', sans-serif;
   font-size: 17px;
@@ -6731,7 +6782,7 @@ function toggleFaq(i){
   text-transform: uppercase;
   color: var(--muted);
 }
-.wkz-confirm-footer svg { opacity: 0.35; }
+/* [FIX] Ícone SVG do rodapé removido a pedido — mantém só o texto */
 @media (max-width: 420px) {
   .wkz-confirm-actions { grid-template-columns: 1fr; }
   .wkz-confirm-btn-ok  { order: -1; }
@@ -6769,6 +6820,13 @@ function toggleFaq(i){
     var title    = opts.title        || defaults.title;
     var okLabel  = opts.confirmLabel || 'Confirmar';
     var noLabel  = opts.cancelLabel  || 'Cancelar';
+    /* [FIX v2.3.0] Modo mascote flutuante — opcional, hoje só usado por
+       cpLogout(). Quando presente, substitui inteiramente o
+       .wkz-confirm-icon-wrap (caixinha com fundo) por um mascote maior,
+       sem moldura, "sangrando" por cima do card. Todos os outros
+       chamadores de _wkzConfirm (danger/warning/info com emoji) seguem
+       exatamente como antes — zero mudança de comportamento pra eles. */
+    var floatingMascotHTML = opts.floatingMascotHTML || null;
 
     return new Promise(function(resolve) {
       /* Remove modal anterior se houver (edge case) */
@@ -6782,10 +6840,15 @@ function toggleFaq(i){
       var overlay = document.createElement('div');
       overlay.id = 'wkzConfirmOverlay';
 
-      overlay.innerHTML =
+      var iconBlockHTML = floatingMascotHTML
+        ? '' /* mascote renderizado fora do box, ver wrapHTML abaixo */
+        : '<div class="wkz-confirm-icon-wrap">' + icon + '</div>';
+      var innerClass = 'wkz-confirm-inner' + (floatingMascotHTML ? ' has-floating-mascot' : '');
+
+      var boxHTML =
         '<div id="wkzConfirmBox" class="variant-' + variant + '">' +
-          '<div class="wkz-confirm-inner">' +
-            '<div class="wkz-confirm-icon-wrap">' + icon + '</div>' +
+          '<div class="' + innerClass + '">' +
+            iconBlockHTML +
             '<div class="wkz-confirm-title">' + title + '</div>' +
             '<div class="wkz-confirm-msg">' + msg + '</div>' +
             '<div class="wkz-confirm-actions">' +
@@ -6793,17 +6856,16 @@ function toggleFaq(i){
               '<button class="wkz-confirm-btn wkz-confirm-btn-ok"     id="wkzConfirmOk">' + okLabel + '</button>' +
             '</div>' +
           '</div>' +
-          '<div class="wkz-confirm-footer">' +
-            '<svg width="14" height="14" viewBox="0 0 40 40" fill="none">' +
-              '<ellipse cx="20" cy="26" rx="13" ry="10" fill="#0F172A" stroke="rgba(0,180,171,0.5)" stroke-width="1.5"/>' +
-              '<ellipse cx="20" cy="21" rx="11" ry="13" fill="#1A2540"/>' +
-              '<polygon points="13,10 17,2 20,7 23,2 27,10" fill="#00B4AB" opacity="0.9"/>' +
-              '<ellipse cx="16" cy="18" rx="2.5" ry="3" fill="#06B6D4"/>' +
-              '<ellipse cx="24" cy="18" rx="2.5" ry="3" fill="#7C3AED"/>' +
-            '</svg>' +
-            'WeKz Shop · Ação segura' +
-          '</div>' +
+          /* [FIX] Ícone SVG do rodapé removido a pedido — mantém só o texto */
+          '<div class="wkz-confirm-footer">WeKz Shop · Ação segura</div>' +
         '</div>';
+
+      overlay.innerHTML = floatingMascotHTML
+        ? '<div class="wkz-confirm-wrap">' +
+            '<div class="wkz-confirm-mascot-float">' + floatingMascotHTML + '</div>' +
+            boxHTML +
+          '</div>'
+        : boxHTML;
 
       document.body.appendChild(overlay);
 
