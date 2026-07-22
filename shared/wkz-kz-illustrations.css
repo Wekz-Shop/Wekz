@@ -1,14 +1,10 @@
 /* ══════════════════════════════════════════════════════════════════════
-   WKZ-KZ-ILLUSTRATIONS.CSS
-   Utilitários de exibição para as ilustrações de campanha do mascote Kz
-   (login, favoritos, rastreamento, 404, etc.) — mesma exceção arquitetônica
-   já aprovada para o flash-sale.png: arte raster de alta-fidelidade, fora
-   do sprite SVG único (#kz-mascot-full), usada em pontos estratégicos e
-   pontuais das páginas (não como ícone de interface reutilizável).
-
-   Zero Rewrite: só classes NOVAS, prefixo "wkz-kz-illus", nenhuma regra
-   de wkz-styles-base.css / wkz-styles-full.css é alterada.
+   WKZ-KZ-ILLUSTRATIONS.CSS — PATCH v2.1
+   Adiciona estilos para: logout modal, perfil (mobile/desktop),
+   e garante compatibilidade com novas ilustrações de segurança.
    ══════════════════════════════════════════════════════════════════════ */
+
+/* ── ESTILOS EXISTENTES (manter todos) ───────────────────────────────── */
 
 .wkz-kz-illus {
   display: block;
@@ -18,13 +14,13 @@
   pointer-events: none;
 }
 
-/* Tamanhos padronizados — escolha por contexto (hero de página vs. selo pequeno) */
+/* Tamanhos padronizados */
 .wkz-kz-illus--xs { max-height: 56px; }
 .wkz-kz-illus--sm { max-height: 90px; }
 .wkz-kz-illus--md { max-height: 150px; }
 .wkz-kz-illus--lg { max-height: 220px; }
 
-/* Entrada suave — aplicar quando a imagem faz parte do primeiro paint da página */
+/* Entrada suave */
 .wkz-kz-illus-fade-in {
   animation: wkzKzIllusFadeIn 0.55s ease both;
 }
@@ -33,14 +29,14 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Wrapper genérico para centralizar uma ilustração acima de um título/texto */
+/* Wrapper genérico */
 .wkz-kz-illus-wrap {
   display: flex;
   justify-content: center;
   margin-bottom: 14px;
 }
 
-/* Selo pequeno inline (ex.: ao lado de um badge "Verificado") */
+/* Selo pequeno inline */
 .wkz-kz-illus-badge {
   display: inline-flex;
   align-items: center;
@@ -49,10 +45,7 @@
 }
 .wkz-kz-illus-badge img { max-height: 28px; width: auto; display: block; }
 
-/* Ilustração decorativa no canto superior direito de um inner-page-hero
-   (ex.: "Sobre", "Acessibilidade") — não interfere no texto, some no
-   mobile pra não sobrepor o título. Requer que o pai (.inner-page-hero-inner)
-   já tenha position:relative, o que já é o caso no design system atual. */
+/* Ilustração decorativa no canto superior direito */
 .wkz-kz-illus-hero-corner {
   position: absolute;
   top: -6px;
@@ -65,7 +58,63 @@
   .wkz-kz-illus-hero-corner { display: none; }
 }
 
-/* Página 404 dedicada */
+/* ── NOVOS ESTILOS — Logout Modal ────────────────────────────────────── */
+.wkz-kz-illus-logout {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  margin: 0 auto 8px;
+  display: block;
+}
+
+/* ── NOVOS ESTILOS — Perfil Hero ─────────────────────────────────────── */
+/* Desktop: mascot no canto, sem sobrepor botões */
+.cp-hero {
+  position: relative;
+  overflow: visible;
+}
+
+.wkz-kz-illus-profile {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  max-height: 110px;
+  width: auto;
+  z-index: 1;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* Mobile: mascot acima do conteúdo, centralizado, sem sobrepor */
+@media (max-width: 760px) {
+  .wkz-kz-illus-profile {
+    position: relative;
+    right: auto;
+    top: auto;
+    display: block;
+    margin: 0 auto 12px;
+    max-height: 90px;
+    z-index: auto;
+  }
+}
+
+/* ── NOVOS ESTILOS — Hero Corner para Security pages ─────────────────── */
+/* Versão mobile: mostra o mascote mas menor e posicionado diferente */
+@media (max-width: 760px) {
+  .wkz-kz-illus-hero-corner-mobile {
+    display: block;
+    position: relative;
+    top: auto;
+    right: auto;
+    max-height: 80px;
+    margin: 8px auto 0;
+    text-align: center;
+  }
+}
+
+/* ── Página 404 ──────────────────────────────────────────────────────── */
 .wkz-404-wrap {
   max-width: 480px;
   margin: 0 auto;
