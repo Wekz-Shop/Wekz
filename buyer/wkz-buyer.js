@@ -544,7 +544,7 @@ function renderWishlist(){
     // [KZ-ILLUS] exceção já aprovada: ilustração raster no estado vazio,
     // com fallback automático pro sprite SVG (#kz-mascot-full) via
     // _wkzWishlistEmptyImgError() se a imagem não carregar.
-    const kzSvg = '<img src="assets/mascot/favorito.png" alt="Kz sem favoritos ainda" '
+    const kzSvg = '<img src="../shared/assets/mascot/favoritos.png" alt="Kz sem favoritos ainda" '
       + 'style="max-height:110px;width:auto;" onerror="_wkzWishlistEmptyImgError(this)">';
     g.innerHTML = `
       <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 24px;text-align:center;">
