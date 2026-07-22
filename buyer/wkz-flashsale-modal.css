@@ -232,27 +232,11 @@
 .wkz-fsm-mascot-fallback,
 .wkz-fsm-mascot-fallback svg { display: block; width: 190px; height: 190px; margin: 0 auto; }
 
-/* Brilho que percorre os óculos do mascote — varredura de luz */
-.wkz-fsm-mascot-shine {
-  position: absolute;
-  top: 28%;
-  left: -30%;
-  width: 26%;
-  height: 18%;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent);
-  mix-blend-mode: overlay;
-  opacity: 0;
-  pointer-events: none;
-}
-.wkz-fsm-stage-active .wkz-fsm-mascot-shine {
-  animation: wkzFsmEyeShine 2.8s ease-in-out 0.9s infinite;
-}
-@keyframes wkzFsmEyeShine {
-  0%   { left: -30%; opacity: 0; }
-  8%   { opacity: 0.9; }
-  22%  { left: 115%; opacity: 0; }
-  100% { left: 115%; opacity: 0; }
-}
+/* [REMOVIDO A PEDIDO] O "brilho que percorre os óculos" (retângulo
+   branco translúcido varrendo a imagem) ficava com aparência de mancha
+   cinza/esbranquiçada sobre a arte real do mascote — removido. A
+   .wkz-fsm-mascot-shine continua sendo criada no JS (span vazio, sem
+   nenhum estilo/animação aqui), então não faz mais nada visualmente. */
 
 /* ── Coluna de conteúdo ──────────────────────────────────────────────── */
 .wkz-fsm-content { min-width: 0; }
