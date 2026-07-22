@@ -70,21 +70,43 @@
 }
 
 /* ── NOVOS ESTILOS — Perfil Hero ─────────────────────────────────────── */
-/* Desktop: mascot no canto, sem sobrepor botões */
 .cp-hero {
   position: relative;
   overflow: visible;
 }
 
+/* ── FIX — mascote ficava atrás/sobre os botões "Editar Perfil" e
+   "Partilhar" no desktop. Causa: estava com position:absolute ancorado
+   na borda do .cp-hero (full-bleed), enquanto os botões ficam na borda
+   direita do .cp-hero-inner (centralizado, max-width:900px) — em telas
+   de largura moderada a folga entre os dois ficava menor que o próprio
+   mascote, gerando sobreposição.
+   Solução: o <img> já é irmão de .cp-hero-inner no HTML, então no
+   desktop viramos .cp-hero num flex row e o mascote passa a ser um
+   item de layout real ao lado do conteúdo (não mais um overlay
+   decorativo) — nunca mais sobrepõe nada, em nenhuma largura. ── */
 .wkz-kz-illus-profile {
-  position: absolute;
-  right: 12px;
-  top: 10px;
   max-height: 110px;
   width: auto;
   z-index: 1;
   opacity: 0.9;
   pointer-events: none;
+}
+@media (min-width: 761px) {
+  .cp-hero {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .cp-hero-inner {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .wkz-kz-illus-profile {
+    position: static;
+    flex-shrink: 0;
+    margin: 0;
+  }
 }
 
 /* Mobile: mascot acima do conteúdo, centralizado, sem sobrepor */
