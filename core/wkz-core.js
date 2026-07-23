@@ -6711,8 +6711,15 @@ function toggleFaq(i){
   filter: drop-shadow(0 10px 22px rgba(0,0,0,0.45)) drop-shadow(0 0 18px rgba(0,180,171,0.25));
 }
 /* Espaço extra no topo do card para o mascote "sangrar" por cima do
-   título sem tapar o texto */
-.wkz-confirm-inner.has-floating-mascot { padding-top: 52px; }
+   título sem tapar o texto.
+   [FIX] O mascote vai de top:-44px até -44+118=74px dentro do box (ver
+   .wkz-confirm-mascot-float acima); o padding anterior (52px) era menor
+   que isso e por isso o título "Sair da conta" ficava embaixo do
+   mascote. Agora sobra folga (74px + ~18px de respiro). */
+.wkz-confirm-inner.has-floating-mascot { padding-top: 92px; }
+@media (max-width: 420px) {
+  .wkz-confirm-inner.has-floating-mascot { padding-top: 80px; }
+}
 @media (max-width: 420px) {
   .wkz-confirm-mascot-float { width: 98px; height: 98px; top: -36px; }
 }
