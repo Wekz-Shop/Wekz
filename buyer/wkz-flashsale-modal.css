@@ -227,7 +227,17 @@
   user-select: none;
   filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.55));
 }
-@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: min(580px, 64vh); } }
+/* [FIX] Leve flutuação contínua no mascote, começando logo depois da
+   animação de entrada (wkzFsmMascotIn, 0.65s) terminar */
+.wkz-fsm-stage-active .wkz-fsm-mascot-img {
+  animation: wkzFsmMascotFloat 3.8s ease-in-out 0.65s infinite;
+}
+@keyframes wkzFsmMascotFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+/* [FIX] Mascote maior no desktop, a pedido */
+@media (min-width: 860px) { .wkz-fsm-mascot-img { max-height: min(680px, 72vh); } }
 
 .wkz-fsm-mascot-fallback,
 .wkz-fsm-mascot-fallback svg { display: block; width: 190px; height: 190px; margin: 0 auto; }
@@ -285,7 +295,12 @@
   gap: 8px;
   margin: 0 auto 20px;
 }
-@media (min-width: 860px) { .wkz-fsm-countdown { justify-content: flex-start; margin: 0 0 22px; } }
+@media (min-width: 860px) {
+  /* [FIX] Pedido do usuário: manter o contador centralizado também no
+     desktop — antes ficava "justify-content:flex-start" aqui, jogando
+     os números pra esquerda. Mantém só o ajuste de margem. */
+  .wkz-fsm-countdown { justify-content: center; margin: 0 0 22px; }
+}
 
 .wkz-fsm-count-block {
   min-width: 68px;
@@ -297,18 +312,15 @@
 .wkz-fsm-count-block:nth-child(3) { background: linear-gradient(var(--wkz-fsm-bg2), var(--wkz-fsm-bg2)) padding-box, var(--grad2) border-box; }
 .wkz-fsm-count-block:nth-child(5) { background: linear-gradient(var(--wkz-fsm-bg2), var(--wkz-fsm-bg2)) padding-box, var(--grad1) border-box; }
 
+/* [FIX] Números do contador em branco sólido (antes usavam gradiente
+   via background-clip:text, um tom diferente por bloco) */
 .wkz-fsm-count-block span {
   display: block;
   font-family: 'DM Sans', sans-serif;
   font-weight: 800;
   font-size: 22px;
-  background: var(--grad3);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff;
 }
-.wkz-fsm-count-block:nth-child(3) span { background: var(--grad2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.wkz-fsm-count-block:nth-child(5) span { background: var(--grad1); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
 .wkz-fsm-count-block label {
   display: block;
