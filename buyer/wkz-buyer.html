@@ -1072,6 +1072,10 @@ document.addEventListener('DOMContentLoaded', function() {
           <span class="pub-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="8" height="18" rx="2"/><rect x="14" y="3" width="8" height="18" rx="2"/></svg></span>
           <span class="pub-label">Comparar</span>
         </button>
+        <button class="pdp-utility-btn pub-share" onclick="pdpShareProduct(currentPdpIndex)">
+          <span class="pub-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
+          <span class="pub-label">Compartilhar</span>
+        </button>
       </div>
       <button class="pdp-utility-btn pub-alert pdp-alert-standalone" id="btnPriceAlert" onclick="kzOpenPriceAlert(currentPdpIndex)">
         <span class="pub-icon" id="kzpaBellIcon"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
@@ -3715,7 +3719,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="cp-review-body">
               <div class="cp-review-name">Teclado Mecânico RGB TKL</div>
               <div class="cp-review-meta">#WKZ-8990 · Entregue em 18 Mai 2026</div>
-              <div class="cp-review-stars" onclick="cpSubmitStarReview(this,'#WKZ-8990','Teclado Mecânico RGB TKL')" title="Clique para avaliar">
+              <div class="cp-review-stars" onclick="cpOpenReviewModal(this,'#WKZ-8990','Teclado Mecânico RGB TKL','⌨️')" title="Clique para avaliar">
                 <span class="cp-review-star">★</span><span class="cp-review-star">★</span>
                 <span class="cp-review-star">★</span><span class="cp-review-star">★</span>
                 <span class="cp-review-star">★</span>
@@ -3728,6 +3732,25 @@ document.addEventListener('DOMContentLoaded', function() {
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           Suas avaliações ajudam outros compradores e rendem pontos Kz.
         </div>
+      </div>
+    </div>
+
+    <!-- ╔══════════════════════════════════════════╗
+         ║  CARD 2c: HISTÓRICO DE COMPRAS (novo)   ║
+         ║  [FIX-06] Consulta rápida do que já foi ║
+         ║  comprado, com atalho para reforçar a   ║
+         ║  compra ou rever a página do produto.   ║
+         ╚══════════════════════════════════════════╝ -->
+    <div class="cp-card cp-full-width" id="cpPurchaseHistoryCard">
+      <div class="cp-card-header">
+        <div class="cp-card-title">
+          <div class="cp-card-title-icon" style="background:rgba(0,180,171,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div>
+          Histórico de Compras
+        </div>
+        <span class="cp-card-link" style="font-size:11px;">Todos os produtos já comprados</span>
+      </div>
+      <div class="cp-card-body">
+        <div id="cpPurchaseHistoryList"><!-- JS --></div>
       </div>
     </div>
 
@@ -3756,16 +3779,21 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="cp-card-title-icon amber"><span class="wkz-icon wkz-icon-creditcard"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span></div>
           Carteira Multimoedas &amp; Cupons Smart
         </div>
-        <span class="cp-card-link" onclick="cpAddCard()">+ Adicionar Cartão</span>
+        <span class="cp-card-link" onclick="cpAddCard()">+ Adicionar</span>
       </div>
       <div class="cp-card-body">
-        <div class="cp-wallet-grid" id="cpWalletGrid"><!-- JS --></div>
-        <div style="margin-bottom:18px;">
-          <button class="cp-add-card-btn" onclick="cpAddCard()">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            + Adicionar novo cartão / conta
-          </button>
+        <!-- [FIX-07] Removido botão duplicado "+ Adicionar novo cartão / conta" com
+             ícone de cartão — já existe a ação "+ Adicionar" no cabeçalho, que abre
+             o mesmo modal cobrindo cartão, banco, MB Way, Pix e cripto. Manter os
+             dois era redundante e o ícone fixo de cartão não representava as
+             demais formas de pagamento suportadas. -->
+        <!-- [FIX-09] Saldo de Créditos WeKz (ganhos via indicação) — sempre visível
+             aqui, respondendo "onde vão os créditos ganhos". -->
+        <div id="cpWalletCreditsStrip" style="display:none;margin-bottom:14px;padding:12px 16px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:12px;font-size:12px;color:#c4b5fd;align-items:center;justify-content:space-between;gap:10px;">
+          <span>🎁 <strong>Créditos WeKz</strong> · ganhos com indicações</span>
+          <strong id="cpWalletCreditsValue" style="font-size:14px;">R$ 0,00</strong>
         </div>
+        <div class="cp-wallet-grid" id="cpWalletGrid"><!-- JS --></div>
         <div class="cp-coupons-title"><span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Cupons gerados pelo Smart Negotiator</div>
         <div class="cp-coupon-list" id="cpCouponList"><!-- JS --></div>
       </div>
@@ -3877,10 +3905,19 @@ document.addEventListener('DOMContentLoaded', function() {
             Copiar Link
           </button>
         </div>
-        <div style="margin-top:14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);display:flex;gap:8px;align-items:flex-start;">
-          <span style="flex-shrink:0;color:#F59E0B;">⭐</span>
-          <span><strong style="color:#F59E0B;">0 indicações ativas</strong> · Sem limite de indicações! Cada amigo que concluir uma compra gera R$50 para você.</span>
+        <!-- [FIX-09] Onde vão os créditos: explicitado + saldo real, sincronizado com a Carteira Multimoedas. -->
+        <div style="margin-top:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.7);">
+          <span style="color:#a78bfa;font-weight:700;">💰 Créditos WeKz ganhos: <span id="cpReferralCreditsTotal">R$ 0,00</span></span> disponíveis
+          <div style="margin-top:2px;">São somados automaticamente à tua <strong>Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
         </div>
+        <div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);display:flex;gap:8px;align-items:flex-start;">
+          <span style="flex-shrink:0;color:#F59E0B;">⭐</span>
+          <span><strong style="color:#F59E0B;" id="cpReferralActiveCount">0 indicações ativas</strong> · Sem limite de indicações! Cada amigo que concluir uma compra gera R$50 para você.</span>
+        </div>
+        <!-- Simulação, já que esta fase é 100% front-end (sem backend para confirmar a compra real do amigo indicado) -->
+        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed rgba(255,255,255,0.2);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;">
+          🧪 Simular: um amigo indicado concluiu a 1ª compra (demo)
+        </button>
       </div>
     </div>
 

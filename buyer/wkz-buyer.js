@@ -3475,12 +3475,39 @@ var _pdpGeneration = 0;
    wkz-core.js.
    Origem monólito: linhas 23189–28105
    ─────────────────────────────────────────────────────────────────────── */
+/* [FIX-03/10] Botão "Compartilhar" da PDP — antes não existia nenhuma ação
+   de compartilhar produto na app (a missão "Compartilhar um produto" não
+   tinha nenhum gatilho real). Usa a Web Share API nativa quando disponível
+   (mobile) e cai para WhatsApp Web + cópia de link como alternativa
+   (desktop), e conclui a missão do dia ao terminar. */
+function pdpShareProduct(i) {
+  var p = products[i];
+  if (!p) return;
+  var url = 'https://wekzshop.com/?p=' + i;
+  var text = '🛍️ Olha isto na WeKz Shop: ' + p.n + ' — ' + (typeof formatPrice === 'function' ? formatPrice(p.p) : ('R$ ' + p.p));
+  function done() {
+    if (typeof window.cpCompleteMission === 'function') window.cpCompleteMission('share');
+  }
+  if (navigator.share) {
+    navigator.share({ title: p.n, text: text, url: url }).then(done).catch(function(){ /* usuário cancelou — não conclui a missão */ });
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank');
+    if (navigator.clipboard) navigator.clipboard.writeText(url);
+    showToast && showToast('🔗 Link do produto copiado — a abrir o WhatsApp!');
+    done();
+  }
+}
+
 function openProduct(i){
   const p=products[i];
   if(!p) return;
   currentPdpIndex = i;
   /* Incrementa geração ANTES de qualquer setTimeout */
   var myGen = ++_pdpGeneration;
+
+  // [FIX-03] Missão do dia "Ver produtos recomendados" — conta produtos
+  // distintos realmente abertos nesta sessão (3 para concluir).
+  if (typeof window.cpTrackProductBrowse === 'function') window.cpTrackProductBrowse(i);
 
   setTimeout(()=>{ if(_pdpGeneration===myGen) initBundles(i); },80);
   setTimeout(()=>{
@@ -4365,6 +4392,16 @@ function ckoutNext(from) {
 
     // FIX FUNC-02: carrinho NÃO é limpo aqui — será limpo em finalizeOrder()
     showToast('🎉 Pedido ' + orderNum + ' confirmado com sucesso!');
+
+    // [FIX-03] Missão do dia "Fazer uma compra hoje" — conclusão real,
+    // disparada apenas quando o pedido é de facto confirmado (não por
+    // clique manual no card da missão).
+    if (typeof window.cpCompleteMission === 'function') window.cpCompleteMission('buy');
+    // Se um cupom estava ativo (aplicado no Carrinho via window._activeCoupon
+    // e carregado até o checkout) conclui também "Usar um cupom numa compra".
+    if (typeof window.cpCompleteMission === 'function' && window._activeCoupon) {
+      window.cpCompleteMission('coupon');
+    }
   }
   _ckoutGoto(from + 1);
 }
