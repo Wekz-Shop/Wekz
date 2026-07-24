@@ -36,7 +36,7 @@ const KZ_WISDOM = {
     'Os meus sensores detetaram descontos a piscar! Usa <strong>WEKZ10</strong> e poupa já.',
     'Missão ativa: economizar o máximo! Já analisei as melhores <strong>ofertas do dia</strong> para ti.',
     'Alerta de preço! O meu radar detetou uma queda de preço em <strong>5 produtos</strong> da tua lista.',
-    'Cupão <strong>FLASH50</strong> ainda está ativo. O meu sexto sentido diz que vai expirar em breve!',
+    'Cupom <strong>FLASH50</strong> ainda está ativo. O meu sexto sentido diz que vai expirar em breve!',
     'Sistema de caça a descontos: <em>ONLINE</em>. Pronto para te guiar às melhores ofertas! 🎯',
   ],
   dashboard: [
@@ -51,7 +51,7 @@ const KZ_WISDOM = {
     'Oferta relâmpago detetada! Só restam poucos minutos. <em>Adiciona ao carrinho já!</em>',
   ],
   items_in_cart: [
-    'Excelente escolha! Os meus olhos de lince aprovam. Usa o cupão <strong>WEKZ10</strong> antes de finalizar!',
+    'Excelente escolha! Os meus olhos de lince aprovam. Usa o cupom <strong>WEKZ10</strong> antes de finalizar!',
     'Carrinho ativo! Sensor de melhor preço: encontrei frete <strong>GRÁTIS</strong> para o teu CEP. Verifica!',
     'Ótimo! Mais <em>R$ {x}</em> e ganhas frete grátis. O meu radar já encontrou produtos complementares!',
   ],
@@ -4402,6 +4402,27 @@ function ckoutNext(from) {
     if (typeof window.cpCompleteMission === 'function' && window._activeCoupon) {
       window.cpCompleteMission('coupon');
     }
+
+    // [FIX-07] Registrar compra no Histórico de Compras do perfil
+    if (typeof window._cpFindProductIndexByName === 'function' && typeof window.CP_PURCHASE_HISTORY !== 'undefined') {
+      var _histIdx = window._cpFindProductIndexByName(_oProd.n);
+      if (_histIdx !== -1) {
+        window.CP_PURCHASE_HISTORY.unshift({ productIdx: _histIdx, date: shortDate, qty: 1 });
+        if (typeof window.renderPurchaseHistory === 'function') window.renderPurchaseHistory();
+      }
+    }
+
+    // [FIX-05] Registrar no micro-histórico
+    if (typeof window.cpPushHistoryItem === 'function') {
+      window.cpPushHistoryItem({
+        emoji: '🛒',
+        text: 'Compra ' + orderNum + ' confirmada — ' + _oProd.n,
+        time: 'Agora mesmo',
+        action: function() {
+          if (typeof window.MapsTo === 'function') window.MapsTo('client-profile');
+        }
+      });
+    }
   }
   _ckoutGoto(from + 1);
 }
@@ -4816,6 +4837,20 @@ function cartBuyExpressNow(idx) {
     if(typeof showToast === 'function') {
       showToast('Alerta ativo! Kz IA monitora o preço. Vamos avisar quando chegar em ' + _fmtPrice(threshold) + '.');
     }
+
+    // [FIX-05] Registrar criação de alerta no micro-histórico
+    if(typeof window.cpPushHistoryItem === 'function') {
+      window.cpPushHistoryItem({
+        emoji: '🔔',
+        text: 'Alerta de preço criado para ' + (p ? p.n : 'produto') + ' — meta: ' + _fmtPrice(threshold),
+        time: 'Agora mesmo',
+        action: function() {
+          var card = document.getElementById('cpPriceAlertsCard');
+          if (card && typeof window._cpScrollAndFlash === 'function') window._cpScrollAndFlash(card);
+          else if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
   };
 
   /* ── REMOVER ALERTA ── */
@@ -4884,11 +4919,12 @@ function cartBuyExpressNow(idx) {
         ? Math.round((1 - a.threshold / a.currentPrice) * 100)
         : 0;
       const notifLabel = { push:'Push', email:'E-mail', sms:'SMS' }[a.notif||'push'] || 'Push';
+      const hasProduct = typeof a.productIdx === 'number' && a.productIdx >= 0;
       return `
-      <div class="cp-alert-item-row">
+      <div class="cp-alert-item-row"${hasProduct ? ' style="cursor:pointer;" onclick="openProduct(' + a.productIdx + ')"' : ''}>
         <div class="cp-alert-emoji">${a.emoji||'📦'}</div>
         <div class="cp-alert-body">
-          <div class="cp-alert-name">${a.name||'Produto'}</div>
+          <div class="cp-alert-name"${hasProduct ? ' style="color:var(--teal);"' : ''}>${a.name||'Produto'}</div>
           <div class="cp-alert-meta">
             Alerta em <strong>${_fmtPrice(a.threshold)}</strong>
             · queda de ${diff}%
@@ -4896,7 +4932,7 @@ function cartBuyExpressNow(idx) {
             · desde ${dateStr}
           </div>
         </div>
-        <button class="cp-alert-del" onclick="kzRemovePriceAlertById('${a.id}')">Remover</button>
+        <button class="cp-alert-del" onclick="event.stopPropagation();kzRemovePriceAlertById('${a.id}')">Remover</button>
       </div>`;
     }).join('')}</div>`;
   };

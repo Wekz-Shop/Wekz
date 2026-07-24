@@ -3873,8 +3873,8 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="cp-referral-hero">
           <div class="cp-referral-emoji">🚀</div>
           <div style="flex:1;">
-            <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-bottom:4px;">Convide amigos e ganhe <span style="color:var(--teal);">R$50</span> cada!</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);">Seu amigo ganha <strong style="color:var(--teal);">-10% OFF</strong> na 1ª compra. Você recebe <strong style="color:#a78bfa;">R$50 em crédito</strong> após a compra ser concluída.</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Convide amigos e ganhe <span style="color:var(--teal);">R$50</span> cada!</div>
+            <div style="font-size:12px;color:var(--muted);">Seu amigo ganha <strong style="color:var(--teal);">-10% OFF</strong> na 1ª compra. Você recebe <strong style="color:#a78bfa;">R$50 em crédito</strong> após a compra ser concluída.</div>
           </div>
         </div>
         <div style="margin-bottom:14px;">
@@ -3900,22 +3900,22 @@ document.addEventListener('DOMContentLoaded', function() {
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             WhatsApp
           </button>
-          <button style="flex:1;min-width:120px;padding:11px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:rgba(255,255,255,0.75);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="cpShareReferral('link')">
+          <button style="flex:1;min-width:120px;padding:11px 16px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="cpShareReferral('link')">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
             Copiar Link
           </button>
         </div>
         <!-- [FIX-09] Onde vão os créditos: explicitado + saldo real, sincronizado com a Carteira Multimoedas. -->
-        <div style="margin-top:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.7);">
+        <div style="margin-top:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted);">
           <span style="color:#a78bfa;font-weight:700;">💰 Créditos WeKz ganhos: <span id="cpReferralCreditsTotal">R$ 0,00</span></span> disponíveis
-          <div style="margin-top:2px;">São somados automaticamente à tua <strong>Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
+          <div style="margin-top:2px;">São somados automaticamente à tua <strong style="color:var(--text);">Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
         </div>
-        <div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);display:flex;gap:8px;align-items:flex-start;">
+        <div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;">
           <span style="flex-shrink:0;color:#F59E0B;">⭐</span>
           <span><strong style="color:#F59E0B;" id="cpReferralActiveCount">0 indicações ativas</strong> · Sem limite de indicações! Cada amigo que concluir uma compra gera R$50 para você.</span>
         </div>
         <!-- Simulação, já que esta fase é 100% front-end (sem backend para confirmar a compra real do amigo indicado) -->
-        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed rgba(255,255,255,0.2);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;">
+        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;">
           🧪 Simular: um amigo indicado concluiu a 1ª compra (demo)
         </button>
       </div>
