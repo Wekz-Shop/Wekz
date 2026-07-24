@@ -4364,8 +4364,57 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   }
 
   /* ── Helpers de template ── */
+  /* [FIX-01] Fonte única de verdade para nível/pontos — antes o hero banner
+     (#cpLevelName), o stat "Nível Atual" (#cpStatLvl) e a bolha inicial do
+     Copilot tinham "Neon Cyber"/"Neon" fixos no HTML estático, enquanto o
+     Guia de Níveis calculava o nível real a partir de userPoints.lifetime
+     (8.340 pts → nível "Cyber", não "Neon Cyber"). Isso fazia o topo do
+     perfil dizer uma coisa e o Guia logo abaixo dizer outra. Agora tudo lê
+     daqui. */
+  function cpCurrentLevelData() {
+    var pts  = (typeof userPoints !== 'undefined' && userPoints) ? userPoints.lifetime : 0;
+    var curr = (typeof _wkzLevel === 'function') ? _wkzLevel(pts) : { name:'Bronze', color:'#CD7F32' };
+    var next = (typeof _wkzNextLevel === 'function') ? _wkzNextLevel(pts) : null;
+    var toNext = next ? (next.min - pts) : 0;
+    return { pts: pts, curr: curr, next: next, toNext: toNext };
+  }
+  function cpLevelShortLabel(name) {
+    return name === 'Neon Cyber' ? 'Neon' : name;
+  }
+  function cpBuildLevelInsight() {
+    var d = cpCurrentLevelData();
+    if (d.next) {
+      return 'Olá, <strong>Alexandre</strong>! ' + CP_ICO.flame + ' Estás no nível <strong>' + d.curr.name + '</strong> e já economizaste <strong>' + cpFmtAmt(CP_SAVED_EUR) + '</strong> com o Smart Negotiator. Mais <strong>' + d.toNext.toLocaleString('pt-BR') + ' pontos</strong> para o nível ' + d.next.name + ' — continua assim!';
+    }
+    return 'Olá, <strong>Alexandre</strong>! ' + CP_ICO.flame + ' Estás no nível máximo <strong>' + d.curr.name + '</strong> e já economizaste <strong>' + cpFmtAmt(CP_SAVED_EUR) + '</strong> com o Smart Negotiator. Aproveita todos os benefícios VIP!';
+  }
+  /* Sincroniza hero banner + stat "Nível Atual" com o nível real (userPoints.lifetime).
+     Chamada no init do perfil e sempre que os pontos mudarem (ex: pós-compra, missão). */
+  window.cpSyncLevelDisplay = function() {
+    var d = cpCurrentLevelData();
+    var lvlNameEl = document.getElementById('cpLevelName');
+    if (lvlNameEl) {
+      lvlNameEl.innerHTML = d.curr.name + ' <span class="wkz-icon wkz-icon-zap">' + CP_ICO.zap + '</span>';
+    }
+    var statLvlEl = document.getElementById('cpStatLvl');
+    if (statLvlEl) {
+      statLvlEl.innerHTML = '<span class="wkz-icon wkz-icon-zap" style="margin-right:2px;">' + CP_ICO.zap + '</span>' + cpLevelShortLabel(d.curr.name);
+      statLvlEl.style.color = d.curr.color;
+    }
+    var ptsFmt = d.pts.toLocaleString('pt-BR');
+    var heroPtsEl = document.getElementById('cpStatHeroPoints');
+    if (heroPtsEl) heroPtsEl.textContent = ptsFmt;
+    var coPtsEl = document.getElementById('cpStatPoints');
+    if (coPtsEl) coPtsEl.textContent = ptsFmt + ' pts';
+  };
+  window.cpPushHistoryItem = function(item) {
+    CP_HISTORY.unshift(item);
+    renderCopilotHistory();
+  };
   function cpApplyTpl(str) {
-    return str ? str.replace('{{SAVED}}', cpFmtAmt(CP_SAVED_EUR)) : str;
+    if (!str) return str;
+    if (str === '{{LEVEL_INSIGHT}}') return cpBuildLevelInsight();
+    return str.replace('{{SAVED}}', cpFmtAmt(CP_SAVED_EUR));
   }
 
   /* ══════════════════════════════════════════
@@ -4433,28 +4482,68 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   var CP_ICO_LABEL = { lynx:'Lince Kz', zap:'Raio', star:'Estrela', hexagon:'Hexágono', gem:'Gema', shield:'Escudo', crown:'Coroa', eye:'Olho Cyber', cpu:'Chip', trophy:'Troféu', flame:'Chama', target:'Mira' };
 
   /* ── Mock Data ── */
+  /* [FIX-05] Cada item do micro-histórico agora é clicável e leva o
+     utilizador de volta ao local exato a que se refere — antes eram só
+     linhas de texto estáticas sem nenhuma ação associada. */
   var CP_HISTORY = [
-    { emoji:CP_ICO.bot, text:'Smart Negotiator desbloqueou -15% no Smartphone Pro X', time:'Hoje 14:22' },
-    { emoji:CP_ICO.tag, text:'Cupão KZNEON18 gerado automaticamente pelo Kz', time:'Ontem 11:05' },
-    { emoji:CP_ICO.package, text:'Encomenda #WKZ-9042 saiu para entrega em Lisboa', time:'Ontem 09:30' },
-    { emoji:CP_ICO.scale, text:'Veredito da disputa #WKZ-8801 emitido a seu favor', time:'3 dias atrás' },
-    { emoji:CP_ICO.flame, text:'Atingiste o nível Neon Cyber — +200 pts bónus!', time:'5 dias atrás' },
-    { emoji:CP_ICO.card, text:'Cartão Visa *4521 adicionado à carteira multimoedas', time:'1 sem atrás' },
+    { emoji:CP_ICO.bot, text:'Smart Negotiator desbloqueou -15% no Smartphone Pro X', time:'Hoje 14:22', action:function(){ window.cpTrackOrder('#WKZ-9042'); } },
+    { emoji:CP_ICO.tag, text:'Cupão KZNEON18 gerado automaticamente pelo Kz', time:'Ontem 11:05', action:function(){ _cpGotoCoupons('KZNEON18'); } },
+    { emoji:CP_ICO.package, text:'Encomenda #WKZ-9042 saiu para entrega em Lisboa', time:'Ontem 09:30', action:function(){ window.cpTrackOrder('#WKZ-9042'); } },
+    { emoji:CP_ICO.scale, text:'Veredito da disputa #WKZ-8801 emitido a seu favor', time:'3 dias atrás', action:function(){ window.cpViewDisputeProduct('#WKZ-8801'); } },
+    { emoji:CP_ICO.flame, text:'Atingiste o nível Neon Cyber — +200 pts bónus!', time:'5 dias atrás', action:function(){ window.cpOpenLevelGuide(); } },
+    { emoji:CP_ICO.card, text:'Cartão Visa *4521 adicionado à carteira multimoedas', time:'1 sem atrás', action:function(){ _cpGotoWallet(); } },
   ];
+  function _cpGotoCoupons(code) {
+    var list = document.getElementById('cpCouponList');
+    if (list) _cpScrollAndFlash(list);
+    if (code && typeof window.cpCopyCoupon === 'function') setTimeout(function(){ window.cpCopyCoupon(code); }, 500);
+  }
+  function _cpGotoWallet() {
+    var grid = document.getElementById('cpWalletGrid');
+    if (grid) _cpScrollAndFlash(grid);
+  }
 
   var CP_ORDERS = [
     { id:'#WKZ-9042', name:'Smartphone Pro X 256GB Grafite', amountEUR: 329.99,
       status:'shipping', statusLabel:CP_ICO.truck+' Saiu p/ Entrega', progress:85,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:3, eta:'27 Mai 2026' },
+      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:3, eta:'27 Mai 2026',
+      carrier:'DHL Express Internacional', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
+      events:[
+        { title:'Saiu para entrega', desc:'O entregador está a caminho do endereço de destino.', time:'Hoje 07:14', location:'CTCE São Paulo/SP — Unidade de distribuição', done:true, active:true },
+        { title:'Chegou ao hub local', desc:'Encomenda chegou ao centro de distribuição mais próximo do destino.', time:'Ontem 18:40', location:'CTCE Vila Prudente — São Paulo/SP', done:true, active:false },
+        { title:'Liberado pela alfândega', desc:'Documentação fiscal verificada e aprovada.', time:'25 Mai 09:12', location:'Receita Federal — Guarulhos/SP', done:true, active:false },
+        { title:'Em trânsito internacional', desc:'Objeto em voo para distribuição no Brasil.', time:'23 Mai 21:30', location:'Aeroporto GRU — Guarulhos/SP', done:true, active:false },
+        { title:'Pedido confirmado', desc:'Pagamento via Pix aprovado em 12 segundos.', time:'20 Mai 09:12', location:'WeKz Shop', done:true, active:false },
+      ] },
     { id:'#WKZ-9038', name:'Fone ANC Pro Bluetooth 5.3', amountEUR: 89.50,
       status:'customs', statusLabel:CP_ICO.customs+' Aguard. Alfândega', progress:55,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:2, eta:'02 Jun 2026' },
+      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:2, eta:'02 Jun 2026',
+      carrier:'Correios — Importado', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
+      events:[
+        { title:'Aguardando liberação alfandegária', desc:'Documentação em análise pela Receita Federal.', time:'Hoje 06:03', location:'Receita Federal — Guarulhos/SP', done:true, active:true },
+        { title:'Chegou ao Brasil', desc:'Objeto desembarcou no país de destino.', time:'Ontem 14:20', location:'Aeroporto GRU — Guarulhos/SP', done:true, active:false },
+        { title:'Em trânsito internacional', desc:'Encomenda embarcada em voo internacional.', time:'28 Mai 11:00', location:'HKIA — Hong Kong', done:true, active:false },
+        { title:'Pedido confirmado', desc:'Pagamento via cartão aprovado.', time:'26 Mai 10:45', location:'WeKz Shop', done:true, active:false },
+      ] },
     { id:'#WKZ-9011', name:'Smartwatch Ultra Series 9', amountEUR: 214.00,
       status:'processing', statusLabel:CP_ICO.gear+' Processando Hub', progress:25,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:1, eta:'08 Jun 2026' },
+      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:1, eta:'08 Jun 2026',
+      carrier:'Transportadora WeKz', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
+      events:[
+        { title:'Em separação no hub', desc:'Pedido está a ser conferido e embalado para envio internacional.', time:'Hoje 08:30', location:'Hub Central WeKz — Shenzhen, CN', done:true, active:true },
+        { title:'Pedido confirmado', desc:'Pagamento via Pix aprovado.', time:'Ontem 19:05', location:'WeKz Shop', done:true, active:false },
+      ] },
     { id:'#WKZ-8990', name:'Teclado Mecânico RGB TKL', amountEUR: 74.99,
       status:'delivered', statusLabel:CP_ICO.check+' Entregue', progress:100,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:4, eta:'Entregue 18 Mai 2026' },
+      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:4, eta:'Entregue 18 Mai 2026',
+      carrier:'Jadlog — .Package', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
+      events:[
+        { title:'Entregue ao destinatário', desc:'Assinado por: A. KZ — Recebido em mãos.', time:'18 Mai 14:32', location:'São Paulo/SP', done:true, active:true },
+        { title:'Saiu para entrega', desc:'Veículo de entrega a caminho.', time:'18 Mai 08:12', location:'CTCE Mooca — São Paulo/SP', done:true, active:false },
+        { title:'Em trânsito', desc:'Objeto em percurso para o destino final.', time:'15 Mai 14:00', location:'HUB Jabaquara — São Paulo/SP', done:true, active:false },
+        { title:'Coletado e enviado', desc:'Transportadora coletou o pacote no vendedor.', time:'13 Mai 09:00', location:'SoundWorld — Campinas/SP', done:true, active:false },
+        { title:'Pedido confirmado', desc:'Pagamento por cartão aprovado.', time:'12 Mai 10:00', location:'WeKz Shop', done:true, active:false },
+      ] },
   ];
 
   var CP_DISPUTES = [
@@ -4509,7 +4598,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   ];
 
   var CP_INSIGHTS = [
-    'Olá, <strong>Alexandre</strong>! '+CP_ICO.flame+' Estás no nível <strong>Neon Cyber</strong> e já economizaste <strong>{{SAVED}}</strong> com o Smart Negotiator. Mais 160 pontos para o próximo nível!',
+    '{{LEVEL_INSIGHT}}',
     CP_ICO.search+' Dica do Kz: Os teus padrões indicam interesse em Electrónicos. Ativa o alerta de preços para poupares ainda mais!',
     CP_ICO.package+' Tens 2 encomendas internacionais em trânsito. A mais próxima chega a <strong>27 Mai</strong> — fica atento!',
     CP_ICO.scale+' O veredito da disputa <strong>#WKZ-8801</strong> foi emitido a teu favor. Reembolso em processamento. '+CP_ICO.check,
@@ -4522,16 +4611,62 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   function renderCopilotHistory() {
     var el = document.getElementById('cpHistoryList');
     if (!el) return;
-    el.innerHTML = CP_HISTORY.map(function(h) {
-      return '<div class="cp-history-item">'
+    el.innerHTML = CP_HISTORY.map(function(h, i) {
+      return '<div class="cp-history-item" data-hidx="' + i + '" style="cursor:pointer;" title="Clique para ver detalhes">'
         + '<span class="cp-history-emoji">' + h.emoji + '</span>'
         + '<span class="cp-history-text">' + h.text + '</span>'
         + '<span class="cp-history-time">' + h.time + '</span>'
         + '</div>';
     }).join('');
+    el.querySelectorAll('.cp-history-item').forEach(function(item) {
+      item.onclick = function() {
+        var h = CP_HISTORY[parseInt(item.dataset.hidx, 10)];
+        if (h && typeof h.action === 'function') h.action();
+      };
+    });
   }
 
   /* ── Render: Order Tracker ── */
+  /* [FIX-06] Histórico de compras — diferente do rastreador (que só
+     mostra pedidos recentes/em curso), esta lista cobre o histórico
+     completo, com atalho direto para a página real do produto e para
+     "comprar novamente". Aponta para produtos do catálogo navegável
+     (mesmo array `products` usado pela PDP) para que os dois botões
+     funcionem de verdade, sem link fantasma. */
+  var CP_PURCHASE_HISTORY = [
+    { productIdx: 2,  date:'02 Jul 2026', qty:1 },
+    { productIdx: 6,  date:'18 Jun 2026', qty:1 },
+    { productIdx: 8,  date:'30 Mai 2026', qty:2 },
+    { productIdx: 10, date:'14 Mai 2026', qty:1 },
+    { productIdx: 22, date:'22 Abr 2026', qty:1 },
+  ];
+  function renderPurchaseHistory() {
+    var el = document.getElementById('cpPurchaseHistoryList');
+    if (!el) return;
+    if (typeof products === 'undefined') { el.innerHTML = ''; return; }
+    el.innerHTML = CP_PURCHASE_HISTORY.map(function(h) {
+      var p = products[h.productIdx];
+      if (!p) return '';
+      var total = p.p * h.qty;
+      return '<div class="cp-history-purchase-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">'
+        + '<div style="font-size:26px;flex-shrink:0;">' + p.e + '</div>'
+        + '<div style="flex:1;min-width:0;">'
+          + '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.n + '</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Comprado em ' + h.date + (h.qty > 1 ? ' · Qtd: ' + h.qty : '') + ' · R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2}) + '</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:6px;flex-shrink:0;">'
+          + '<button onclick="openProduct(' + h.productIdx + ')" style="padding:6px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Ver Produto</button>'
+          + '<button onclick="cpBuyAgain(' + h.productIdx + ')" style="padding:6px 12px;background:linear-gradient(135deg,#00B4AB,#0891B2);border:none;border-radius:8px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Comprar Novamente</button>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+  }
+  window.cpBuyAgain = function(productIdx) {
+    if (typeof addToCart === 'function') addToCart(productIdx);
+    if (typeof openProduct === 'function') openProduct(productIdx);
+    showToast && showToast('🛒 Adicionado ao carrinho — a mostrar o produto!');
+  };
+
   function renderOrders() {
     var el = document.getElementById('cpOrderList');
     if (!el) return;
@@ -4634,10 +4769,10 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       var descLabel = (c.discountEUR != null && c.discountMinEUR != null)
         ? 'Mín. ' + cpFmtAmt(c.discountMinEUR) + ' · ' + c.desc
         : c.desc;
-      return '<div class="cp-coupon-item" onclick="cpCopyCoupon(\'' + c.code + '\')">'
+      return '<div class="cp-coupon-item' + (c.isCompensation ? ' cp-coupon-comp' : '') + '" onclick="cpCopyCoupon(\'' + c.code + '\')">'
         + '<span class="cp-coupon-emoji">' + c.emoji + '</span>'
         + '<div class="cp-coupon-body">'
-          + '<div class="cp-coupon-discount">' + discLabel + '</div>'
+          + '<div class="cp-coupon-discount">' + discLabel + (c.isCompensation ? ' <span style="display:inline-block;margin-left:4px;padding:1px 6px;background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);border-radius:5px;font-size:9px;font-weight:800;color:#60a5fa;vertical-align:middle;">COMPENSAÇÃO</span>' : '') + '</div>'
           + '<div class="cp-coupon-desc">' + descLabel + '</div>'
         + '</div>'
         + '<div class="cp-coupon-right">'
@@ -4660,11 +4795,21 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     var copilotSavedEl = document.getElementById('cpCopilotSaved');
     if (copilotSavedEl) copilotSavedEl.textContent = savedFmt;
 
+    /* [FIX-01] Nível real sincronizado + bolha inicial do Copilot já nasce
+       consistente com o Guia de Níveis (antes ficava hardcoded "Neon Cyber"
+       até o utilizador clicar "Novo insight"). */
+    window.cpSyncLevelDisplay();
+    _cpInsightIdx = 0;
+    var copilotMsgEl = document.getElementById('cpCopilotMsg');
+    if (copilotMsgEl) copilotMsgEl.innerHTML = cpApplyTpl(CP_INSIGHTS[0]);
+
     renderCopilotHistory();
     renderLevelGuideSection();
     renderOrders();
+    renderPurchaseHistory();
     renderDisputes();
     renderWallet();
+    if (typeof cpRenderReferralStats === 'function') cpRenderReferralStats();
     /* Set logo as default avatar on first load */
     var logoEl = document.getElementById('cpAvatarLogo');
     if (logoEl && !logoEl.src) {
@@ -4698,6 +4843,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
      Lê directamente de WKZ_REWARDS.levels para
      garantir consistência com checkout e PDP.
   ══════════════════════════════════════════ */
+  window.cpRefreshLevelGuide = function() { renderLevelGuideSection(); };
   function renderLevelGuideSection() {
     var host = document.getElementById('cpLevelGuideBody');
     if (!host) return;
@@ -4852,12 +4998,84 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     }, 1800);
   };
 
+  /* [FIX-02] Antes disto, "Rastrear" só disparava um toast genérico e não
+     mostrava o histórico de eventos (o que existia só na página dedicada
+     de rastreio, com um dataset totalmente separado). Agora abre um
+     overlay com o stepper + a timeline completa de eventos do próprio
+     pedido, e ainda oferece atalho para a página cheia de rastreio —
+     registando o pedido em _TRK_DATA (se disponível) para que a página
+     completa mostre exatamente os mesmos dados, sem duplicar fontes de
+     verdade divergentes. */
+  function _cpTrkIcoDone(active) {
+    return active
+      ? '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  }
   window.cpTrackOrder = function(id) {
-    showToast && showToast('Lince Kz: Consultando estado de ' + id + '...');
     var order = CP_ORDERS.find(function(o){ return o.id === id; });
-    setTimeout(function() {
-      if (order) showToast && showToast(id + ': ' + order.statusLabel + ' — Chegada estimada: ' + order.eta);
-    }, 1200);
+    if (!order) { showToast && showToast('Pedido não encontrado.'); return; }
+
+    /* Espelha para a página completa de rastreio (mesma fonte de dados) */
+    var trkCode = id.replace('#','');
+    if (typeof _TRK_DATA !== 'undefined' && !_TRK_DATA[trkCode]) {
+      _TRK_DATA[trkCode] = {
+        orderNum: id, status: order.status === 'shipping' ? 'transit' : order.status,
+        statusLabel: (order.name) ? order.statusLabel.replace(/<[^>]+>/g,'').trim() : order.statusLabel,
+        statusIcon: '📦', bannerGrad: 'linear-gradient(135deg,var(--teal) 0%,#0891b2 100%)',
+        product: { name: order.name, emoji: '📦', qty: 1, price: cpFmtAmt(order.amountEUR) },
+        carrier: { name: order.carrier || 'Transportadora WeKz', code: 'WKZ-TRK-' + trkCode, logo: '📦' },
+        etaDate: null, etaLabel: order.eta, progress: order.progress,
+        address: order.address || 'Endereço de entrega cadastrado',
+        seller: { name: 'Vendedor WeKz', rating: 4.8 },
+        activeStep: order.activeStep,
+        steps: order.steps.map(function(label, i) { return { label: label, icon: ['check','box','customs','map','home'][i] || 'box', date: i <= order.activeStep ? '—' : '—' }; }),
+        events: order.events || []
+      };
+    }
+
+    var stepperHtml = order.steps.map(function(s, i) {
+      var cls = i < order.activeStep ? 'done' : (i === order.activeStep ? 'active' : '');
+      var dotBg = cls === 'done' ? 'var(--teal)' : (cls === 'active' ? '#F59E0B' : 'var(--card2)');
+      var dotBd = cls ? 'transparent' : 'var(--border)';
+      return '<div style="flex:1;text-align:center;position:relative;">'
+        + '<div style="width:10px;height:10px;border-radius:50%;background:' + dotBg + ';border:2px solid ' + dotBd + ';margin:0 auto 6px;"></div>'
+        + '<div style="font-size:9px;color:' + (cls ? 'var(--text)' : 'var(--muted)') + ';font-weight:' + (cls === 'active' ? '800' : '600') + ';line-height:1.3;">' + s + '</div>'
+        + '</div>';
+    }).join('');
+
+    var evHtml = (order.events || []).map(function(ev) {
+      return '<div style="display:flex;gap:10px;margin-bottom:14px;">'
+        + '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;padding-top:2px;">'
+          + '<div style="width:20px;height:20px;border-radius:50%;background:' + (ev.active ? '#F59E0B' : 'rgba(0,180,171,0.15)') + ';display:flex;align-items:center;justify-content:center;">' + _cpTrkIcoDone(ev.active) + '</div>'
+        + '</div>'
+        + '<div style="flex:1;min-width:0;padding-bottom:2px;">'
+          + '<div style="display:flex;justify-content:space-between;gap:8px;"><span style="font-size:12px;font-weight:700;color:var(--text);">' + ev.title + '</span><span style="font-size:10px;color:var(--muted);white-space:nowrap;">' + ev.time + '</span></div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + ev.desc + '</div>'
+          + '<div style="font-size:10px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:4px;">' + CP_ICO.package + ' ' + ev.location + '</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+
+    _cpShowModal({
+      id: 'cpTrackModal',
+      title: CP_ICO.package + ' Rastreio — ' + id,
+      width: '480px',
+      body: '<div style="display:flex;flex-direction:column;gap:14px;">'
+        + '<div style="display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">'
+          + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + order.name + '</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">' + (order.carrier || 'Transportadora WeKz') + '</div></div>'
+          + '<div style="font-size:14px;font-weight:800;color:var(--teal);flex-shrink:0;">' + cpFmtAmt(order.amountEUR) + '</div>'
+        + '</div>'
+        + '<span class="cp-status-pill ' + order.status + '" style="align-self:flex-start;">' + order.statusLabel + '</span>'
+        + '<div style="display:flex;align-items:flex-start;padding:0 4px;">' + stepperHtml + '</div>'
+        + '<div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;">' + CP_ICO.calendar + ' Estimativa: <strong style="color:var(--text);">' + order.eta + '</strong></div>'
+        + '<div style="border-top:1px solid var(--border);padding-top:12px;">'
+          + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Histórico de Rastreamento</div>'
+          + (evHtml || '<div style="font-size:12px;color:var(--muted);">Ainda sem eventos registados.</div>')
+        + '</div>'
+        + '<button onclick="_cpCloseModal(\'cpTrackModal\');MapsTo(\'tracking\');setTimeout(function(){loadTracking(\'' + trkCode + '\');},350);" style="width:100%;padding:11px;background:linear-gradient(135deg,#00B4AB,#0891B2);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">' + CP_ICO.search + ' Ver Página Completa de Rastreio</button>'
+      + '</div>',
+      confirmLabel: null
+    });
   };
 
   /* ══════════════════════════════════════════
@@ -5195,35 +5413,30 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     cpRenderCountryList(val);
   };
 
-    // [KZ-ILLUS] Fallback seguro do mascote flutuante do modal de logout —
-  // definida aqui (dentro do mesmo escopo de CP_ICO) mas exposta em
-  // window, então o atributo onerror="_wkzLogoutIconError(this)" consegue
-  // chamá-la de qualquer lugar e ainda assim acessar CP_ICO via closure.
-  // FIX v2.3.0: fallback agora preenche o slot flutuante (sem moldura),
-  // não mais a caixinha antiga de 52px.
+    // [KZ-ILLUS] Fallback seguro do ícone do modal de logout — definida aqui
+  // (dentro do mesmo escopo de CP_ICO) mas exposta em window, então o
+  // atributo onerror="_wkzLogoutIconError(this)" consegue chamá-la de
+  // qualquer lugar e ainda assim acessar CP_ICO via closure.
   window._wkzLogoutIconError = function(imgEl) {
     if (!imgEl) return;
-    imgEl.outerHTML = '<span style="display:flex;align-items:center;justify-content:center;'
-      + 'width:100%;height:100%;font-size:56px;color:#EF4444;'
-      + 'filter:drop-shadow(0 10px 22px rgba(0,0,0,0.45));">' + CP_ICO.door + '</span>';
+    imgEl.outerHTML = CP_ICO.door;
   };
 
   window.cpLogout = function() {
-    // [KZ-ILLUS] mesma exceção já aprovada: ilustração raster como mascote
-    // do modal de logout, com fallback pro ícone de porta via
+    // [KZ-ILLUS] mesma exceção já aprovada: ilustração raster no ícone do
+    // modal de logout, com fallback pro ícone de porta original via
     // _wkzLogoutIconError() se a imagem não carregar. Só afeta ESTA
     // chamada de _wkzConfirm — o helper genérico continua servindo os
     // outros confirms do site sem nenhuma alteração.
-    // FIX v2.3.0: removida a "figurinha" com fundo/borda/box-shadow em
-    // caixa — agora é um mascote flutuante "vazado" (sem moldura), maior,
-    // que sangra por cima do topo do card, renderizado via
-    // opts.floatingMascotHTML (ver .wkz-confirm-mascot-float no CSS acima).
-    var logoutMascotHTML = '<img src="../shared/assets/mascot/ate-logo.png" alt="Kz acenando um até logo" '
-      + 'class="wkz-confirm-mascot-img" '
+    // FIX: estava 100%/100% do wrap de 52px (ficava minúsculo). O
+    // wrap não tem overflow:hidden, então uma imagem maior fica
+    // FIX v2.1: mascote menor, contain (não corta), centralizado
+    var logoutIcon = '<img src="../shared/assets/mascot/ate-logo.png" alt="Kz acenando um até logo" '
+      + 'style="width:80px;height:80px;object-fit:contain;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.35);display:block;margin:0 auto 8px;" '
       + 'onerror="_wkzLogoutIconError(this)">';
     window._wkzConfirm('Tens a certeza que queres encerrar a sessão?', {
       title: 'Sair da conta',
-      floatingMascotHTML: logoutMascotHTML,
+      icon: logoutIcon,
       variant: 'danger',
       confirmLabel: 'Sair',
       cancelLabel: 'Ficar',
@@ -5541,9 +5754,9 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
           }).join('')+'</div>';
     }
     var actionBtn='';
-    if (dispute.verdict==='buyer') actionBtn='<button onclick="_cpCloseModal(\'cpDisputeProductModal\')" style="width:100%;padding:10px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">'+CP_ICO.money+' Ver Reembolso na Carteira</button>';
+    if (dispute.verdict==='buyer') actionBtn='<button onclick="cpViewRefundInWallet(\''+dispute.id+'\')" style="width:100%;padding:10px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">'+CP_ICO.money+' Ver Reembolso na Carteira</button>';
     else if (dispute.verdict==='pending') actionBtn='<button onclick="_cpCloseModal(\'cpDisputeProductModal\')" style="width:100%;padding:10px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:10px;color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer;">'+CP_ICO.mail+' Aguardar — Receberás notificação por email</button>';
-    else if (dispute.verdict==='partial') actionBtn='<button onclick="_cpCloseModal(\'cpDisputeProductModal\')" style="width:100%;padding:10px;background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);border-radius:10px;color:#60a5fa;font-size:13px;font-weight:700;cursor:pointer;">'+CP_ICO.tag+' Ver Cupão de Compensação</button>';
+    else if (dispute.verdict==='partial') actionBtn='<button onclick="cpViewCompensationCoupon(\''+dispute.id+'\')" style="width:100%;padding:10px;background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);border-radius:10px;color:#60a5fa;font-size:13px;font-weight:700;cursor:pointer;">'+CP_ICO.tag+' Ver Cupão de Compensação</button>';
     _cpShowModal({
       id:'cpDisputeProductModal',
       title:'▸ Disputa '+orderId,
@@ -5567,6 +5780,77 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         +'</div>',
       confirmLabel:null
     });
+  };
+
+  /* [FIX-08] Helper genérico: rola até um cartão do perfil e dá um
+     destaque visual temporário (usado pelos botões de disputa e pelo
+     micro-histórico clicável). */
+  function _cpScrollAndFlash(el) {
+    if (!el) return;
+    var target = (el.closest && el.closest('.cp-card')) || el;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var prevShadow = target.style.boxShadow;
+    target.style.transition = 'box-shadow 0.3s ease';
+    target.style.boxShadow = '0 0 0 2px var(--teal), 0 0 26px rgba(0,180,171,0.35)';
+    setTimeout(function() { target.style.boxShadow = prevShadow; }, 1800);
+  }
+  window._cpScrollAndFlash = _cpScrollAndFlash;
+
+  /* [FIX-08] "Ver Reembolso na Carteira" antes só fechava o modal. Agora
+     leva mesmo à Carteira e mostra uma confirmação/comprovante temporário
+     do valor creditado — não há gateway de pagamento real nesta fase
+     (front-end puro), então a "comprovação" possível é esta confirmação
+     visual + toast, já deixando claro em qual método foi creditado. */
+  window.cpViewRefundInWallet = function(disputeId) {
+    var d = CP_DISPUTES.find(function(x){ return x.id === disputeId; });
+    _cpCloseModal('cpDisputeProductModal');
+    if (typeof MapsTo === 'function') MapsTo('client-profile');
+    setTimeout(function() {
+      var grid = document.getElementById('cpWalletGrid');
+      if (!grid) return;
+      _cpScrollAndFlash(grid);
+      var amt = (d && d.verdictAmtEUR != null) ? cpFmtAmt(d.verdictAmtEUR) : '';
+      var defaultCard = CP_CARDS.find(function(c){ return c.isDefault; }) || CP_CARDS[0];
+      var cardLabel = defaultCard ? (defaultCard.brand + ' ' + defaultCard.number.slice(-9)) : 'seu método de pagamento principal';
+      var old = document.getElementById('cpRefundReceipt');
+      if (old) old.remove();
+      var receipt = document.createElement('div');
+      receipt.id = 'cpRefundReceipt';
+      receipt.style.cssText = 'margin-bottom:14px;padding:12px 16px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;font-size:12px;color:#34d399;display:flex;align-items:center;gap:10px;';
+      receipt.innerHTML = CP_ICO.check + '<span><strong>Reembolso confirmado' + (amt ? (' — ' + amt) : '') + '</strong><br><span style="color:var(--muted);">Creditado no ' + cardLabel + (d ? (' · Disputa ' + d.id) : '') + '</span></span>';
+      grid.parentNode.insertBefore(receipt, grid);
+      setTimeout(function(){ if (receipt && receipt.parentNode) receipt.remove(); }, 9000);
+      showToast && showToast('💰 Reembolso confirmado' + (amt ? (' — ' + amt) : '') + '!');
+    }, 350);
+  };
+
+  /* [FIX-08] "Ver Cupão de Compensação" antes só fechava o modal e o
+     cupão de compensação não existia em lugar nenhum. Agora gera (uma
+     única vez por disputa) um cupão real na Carteira, marcado como
+     "COMPENSAÇÃO" para não se confundir com cupões promocionais, e leva
+     o utilizador até lá. */
+  window.cpViewCompensationCoupon = function(disputeId) {
+    var d = CP_DISPUTES.find(function(x){ return x.id === disputeId; });
+    _cpCloseModal('cpDisputeProductModal');
+    if (d && d.verdictAmtEUR != null) {
+      var already = CP_COUPONS.find(function(c){ return c.compDisputeId === d.id; });
+      if (!already) {
+        var code = 'KZCOMP' + (d.id.replace(/\D/g,'').slice(-4) || '0000');
+        CP_COUPONS.unshift({
+          emoji: CP_ICO.tag, discountEUR: d.verdictAmtEUR, discountMinEUR: null,
+          desc: 'Compensação — Disputa ' + d.id, code: code, expiry: 'Sem validade',
+          isCompensation: true, compDisputeId: d.id
+        });
+      }
+      renderWallet();
+    }
+    if (typeof MapsTo === 'function') MapsTo('client-profile');
+    setTimeout(function() {
+      var list = document.getElementById('cpCouponList');
+      if (!list) return;
+      _cpScrollAndFlash(list);
+      showToast && showToast('🎟️ Cupão de compensação disponível na tua carteira de cupões!');
+    }, 350);
   };
 
   /* ══════════════════════════════════════════
@@ -6247,14 +6531,26 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 })();
 
 /* ── 2. MISSÕES DO DIA ──────────────────────────────────────────── */
+/* [FIX-03] Antes, clicar na PRÓPRIA linha da missão já a marcava como
+   concluída — ou seja, a missão não verificava se a ação real (comprar,
+   avaliar, compartilhar, usar cupom, ver produtos) tinha de facto
+   acontecido. Isso não é "funcionamento", é um checkbox solto. Agora cada
+   missão só é marcada por window.cpCompleteMission(id), chamada pelos
+   pontos reais de conclusão de cada ação em toda a app (ver chamadas em
+   ckoutNext() para 'buy'/'coupon', cpSubmitProfileReview()
+   para 'review', openProduct() para 'browse', e o novo botão de partilha
+   da PDP para 'share') — a marcação na UI é imediata (renderMissoes()
+   síncrono), como pedido. */
 (function() {
   var CP_MISSOES = [
     { id:'buy',    emoji:'🛒', title:'Fazer uma compra hoje',        sub:'Qualquer produto conta',                pts:50,  done:false },
     { id:'review', emoji:'⭐', title:'Avaliar um produto',            sub:'Opiniões valem +30 pts bônus',          pts:30,  done:false },
-    { id:'browse', emoji:'🔍', title:'Ver produtos recomendados',     sub:'Acesse 3 produtos da sua categoria',    pts:10,  done:true  },
+    { id:'browse', emoji:'🔍', title:'Ver produtos recomendados',     sub:'Acesse 3 produtos da sua categoria',    pts:10,  done:false },
     { id:'share',  emoji:'📤', title:'Compartilhar um produto',       sub:'Via WhatsApp, link ou redes sociais',   pts:20,  done:false },
     { id:'coupon', emoji:'🎟️', title:'Usar um cupom numa compra',     sub:'Aplique qualquer cupom no checkout',    pts:25,  done:false },
   ];
+  var _cpBrowseCount = 0; // produtos distintos vistos nesta sessão (missão 'browse')
+  var _cpBrowseSeen  = {};
 
   function renderMissoes() {
     var list = document.getElementById('cpMissaoList');
@@ -6262,37 +6558,65 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     var done = CP_MISSOES.filter(function(m){return m.done;}).length;
     var total = CP_MISSOES.length;
     list.innerHTML = CP_MISSOES.map(function(m) {
-      return '<div class="cp-mission-item' + (m.done ? ' done' : '') + '" data-mid="' + m.id + '">' +
+      var subLabel = m.sub;
+      if (m.id === 'browse' && !m.done) subLabel += ' (' + Math.min(_cpBrowseCount,3) + '/3)';
+      return '<div class="cp-mission-item' + (m.done ? ' done' : '') + '" data-mid="' + m.id + '" title="' + (m.done ? 'Concluída!' : 'Complete a ação para marcar automaticamente') + '">' +
         '<div class="cp-mission-chk">' +
         (m.done ? '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>' : '') +
         '</div>' +
         '<div class="cp-mission-body">' +
           '<div class="cp-mission-title">' + m.emoji + ' ' + m.title + '</div>' +
-          '<div class="cp-mission-sub">' + m.sub + '</div>' +
+          '<div class="cp-mission-sub">' + subLabel + '</div>' +
         '</div>' +
         '<div class="cp-mission-pts">+' + m.pts + ' pts</div>' +
         '</div>';
     }).join('');
-    // Click to complete (demo)
-    list.querySelectorAll('.cp-mission-item:not(.done)').forEach(function(item) {
-      item.style.cursor = 'pointer';
-      item.onclick = function() {
-        var mid = item.dataset.mid;
-        var m = CP_MISSOES.find(function(x){return x.id===mid;});
-        if (!m || m.done) return;
-        m.done = true;
-        renderMissoes();
-        if (typeof showToast === 'function') showToast('🎯 Missão concluída! +' + m.pts + ' pts creditados.');
-      };
-    });
     // Update progress bar
     var pct = Math.round((done / total) * 100);
     var bar = document.getElementById('cpMissaoBarFill');
     var lbl = document.getElementById('cpMissaoPct');
     if (bar) bar.style.width = pct + '%';
     if (lbl) lbl.textContent = done + '/' + total + ' concluídas';
+    if (done === total) {
+      var wrap = document.getElementById('cpMissoesCard');
+      if (wrap && !wrap.dataset.allDoneToasted) {
+        wrap.dataset.allDoneToasted = '1';
+        if (typeof showToast === 'function') showToast('🏆 Todas as missões de hoje concluídas! Volta amanhã para mais.');
+      }
+    }
   }
 
+  /* [FIX-03] Ponto único de conclusão — chamado pelas ações reais em toda
+     a app. Credita pontos de verdade (soma a userPoints, a mesma fonte
+     usada pelo Guia de Níveis) e atualiza a UI imediatamente. */
+  window.cpCompleteMission = function(id) {
+    var m = CP_MISSOES.find(function(x){ return x.id === id; });
+    if (!m || m.done) return;
+    m.done = true;
+    if (typeof userPoints !== 'undefined' && userPoints) {
+      userPoints.balance  = (userPoints.balance  || 0) + m.pts;
+      userPoints.lifetime = (userPoints.lifetime || 0) + m.pts;
+    }
+    renderMissoes();
+    if (typeof window.cpSyncLevelDisplay === 'function') window.cpSyncLevelDisplay();
+    if (typeof window.cpRefreshLevelGuide === 'function') window.cpRefreshLevelGuide();
+    if (typeof showToast === 'function') showToast('🎯 Missão concluída: ' + m.title + '! +' + m.pts + ' pts creditados.');
+  };
+
+  /* Chamada por openProduct() a cada produto aberto — conta até 3
+     produtos distintos para completar a missão 'browse'. */
+  window.cpTrackProductBrowse = function(productIdx) {
+    if (_cpBrowseSeen[productIdx]) return;
+    _cpBrowseSeen[productIdx] = true;
+    _cpBrowseCount++;
+    if (_cpBrowseCount >= 3) {
+      window.cpCompleteMission('browse');
+    } else {
+      renderMissoes();
+    }
+  };
+
+  var _cpMissoesCountdownTimer = null;
   function startCountdown() {
     function tick() {
       var el = document.getElementById('cpMissoesCountdown');
@@ -6306,7 +6630,11 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       el.textContent = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
     }
     tick();
-    setInterval(tick, 1000);
+    /* [hygiene] evita empilhar um novo setInterval a cada vez que a página
+       de perfil é reaberta — sem isto, o contador acelerava/duplicava
+       toasts indiretamente após várias navegações. */
+    if (_cpMissoesCountdownTimer) clearInterval(_cpMissoesCountdownTimer);
+    _cpMissoesCountdownTimer = setInterval(tick, 1000);
   }
 
   // Init when profile opens
@@ -6326,8 +6654,15 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 })();
 
 /* ── 3. AVALIAÇÕES — star rating interativo ─────────────────────── */
+/* [FIX-04] Antes, clicar numa estrela já "enviava" a avaliação sozinha,
+   sem texto, foto/vídeo, e sem nenhuma ligação com o produto real — só
+   trocava um texto no próprio card do perfil. Agora abre um modal
+   completo (estrelas + título + comentário + fotos/vídeos), e a
+   publicação de verdade acontece através do MESMO formulário/robô já
+   usado na página do produto (#writeReviewForm → submitReview()), para
+   a avaliação realmente aparecer lá — não apenas simular no perfil. */
 (function() {
-  // Highlight stars on hover
+  // Highlight stars on hover (preview antes de abrir o modal)
   document.addEventListener('mouseover', function(e) {
     var star = e.target.closest('.cp-review-star');
     if (!star) return;
@@ -6342,30 +6677,168 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   document.addEventListener('mouseout', function(e) {
     var wrap = e.target.closest && e.target.closest('.cp-review-stars');
     if (!wrap) return;
-    wrap.querySelectorAll('.cp-review-star.lit').forEach(function(s) {
-      s.style.color = '#F59E0B';
-    });
-    wrap.querySelectorAll('.cp-review-star:not(.lit)').forEach(function(s) {
+    wrap.querySelectorAll('.cp-review-star').forEach(function(s) {
       s.style.color = 'rgba(255,255,255,0.2)';
     });
   });
 
-  window.cpSubmitStarReview = function(wrap, orderId, productName) {
-    var stars = Array.from(wrap.querySelectorAll('.cp-review-star'));
-    var rating = stars.filter(function(s){return s.style.color === 'rgb(245, 158, 11)' || s.style.color === '#F59E0B';}).length;
-    if (rating === 0) rating = 5; // default 5 stars if click without hover
-    stars.forEach(function(s,i){ s.style.color = i < rating ? '#F59E0B' : 'rgba(255,255,255,0.2)'; s.classList.toggle('lit', i < rating); });
-    setTimeout(function() {
-      var item = wrap.closest('.cp-review-item');
-      if (item) {
+  /* Fuzzy matcher: nomes nos pedidos/disputas mock nem sempre batem
+     100% com o catálogo navegável (products em wkz-core.js) — em vez de
+     inventar uma correspondência falsa, tentamos várias estratégias e
+     assumimos honestamente quando não há produto real disponível. */
+  function _cpNormName(s) {
+    return (s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function _cpFindProductIndexByName(name) {
+    if (!name || typeof products === 'undefined') return -1;
+    var target = _cpNormName(name);
+    var idx = products.findIndex(function(p) { return _cpNormName(p.n) === target; });
+    if (idx !== -1) return idx;
+    idx = products.findIndex(function(p) {
+      var pn = _cpNormName(p.n);
+      return pn.indexOf(target) !== -1 || target.indexOf(pn) !== -1;
+    });
+    if (idx !== -1) return idx;
+    var tokens = target.split(' ').filter(function(t) { return t.length > 3; });
+    idx = products.findIndex(function(p) {
+      var pn = _cpNormName(p.n);
+      return tokens.some(function(t) { return pn.indexOf(t) !== -1; });
+    });
+    return idx;
+  }
+  window._cpFindProductIndexByName = _cpFindProductIndexByName;
+
+  var _cpRevFiles = [];
+  var _cpRevRating = 5;
+
+  function _cpRevStarsHtml(rating) {
+    var out = '';
+    for (var i = 1; i <= 5; i++) {
+      out += '<span onclick="cpReviewModalPickStar(' + i + ')" style="cursor:pointer;font-size:26px;color:' + (i <= rating ? '#F59E0B' : 'rgba(255,255,255,0.2)') + ';">★</span>';
+    }
+    return out;
+  }
+
+  window.cpReviewModalPickStar = function(n) {
+    _cpRevRating = n;
+    var el = document.getElementById('cpRevStarsPicker');
+    if (el) el.innerHTML = _cpRevStarsHtml(n);
+  };
+
+  window.cpReviewModalHandleFiles = function(input) {
+    var preview = document.getElementById('cpRevFilePreview');
+    if (!preview) return;
+    Array.from(input.files || []).forEach(function(file) {
+      if (_cpRevFiles.length >= 6) { showToast && showToast('⚠️ Máximo 6 arquivos'); return; }
+      _cpRevFiles.push(file);
+      var isVideo = file.type.indexOf('video') === 0;
+      var chip = document.createElement('div');
+      chip.style.cssText = 'width:52px;height:52px;border-radius:8px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;flex-shrink:0;';
+      if (isVideo) {
+        chip.innerHTML = '🎬';
+      } else {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          chip.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      }
+      preview.appendChild(chip);
+    });
+    input.value = '';
+  };
+
+  /* [FIX-04] Abre o modal completo de avaliação. wrap/orderId/productName
+     mantidos por compatibilidade com o onclick já existente no HTML. */
+  window.cpOpenReviewModal = function(wrap, orderId, productName, emoji) {
+    _cpRevFiles = [];
+    _cpRevRating = 5;
+    _cpShowModal({
+      id: 'cpReviewModal',
+      title: '⭐ Avaliar ' + productName,
+      width: '440px',
+      body: '<div style="display:flex;flex-direction:column;gap:14px;">'
+        + '<div style="display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">'
+          + '<div style="font-size:28px;">' + (emoji || '📦') + '</div>'
+          + '<div><div style="font-size:13px;font-weight:700;color:var(--text);">' + productName + '</div><div style="font-size:11px;color:var(--muted);">' + orderId + '</div></div>'
+        + '</div>'
+        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Sua nota</label>'
+        + '<div id="cpRevStarsPicker" style="margin-top:6px;display:flex;gap:4px;">' + _cpRevStarsHtml(5) + '</div></div>'
+        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Título</label>'
+        + '<input id="cpRevTitle" type="text" placeholder="Resumo da sua experiência" style="width:100%;margin-top:6px;padding:10px 14px;background:var(--card2);border:1px solid rgba(0,180,171,0.3);border-radius:10px;color:var(--text);font-size:13px;outline:none;box-sizing:border-box;"></div>'
+        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Comentário</label>'
+        + '<textarea id="cpRevText" placeholder="Descreve a tua experiência com o produto..." style="width:100%;margin-top:6px;padding:10px 14px;background:var(--card2);border:1px solid rgba(0,180,171,0.3);border-radius:10px;color:var(--text);font-size:13px;outline:none;box-sizing:border-box;resize:vertical;min-height:80px;font-family:inherit;"></textarea></div>'
+        + '<div><label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Fotos / vídeos (opcional)</label>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;">'
+          + '<div id="cpRevFilePreview" style="display:flex;gap:8px;flex-wrap:wrap;"></div>'
+          + '<label style="width:52px;height:52px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:20px;flex-shrink:0;">+'
+            + '<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="cpReviewModalHandleFiles(this)"></label>'
+        + '</div></div>'
+        + '<button onclick="cpSubmitProfileReview(\'' + orderId + '\',\'' + productName.replace(/'/g,"\\'") + '\')" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;border-radius:10px;color:#000;font-size:13px;font-weight:800;cursor:pointer;">Publicar Avaliação</button>'
+      + '</div>',
+      confirmLabel: null
+    });
+  };
+
+  /* [FIX-04] Publicação real: tenta localizar o produto no catálogo
+     navegável e, se encontrado, publica através do MESMO pipeline usado
+     na PDP (garantindo que a avaliação realmente aparece lá). Se o
+     produto do pedido mock não existir no catálogo desta simulação
+     (gap de dados herdado de sprints anteriores — pedidos/disputas mock
+     usam nomes que não foram cadastrados no catálogo navegável), regista
+     a avaliação mesmo assim no perfil, com aviso honesto em vez de
+     fabricar uma página de produto que não existe. */
+  window.cpSubmitProfileReview = function(orderId, productName) {
+    var title = (document.getElementById('cpRevTitle') || {}).value || '';
+    var text  = (document.getElementById('cpRevText')  || {}).value || '';
+    title = title.trim(); text = text.trim();
+    if (!text) { showToast && showToast('⚠️ Escreve um comentário sobre o produto!'); return; }
+    if (!title) title = '★'.repeat(_cpRevRating) + ' ' + productName;
+
+    var idx = _cpFindProductIndexByName(productName);
+    _cpCloseModal('cpReviewModal');
+    _cpMarkPendingReviewDone(orderId);
+    if (typeof window.cpCompleteMission === 'function') window.cpCompleteMission('review');
+
+    if (idx !== -1 && typeof openProduct === 'function') {
+      openProduct(idx);
+      setTimeout(function() {
+        var form = document.getElementById('writeReviewForm');
+        if (form) form.style.display = 'block';
+        if (typeof pickStar === 'function') pickStar(_cpRevRating);
+        var titleEl = document.querySelector('#writeReviewForm input[type="text"]');
+        var textEl  = document.querySelector('#writeReviewForm textarea');
+        if (titleEl) titleEl.value = title;
+        if (textEl)  textEl.value  = text;
+        if (_cpRevFiles.length && typeof handleRevUpload === 'function') {
+          handleRevUpload({ files: _cpRevFiles });
+        }
+        if (typeof submitReview === 'function') submitReview();
+        var revList = document.getElementById('reviewsListMain');
+        if (revList) revList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 400);
+    } else {
+      showToast && showToast('⭐ Avaliação registada — obrigado! (Este produto do pedido ainda não está disponível para navegação direta no catálogo de demonstração.)');
+    }
+  };
+
+  function _cpMarkPendingReviewDone(orderId) {
+    document.querySelectorAll('.cp-review-item').forEach(function(item) {
+      var starsEl = item.querySelector('.cp-review-stars');
+      if (starsEl && starsEl.getAttribute('onclick') && starsEl.getAttribute('onclick').indexOf(orderId) !== -1) {
         item.style.transition = 'opacity 0.4s';
         item.style.opacity = '0.4';
         item.style.pointerEvents = 'none';
-        item.querySelector('.cp-review-meta').textContent = '✅ Avaliação enviada — +30 pts creditados!';
+        var meta = item.querySelector('.cp-review-meta');
+        if (meta) meta.textContent = '✅ Avaliação enviada — +30 pts creditados!';
       }
-      if (typeof showToast === 'function') showToast('⭐ Obrigado pela avaliação! +30 pts Kz creditados.');
-    }, 300);
-  };
+    });
+  }
 })();
 
 /* ── 4. REFERRAL / INDICAÇÃO ────────────────────────────────────── */
@@ -6392,6 +6865,50 @@ window.cpShareReferral = function(channel) {
       });
     }
   }
+};
+
+/* [FIX-09] Estado real do programa de indicação. Os créditos ganhos são
+   alocados na Carteira Multimoedas (faixa "Créditos WeKz", sempre visível
+   ali) — é a resposta a "onde vai ser alocado". Como esta fase do projeto
+   é 100% front-end (sem backend para confirmar a compra real do amigo
+   indicado), o botão "Simular" existe para demonstrar o fluxo completo
+   ponta a ponta; em produção ele seria substituído por um webhook/evento
+   de backend disparado quando a compra do indicado for confirmada. */
+window.WKZ_REFERRAL_STATE = { activeReferrals: 0, creditsBRL: 0 };
+
+function _cpFmtBRL(v) {
+  return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+}
+function cpRenderReferralStats() {
+  var s = window.WKZ_REFERRAL_STATE;
+  var activeEl = document.getElementById('cpReferralActiveCount');
+  if (activeEl) activeEl.textContent = s.activeReferrals + (s.activeReferrals === 1 ? ' indicação ativa' : ' indicações ativas');
+  var totalEl = document.getElementById('cpReferralCreditsTotal');
+  if (totalEl) totalEl.textContent = _cpFmtBRL(s.creditsBRL);
+  var strip = document.getElementById('cpWalletCreditsStrip');
+  var valEl = document.getElementById('cpWalletCreditsValue');
+  if (valEl) valEl.textContent = _cpFmtBRL(s.creditsBRL);
+  if (strip) strip.style.display = s.creditsBRL > 0 ? 'flex' : 'none';
+}
+
+window.cpSimulateReferralConversion = function() {
+  var s = window.WKZ_REFERRAL_STATE;
+  s.activeReferrals += 1;
+  s.creditsBRL += 50;
+  cpRenderReferralStats();
+  if (typeof window.cpPushHistoryItem === 'function') {
+    window.cpPushHistoryItem({
+      emoji: '🎁',
+      text: 'Indicação concluiu a 1ª compra — +R$50 em Créditos WeKz',
+      time: 'Agora mesmo',
+      action: function() {
+        var card = document.getElementById('cpReferralCard');
+        if (card && typeof window._cpScrollAndFlash === 'function') window._cpScrollAndFlash(card);
+        else if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+  if (typeof showToast === 'function') showToast('🎉 O teu amigo concluiu a 1ª compra — R$50 creditados na tua Carteira WeKz!');
 };
 
 /* ── 5. ACESSO RÁPIDO — scroll suave para secções ──────────────── */
@@ -6670,59 +7187,6 @@ function toggleFaq(i){
 .variant-danger  .wkz-confirm-icon-wrap { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.25); }
 .variant-warning .wkz-confirm-icon-wrap { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); }
 .variant-info    .wkz-confirm-icon-wrap { background: rgba(0,180,171,0.1);   border: 1px solid rgba(0,180,171,0.25); }
-/* ── FIX v2.3.0 — Mascote flutuante "vazado" no topo do modal ──────────
-   Substitui o .wkz-confirm-icon-wrap (caixinha com fundo/borda) quando
-   opts.floatingMascotHTML é fornecido (hoje só usado por cpLogout()).
-   O wrapper é irmão de #wkzConfirmBox (não filho), então o
-   overflow:hidden do box NÃO corta o mascote — ele pode "sangrar" para
-   fora/por cima do card livremente. Sem fundo, sem border-radius, sem
-   box-shadow em caixa: só drop-shadow acompanhando o recorte real da
-   arte (PNG/SVG com fundo transparente) — igual ao efeito flutuante do
-   mascote do Flash Sale (.wkz-fsm-mascot-img). */
-.wkz-confirm-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-}
-.wkz-confirm-mascot-float {
-  position: absolute;
-  top: -44px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  width: 118px;
-  height: 118px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  animation: wkzConfirmMascotFloat 3.6s ease-in-out infinite;
-}
-@keyframes wkzConfirmMascotFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%      { transform: translateX(-50%) translateY(-7px); }
-}
-.wkz-confirm-mascot-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.45)) drop-shadow(0 0 18px rgba(0,180,171,0.25));
-}
-/* Espaço extra no topo do card para o mascote "sangrar" por cima do
-   título sem tapar o texto.
-   [FIX] O mascote vai de top:-44px até -44+118=74px dentro do box (ver
-   .wkz-confirm-mascot-float acima); o padding anterior (52px) era menor
-   que isso e por isso o título "Sair da conta" ficava embaixo do
-   mascote. Agora sobra folga (74px + ~18px de respiro). */
-.wkz-confirm-inner.has-floating-mascot { padding-top: 92px; }
-@media (max-width: 420px) {
-  .wkz-confirm-inner.has-floating-mascot { padding-top: 80px; }
-}
-@media (max-width: 420px) {
-  .wkz-confirm-mascot-float { width: 98px; height: 98px; top: -36px; }
-}
 .wkz-confirm-title {
   font-family: 'DM Sans', sans-serif;
   font-size: 17px;
@@ -6789,7 +7253,7 @@ function toggleFaq(i){
   text-transform: uppercase;
   color: var(--muted);
 }
-/* [FIX] Ícone SVG do rodapé removido a pedido — mantém só o texto */
+.wkz-confirm-footer svg { opacity: 0.35; }
 @media (max-width: 420px) {
   .wkz-confirm-actions { grid-template-columns: 1fr; }
   .wkz-confirm-btn-ok  { order: -1; }
@@ -6827,13 +7291,6 @@ function toggleFaq(i){
     var title    = opts.title        || defaults.title;
     var okLabel  = opts.confirmLabel || 'Confirmar';
     var noLabel  = opts.cancelLabel  || 'Cancelar';
-    /* [FIX v2.3.0] Modo mascote flutuante — opcional, hoje só usado por
-       cpLogout(). Quando presente, substitui inteiramente o
-       .wkz-confirm-icon-wrap (caixinha com fundo) por um mascote maior,
-       sem moldura, "sangrando" por cima do card. Todos os outros
-       chamadores de _wkzConfirm (danger/warning/info com emoji) seguem
-       exatamente como antes — zero mudança de comportamento pra eles. */
-    var floatingMascotHTML = opts.floatingMascotHTML || null;
 
     return new Promise(function(resolve) {
       /* Remove modal anterior se houver (edge case) */
@@ -6847,15 +7304,10 @@ function toggleFaq(i){
       var overlay = document.createElement('div');
       overlay.id = 'wkzConfirmOverlay';
 
-      var iconBlockHTML = floatingMascotHTML
-        ? '' /* mascote renderizado fora do box, ver wrapHTML abaixo */
-        : '<div class="wkz-confirm-icon-wrap">' + icon + '</div>';
-      var innerClass = 'wkz-confirm-inner' + (floatingMascotHTML ? ' has-floating-mascot' : '');
-
-      var boxHTML =
+      overlay.innerHTML =
         '<div id="wkzConfirmBox" class="variant-' + variant + '">' +
-          '<div class="' + innerClass + '">' +
-            iconBlockHTML +
+          '<div class="wkz-confirm-inner">' +
+            '<div class="wkz-confirm-icon-wrap">' + icon + '</div>' +
             '<div class="wkz-confirm-title">' + title + '</div>' +
             '<div class="wkz-confirm-msg">' + msg + '</div>' +
             '<div class="wkz-confirm-actions">' +
@@ -6863,16 +7315,17 @@ function toggleFaq(i){
               '<button class="wkz-confirm-btn wkz-confirm-btn-ok"     id="wkzConfirmOk">' + okLabel + '</button>' +
             '</div>' +
           '</div>' +
-          /* [FIX] Ícone SVG do rodapé removido a pedido — mantém só o texto */
-          '<div class="wkz-confirm-footer">WeKz Shop · Ação segura</div>' +
+          '<div class="wkz-confirm-footer">' +
+            '<svg width="14" height="14" viewBox="0 0 40 40" fill="none">' +
+              '<ellipse cx="20" cy="26" rx="13" ry="10" fill="#0F172A" stroke="rgba(0,180,171,0.5)" stroke-width="1.5"/>' +
+              '<ellipse cx="20" cy="21" rx="11" ry="13" fill="#1A2540"/>' +
+              '<polygon points="13,10 17,2 20,7 23,2 27,10" fill="#00B4AB" opacity="0.9"/>' +
+              '<ellipse cx="16" cy="18" rx="2.5" ry="3" fill="#06B6D4"/>' +
+              '<ellipse cx="24" cy="18" rx="2.5" ry="3" fill="#7C3AED"/>' +
+            '</svg>' +
+            'WeKz Shop · Ação segura' +
+          '</div>' +
         '</div>';
-
-      overlay.innerHTML = floatingMascotHTML
-        ? '<div class="wkz-confirm-wrap">' +
-            '<div class="wkz-confirm-mascot-float">' + floatingMascotHTML + '</div>' +
-            boxHTML +
-          '</div>'
-        : boxHTML;
 
       document.body.appendChild(overlay);
 
