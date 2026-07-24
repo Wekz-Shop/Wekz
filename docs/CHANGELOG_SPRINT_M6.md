@@ -63,6 +63,11 @@ anteriores — nomes de pedidos/disputas mock nunca foram cadastrados no
 catálogo), o sistema avisa honestamente em vez de fabricar uma página de
 produto inexistente.
 
+> **Hotfix pós-entrega:** o `onclick` inicial só estava na fileira de
+> estrelinhas (alvo pequeno) — clicar no nome/imagem do produto não fazia
+> nada. Corrigido para o card inteiro (`.cp-review-item`) ser clicável,
+> com hover de destaque para indicar que é interativo.
+
 ## 5. Micro-histórico de interações — cada item agora é clicável — CORRIGIDO
 Cada linha leva ao local exato a que se refere:
 cupom desbloqueado → aba de cupons (com o código já copiado); encomenda →
