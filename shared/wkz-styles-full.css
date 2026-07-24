@@ -4394,6 +4394,8 @@ img, svg, video, canvas, iframe {
 .pdp-utility-btn.pub-compare{border-color:rgba(124,58,237,0.4);color:var(--c-premium);}
 .pdp-utility-btn.pub-compare:hover{background:rgba(124,58,237,0.08);}
 .pdp-utility-btn.pub-compare.kzpa-active{background:rgba(124,58,237,0.12);border-color:var(--c-premium);color:var(--c-premium);}
+.pdp-utility-btn.pub-share{border-color:rgba(245,158,11,0.45);color:#FBB524;}
+.pdp-utility-btn.pub-share:hover{background:rgba(245,158,11,0.08);box-shadow:0 0 16px rgba(245,158,11,0.2);}
 
 .pdp-protection{
   background:rgba(0,180,171,0.05);
@@ -5334,7 +5336,9 @@ html, body {
 
   /* CTAs principais em grid 2x2 */
   .pdp-actions{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .pdp-utility-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; margin-bottom:0; }
+  /* [FIX-03] 3 colunas agora (Negociar · Comparar · Compartilhar) — era
+     fixo em 2, o que deixava o 3º botão sozinho numa linha à parte. */
+  .pdp-utility-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:10px; margin-bottom:0; }
   .pdp-alert-standalone{ width:100%; margin-top:10px; justify-content:center; }
 
   /* Card de abas — Histórico de Preços / Cálculo de Frete */
