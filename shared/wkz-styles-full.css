@@ -9414,6 +9414,12 @@ h2.section-title .wkz-icon svg {
 }
 .cp-mission-item.done { opacity: 0.55; }
 .cp-mission-item:hover:not(.done) { border-color: rgba(0,180,171,0.3); }
+.cp-mission-item--clickable:hover:not(.done) {
+  background: rgba(0,180,171,0.06);
+  border: 1px dashed rgba(0,180,171,0.4);
+  box-shadow: 0 2px 8px rgba(0,180,171,0.1);
+}
+.cp-mission-item--clickable:not(.done) { cursor: pointer; }
 .cp-mission-chk {
   width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
   border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center;
