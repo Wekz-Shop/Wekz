@@ -6829,11 +6829,12 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   function _cpMarkPendingReviewDone(orderId) {
     document.querySelectorAll('.cp-review-item').forEach(function(item) {
-      var starsEl = item.querySelector('.cp-review-stars');
-      if (starsEl && starsEl.getAttribute('onclick') && starsEl.getAttribute('onclick').indexOf(orderId) !== -1) {
+      var onclickAttr = item.getAttribute('onclick') || '';
+      if (onclickAttr.indexOf(orderId) !== -1) {
         item.style.transition = 'opacity 0.4s';
         item.style.opacity = '0.4';
         item.style.pointerEvents = 'none';
+        item.style.cursor = 'default';
         var meta = item.querySelector('.cp-review-meta');
         if (meta) meta.textContent = '✅ Avaliação enviada — +30 pts creditados!';
       }
