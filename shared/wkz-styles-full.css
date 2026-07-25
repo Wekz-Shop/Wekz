@@ -14988,7 +14988,14 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
 .cp-lvlcard-track{
   display:flex; align-items:flex-start; gap:14px;
   overflow-x:auto; scroll-behavior:smooth; scroll-snap-type:x proximity;
-  padding:16px 4px 24px; margin:0 0 4px;
+  /* padding-top generoso de propósito: overflow-x:auto força overflow-y a
+     computar como auto também (regra do CSS Overflow Module), então
+     qualquer coisa que "vaze" para cima do card — o selo flutuante
+     .cp-lvlcard-pill (top:-11px) somado ao scale(1.07) do nível atual e
+     ao translateY(-3px) do hover — fica dentro da scrollable overflow
+     region e é recortada se não houver folga. 34px cobre o pior caso
+     (~22px) com margem. Não reduzir sem re-testar o selo "Você está aqui". */
+  padding:34px 4px 24px; margin:0 0 4px;
   scrollbar-width:none;
 }
 .cp-lvlcard-track::-webkit-scrollbar{ display:none; }
@@ -15071,7 +15078,7 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
 
 @media (max-width:768px){
   .cp-lvlcard{ width:128px; }
-  .cp-lvlcard-track{ gap:10px; padding:14px 2px 22px; }
+  .cp-lvlcard-track{ gap:10px; padding:28px 2px 22px; }
 }
 
 /* ── Grid inferior: bónus da categoria + progresso lado a lado ── */
