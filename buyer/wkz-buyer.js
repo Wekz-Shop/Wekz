@@ -7095,11 +7095,11 @@ const WKZ_REWARDS = {
   redeemRate:  0.05,   // R$ 0,05 por ponto resgatado
   maxRedeemPct:0.20,   // máx 20% do total pode vir de pontos
   levels: [
-    { name:'Bronze',     emoji:'🥉', icon:'award',   min:0,     max:499,      color:'#CD7F32', bg:'rgba(205,127,50,0.15)',  perks:'1pt/R$1 · Frete grátis acima R$150' },
-    { name:'Silver',     emoji:'🥈', icon:'award',   min:500,   max:1999,     color:'#94A3B8', bg:'rgba(148,163,184,0.15)', perks:'1.2pt/R$1 · Frete grátis · 5% extra' },
-    { name:'Gold',       emoji:'🥇', icon:'award',   min:2000,  max:4999,     color:'#F59E0B', bg:'rgba(245,158,11,0.12)',  perks:'1.5pt/R$1 · Frete grátis · 10% extra' },
-    { name:'Cyber',      emoji:'⚡', icon:'cyclone', min:5000,  max:9999,     color:'#00B4AB', bg:'rgba(0,180,171,0.12)',   perks:'2pt/R$1 · Frete express · 15% extra' },
-    { name:'Neon Cyber', emoji:'💎', icon:'zap',     min:10000, max:Infinity, color:'#A78BFA', bg:'rgba(167,139,250,0.15)', perks:'3pt/R$1 · Frete express · 20% extra + acesso VIP' },
+    { name:'Bronze',     emoji:'🥉', icon:'award',   min:0,     max:499,      color:'#CD7F32', bg:'rgba(205,127,50,0.15)',  perks:'1pt/R$1 · Frete grátis acima R$150',              img:'../shared/assets/levels/card-bronze.png' },
+    { name:'Silver',     emoji:'🥈', icon:'award',   min:500,   max:1999,     color:'#94A3B8', bg:'rgba(148,163,184,0.15)', perks:'1.2pt/R$1 · Frete grátis · 5% extra',             img:'../shared/assets/levels/card-silver.png' },
+    { name:'Gold',       emoji:'🥇', icon:'award',   min:2000,  max:4999,     color:'#F59E0B', bg:'rgba(245,158,11,0.12)',  perks:'1.5pt/R$1 · Frete grátis · 10% extra',            img:'../shared/assets/levels/card-gold.png' },
+    { name:'Cyber',      emoji:'⚡', icon:'cyclone', min:5000,  max:9999,     color:'#00B4AB', bg:'rgba(0,180,171,0.12)',   perks:'2pt/R$1 · Frete express · 15% extra',             img:'../shared/assets/levels/card-cyber.png' },
+    { name:'Neon Cyber', emoji:'💎', icon:'zap',     min:10000, max:Infinity, color:'#A78BFA', bg:'rgba(167,139,250,0.15)', perks:'3pt/R$1 · Frete express · 20% extra + acesso VIP', img:'../shared/assets/levels/card-neon-cyber.png' },
   ],
   /* [v3.0] Categoria em destaque com taxa de pontos reforçada — alimenta o
      CTA do Guia de Níveis Kz. Pode futuramente vir do backend/admin. */
