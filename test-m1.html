@@ -102,8 +102,8 @@
     check('wkzExactPrice()/wkzExactOff() calculam corretamente', function () {
       return wkzExactPrice(100, 50) === 50 && Math.round(wkzExactOff(50, 100)) === 50;
     });
-    check('products[] carregado com 28 itens', function () {
-      return Array.isArray(products) && products.length === 28;
+    check('products[] carregado com 29 itens', function () {
+      return Array.isArray(products) && products.length === 29;
     });
     check('cartItemsData é reativo (Proxy do WkzBus.makeReactive)', function () {
       var fired = false;
