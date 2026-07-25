@@ -2310,6 +2310,17 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- [v2.9.30] Desconto do produto (preço anunciado) + cupom, separado do desconto por forma de pagamento -->
         <div class="ckout-sb-row" id="ckoutSbDiscPromo" style="color:#FF6B35;display:none;"><span id="ckoutSbDiscPromoLabel">Desconto</span><span id="ckoutSbDiscPromoVal"></span></div>
         <div class="ckout-sb-row" id="ckoutSbDisc" style="color:#4ade80;display:none;"><span>Desconto Pix (5%)</span><span id="ckoutSbDiscVal"></span></div>
+        <!-- [FIX-item9] Opção de usar o saldo da Carteira WeKz (créditos ganhos
+             via indicação) no checkout — antes não existia nenhuma forma de
+             aplicar esse saldo na compra, mesmo aparecendo na Carteira Multimoedas
+             do perfil. Só aparece quando há saldo disponível. -->
+        <div class="ckout-sb-row" id="ckoutSbWalletRow" style="display:none;align-items:center;color:#a78bfa;">
+          <span style="display:flex;align-items:center;gap:6px;font-size:12px;">
+            <input type="checkbox" id="ckoutUseWalletCredits" onchange="ckoutToggleWalletCredits(this)" style="cursor:pointer;accent-color:#a78bfa;">
+            <label for="ckoutUseWalletCredits" style="cursor:pointer;">Usar Créditos WeKz (<span id="ckoutWalletBalanceLabel">R$ 0,00</span> disp.)</label>
+          </span>
+          <span id="ckoutWalletCreditsApplied">-R$ 0,00</span>
+        </div>
         <div class="ckout-sb-row grand"><span>Total</span><span id="ckoutSbTotal">R$ 0,00</span></div>
         <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;border-top:1px solid var(--border);padding-top:10px;"><span class="wkz-icon wkz-icon-scale"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>A WeKz atua como <strong style="color:var(--text);">intermediária de pagamento</strong> entre você e o Vendedor Parceiro. Tributos aduaneiros, quando aplicáveis a envios internacionais, são de responsabilidade do comprador conforme a legislação vigente (Remessa Conforme / VAT).</div>
         <div class="ckout-trust">
@@ -3670,7 +3681,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="cp-card-title-icon" style="background:rgba(245,158,11,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">🎯</div>
           Missões do Dia
         </div>
-        <span class="cp-card-link" id="cpMissoesTimer" style="font-size:11px;color:var(--muted);">Resetam em <strong id="cpMissoesCountdown" style="color:var(--teal);">--:--:--</strong></span>
+        <span class="cp-card-note" id="cpMissoesTimer" style="font-size:11px;color:var(--muted);cursor:default;">Resetam em <strong id="cpMissoesCountdown" style="color:var(--teal);">--:--:--</strong></span>
       </div>
       <div class="cp-card-body">
         <div class="cp-mission-list" id="cpMissaoList"><!-- JS --></div>
@@ -3709,7 +3720,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="cp-card-title-icon" style="background:rgba(251,191,36,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">⭐</div>
           Avaliações Pendentes
         </div>
-        <span class="cp-card-link" style="font-size:11px;color:#F59E0B;font-weight:700;">+30 pts cada</span>
+        <span class="cp-card-note" style="font-size:11px;color:#F59E0B;font-weight:700;cursor:default;">+30 pts cada</span>
       </div>
       <div class="cp-card-body">
         <div id="cpAvaliacoesList">
@@ -3747,7 +3758,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="cp-card-title-icon" style="background:rgba(0,180,171,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div>
           Histórico de Compras
         </div>
-        <span class="cp-card-link" style="font-size:11px;">Todos os produtos já comprados</span>
+        <span class="cp-card-note" style="font-size:11px;cursor:default;">Todos os produtos já comprados</span>
       </div>
       <div class="cp-card-body">
         <div id="cpPurchaseHistoryList"><!-- JS --></div>
@@ -3867,14 +3878,18 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="cp-card-title-icon" style="background:rgba(124,58,237,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">🎁</div>
           Indicação WeKz — Ganhe Juntos
         </div>
-        <span class="cp-card-link" style="color:#a78bfa;">Como funciona</span>
+        <span class="cp-card-link" style="color:#a78bfa;" onclick="window._cpReferralHowItWorks && window._cpReferralHowItWorks()">Como funciona</span>
       </div>
       <div class="cp-card-body">
         <div class="cp-referral-hero">
           <div class="cp-referral-emoji">🚀</div>
           <div style="flex:1;">
-            <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-bottom:4px;">Convide amigos e ganhe <span style="color:var(--teal);">R$50</span> cada!</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);">Seu amigo ganha <strong style="color:var(--teal);">-10% OFF</strong> na 1ª compra. Você recebe <strong style="color:#a78bfa;">R$50 em crédito</strong> após a compra ser concluída.</div>
+            <!-- [FIX-item9] Cores fixas em branco (#fff / rgba(255,255,255,x)) ficavam
+                 invisíveis no tema claro, pois .cp-referral-hero tem fundo translúcido
+                 (não sólido) — usa as variáveis de tema (var(--text) / var(--muted)),
+                 que já se adaptam corretamente aos dois temas. -->
+            <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Convide amigos e ganhe <span style="color:var(--teal);">R$15</span> cada!</div>
+            <div style="font-size:12px;color:var(--muted);">Seu amigo ganha <strong style="color:var(--teal);">-10% OFF</strong> na 1ª compra. Você recebe <strong style="color:#a78bfa;">R$15 em crédito</strong> quando a compra do seu amigo for de pelo menos <strong style="color:var(--text);">R$100</strong>.</div>
           </div>
         </div>
         <div style="margin-bottom:14px;">
@@ -3892,7 +3907,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="cp-referral-steps">
             <div class="cp-referral-step"><div class="cp-referral-step-num">1</div><div class="cp-referral-step-text">Compartilhe seu código <strong>KZWEKZ8340</strong> com amigos</div></div>
             <div class="cp-referral-step"><div class="cp-referral-step-num">2</div><div class="cp-referral-step-text">Seu amigo usa o código no cadastro e recebe <strong>-10% OFF</strong></div></div>
-            <div class="cp-referral-step"><div class="cp-referral-step-num">3</div><div class="cp-referral-step-text">Após a 1ª compra concluída, você recebe <strong>R$50 em crédito WeKz</strong></div></div>
+            <div class="cp-referral-step"><div class="cp-referral-step-num">3</div><div class="cp-referral-step-text">Após a 1ª compra do seu amigo (mín. <strong>R$100</strong>), você recebe <strong>R$15 em crédito WeKz</strong></div></div>
           </div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -3900,22 +3915,22 @@ document.addEventListener('DOMContentLoaded', function() {
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             WhatsApp
           </button>
-          <button style="flex:1;min-width:120px;padding:11px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:rgba(255,255,255,0.75);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="cpShareReferral('link')">
+          <button style="flex:1;min-width:120px;padding:11px 16px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="cpShareReferral('link')">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
             Copiar Link
           </button>
         </div>
         <!-- [FIX-09] Onde vão os créditos: explicitado + saldo real, sincronizado com a Carteira Multimoedas. -->
-        <div style="margin-top:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.7);">
+        <div style="margin-top:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text);">
           <span style="color:#a78bfa;font-weight:700;">💰 Créditos WeKz ganhos: <span id="cpReferralCreditsTotal">R$ 0,00</span></span> disponíveis
-          <div style="margin-top:2px;">São somados automaticamente à tua <strong>Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
+          <div style="margin-top:2px;color:var(--muted);">São somados automaticamente à tua <strong>Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
         </div>
-        <div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);display:flex;gap:8px;align-items:flex-start;">
+        <div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;">
           <span style="flex-shrink:0;color:#F59E0B;">⭐</span>
-          <span><strong style="color:#F59E0B;" id="cpReferralActiveCount">0 indicações ativas</strong> · Sem limite de indicações! Cada amigo que concluir uma compra gera R$50 para você.</span>
+          <span><strong style="color:#F59E0B;" id="cpReferralActiveCount">0 indicações ativas</strong> · Sem limite de indicações! Cada amigo que concluir uma compra de pelo menos R$100 gera R$15 para você.</span>
         </div>
         <!-- Simulação, já que esta fase é 100% front-end (sem backend para confirmar a compra real do amigo indicado) -->
-        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed rgba(255,255,255,0.2);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;">
+        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;">
           🧪 Simular: um amigo indicado concluiu a 1ª compra (demo)
         </button>
       </div>

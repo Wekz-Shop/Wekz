@@ -3981,6 +3981,15 @@ function renderSavedForLater() {
 var _ckoutStep = 1;
 var _ckoutAddr = 1;  // selected address card
 var _ckoutPay  = 'pix'; // selected payment
+// [FIX-item9] Estado do toggle "Usar Créditos WeKz" no checkout.
+var _ckoutUseWalletCredits = false;
+function ckoutToggleWalletCredits(checkbox) {
+  _ckoutUseWalletCredits = !!(checkbox && checkbox.checked);
+  _ckoutPopulateSidebar();
+  if (typeof showToast === 'function') {
+    showToast(_ckoutUseWalletCredits ? '💜 Créditos WeKz aplicados ao pedido!' : 'Créditos WeKz removidos do pedido.');
+  }
+}
 
 var _SAVED_ADDRS = {
   1: { label:'🏠 Casa', name:'João da Silva', line1:'Rua das Flores, 42, Ap 12', line2:'São Paulo – SP · 01310-100' },
@@ -4073,7 +4082,22 @@ function _ckoutPopulateSidebar() {
   // do usuário efetivamente chegar/escolher a forma de pagamento.
   var pixApplies = (_ckoutStep >= 2) && (_ckoutPay === 'pix');
   var disc  = pixApplies ? (sub - couponDiscount) * 0.05 : 0;
-  var totalDiscount = promoDiscount + couponDiscount + disc;
+
+  // [FIX-item9] Créditos WeKz (Carteira) — saldo ganho via indicações,
+  // opcionalmente aplicado pelo comprador no checkout. Limitado ao saldo
+  // disponível e ao valor restante do pedido (nunca deixa o total negativo).
+  var walletBalance = (typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE) ? (window.WKZ_REFERRAL_STATE.creditsBRL || 0) : 0;
+  var walletRow = document.getElementById('ckoutSbWalletRow');
+  var walletBalanceLbl = document.getElementById('ckoutWalletBalanceLabel');
+  var walletAppliedLbl = document.getElementById('ckoutWalletCreditsApplied');
+  if (walletRow) walletRow.style.display = walletBalance > 0 ? 'flex' : 'none';
+  if (walletBalanceLbl) walletBalanceLbl.textContent = (typeof formatPrice === 'function') ? formatPrice(walletBalance) : 'R$ ' + walletBalance.toFixed(2).replace('.', ',');
+  var remainingBeforeWallet = Math.max(0, subFull - promoDiscount - couponDiscount - disc);
+  var walletDiscount = (_ckoutUseWalletCredits && walletBalance > 0) ? Math.min(walletBalance, remainingBeforeWallet) : 0;
+  window._ckoutLastWalletDiscount = walletDiscount;
+  if (walletAppliedLbl) walletAppliedLbl.textContent = '-' + ((typeof formatPrice === 'function') ? formatPrice(walletDiscount) : 'R$ ' + walletDiscount.toFixed(2).replace('.', ','));
+
+  var totalDiscount = promoDiscount + couponDiscount + disc + walletDiscount;
   var total = Math.max(0, subFull - totalDiscount);
 
   var fmt = v => typeof formatPrice==='function' ? formatPrice(v) : 'R$ '+v.toFixed(2).replace('.',',');
@@ -4102,6 +4126,7 @@ function _ckoutPopulateSidebar() {
     <div class="ckout-tot-row"><span>Frete</span><span style="color:#22C55E;">Grátis</span></div>
     ${promoPlusCoupon>0?`<div class="ckout-tot-row" style="color:#FF6B35;"><span>${couponDiscount>0?'Desconto (produto + cupom)':'Desconto'}</span><span>-${fmt(promoPlusCoupon)}</span></div>`:''}
     ${pixApplies?`<div class="ckout-tot-row" style="color:#4ade80;"><span>Desconto Pix (5%)</span><span>-${fmt(disc)}</span></div>`:''}
+    ${walletDiscount>0?`<div class="ckout-tot-row" style="color:#a78bfa;"><span>Créditos WeKz aplicados</span><span>-${fmt(walletDiscount)}</span></div>`:''}
     <div class="ckout-tot-row grand"><span>Total</span><span>${fmt(total)}</span></div>`;
 
   // Rev address
@@ -4389,6 +4414,30 @@ function ckoutNext(from) {
 
     // ── KPIs reativos: Pedidos + Receita ──
     _wkzUpdateSellerKpis(newOrder);
+
+    // [FIX-item9] Se o comprador usou Créditos WeKz no checkout, debita o
+    // valor aplicado do saldo da Carteira (evita "gastar" o mesmo crédito
+    // duas vezes em compras futuras) e reseta o toggle para o próximo pedido.
+    if (_ckoutUseWalletCredits && typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE) {
+      var _walletSpent = Math.min(window.WKZ_REFERRAL_STATE.creditsBRL || 0, window._ckoutLastWalletDiscount || 0);
+      window.WKZ_REFERRAL_STATE.creditsBRL = Math.max(0, (window.WKZ_REFERRAL_STATE.creditsBRL || 0) - _walletSpent);
+      if (typeof cpRenderReferralStats === 'function') cpRenderReferralStats();
+    }
+    _ckoutUseWalletCredits = false;
+
+    // [FIX-item7] Registra a compra real no Meu Perfil — Histórico de
+    // Compras, Rastreador de Encomendas e Micro-Histórico. Antes disso,
+    // nenhuma compra concluída aparecia nesses cartões (só dados mock).
+    if (typeof window.cpRegisterNewPurchase === 'function') {
+      window.cpRegisterNewPurchase({
+        id: orderNum,
+        name: _oProd.n,
+        emoji: _oProd.e || '📦',
+        amountBRL: _oPrice,
+        qty: 1,
+        seller: _oSeller
+      });
+    }
 
     // FIX FUNC-02: carrinho NÃO é limpo aqui — será limpo em finalizeOrder()
     showToast('🎉 Pedido ' + orderNum + ' confirmado com sucesso!');
@@ -4816,6 +4865,23 @@ function cartBuyExpressNow(idx) {
     if(typeof showToast === 'function') {
       showToast('Alerta ativo! Kz IA monitora o preço. Vamos avisar quando chegar em ' + _fmtPrice(threshold) + '.');
     }
+
+    /* [FIX-item5] Micro-Histórico não registava a criação de alertas de preço. */
+    if (typeof window.cpPushHistoryItem === 'function') {
+      window.cpPushHistoryItem({
+        emoji: '🔔',
+        text: 'Alerta de preço criado para ' + (p ? p.n : 'produto') + ' — avisar em ' + _fmtPrice(threshold),
+        time: 'Agora',
+        action: function() {
+          if (typeof openProduct === 'function' && idx >= 0) { openProduct(idx); return; }
+          if (typeof MapsTo === 'function') MapsTo('client-profile');
+          setTimeout(function() {
+            var el = document.getElementById('cpPriceAlertsCard');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 250);
+        }
+      });
+    }
   };
 
   /* ── REMOVER ALERTA ── */
@@ -4830,12 +4896,28 @@ function cartBuyExpressNow(idx) {
   };
 
   window.kzRemovePriceAlertById = function(pid) {
+    const removedAlert = paLoad().find(a => a.id === pid);
     const alerts = paLoad().filter(a => a.id !== pid);
     paSave(alerts);
     // Atualizar botão da PDP se o produto removido for o atual
     if(typeof currentPdpIndex !== 'undefined') _paUpdatePdpBtn(currentPdpIndex);
     kzRenderProfileAlerts();
     if(typeof showToast === 'function') showToast('Alerta de preço removido.');
+    /* [FIX-item5] Micro-Histórico não registava a remoção de alertas de preço. */
+    if (typeof window.cpPushHistoryItem === 'function' && removedAlert) {
+      window.cpPushHistoryItem({
+        emoji: '🔕',
+        text: 'Alerta de preço removido — ' + (removedAlert.name || 'produto'),
+        time: 'Agora',
+        action: function() {
+          if (typeof MapsTo === 'function') MapsTo('client-profile');
+          setTimeout(function() {
+            var el = document.getElementById('cpPriceAlertsCard');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 250);
+        }
+      });
+    }
   };
 
   /* ── ATUALIZAR BOTÃO DA PDP ── */
@@ -4884,8 +4966,12 @@ function cartBuyExpressNow(idx) {
         ? Math.round((1 - a.threshold / a.currentPrice) * 100)
         : 0;
       const notifLabel = { push:'Push', email:'E-mail', sms:'SMS' }[a.notif||'push'] || 'Push';
+      /* [FIX-item11] Linha do alerta agora é clicável — atalho direto para
+         a página do produto monitorado (event.stopPropagation no botão
+         "Remover" evita que o clique de remoção também navegue). */
+      const hasProduct = typeof a.productIdx === 'number' && a.productIdx >= 0;
       return `
-      <div class="cp-alert-item-row">
+      <div class="cp-alert-item-row"${hasProduct ? ` onclick="openProduct(${a.productIdx})" style="cursor:pointer;" title="Clique para ver o produto"` : ''}>
         <div class="cp-alert-emoji">${a.emoji||'📦'}</div>
         <div class="cp-alert-body">
           <div class="cp-alert-name">${a.name||'Produto'}</div>
@@ -4896,7 +4982,7 @@ function cartBuyExpressNow(idx) {
             · desde ${dateStr}
           </div>
         </div>
-        <button class="cp-alert-del" onclick="kzRemovePriceAlertById('${a.id}')">Remover</button>
+        <button class="cp-alert-del" onclick="event.stopPropagation();kzRemovePriceAlertById('${a.id}')">Remover</button>
       </div>`;
     }).join('')}</div>`;
   };
