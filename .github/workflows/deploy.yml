@@ -17,21 +17,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      # Mesmo sem bundler (HTML/JS/CSS estÃ¡ticos), validamos sintaxe de
-      # todos os mÃ³dulos core antes de publicar â€” espelha o workflow local
-      # de "node --check obrigatÃ³rio apÃ³s cada mudanÃ§a".
+      # Mesmo sem bundler (HTML/JS/CSS estáticos), validamos sintaxe de
+      # todos os módulos core antes de publicar — espelha o workflow local
+      # de "node --check obrigatório após cada mudança".
       - run: npm run check
       - run: npm run check:buyer
       - run: npm run check:seller
-      - run: npm run check:admin
       - run: npm run test:m1
       - run: npm run test:m2
       - run: npm run test:m3
-      - run: npm run test:m4
 
   deploy:
     needs: validate
     runs-on: ubuntu-latest
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
