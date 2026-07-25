@@ -1151,7 +1151,7 @@ const categories = [
    em todo render de card — não precisa de nenhuma outra mudança de
    código quando as fotos reais forem cadastradas. */
 const products = [
-  /* ── Eletrônicos (6) ── */
+  /* ── Eletrônicos (7) ── */
   {e:'📱',n:'Smartphone Ultra Pro 5G 256GB — Câmera 200MP',p:1249.90,op:2199.90,off:43,s:'TechStore',r:4.9,sales:'18.4k',badge:'sale', stock:3,  stockMax:120, cat:'eletronicos'},
   {e:'💻',n:'Notebook Gamer RTX 4060 — 16GB RAM 1TB SSD',p:3499,op:5299,off:34,s:'NoteShop',r:4.8,sales:'9.2k',badge:'hot',          stock:12, stockMax:80,  cat:'eletronicos'},
   {e:'🎧',n:'Fone Bluetooth ANC Pro — 40h bateria',p:289,op:599,off:52,s:'SoundWorld',r:4.7,sales:'31k',badge:'sale',                 stock:0,  stockMax:200, cat:'eletronicos'},
