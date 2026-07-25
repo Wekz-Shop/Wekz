@@ -4901,12 +4901,23 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   };
 
   /* ══════════════════════════════════════════
-     GUIA DE NÍVEIS KZ — v3.0
+     GUIA DE NÍVEIS KZ — v4.0
      [v3.0] Deixou de ser um modal: agora é
      renderizado numa secção fixa do perfil
      (#cpLevelGuideBody) e inclui um CTA directo
      para a categoria com maior taxa de pontos do
      momento (WKZ_REWARDS.bonusCategory).
+     [v4.0] Substitui as linhas de texto/ícone por
+     card completo (arte ilustrada Kz por nível,
+     ver Estética Visual - Níveis Kz.pdf e
+     card-*.png de referência). A arte nunca é
+     recortada — cada card mostra a imagem inteira,
+     100% de largura do próprio contentor; selos de
+     estado (bloqueado / concluído / "você está
+     aqui") são sobrepostos por CSS, sem tocar na
+     arte. Trilha horizontal (scroll) para caber os
+     5 níveis em qualquer largura de ecrã, com
+     auto-scroll até ao nível atual ao abrir.
      Lê directamente de WKZ_REWARDS.levels para
      garantir consistência com checkout e PDP.
   ══════════════════════════════════════════ */
@@ -4924,47 +4935,30 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       return n==='Silver'?'1,2x': n==='Gold'?'1,5x': n==='Cyber'?'2x': n==='Neon Cyber'?'3x':'1x';
     }
 
-    /* [FIX light-mode] Este bloco usava rgba(255,255,255,X) fixo para texto/
-       bordas/fundos — herdado do tema escuro original. Em tema claro isso
-       resultava em texto quase branco sobre cartão branco (ilegível) e
-       bordas invisíveis entre níveis. Trocado por var(--text)/var(--muted)/
-       var(--border)/var(--card2), que já se adaptam a claro/escuro sozinhos
-       (ver wkz-styles-base.css). Níveis ainda não alcançados usam opacidade
-       0.55 (antes 0.42) — suficiente para "bloqueado" sem ficar ilegível. */
-    var levelsHtml = WKZ_REWARDS.levels.map(function(lvl) {
+    /* ── Trilha de cards completos (um por nível) ── */
+    var cardsHtml = WKZ_REWARDS.levels.map(function(lvl) {
       var isCurrent = (lvl.name === curr.name);
-      var isPast    = (pts >= lvl.min);
-      var border    = isCurrent
-        ? ('2px solid ' + lvl.color)
-        : (isPast ? '1px solid var(--border)' : '1px dashed var(--border)');
-      var bg = isCurrent ? lvl.bg : (isPast ? 'var(--card2)' : 'transparent');
-      var op = (!isPast && !isCurrent) ? '0.55' : '1';
-      var shadow = isCurrent ? 'box-shadow:0 3px 14px rgba(0,0,0,0.07);' : '';
+      var isPast    = !isCurrent && (pts >= lvl.min);
+      var isLocked  = !isCurrent && !isPast;
+      var stateClass = isCurrent ? ' is-current' : (isLocked ? ' is-locked' : ' is-past');
       var maxLabel = (lvl.max === Infinity) ? '∞' : lvl.max.toLocaleString('pt-BR');
-      var icoSvg = (CP_ICO[lvl.icon] || CP_ICO.award);
-      return '<div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;'
-           + 'border-radius:14px;border:'+border+';background:'+bg+';opacity:'+op+';'+shadow
-           + 'margin-bottom:8px;position:relative;">'
-           + '<div style="font-size:26px;flex-shrink:0;line-height:1;color:'+lvl.color+';">'+icoSvg+'</div>'
-           + '<div style="flex:1;min-width:0;">'
-             + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">'
-               + '<span style="font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:800;color:'+lvl.color+';">'+lvl.name+'</span>'
-               + (isCurrent ? '<span style="font-family:\'DM Sans\',sans-serif;font-size:9px;font-weight:800;background:'+lvl.color+';color:#000;border-radius:4px;padding:1px 6px;letter-spacing:0.4px;">VOCÊ ESTÁ AQUI</span>' : '')
-             + '</div>'
-             + '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">'
-               + lvl.min.toLocaleString('pt-BR')+' – '+maxLabel+' pts'
-             + '</div>'
-             + '<div style="font-size:12px;color:var(--text);line-height:1.55;">'+lvl.perks+'</div>'
-             + '<div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--muted);">'
-               + 'Taxa: <span style="color:'+lvl.color+';">'+rateLabel(lvl.name)+'</span> ponto por R$1'
-             + '</div>'
-           + '</div>'
+      var rangeLabel = lvl.min.toLocaleString('pt-BR') + ' – ' + maxLabel + ' pts';
+      return '<div class="cp-lvlcard'+stateClass+'" data-lvl="'+lvl.name+'"'
+           + (isCurrent ? ' id="cpLvlCardCurrent"' : '')
+           + ' style="--lvl-color:'+lvl.color+';--lvl-glow:'+lvl.color+'59;"'
+           + ' title="'+lvl.name+' · '+rangeLabel+'">'
+           + '<img src="'+lvl.img+'" alt="Card do nível '+lvl.name+' — '+rangeLabel+'" loading="lazy" '
+             + 'onerror="this.closest(\'.cp-lvlcard\').classList.add(\'cp-lvlcard-broken\')">'
+           + (isCurrent ? '<span class="cp-lvlcard-pill">'+CP_ICO.zap+' Você está aqui</span>' : '')
+           + (isPast ? '<span class="cp-lvlcard-check" title="Nível já alcançado">'+CP_ICO.check+'</span>' : '')
+           + (isLocked ? '<span class="cp-lvlcard-lock" title="Ainda não desbloqueado">'+CP_ICO.lock+'</span>' : '')
            + '</div>';
     }).join('');
+    var trackHtml = '<div class="cp-lvlcard-track" id="cpLvlTrack">' + cardsHtml + '</div>';
 
+    /* ── Caixa de progresso (Faltam para o próximo nível) ── */
     var progressHtml = next
-      ? '<div style="margin:4px 0 16px;padding:14px 16px;background:rgba(0,180,171,0.07);'
-          + 'border:1px solid rgba(0,180,171,0.2);border-radius:14px;">'
+      ? '<div class="cp-lvlgoal-box cp-lvlgoal-box--progress">'
           + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
             + '<span style="font-size:12px;font-weight:700;color:var(--text);">Faltam para '+next.name+'</span>'
             + '<span style="font-family:\'DM Sans\',sans-serif;font-size:16px;font-weight:800;color:var(--teal);">'+toNext.toLocaleString('pt-BR')+' pts</span>'
@@ -4978,23 +4972,23 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
             + '<strong style="color:var(--teal);">'+rateLabel(curr.name)+' ponto por R$1</strong> em cada compra.'
           + '</div>'
         + '</div>'
-      : '<div style="margin:4px 0 16px;padding:14px 16px;background:rgba(167,139,250,0.08);'
-          + 'border:1px solid rgba(167,139,250,0.3);border-radius:14px;text-align:center;">'
+      : '<div class="cp-lvlgoal-box cp-lvlgoal-box--maxed">'
           + '<div style="font-size:20px;margin-bottom:4px;color:#a78bfa;">'+CP_ICO.zap+'</div>'
           + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:#a78bfa;">Nível Máximo Atingido!</div>'
           + '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Aproveita todos os benefícios VIP · 3x pontos por R$1 gasto.</div>'
         + '</div>';
 
-    /* [v3.0] CTA directo para a categoria com maior taxa de pontos do momento */
+    /* ── CTA directo para a categoria com maior taxa de pontos do momento ── */
     var ctaHtml = bonus ? (
-      '<div style="margin:0 0 18px;padding:14px 16px;background:rgba(245,158,11,0.08);'
-        + 'border:1px solid rgba(245,158,11,0.28);border-radius:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
-        + '<div style="font-size:22px;color:var(--c-warning);flex-shrink:0;">'+CP_ICO.flame+'</div>'
-        + '<div style="flex:1;min-width:180px;">'
-          + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:var(--c-warning);">'+bonus.rate+' pontos em '+bonus.name+'</div>'
-          + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+bonus.note+'</div>'
+      '<div class="cp-lvlgoal-box cp-lvlgoal-box--bonus">'
+        + '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
+          + '<div style="font-size:22px;color:var(--c-warning);flex-shrink:0;">'+CP_ICO.flame+'</div>'
+          + '<div style="flex:1;min-width:140px;">'
+            + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:var(--c-warning);">'+bonus.rate+' pontos em '+bonus.name+'</div>'
+            + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+bonus.note+'</div>'
+          + '</div>'
+          + '<button onclick="cpGoToBonusCategory()" style="padding:8px 16px;background:#F59E0B;border:none;border-radius:9px;color:#000;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ver Produtos →</button>'
         + '</div>'
-        + '<button onclick="cpGoToBonusCategory()" style="padding:8px 16px;background:#F59E0B;border:none;border-radius:9px;color:#000;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ver Produtos →</button>'
       + '</div>'
     ) : '';
 
@@ -5002,10 +4996,20 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         '<p style="font-size:12px;color:var(--muted);margin:0 0 16px;line-height:1.6;">'
           + 'Sobe de nível acumulando pontos em cada compra. A taxa de ganho de pontos aumenta com o nível — quanto mais alto, mais pontos por real gasto.'
         + '</p>'
-        + ctaHtml
-        + progressHtml
-        + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Todos os Níveis</div>'
-        + levelsHtml;
+        + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Todos os Níveis</div>'
+        + trackHtml
+        + '<div class="cp-lvlgoal-grid">' + ctaHtml + progressHtml + '</div>';
+
+    /* Auto-scroll horizontal até ao card do nível atual, para o utilizador
+       não precisar de arrastar a trilha para se localizar. */
+    var trackEl = document.getElementById('cpLvlTrack');
+    var curEl   = document.getElementById('cpLvlCardCurrent');
+    if (trackEl && curEl) {
+      requestAnimationFrame(function() {
+        var target = curEl.offsetLeft - (trackEl.clientWidth - curEl.clientWidth) / 2;
+        trackEl.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+      });
+    }
   }
 
   /* [v3.0] Mantém o nome cpOpenLevelGuide() por compatibilidade com os
