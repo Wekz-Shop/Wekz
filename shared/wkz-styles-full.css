@@ -9590,6 +9590,11 @@ h2.section-title .wkz-icon svg {
 @media (max-width: 768px) { .cp-card-body { padding: 12px 14px; } .cp-card-header { padding: 12px 14px 10px; } }
 .cp-card-link { font-size: 12px; color: var(--teal); cursor: pointer; font-weight: 600; transition: var(--transition); }
 .cp-card-link:hover { text-decoration: underline; }
+/* [FIX-item12] Variante não-interativa de .cp-card-link — para textos de
+   apoio no cabeçalho dos cartões (contador, badge, legenda) que antes usavam
+   .cp-card-link só pelo estilo e herdavam cursor:pointer + hover sublinhado
+   sem nenhuma ação real por trás, confundindo o utilizador. */
+.cp-card-note { font-size: 12px; color: var(--muted); cursor: default; font-weight: 600; }
 
 /* ── Kz Copilot Panel ── */
 .cp-copilot-bubble {
