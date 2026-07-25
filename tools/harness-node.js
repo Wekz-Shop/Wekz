@@ -142,7 +142,12 @@ const assertions = `
   assert('wkzUid gera IDs únicos', function() { return wkzUid('t') !== wkzUid('t'); });
   assert('showToast está definida (versão única)', function() { return typeof showToast === 'function'; });
   assert('wkzExactPrice(100,50) === 50', function() { return wkzExactPrice(100, 50) === 50; });
-  assert('products[] tem 28 itens', function() { return Array.isArray(products) && products.length === 28; });
+  /* [FIX-item4 / Meu Perfil] Catálogo passou de 28 para 29 itens: adicionado
+     "Teclado Mecânico RGB TKL" (produto referenciado pelo pedido mock
+     #WKZ-8990 em Avaliações Pendentes / Rastreador / Disputas do Meu Perfil,
+     que antes não existia no catálogo navegável e fazia o fluxo de avaliação
+     falhar silenciosamente). Mudança intencional — ver CHANGELOG do sprint. */
+  assert('products[] tem 29 itens', function() { return Array.isArray(products) && products.length === 29; });
   assert('cartItemsData é reativo (Proxy)', function() {
     var fired = false;
     WkzBus.on('cart:change', function() { fired = true; });
