@@ -14988,14 +14988,14 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
 .cp-lvlcard-track{
   display:flex; align-items:flex-start; gap:14px;
   overflow-x:auto; scroll-behavior:smooth; scroll-snap-type:x proximity;
-  /* padding-top generoso de propósito: overflow-x:auto força overflow-y a
-     computar como auto também (regra do CSS Overflow Module), então
-     qualquer coisa que "vaze" para cima do card — o selo flutuante
-     .cp-lvlcard-pill (top:-11px) somado ao scale(1.07) do nível atual e
-     ao translateY(-3px) do hover — fica dentro da scrollable overflow
-     region e é recortada se não houver folga. 34px cobre o pior caso
-     (~22px) com margem. Não reduzir sem re-testar o selo "Você está aqui". */
-  padding:34px 4px 24px; margin:0 0 4px;
+  /* padding-top: overflow-x:auto força overflow-y a computar como auto
+     também (regra do CSS Overflow Module), então qualquer coisa que
+     "vaze" para cima de um card fica sujeita a corte. O selo "Você está
+     aqui" NÃO depende mais disso (v4.1 — ver .cp-lvlcard-pill, agora
+     top:8px, dentro da própria caixa do card). Esta folga cobre só o
+     ink overflow do scale(1.07) do nível atual + translateY(-3px) do
+     hover (~11px no pior caso) — não é mais crítica para o selo. */
+  padding:20px 4px 24px; margin:0 0 4px;
   scrollbar-width:none;
 }
 .cp-lvlcard-track::-webkit-scrollbar{ display:none; }
@@ -15034,15 +15034,25 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
   .cp-lvlcard.is-current:hover{ transform:scale(1.07) translateY(-3px); }
 }
 
-/* Selo flutuante "Você está aqui" — só no nível atual */
+/* Selo "Você está aqui" — só no nível atual.
+   [v4.1] FIX: antes ficava em top:-11px (flutuando ACIMA da caixa do
+   card), o que o colocava dentro da scrollable-overflow region de
+   .cp-lvlcard-track e o corte era recortado (overflow-y forçado a auto
+   pelo overflow-x:auto — ver comentário acima). Agora fica em top:8px,
+   ou seja, DENTRO da própria caixa do card (que já tem overflow:hidden
+   próprio, sem o problema de eixo acoplado). Isso torna o selo imune a
+   qualquer clipping do container de scroll, independente de padding,
+   escala ou hover — não é mais uma questão de "folga suficiente".
+   Sobrepõe levemente o medalhão da arte do card atual; troca aceitável
+   porque o selo comunica a mesma informação de forma mais clara. */
 .cp-lvlcard-pill{
-  position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+  position:absolute; top:8px; left:50%; transform:translateX(-50%);
   display:flex; align-items:center; gap:4px;
   background:#0B0F1A; border:1.5px solid var(--lvl-color, var(--teal));
   color:#fff; font-family:'DM Sans',sans-serif; font-size:8.5px; font-weight:800;
   letter-spacing:0.4px; text-transform:uppercase; white-space:nowrap;
-  padding:4px 9px; border-radius:20px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.35);
+  padding:4px 9px; border-radius:20px; z-index:3;
+  box-shadow:0 4px 10px rgba(0,0,0,0.45);
 }
 .cp-lvlcard-pill svg{ color:var(--lvl-color, var(--teal)); font-size:9px; }
 
@@ -15078,7 +15088,7 @@ body.wkz-bar-active #page-admin-dashboard { top: 0 !important; }
 
 @media (max-width:768px){
   .cp-lvlcard{ width:128px; }
-  .cp-lvlcard-track{ gap:10px; padding:28px 2px 22px; }
+  .cp-lvlcard-track{ gap:10px; padding:18px 2px 22px; }
 }
 
 /* ── Grid inferior: bónus da categoria + progresso lado a lado ── */
