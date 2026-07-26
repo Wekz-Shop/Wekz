@@ -5926,7 +5926,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   /* ══════════════════════════════════════════
      ADICIONAR CARTÃO / CONTA — Modal completo
-     Tipos: Cartão | Banco | MB Way | Pix | Cripto
+     Tipos: Cartão | Banco | MB Way | Pix
   ══════════════════════════════════════════ */
 
   /* Forms HTML por tipo */
@@ -5992,36 +5992,6 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         + '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:2px;"><input type="checkbox" data-wkz-default-method="1" name="cpNewCardDefault" style="accent-color:var(--teal);width:15px;height:15px;"><span style="font-size:12px;color:var(--muted);">Definir como método principal</span></label>'
         + _cpSecBadge()
         + '</div>';
-    },
-    4: /* ── Cripto ── */ function() {
-      return '<div style="display:flex;flex-direction:column;gap:12px;">'
-        + '<div style="background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(239,68,68,0.06));border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;">'
-        + '<div style="font-size:30px;color:#F59E0B;">' + CP_ICO.coin + '</div>'
-        + '<div><div style="font-size:13px;font-weight:700;color:var(--text);">Carteira Cripto</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Bitcoin, Ethereum, USDT e outras</div></div>'
-        + '</div>'
-        + _cpField('Criptomoeda','<select id="cpNewCryptoCoin" '+_cpSelStyle()+'>'
-            +'<option value="BTC">₿ Bitcoin (BTC)</option>'
-            +'<option value="ETH">⟠ Ethereum (ETH)</option>'
-            +'<option value="USDT">₮ Tether (USDT)</option>'
-            +'<option value="USDC">$ USD Coin (USDC)</option>'
-            +'<option value="BNB">◈ BNB (BNB)</option>'
-            +'<option value="SOL">◎ Solana (SOL)</option>'
-            +'<option value="MATIC">⬡ Polygon (MATIC)</option>'
-            +'<option value="OTHER">🪙 Outra</option>'
-            +'</select>')
-        + _cpField('Endereço da Carteira','<input id="cpNewCryptoAddress" type="text" placeholder="0x... ou bc1..." '+_cpInStyle('font-family:monospace;font-size:12px;letter-spacing:0.5px;')+'>')
-        + _cpField('Rede / Network','<select id="cpNewCryptoNetwork" '+_cpSelStyle()+'>'
-            +'<option value="ERC20">Ethereum (ERC-20)</option>'
-            +'<option value="TRC20">Tron (TRC-20)</option>'
-            +'<option value="BEP20">BNB Smart Chain (BEP-20)</option>'
-            +'<option value="BTC">Bitcoin Network</option>'
-            +'<option value="SOL">Solana Network</option>'
-            +'<option value="MATIC">Polygon Network</option>'
-            +'</select>')
-        + _cpField('Alias / Apelido','<input id="cpNewCryptoAlias" type="text" placeholder="Ex: Minha carteira ETH" '+_cpInStyle()+'>')
-        + '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:2px;"><input type="checkbox" data-wkz-default-method="1" name="cpNewCardDefault" style="accent-color:var(--teal);width:15px;height:15px;"><span style="font-size:12px;color:var(--muted);">Definir como método principal</span></label>'
-        + _cpSecBadge()
-        + '</div>';
     }
   };
 
@@ -6043,7 +6013,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   window.cpAddCard = function() {
     _cpActiveCardType = 0;
-    var tabs = [CP_ICO.card+' Cartão', CP_ICO.bank+' Banco', CP_ICO.smartphone+' MB Way', CP_ICO.zap+' Pix', CP_ICO.coin+' Cripto'];
+    var tabs = [CP_ICO.card+' Cartão', CP_ICO.bank+' Banco', CP_ICO.smartphone+' MB Way', CP_ICO.zap+' Pix'];
     var tabsHtml = '<div style="display:flex;gap:6px;margin-bottom:4px;overflow-x:auto;padding-bottom:2px;">'
       + tabs.map(function(t,i){
           var active = i===0;
@@ -6140,16 +6110,6 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       var maskedPix = pixKey.length > 6 ? pixKey.slice(0,3) + '···' + pixKey.slice(-3) : pixKey;
       entry = { chip:CP_ICO.zap, number:'Pix ' + pixTypeLabel + ' · ' + maskedPix, holder:pixHolder, brand:'Pix' + (pixBank ? ' · ' + pixBank : ''), isDefault:isDefault };
       showToast && showToast('Chave Pix adicionada com sucesso!');
-
-    } else if (_cpActiveCardType === 4) { /* Cripto */
-      var addr    = document.getElementById('cpNewCryptoAddress') ? document.getElementById('cpNewCryptoAddress').value.trim() : '';
-      var coin    = document.getElementById('cpNewCryptoCoin')    ? document.getElementById('cpNewCryptoCoin').value    : 'BTC';
-      var network = document.getElementById('cpNewCryptoNetwork') ? document.getElementById('cpNewCryptoNetwork').value : '';
-      var calias  = document.getElementById('cpNewCryptoAlias')   ? document.getElementById('cpNewCryptoAlias').value.trim() : '';
-      if (!addr || addr.length < 10) { showToast && showToast('Endereço de carteira inválido!'); return false; }
-      var maskedAddr = addr.slice(0,6) + '···' + addr.slice(-4);
-      entry = { chip:CP_ICO.coin, number:coin + ' · ' + maskedAddr, holder:calias || (coin + ' Wallet'), brand:network || coin, isDefault:isDefault };
-      showToast && showToast('Carteira ' + coin + ' adicionada!');
     }
 
     if (!entry) return false;
@@ -7647,7 +7607,7 @@ const FAQ_THEMES_DATA = {
     {q:'Posso alterar o endereço de entrega?', a:'Se o pedido ainda não foi enviado, contacte o vendedor pelo chat da WeKz. Após o envio, o redirecionamento depende da transportadora.'},
   ],
   pagamentos: [
-    {q:'Quais formas de pagamento são aceitas?', a:'Aceitamos Pix (aprovação imediata), cartões de crédito/débito (Visa, Master, Amex, Elo), boleto bancário, carteiras digitais (PayPal, Mercado Pago) e criptomoedas (BTC, ETH, USDT).'},
+    {q:'Quais formas de pagamento são aceitas?', a:'Aceitamos Pix (aprovação imediata), cartões de crédito/débito (Visa, Master, Amex, Elo) e boleto bancário.'},
     {q:'O pagamento é seguro?', a:'Sim! Utilizamos criptografia AES-256, somos certificados PCI DSS Nível 1 e o dinheiro fica retido em custódia até a confirmação da entrega. Nunca transferimos antes do prazo de proteção.'},
     {q:'Quando meu cartão é cobrado?', a:'O débito ocorre no momento da confirmação do pedido. Para parcelamentos, as cobranças seguem as datas da sua fatura conforme o banco emissor.'},
     {q:'Como funciona o reembolso?', a:'Reembolsos são processados em até 5 dias úteis para o método original de pagamento. Pix e carteiras digitais costumam ser mais rápidos (1-2 dias).'},
