@@ -874,7 +874,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="trust-icon"><span class="wkz-icon wkz-icon-creditcard"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="7" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="11" cy="15" r="1.5" fill="currentColor" stroke="none"/></svg></span></div>
         <div>
           <div class="trust-title">Pagamento Seguro</div>
-          <div class="trust-desc">Pix, cartão, boleto, cripto</div>
+          <div class="trust-desc">Pix, cartão, boleto</div>
         </div>
       </div>
       <div class="trust-item">
@@ -1769,7 +1769,6 @@ document.addEventListener('DOMContentLoaded', function() {
           <span class="payment-icon">💳 Master</span>
           <span class="payment-icon">📱 Pix</span>
           <span class="payment-icon">📄 Boleto</span>
-          <span class="payment-icon">₿ Cripto</span>
         </div>
       </div>
     </div>
@@ -1977,11 +1976,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="pay-nm">Boleto Bancário</div>
             <div class="pay-ds">Vence em 3 dias úteis</div>
           </div>
-          <div class="ckout-pay-opt" id="payCrypto" onclick="selectPay('crypto')">
-            <div class="pay-icon">₿</div>
-            <div class="pay-nm">Cripto</div>
-            <div class="pay-ds">BTC · ETH · USDT</div>
-          </div>
         </div>
 
         <!-- PIX detail -->
@@ -2038,66 +2032,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="font-size:14px;font-weight:700;margin-bottom:6px;">Boleto Bancário</div>
             <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">O boleto será gerado após a confirmação. Vence em <strong style="color:var(--text);">3 dias úteis</strong>.</div>
             <div style="font-size:11px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:10px;color:#ffa07a;">⚠️ Após o vencimento, o pedido é cancelado automaticamente.</div>
-          </div>
-        </div>
-
-        <!-- Crypto detail -->
-        <div class="ckout-pay-detail" id="payDetailCrypto">
-          <!-- Coin selector -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;" id="cryptoCoinGrid">
-            <div class="kz-crypto-coin sel" id="coinBTC" onclick="kzSelectCoin('BTC')" data-color="#F7931A">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F7931A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2a3 3 0 013 4.5H9.5V2z"/><path d="M9.5 2H7a2 2 0 00-2 2v14a2 2 0 002 2h2.5"/><path d="M9.5 13.5a3 3 0 013 3H9.5v-3z"/><line x1="6" y1="8" x2="7" y2="8"/><line x1="6" y1="13" x2="7" y2="13"/></svg>
-              <div class="kz-crypto-sym">BTC</div><div class="kz-crypto-nm">Bitcoin</div>
-            </div>
-            <div class="kz-crypto-coin" id="coinETH" onclick="kzSelectCoin('ETH')" data-color="#627EEA">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#627EEA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 20,12 12,16 4,12"/><polygon points="12,16 20,12 12,22 4,12"/></svg>
-              <div class="kz-crypto-sym">ETH</div><div class="kz-crypto-nm">Ethereum</div>
-            </div>
-            <div class="kz-crypto-coin" id="coinUSDT" onclick="kzSelectCoin('USDT')" data-color="#26A17B">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#26A17B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
-              <div class="kz-crypto-sym">USDT</div><div class="kz-crypto-nm">Tether</div>
-            </div>
-          </div>
-          <!-- QR + Wallet block -->
-          <div id="cryptoPayBlock" style="background:var(--card2);border:1px solid rgba(0,180,171,0.2);border-radius:14px;padding:16px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-              <div id="cryptoCoinBadge" style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(247,147,26,0.15);color:#F7931A;border:1px solid rgba(247,147,26,0.3);">₿ Bitcoin</div>
-              <div style="flex:1;"></div>
-              <!-- Timer -->
-              <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);">
-                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                <span id="cryptoTimer" style="font-weight:700;color:#F59E0B;">29:59</span>
-              </div>
-            </div>
-            <!-- QR Code SVG gerado inline -->
-            <div style="text-align:center;margin-bottom:12px;">
-              <div id="cryptoQrWrap" style="display:inline-block;background:#fff;border-radius:10px;padding:10px;">
-                <svg id="cryptoQrSvg" width="120" height="120" viewBox="0 0 21 21" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"></svg>
-              </div>
-            </div>
-            <!-- Wallet address -->
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:5px;">Endereço da Carteira</div>
-            <div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px;">
-              <div id="cryptoWalletAddr" style="font-size:10px;color:var(--text);font-family:monospace;flex:1;word-break:break-all;line-height:1.5;">1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf Na</div>
-              <button onclick="kzCopyWallet()" style="background:none;border:none;cursor:pointer;color:var(--teal);flex-shrink:0;padding:2px;" title="Copiar endereço">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              </button>
-            </div>
-            <!-- Amount -->
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.15);border-radius:8px;margin-bottom:10px;">
-              <div style="font-size:11px;color:var(--muted);">Valor a enviar</div>
-              <div id="cryptoAmount" style="font-size:13px;font-weight:800;color:var(--teal);font-family:monospace;">0.00042 BTC</div>
-            </div>
-            <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6;">Envie <strong style="color:var(--text);" id="cryptoAmountInline">exatamente 0.00042 BTC</strong> para o endereço acima. O pagamento é confirmado automaticamente após 1 confirmação na rede.</div>
-          </div>
-          <!-- FIX MELHORIA-06: Aviso de verificação de endereço de carteira -->
-          <div style="margin-top:10px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:10px;display:flex;align-items:flex-start;gap:8px;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <div style="font-size:11px;color:#F59E0B;line-height:1.6;"><strong>Verifique o endereço</strong> antes de enviar. Transações cripto são irreversíveis. Confirme os primeiros e últimos 4 caracteres do endereço acima antes de confirmar o envio na sua carteira.</div>
-          </div>
-          <div style="margin-top:10px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);justify-content:center;">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>
-            Endereço verificado · Rede BEP-20/ERC-20 · WeKz Buyer Protection ativa
           </div>
         </div>
 
@@ -2801,7 +2735,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="steps-grid">
         <div class="step-card"><div class="step-num">1</div><div class="step-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div><h3>Busque o produto</h3><p>Use a barra de busca ou navegue pelas categorias. Use filtros avançados por preço, avaliação, frete grátis e muito mais.</p></div>
         <div class="step-card"><div class="step-num">2</div><div class="step-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></div><h3>Escolha com confiança</h3><p>Veja avaliações de compradores verificados, fotos reais, especificações detalhadas e confirme que o vendedor é certificado WeKz.</p></div>
-        <div class="step-card"><div class="step-num">3</div><div class="step-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span></div><h3>Pague com segurança</h3><p>Pix, cartão de crédito (até 12x), boleto ou cripto. Pagamento criptografado AES-256. Nunca enviamos seus dados ao vendedor.</p></div>
+        <div class="step-card"><div class="step-num">3</div><div class="step-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span></div><h3>Pague com segurança</h3><p>Pix, cartão de crédito (até 12x) ou boleto. Pagamento criptografado AES-256. Nunca enviamos seus dados ao vendedor.</p></div>
         <div class="step-card"><div class="step-num">4</div><div class="step-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div><h3>Rastreie em tempo real</h3><p>Acompanhe cada etapa do envio pelo app ou site. Notificações automáticas por WhatsApp, SMS ou e-mail a cada atualização.</p></div>
         <div class="step-card"><div class="step-num">5</div><div class="step-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.8 11.3L2 22l10.7-3.79"/><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01M22 2l-2.24.75A2.9 2.9 0 0018 6.34v0a2.9 2.9 0 01-2.76 2.9L12 9.5l3.71 3.71 2.26-3.24a2.9 2.9 0 012.9-1.24h0a2.9 2.9 0 002.59-3.61L22 2z"/><path d="M5 3l-.88 2.12a4 4 0 01-1 1.36l0 0A4 4 0 002 9.8V10h0a4 4 0 004 4h.2a4 4 0 003.32-1.12v0a4 4 0 011.36-1L13 11"/></svg></span></div><h3>Receba e avalie</h3><p>Ao receber, confirme a entrega no app. Você tem 30 dias para avaliar o produto e o vendedor, ajudando outros compradores.</p></div>
         <div class="step-card"><div class="step-num">6</div><div class="step-icon"><span class="wkz-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg></span></div><h3>Proteção garantida</h3><p>Se algo der errado, abra uma disputa. A WeKz analisa em até 48h e garante seu reembolso se o produto não for como descrito.</p></div>
@@ -2827,11 +2761,6 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="info-card-icon" style="background:linear-gradient(135deg,#F59E0B,#EF4444);"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>
           <h3>Boleto Bancário</h3>
           <p>Vence em 3 dias úteis. Compensação em até 1-3 dias após pagamento. Disponível para compras acima de R$ 20.</p>
-        </div>
-        <div class="info-card">
-          <div class="info-card-icon" style="background:linear-gradient(135deg,#F59E0B,#92400E);">₿</div>
-          <h3>Criptomoedas</h3>
-          <p>Bitcoin (BTC), Ethereum (ETH), USDT, BNB e mais 20 moedas. Conversão automática. Ideal para compradores internacionais.</p>
         </div>
         <div class="info-card">
           <div class="info-card-icon" style="background:linear-gradient(135deg,#1D4ED8,#1E40AF);"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
@@ -2939,7 +2868,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="faq-item" onclick="toggleFaq(this)">
           <div class="faq-q">Quanto tempo demora o reembolso?</div>
-          <div class="faq-a">Pix: até 1 dia útil após aprovação. Cartão de crédito: 1–2 faturas (depende da operadora). Boleto/cripto: até 5 dias úteis. WeKz Coins: instantâneo.</div>
+          <div class="faq-a">Pix: até 1 dia útil após aprovação. Cartão de crédito: 1–2 faturas (depende da operadora). Boleto: até 5 dias úteis. WeKz Coins: instantâneo.</div>
         </div>
       </div>
     </div>
@@ -3795,7 +3724,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-body">
         <!-- [FIX-07] Removido botão duplicado "+ Adicionar novo cartão / conta" com
              ícone de cartão — já existe a ação "+ Adicionar" no cabeçalho, que abre
-             o mesmo modal cobrindo cartão, banco, MB Way, Pix e cripto. Manter os
+             o mesmo modal cobrindo cartão, banco, MB Way e Pix. Manter os
              dois era redundante e o ícone fixo de cartão não representava as
              demais formas de pagamento suportadas. -->
         <!-- [FIX-09] Saldo de Créditos WeKz (ganhos via indicação) — sempre visível
@@ -5189,7 +5118,6 @@ body.kzlive-active .bottom-nav {
         <span class="payment-icon">Amex</span>
         <span class="payment-icon">Pix</span>
         <span class="payment-icon">Boleto</span>
-        <span class="payment-icon">₿ BTC</span>
         <span class="payment-icon">PayPal</span>
       </div>
     </div>
@@ -5223,7 +5151,7 @@ body.kzlive-active .bottom-nav {
     <button class="modal-close" onclick="closeModalDirect()">✕</button>
     <div class="modal-title">🔒 Finalizar Compra</div>
     <div class="modal-sub">Escolha a forma de pagamento</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
       <button class="btn-icon" style="justify-content:center;padding:16px;flex-direction:column;gap:6px;" onclick="showToast('📱 Pix copiado!')">
         <span style="font-size:24px;">📱</span><span>Pix</span><span style="font-size:11px;color:var(--teal);">Desconto 5%</span>
       </button>
@@ -5232,9 +5160,6 @@ body.kzlive-active .bottom-nav {
       </button>
       <button class="btn-icon" style="justify-content:center;padding:16px;flex-direction:column;gap:6px;" onclick="showToast('📄 Boleto gerado!')">
         <span style="font-size:24px;">📄</span><span>Boleto</span><span style="font-size:11px;color:var(--muted);">Vence em 3 dias</span>
-      </button>
-      <button class="btn-icon" style="justify-content:center;padding:16px;flex-direction:column;gap:6px;" onclick="showToast('₿ Cripto selecionada!')">
-        <span style="font-size:24px;">₿</span><span>Cripto</span><span style="font-size:11px;color:var(--muted);">BTC, ETH, USDT</span>
       </button>
     </div>
     <div style="font-size:12px;color:var(--muted);text-align:center;">🛡️ Transação protegida pela WeKz Buyer Protection</div>

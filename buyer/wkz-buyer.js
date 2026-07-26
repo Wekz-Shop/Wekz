@@ -1192,7 +1192,7 @@ const TRANSLATIONS = {
     trustReturn: 'Devolução Fácil',
     trustReturnSub: '30 dias sem perguntas',
     trustPayment: 'Pagamento Seguro',
-    trustPaymentSub: 'Pix, cartão, boleto, cripto',
+    trustPaymentSub: 'Pix, cartão, boleto',
     trustSupport: 'Suporte 24/7',
     trustSupportSub: 'Chat, e-mail e WhatsApp',
     // PDP
@@ -1310,7 +1310,7 @@ const TRANSLATIONS = {
     trustReturn: 'Easy Returns',
     trustReturnSub: '30 days, no questions asked',
     trustPayment: 'Secure Payment',
-    trustPaymentSub: 'Cards, PayPal, Crypto',
+    trustPaymentSub: 'Cards, PayPal, Boleto',
     trustSupport: '24/7 Support',
     trustSupportSub: 'Chat, email and WhatsApp',
     buyNow: '⚡ Buy Now',
@@ -1422,7 +1422,7 @@ const TRANSLATIONS = {
     trustReturn: 'Devolución Fácil',
     trustReturnSub: '30 días sin preguntas',
     trustPayment: 'Pago Seguro',
-    trustPaymentSub: 'Tarjeta, transferencia, cripto',
+    trustPaymentSub: 'Tarjeta, transferencia, boleto',
     trustSupport: 'Soporte 24/7',
     trustSupportSub: 'Chat, correo y WhatsApp',
     buyNow: '⚡ Comprar Ahora',
@@ -1646,7 +1646,7 @@ const TRANSLATIONS = {
     trustReturn: 'Retours Faciles',
     trustReturnSub: '30 jours sans questions',
     trustPayment: 'Paiement Sécurisé',
-    trustPaymentSub: 'CB, virement, crypto',
+    trustPaymentSub: 'CB, virement, boleto',
     trustSupport: 'Support 24/7',
     trustSupportSub: 'Chat, e-mail et WhatsApp',
     buyNow: '⚡ Acheter Maintenant',
@@ -1758,7 +1758,7 @@ const TRANSLATIONS = {
     trustReturn: 'Einfache Rückgabe',
     trustReturnSub: '30 Tage ohne Fragen',
     trustPayment: 'Sichere Zahlung',
-    trustPaymentSub: 'Karte, PayPal, Krypto',
+    trustPaymentSub: 'Karte, PayPal, Überweisung',
     trustSupport: '24/7 Support',
     trustSupportSub: 'Chat, E-Mail und WhatsApp',
     buyNow: '⚡ Jetzt kaufen',
@@ -1870,7 +1870,7 @@ const TRANSLATIONS = {
     trustReturn: '簡単返品',
     trustReturnSub: '30日間返品保証',
     trustPayment: '安全決済',
-    trustPaymentSub: 'クレジット・PayPay・暗号通貨',
+    trustPaymentSub: 'クレジット・PayPay・銀行振込',
     trustSupport: '24/7サポート',
     trustSupportSub: 'チャット・メール・LINE',
     buyNow: '⚡ 今すぐ購入',
@@ -3998,8 +3998,7 @@ var _SAVED_ADDRS = {
 var _PAY_META = {
   pix:    { icon:'📱', name:'Pix — aprovação em segundos', desc:'5% de desconto aplicado' },
   card:   { icon:'💳', name:'Cartão de Crédito', desc:'Até 12x sem juros' },
-  boleto: { icon:'📄', name:'Boleto Bancário', desc:'Vence em 3 dias úteis' },
-  crypto: { icon:'₿',  name:'Cripto (BTC/ETH/USDT)', desc:'Pagamento em criptomoeda' }
+  boleto: { icon:'📄', name:'Boleto Bancário', desc:'Vence em 3 dias úteis' }
 };
 
 function openCheckout(expressMode) {
@@ -4585,7 +4584,7 @@ function toggleNewAddr() {
 
 function selectPay(type) {
   _ckoutPay = type;
-  ['pix','card','boleto','crypto'].forEach(t => {
+  ['pix','card','boleto'].forEach(t => {
     var opt = document.getElementById('pay'+t.charAt(0).toUpperCase()+t.slice(1));
     if(opt) opt.classList.toggle('sel', t===type);
     var det = document.getElementById('payDetail'+t.charAt(0).toUpperCase()+t.slice(1));
