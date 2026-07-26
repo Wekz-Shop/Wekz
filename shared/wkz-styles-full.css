@@ -2141,17 +2141,6 @@ body{background:var(--darker);color:var(--text);font-family:'DM Sans',sans-serif
 #kzTourLaunchBtn.visible { display: flex; }
 #kzTourLaunchBtn:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(0,180,171,0.35); }
 
-/* ── Crypto coin selector ── */
-.kz-crypto-coin {
-  background:var(--card2);border:1.5px solid var(--border);border-radius:10px;
-  padding:10px 8px;text-align:center;cursor:pointer;transition:var(--transition);
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-}
-.kz-crypto-coin:hover { border-color:rgba(255,255,255,0.2); }
-.kz-crypto-coin.sel { border-color:var(--teal);background:rgba(0,180,171,0.06); box-shadow:0 0 12px rgba(0,180,171,0.15); }
-.kz-crypto-sym { font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;color:var(--text); }
-.kz-crypto-nm  { font-size:9px;color:var(--muted);font-weight:500; }
-
 /* Modal Overlay do Negotiator */
 #kzNegotiatorOverlay {
   position: fixed;
