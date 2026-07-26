@@ -3547,7 +3547,14 @@ img, svg, video, canvas, iframe {
   .btn-icon-desktop, .btn-login-desktop     { order: -1; }
 }
 
-/* logo-text: clamp para não quebrar em telas estreitas */
+/* logo-text: clamp para não quebrar em telas estreitas.
+   FIX [header-mobile-wrap]: adicionado overflow:hidden + text-overflow:ellipsis
+   como rede de segurança. Sem isso, o texto (white-space:nowrap) podia
+   extrapolar visualmente a caixa do .logo quando o flex tentava encolhê-la
+   no mobile, e esse overflow "invisível" influenciava o cálculo de
+   flex-wrap do .topbar-inner de forma inconsistente (variava conforme o
+   momento exato de troca da webfont). Em telas com espaço normal isso
+   nunca é acionado — só entra em ação se realmente faltar espaço. */
 .logo-text{
   font-family:'DM Sans',sans-serif;
   font-size:clamp(14px,3.5vw,20px);
@@ -3556,9 +3563,12 @@ img, svg, video, canvas, iframe {
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
 }
 
-/* logo-sub: fluid e nunca cortado */
+/* logo-sub: fluid, com o mesmo fallback de truncamento do logo-text acima */
 .logo-sub{
   font-size:clamp(8px,1.8vw,11px);
   color:var(--muted);
@@ -3566,6 +3576,9 @@ img, svg, video, canvas, iframe {
   text-transform:uppercase;
   margin-top:-2px;
   white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
 }
 
 /* logo-icon: flex-shrink:0 para nunca espremer */
@@ -5487,21 +5500,34 @@ html, body {
 
   /* ── Topbar: logo à esquerda, ícones à direita, busca em linha própria ── */
   .topbar {
-    padding: 0 12px;
+    padding: 0 10px;
   }
+  /* FIX [header-mobile-wrap]: era "flex-wrap:wrap", o que deixava a
+     decisão de quebrar (ou não) a fileira logo+ícones para uma segunda
+     linha sujeita a variações de meio-pixel entre renderizações (troca
+     de webfont, zoom do SO, etc.) — daí a inconsistência reportada
+     (às vezes cabia tudo numa linha, às vezes os ícones "pulavam" pra
+     baixo). Com nowrap, essa fileira NUNCA quebra: o .logo (flex:1)
+     encolhe e trunca com reticências antes que isso aconteça, e os
+     ícones (flex-shrink:0 abaixo) mantêm sempre seu tamanho e nunca são
+     cortados. .search-wrap-top já é display:none nesta faixa (regra
+     @media max-width:900px acima), então não há 2ª linha real afetada. */
   .topbar-inner {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     height: auto;
-    padding: 10px 0 0;
+    padding: 10px 0;
     gap: 0;
     align-items: center;
   }
 
   /* Linha 1: logo + ações */
   .logo {
-    flex: 1;
+    flex: 1; /* = 1 1 0% — basis 0 é essencial: garante que o .logo só
+                ocupe o espaço que sobrar depois da fileira de ícones,
+                em vez de calcular a quebra a partir do content-width
+                do texto (que é o que causava o wrap inconsistente) */
     gap: 8px;
-    min-width: 0;
+    min-width: 0; /* permite ao flex item encolher abaixo do content-width */
   }
   .logo-icon {
     width: 36px;
@@ -5513,6 +5539,15 @@ html, body {
     height: 36px;
     flex-shrink: 0;
   }
+  /* Wrapper interno (div sem classe) que envolve logo-text + logo-sub.
+     FIX [header-mobile-wrap]: sem min-width:0 aqui, esse wrapper — mesmo
+     dentro de um .logo que já encolhe — mantinha seu min-content-width
+     (definido pelo texto em white-space:nowrap) e podia extrapolar a
+     caixa do .logo visualmente. Isso é o que tornava o wrap ambíguo. */
+  .logo > div:not(.logo-icon) {
+    min-width: 0;
+    overflow: hidden;
+  }
   .logo-text {
     font-size: clamp(13px, 3.5vw, 17px);
     white-space: nowrap;
@@ -5523,17 +5558,37 @@ html, body {
     display: block; /* sempre visível — usa fluid font */
   }
   .topbar-actions {
-    margin-left: 0;
+    margin-left: 0; /* .logo (flex:1, basis 0) já ocupa todo o espaço
+                        sobrando à esquerda desta fileira — não precisa
+                        de margin-left:auto aqui */
     gap: 0 !important;
-    flex-shrink: 0;
+    flex-shrink: 0; /* nunca encolhe — quem cede espaço é sempre o .logo */
   }
   .btn-icon {
-    padding: 8px 9px;
+    padding: 7px 8px;
     font-size: 15px;
+  }
+  /* Sino de notificação (injetado via JS) e botão de perfil também fazem
+     parte da fileira de ícones fixos — mesmo aperto leve de padding que
+     .btn-icon acima, para dar folga extra à fileira como um todo. */
+  .topbar-actions #wkzBellBtn {
+    padding: 7px 8px;
+  }
+  .topbar-actions .btn-client-profile {
+    padding: 7px 8px;
   }
   .btn-primary {
     padding: 8px 14px;
     font-size: 12px;
+  }
+
+  /* Degradação graciosa em telefones bem estreitos (~360px e abaixo):
+     a tagline "GLOBAL MARKETPLACE" é a parte menos essencial do bloco de
+     marca — melhor escondê-la de forma limpa aqui do que deixar o
+     text-overflow:ellipsis cortá-la (".../ Global Marketpla…") lá em
+     cima. Os ícones nunca são afetados por esta regra. */
+  @media(max-width:380px){
+    .logo-sub{ display:none; }
   }
 
   /* Linha 2: barra de busca ocupa largura total */
