@@ -4392,9 +4392,19 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   function cpBuildLevelInsight() {
     var d = cpCurrentLevelData();
     if (d.next) {
-      return 'Olá, <strong>Alexandre</strong>! ' + CP_ICO.flame + ' Estás no nível <strong>' + d.curr.name + '</strong> e já economizaste <strong>' + cpFmtAmt(CP_SAVED_EUR) + '</strong> com o Smart Negotiator. Mais <strong>' + d.toNext.toLocaleString('pt-BR') + ' pontos</strong> para o nível ' + d.next.name + ' — continua assim!';
+      return t('cpInsightLevelProgress')
+        .replace('{NAME}', 'Alexandre')
+        .replace('{ICON}', CP_ICO.flame)
+        .replace('{LEVEL}', d.curr.name)
+        .replace('{SAVED}', cpFmtAmt(CP_SAVED_EUR))
+        .replace('{NEXT_PTS}', d.toNext.toLocaleString('pt-BR'))
+        .replace('{NEXT_LEVEL}', d.next.name);
     }
-    return 'Olá, <strong>Alexandre</strong>! ' + CP_ICO.flame + ' Estás no nível máximo <strong>' + d.curr.name + '</strong> e já economizaste <strong>' + cpFmtAmt(CP_SAVED_EUR) + '</strong> com o Smart Negotiator. Aproveita todos os benefícios VIP!';
+    return t('cpInsightLevelMaxed')
+      .replace('{NAME}', 'Alexandre')
+      .replace('{ICON}', CP_ICO.flame)
+      .replace('{LEVEL}', d.curr.name)
+      .replace('{SAVED}', cpFmtAmt(CP_SAVED_EUR));
   }
   /* Sincroniza hero banner + stat "Nível Atual" com o nível real (userPoints.lifetime).
      Chamada no init do perfil e sempre que os pontos mudarem (ex: pós-compra, missão). */
@@ -4513,8 +4523,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   var CP_ORDERS = [
     { id:'#WKZ-9042', name:'Smartphone Pro X 256GB Grafite', amountEUR: 329.99,
-      status:'shipping', statusLabel:CP_ICO.truck+' Saiu p/ Entrega', progress:85,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:3, eta:'27 Mai 2026',
+      status:'shipping', progress:85,
+      activeStep:3, eta:'27 Mai 2026',
       carrier:'DHL Express Internacional', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
       events:[
         { title:'Saiu para entrega', desc:'O entregador está a caminho do endereço de destino.', time:'Hoje 07:14', location:'CTCE São Paulo/SP — Unidade de distribuição', done:true, active:true },
@@ -4524,8 +4534,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         { title:'Pedido confirmado', desc:'Pagamento via Pix aprovado em 12 segundos.', time:'20 Mai 09:12', location:'WeKz Shop', done:true, active:false },
       ] },
     { id:'#WKZ-9038', name:'Fone ANC Pro Bluetooth 5.3', amountEUR: 89.50,
-      status:'customs', statusLabel:CP_ICO.customs+' Aguard. Alfândega', progress:55,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:2, eta:'02 Jun 2026',
+      status:'customs', progress:55,
+      activeStep:2, eta:'02 Jun 2026',
       carrier:'Correios — Importado', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
       events:[
         { title:'Aguardando liberação alfandegária', desc:'Documentação em análise pela Receita Federal.', time:'Hoje 06:03', location:'Receita Federal — Guarulhos/SP', done:true, active:true },
@@ -4534,16 +4544,16 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         { title:'Pedido confirmado', desc:'Pagamento via cartão aprovado.', time:'26 Mai 10:45', location:'WeKz Shop', done:true, active:false },
       ] },
     { id:'#WKZ-9011', name:'Smartwatch Ultra Series 9', amountEUR: 214.00,
-      status:'processing', statusLabel:CP_ICO.gear+' Processando Hub', progress:25,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:1, eta:'08 Jun 2026',
+      status:'processing', progress:25,
+      activeStep:1, eta:'08 Jun 2026',
       carrier:'Transportadora WeKz', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
       events:[
         { title:'Em separação no hub', desc:'Pedido está a ser conferido e embalado para envio internacional.', time:'Hoje 08:30', location:'Hub Central WeKz — Shenzhen, CN', done:true, active:true },
         { title:'Pedido confirmado', desc:'Pagamento via Pix aprovado.', time:'Ontem 19:05', location:'WeKz Shop', done:true, active:false },
       ] },
     { id:'#WKZ-8990', name:'Teclado Mecânico RGB TKL', amountEUR: 74.99,
-      status:'delivered', statusLabel:CP_ICO.check+' Entregue', progress:100,
-      steps:['Confirmado','Hub Central','Alfândega','Em Trânsito','Entregue'], activeStep:4, eta:'Entregue 18 Mai 2026',
+      status:'delivered', progress:100,
+      activeStep:4, eta:'Entregue 18 Mai 2026',
       carrier:'Jadlog — .Package', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
       events:[
         { title:'Entregue ao destinatário', desc:'Assinado por: A. KZ — Recebido em mãos.', time:'18 Mai 14:32', location:'São Paulo/SP', done:true, active:true },
@@ -4553,6 +4563,22 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         { title:'Pedido confirmado', desc:'Pagamento por cartão aprovado.', time:'12 Mai 10:00', location:'WeKz Shop', done:true, active:false },
       ] },
   ];
+  /* FIX [meu-perfil-i18n-2]: nomes de etapa e rótulos de status eram
+     campos fixos repetidos em CADA pedido (a mesma string 'Confirmado',
+     'Entregue' etc. copiada 4x) — nunca traduziam. Agora são resolvidos
+     uma única vez aqui, via t(), e reutilizados por todos os pedidos. */
+  function _cpOrderSteps() {
+    return [t('cpOrderStepConfirmed'), t('cpOrderStepHub'), t('cpOrderStepCustoms'), t('cpOrderStepTransit'), t('cpOrderStepDelivered')];
+  }
+  function _cpOrderStatusLabel(status) {
+    var map = {
+      shipping:   CP_ICO.truck + ' ' + t('cpOrderStatusShipping'),
+      customs:    CP_ICO.customs + ' ' + t('cpOrderStatusCustoms'),
+      processing: CP_ICO.gear + ' ' + t('cpOrderStatusProcessing'),
+      delivered:  CP_ICO.check + ' ' + t('cpOrderStepDelivered'),
+    };
+    return map[status] || status;
+  }
 
   var CP_DISPUTES = [
     { id:'#WKZ-8801', reason:'Produto chegou com ecrã danificado', date:'19 Mai 2026',
@@ -4653,7 +4679,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     if (!el) return;
     if (typeof products === 'undefined') { el.innerHTML = ''; return; }
     if (!CP_PURCHASE_HISTORY.length) {
-      el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0;">Ainda não há compras registadas.</div>';
+      el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0;">' + t('cpPurchaseHistoryEmpty') + '</div>';
       return;
     }
     el.innerHTML = CP_PURCHASE_HISTORY.map(function(h) {
@@ -4666,19 +4692,22 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       var unitPrice = p ? p.p : (h._price || 0);
       var total = unitPrice * h.qty;
       var canBuyAgain = p !== null;
+      /* FIX [meu-perfil-moeda]: o total era sempre exibido em 'R$' fixo,
+         mesmo com outra moeda selecionada no header. cpFmtAmt (mesma
+         engine do resto da página) converte corretamente. */
       return '<div class="cp-history-purchase-item" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">'
         + '<div style="font-size:26px;flex-shrink:0;">' + emoji + '</div>'
         + '<div style="flex:1;min-width:0;">'
           + '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + name + '</div>'
-          + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Comprado em ' + h.date + (h.qty > 1 ? ' · Qtd: ' + h.qty : '') + ' · R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2}) + '</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + t('cpPurchaseHistoryBoughtOn') + ' ' + h.date + (h.qty > 1 ? ' · ' + t('cpPurchaseHistoryQty') + ' ' + h.qty : '') + ' · ' + (typeof formatPrice === 'function' ? formatPrice(total) : ('R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2}))) + '</div>'
         + '</div>'
         /* [FIX-item7] "Ver Produto" removido — redundante com "Comprar
            Novamente", que já abre a mesma página do produto (além de
            adicionar ao carrinho). Uma única rota de ação, sem duplicidade. */
         + '<div style="display:flex;gap:6px;flex-shrink:0;">'
           + (canBuyAgain
-              ? '<button onclick="cpBuyAgain(' + h.productIdx + ')" style="padding:6px 12px;background:linear-gradient(135deg,#00B4AB,#0891B2);border:none;border-radius:8px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Comprar Novamente</button>'
-              : '<span style="padding:6px 12px;font-size:10px;color:var(--muted);white-space:nowrap;">Fora do catálogo de demo</span>')
+              ? '<button onclick="cpBuyAgain(' + h.productIdx + ')" style="padding:6px 12px;background:linear-gradient(135deg,#00B4AB,#0891B2);border:none;border-radius:8px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">' + t('cpBuyAgainBtn') + '</button>'
+              : '<span style="padding:6px 12px;font-size:10px;color:var(--muted);white-space:nowrap;">' + t('cpNotInDemoCatalog') + '</span>')
         + '</div>'
       + '</div>';
     }).join('');
@@ -4737,8 +4766,9 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   function renderOrders() {
     var el = document.getElementById('cpOrderList');
     if (!el) return;
+    var stepNames = _cpOrderSteps();
     el.innerHTML = CP_ORDERS.map(function(o) {
-      var stepsHtml = o.steps.map(function(s, i) {
+      var stepsHtml = stepNames.map(function(s, i) {
         var cls = i < o.activeStep ? 'done' : (i === o.activeStep ? 'active' : '');
         return '<div class="cp-step ' + cls + '">'
           + '<div class="cp-step-dot"></div>'
@@ -4751,17 +4781,17 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
           + '<span class="cp-order-name">' + o.name + '</span>'
           + '<span class="cp-order-amount">' + cpFmtAmt(o.amountEUR) + '</span>'
         + '</div>'
-        + '<span class="cp-status-pill ' + o.status + '">' + o.statusLabel + '</span>'
+        + '<span class="cp-status-pill ' + o.status + '">' + _cpOrderStatusLabel(o.status) + '</span>'
         + '<div class="cp-progress-wrap">'
           + '<div class="cp-progress-bar"><div class="cp-progress-fill" data-w="' + o.progress + '" style="width:0%"></div></div>'
           + '<div class="cp-progress-steps">' + stepsHtml + '</div>'
         + '</div>'
         + '<div class="cp-order-eta">'
-          + '<span>' + CP_ICO.calendar + ' Estimativa:</span>'
+          + '<span>' + CP_ICO.calendar + ' ' + t('cpOrderEtaLabel') + '</span>'
           + '<span class="cp-order-eta-value">' + o.eta + '</span>'
-          + '<button onclick="cpTrackOrder(\'' + o.id + '\')" style="margin-left:auto;padding:3px 10px;background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.3);border-radius:6px;color:var(--teal);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(0,180,171,0.2)\'" onmouseout="this.style.background=\'rgba(0,180,171,0.1)\'">' + CP_ICO.search + ' Rastrear</button>'
-          + (o.status === 'delivered' ? '<button onclick="openReturnModal(\'' + o.id + '\',\'' + o.name.replace(/'/g,"\\\\'") + '\')" style="padding:3px 10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:6px;color:#a78bfa;font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(124,58,237,0.2)\'" onmouseout="this.style.background=\'rgba(124,58,237,0.1)\'">' + CP_ICO.undo + ' Solicitar Devolução</button>' : '')
-          + (o.status === 'shipping' ? '<button onclick="wkzBuyerConfirmReceived(\'' + o.id + '\')" style="padding:3px 10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(34,197,94,0.2)\'" onmouseout="this.style.background=\'rgba(34,197,94,0.1)\'">' + '\u2713 Confirmar Recebimento</button>' : '')
+          + '<button onclick="cpTrackOrder(\'' + o.id + '\')" style="margin-left:auto;padding:3px 10px;background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.3);border-radius:6px;color:var(--teal);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(0,180,171,0.2)\'" onmouseout="this.style.background=\'rgba(0,180,171,0.1)\'">' + CP_ICO.search + ' ' + t('cpOrderTrackBtn') + '</button>'
+          + (o.status === 'delivered' ? '<button onclick="openReturnModal(\'' + o.id + '\',\'' + o.name.replace(/'/g,"\\\\'") + '\')" style="padding:3px 10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:6px;color:#a78bfa;font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(124,58,237,0.2)\'" onmouseout="this.style.background=\'rgba(124,58,237,0.1)\'">' + CP_ICO.undo + ' ' + t('cpOrderReturnBtn') + '</button>' : '')
+          + (o.status === 'shipping' ? '<button onclick="wkzBuyerConfirmReceived(\'' + o.id + '\')" style="padding:3px 10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(34,197,94,0.2)\'" onmouseout="this.style.background=\'rgba(34,197,94,0.1)\'">' + '\u2713 ' + t('cpOrderConfirmBtn') + '</button>' : '')
         + '</div>'
         + '</div>';
     }).join('');
@@ -4779,7 +4809,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     var el = document.getElementById('cpDisputeContainer');
     if (!el) return;
     if (!CP_DISPUTES.length) {
-      el.innerHTML = '<div class="cp-dispute-empty"><div class="cp-dispute-empty-icon">' + CP_ICO.scale + '</div>Nenhuma disputa registada. As tuas compras estão protegidas pela WeKz Buyer Protection!</div>';
+      el.innerHTML = '<div class="cp-dispute-empty"><div class="cp-dispute-empty-icon">' + CP_ICO.scale + '</div>' + t('cpDisputeEmpty') + '</div>';
       return;
     }
     el.innerHTML = '<div class="cp-dispute-list">'
@@ -4793,9 +4823,9 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
             + '<div class="cp-dispute-body">'
               + '<div class="cp-dispute-order">' + d.id + '</div>'
               + '<div class="cp-dispute-reason">' + d.reason + '</div>'
-              + '<div class="cp-dispute-date">Aberta em ' + d.date + '</div>'
+              + '<div class="cp-dispute-date">' + t('cpDisputeOpenedOn') + ' ' + d.date + '</div>'
               + '<div class="cp-verdict-box ' + d.verdict + '">' + verdictHtml + '</div>'
-              + '<button onclick="cpViewDisputeProduct(\'' + d.id + '\')" style="margin-top:10px;padding:6px 14px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);border-radius:8px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'rgba(124,58,237,0.22)\'" onmouseout="this.style.background=\'rgba(124,58,237,0.12)\'">' + CP_ICO.search + ' Ver Produto / Detalhe</button>'
+              + '<button onclick="cpViewDisputeProduct(\'' + d.id + '\')" style="margin-top:10px;padding:6px 14px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);border-radius:8px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'rgba(124,58,237,0.22)\'" onmouseout="this.style.background=\'rgba(124,58,237,0.12)\'">' + CP_ICO.search + ' ' + t('cpDisputeViewBtn') + '</button>'
             + '</div>'
           + '</div>';
         }).join('')
@@ -4808,7 +4838,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     if (grid) {
       grid.innerHTML = CP_CARDS.map(function(c, i) {
         return '<div class="cp-saved-card">'
-          + (c.isDefault ? '<span class="cp-card-default-badge">Principal</span>' : '')
+          + (c.isDefault ? '<span class="cp-card-default-badge">' + t('cpCardPrincipal') + '</span>' : '')
           + '<div class="cp-card-chip">' + c.chip + '</div>'
           + '<div class="cp-card-number">' + c.number + '</div>'
           + '<div class="cp-card-meta">'
@@ -4816,7 +4846,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
             + '<span class="cp-card-brand">' + c.brand + '</span>'
           + '</div>'
           + '<div style="display:flex;gap:6px;margin-top:12px;">'
-            + (!c.isDefault ? '<button onclick="cpSetDefaultCard(' + i + ')" style="flex:1;padding:5px 8px;background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.3);border-radius:7px;color:var(--teal);font-size:10px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'rgba(0,180,171,0.2)\'" onmouseout="this.style.background=\'rgba(0,180,171,0.1)\'">' + CP_ICO.star + ' Principal</button>' : '<span style="flex:1;padding:5px 8px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;">' + CP_ICO.check + ' Cartão principal</span>')
+            + (!c.isDefault ? '<button onclick="cpSetDefaultCard(' + i + ')" style="flex:1;padding:5px 8px;background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.3);border-radius:7px;color:var(--teal);font-size:10px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'rgba(0,180,171,0.2)\'" onmouseout="this.style.background=\'rgba(0,180,171,0.1)\'">' + CP_ICO.star + ' ' + t('cpCardPrincipal') + '</button>' : '<span style="flex:1;padding:5px 8px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;">' + CP_ICO.check + ' ' + t('cpCardIsDefaultLabel') + '</span>')
             + '<button onclick="cpDeleteCard(' + i + ')" style="padding:5px 10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:7px;color:#f87171;font-size:10px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'rgba(239,68,68,0.2)\'" onmouseout="this.style.background=\'rgba(239,68,68,0.1)\'">' + CP_ICO.trash + '</button>'
           + '</div>'
         + '</div>';
@@ -4825,7 +4855,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     var clist = document.getElementById('cpCouponList');
     if (!clist) return;
     if (!CP_COUPONS.length) {
-      clist.innerHTML = '<div class="cp-no-coupons">' + CP_ICO.tag + ' Nenhum cupom disponível. Negoceie um produto para gerar cupons exclusivos!</div>';
+      clist.innerHTML = '<div class="cp-no-coupons">' + CP_ICO.tag + ' ' + t('cpCouponsEmpty') + '</div>';
       return;
     }
     clist.innerHTML = CP_COUPONS.map(function(c) {
@@ -4834,12 +4864,12 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         ? '-' + cpFmtAmt(c.discountEUR)
         : c.discount;
       var descLabel = (c.discountEUR != null && c.discountMinEUR != null)
-        ? 'Mín. ' + cpFmtAmt(c.discountMinEUR) + ' · ' + c.desc
+        ? t('cpCouponMinPrefix') + ' ' + cpFmtAmt(c.discountMinEUR) + ' · ' + c.desc
         : c.desc;
       return '<div class="cp-coupon-item' + (c.isCompensation ? ' cp-coupon-comp' : '') + '" onclick="cpCopyCoupon(\'' + c.code + '\')">'
         + '<span class="cp-coupon-emoji">' + c.emoji + '</span>'
         + '<div class="cp-coupon-body">'
-          + '<div class="cp-coupon-discount">' + discLabel + (c.isCompensation ? ' <span style="display:inline-block;margin-left:4px;padding:1px 6px;background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);border-radius:5px;font-size:9px;font-weight:800;color:#60a5fa;vertical-align:middle;">COMPENSAÇÃO</span>' : '') + '</div>'
+          + '<div class="cp-coupon-discount">' + discLabel + (c.isCompensation ? ' <span style="display:inline-block;margin-left:4px;padding:1px 6px;background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);border-radius:5px;font-size:9px;font-weight:800;color:#60a5fa;vertical-align:middle;">' + t('cpCouponCompensationBadge') + '</span>' : '') + '</div>'
           + '<div class="cp-coupon-desc">' + descLabel + '</div>'
         + '</div>'
         + '<div class="cp-coupon-right">'
@@ -4886,6 +4916,15 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   }
 
   /* ── Public API ── */
+
+  /* FIX [meu-perfil-i18n-2]: re-renderiza a bolha do Copilot no MESMO
+     índice atual (sem avançar para o próximo insight, ao contrário de
+     cpRefreshCopilot) — usada quando o idioma muda com o usuário já na
+     página, para o texto acompanhar sem trocar de conteúdo. */
+  window.cpRefreshCopilotLanguage = function() {
+    var el = document.getElementById('cpCopilotMsg');
+    if (el) el.innerHTML = cpApplyTpl(CP_INSIGHTS[_cpInsightIdx]);
+  };
 
   window.cpRefreshCopilot = function() {
     _cpInsightIdx = (_cpInsightIdx + 1) % CP_INSIGHTS.length;
@@ -4949,18 +4988,23 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
            + ' title="'+lvl.name+' · '+rangeLabel+'">'
            + '<img src="'+lvl.img+'" alt="Card do nível '+lvl.name+' — '+rangeLabel+'" loading="lazy" '
              + 'onerror="this.closest(\'.cp-lvlcard\').classList.add(\'cp-lvlcard-broken\')">'
-           + (isCurrent ? '<span class="cp-lvlcard-pill">'+CP_ICO.zap+' Você está aqui</span>' : '')
-           + (isPast ? '<span class="cp-lvlcard-check" title="Nível já alcançado">'+CP_ICO.check+'</span>' : '')
-           + (isLocked ? '<span class="cp-lvlcard-lock" title="Ainda não desbloqueado">'+CP_ICO.lock+'</span>' : '')
+           + (isCurrent ? '<span class="cp-lvlcard-pill">'+CP_ICO.zap+' ' + t('cpLvlHereBadge') + '</span>' : '')
+           + (isPast ? '<span class="cp-lvlcard-check" title="' + t('cpLvlReachedTitle') + '">'+CP_ICO.check+'</span>' : '')
+           + (isLocked ? '<span class="cp-lvlcard-lock" title="' + t('cpLvlLockedTitle') + '">'+CP_ICO.lock+'</span>' : '')
            + '</div>';
     }).join('');
     var trackHtml = '<div class="cp-lvlcard-track" id="cpLvlTrack">' + cardsHtml + '</div>';
+
+    /* FIX [meu-perfil-moeda]: 'R$1' era hardcoded na frase de taxa de
+       pontos — mostrava 'R$1' mesmo com outra moeda selecionada.
+       formatPrice(1) devolve a unidade monetária já convertida (ex.: '$1'). */
+    var unitPriceLabel = (typeof formatPrice === 'function') ? formatPrice(1) : 'R$1';
 
     /* ── Caixa de progresso (Faltam para o próximo nível) ── */
     var progressHtml = next
       ? '<div class="cp-lvlgoal-box cp-lvlgoal-box--progress">'
           + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-            + '<span style="font-size:12px;font-weight:700;color:var(--text);">Faltam para '+next.name+'</span>'
+            + '<span style="font-size:12px;font-weight:700;color:var(--text);">' + t('cpLvlMissingFor') + ' '+next.name+'</span>'
             + '<span style="font-family:\'DM Sans\',sans-serif;font-size:16px;font-weight:800;color:var(--teal);">'+toNext.toLocaleString('pt-BR')+' pts</span>'
           + '</div>'
           + '<div style="background:var(--border);border-radius:99px;height:6px;overflow:hidden;">'
@@ -4968,15 +5012,16 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
               + 'background:linear-gradient(90deg,'+curr.color+','+next.color+');border-radius:99px;"></div>'
           + '</div>'
           + '<div style="margin-top:8px;font-size:11px;color:var(--muted);">'
-            + 'No nível <strong style="color:'+curr.color+';">'+curr.name+'</strong> ganhas '
-            + '<strong style="color:var(--teal);">'+rateLabel(curr.name)+' ponto por R$1</strong> em cada compra.'
+            + t('cpLvlEarnRatePre') + ' <strong style="color:'+curr.color+';">'+curr.name+'</strong> ' + t('cpLvlEarnRateMid') + ' '
+            + '<strong style="color:var(--teal);">'+rateLabel(curr.name)+' ' + t('cpLvlEarnRatePost') + ' ' + unitPriceLabel + '</strong> ' + t('cpLvlEarnRateSuffix')
           + '</div>'
         + '</div>'
       : '<div class="cp-lvlgoal-box cp-lvlgoal-box--maxed">'
           + '<div style="font-size:20px;margin-bottom:4px;color:#a78bfa;">'+CP_ICO.zap+'</div>'
-          + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:#a78bfa;">Nível Máximo Atingido!</div>'
-          + '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Aproveita todos os benefícios VIP · 3x pontos por R$1 gasto.</div>'
+          + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:#a78bfa;">' + t('cpLvlMaxedTitle') + '</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:4px;">' + t('cpLvlMaxedSub') + ' ' + unitPriceLabel + ' ' + t('cpLvlMaxedSuffix') + '</div>'
         + '</div>';
+
 
     /* ── CTA directo para a categoria com maior taxa de pontos do momento ── */
     var ctaHtml = bonus ? (
@@ -4984,19 +5029,19 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         + '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
           + '<div style="font-size:22px;color:var(--c-warning);flex-shrink:0;">'+CP_ICO.flame+'</div>'
           + '<div style="flex:1;min-width:140px;">'
-            + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:var(--c-warning);">'+bonus.rate+' pontos em '+bonus.name+'</div>'
+            + '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:800;color:var(--c-warning);">'+bonus.rate+' ' + t('cpLvlBonusSuffix') + ' '+bonus.name+'</div>'
             + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+bonus.note+'</div>'
           + '</div>'
-          + '<button onclick="cpGoToBonusCategory()" style="padding:8px 16px;background:#F59E0B;border:none;border-radius:9px;color:#000;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;">Ver Produtos →</button>'
+          + '<button onclick="cpGoToBonusCategory()" style="padding:8px 16px;background:#F59E0B;border:none;border-radius:9px;color:#000;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;">' + t('cpLvlBonusBtn') + '</button>'
         + '</div>'
       + '</div>'
     ) : '';
 
     host.innerHTML =
         '<p style="font-size:12px;color:var(--muted);margin:0 0 16px;line-height:1.6;">'
-          + 'Sobe de nível acumulando pontos em cada compra. A taxa de ganho de pontos aumenta com o nível — quanto mais alto, mais pontos por real gasto.'
+          + t('cpLvlIntro')
         + '</p>'
-        + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Todos os Níveis</div>'
+        + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">' + t('cpLvlAllLevelsLabel') + '</div>'
         + trackHtml
         + '<div class="cp-lvlgoal-grid">' + ctaHtml + progressHtml + '</div>';
 
@@ -5028,7 +5073,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   window.cpGoToBonusCategory = function() {
     var bonus = WKZ_REWARDS.bonusCategory;
     if (!bonus) return;
-    showToast && showToast('A render ' + bonus.rate + ' pontos em ' + bonus.name + ' — aproveita e escolhe o que quiseres!');
+    var msg = t('cpLvlBonusToast').replace('{RATE}', bonus.rate).replace('{NAME}', bonus.name);
+    showToast && showToast(msg);
     if (typeof MapsTo === 'function') {
       MapsTo('home');
     } else if (typeof showPage === 'function') {
@@ -5084,14 +5130,16 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   }
   window.cpTrackOrder = function(id) {
     var order = CP_ORDERS.find(function(o){ return o.id === id; });
-    if (!order) { showToast && showToast('Pedido não encontrado.'); return; }
+    if (!order) { showToast && showToast(t('cpOrderNotFound')); return; }
+    var orderStatusLabel = _cpOrderStatusLabel(order.status);
+    var orderSteps = _cpOrderSteps();
 
     /* Espelha para a página completa de rastreio (mesma fonte de dados) */
     var trkCode = id.replace('#','');
     if (typeof _TRK_DATA !== 'undefined' && !_TRK_DATA[trkCode]) {
       _TRK_DATA[trkCode] = {
         orderNum: id, status: order.status === 'shipping' ? 'transit' : order.status,
-        statusLabel: (order.name) ? order.statusLabel.replace(/<[^>]+>/g,'').trim() : order.statusLabel,
+        statusLabel: orderStatusLabel.replace(/<[^>]+>/g,'').trim(),
         statusIcon: '📦', bannerGrad: 'linear-gradient(135deg,var(--teal) 0%,#0891b2 100%)',
         product: { name: order.name, emoji: '📦', qty: 1, price: cpFmtAmt(order.amountEUR) },
         carrier: { name: order.carrier || 'Transportadora WeKz', code: 'WKZ-TRK-' + trkCode, logo: '📦' },
@@ -5099,12 +5147,12 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         address: order.address || 'Endereço de entrega cadastrado',
         seller: { name: 'Vendedor WeKz', rating: 4.8 },
         activeStep: order.activeStep,
-        steps: order.steps.map(function(label, i) { return { label: label, icon: ['check','box','customs','map','home'][i] || 'box', date: i <= order.activeStep ? '—' : '—' }; }),
+        steps: orderSteps.map(function(label, i) { return { label: label, icon: ['check','box','customs','map','home'][i] || 'box', date: i <= order.activeStep ? '—' : '—' }; }),
         events: order.events || []
       };
     }
 
-    var stepperHtml = order.steps.map(function(s, i) {
+    var stepperHtml = orderSteps.map(function(s, i) {
       var cls = i < order.activeStep ? 'done' : (i === order.activeStep ? 'active' : '');
       var dotBg = cls === 'done' ? 'var(--teal)' : (cls === 'active' ? '#F59E0B' : 'var(--card2)');
       var dotBd = cls ? 'transparent' : 'var(--border)';
@@ -5129,21 +5177,21 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
     _cpShowModal({
       id: 'cpTrackModal',
-      title: CP_ICO.package + ' Rastreio — ' + id,
+      title: CP_ICO.package + ' ' + t('cpTrackModalTitle') + ' — ' + id,
       width: '480px',
       body: '<div style="display:flex;flex-direction:column;gap:14px;">'
         + '<div style="display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">'
           + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + order.name + '</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">' + (order.carrier || 'Transportadora WeKz') + '</div></div>'
           + '<div style="font-size:14px;font-weight:800;color:var(--teal);flex-shrink:0;">' + cpFmtAmt(order.amountEUR) + '</div>'
         + '</div>'
-        + '<span class="cp-status-pill ' + order.status + '" style="align-self:flex-start;">' + order.statusLabel + '</span>'
+        + '<span class="cp-status-pill ' + order.status + '" style="align-self:flex-start;">' + orderStatusLabel + '</span>'
         + '<div style="display:flex;align-items:flex-start;padding:0 4px;">' + stepperHtml + '</div>'
-        + '<div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;">' + CP_ICO.calendar + ' Estimativa: <strong style="color:var(--text);">' + order.eta + '</strong></div>'
+        + '<div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;">' + CP_ICO.calendar + ' ' + t('cpOrderEtaLabel') + ' <strong style="color:var(--text);">' + order.eta + '</strong></div>'
         + '<div style="border-top:1px solid var(--border);padding-top:12px;">'
-          + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Histórico de Rastreamento</div>'
-          + (evHtml || '<div style="font-size:12px;color:var(--muted);">Ainda sem eventos registados.</div>')
+          + '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">' + t('cpTrackHistoryLabel') + '</div>'
+          + (evHtml || '<div style="font-size:12px;color:var(--muted);">' + t('cpTrackNoEvents') + '</div>')
         + '</div>'
-        + '<button onclick="_cpCloseModal(\'cpTrackModal\');MapsTo(\'tracking\');setTimeout(function(){loadTracking(\'' + trkCode + '\');},350);" style="width:100%;padding:11px;background:linear-gradient(135deg,#00B4AB,#0891B2);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">' + CP_ICO.search + ' Ver Página Completa de Rastreio</button>'
+        + '<button onclick="_cpCloseModal(\'cpTrackModal\');MapsTo(\'tracking\');setTimeout(function(){loadTracking(\'' + trkCode + '\');},350);" style="width:100%;padding:11px;background:linear-gradient(135deg,#00B4AB,#0891B2);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">' + CP_ICO.search + ' ' + t('cpTrackViewFullBtn') + '</button>'
       + '</div>',
       confirmLabel: null
     });
@@ -6274,6 +6322,39 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     }, 220);
   };
 
+  /* FIX [meu-perfil-moeda]: initClientProfile() só roda quando o usuário
+     ENTRA na página "Meu Perfil" (via registerNavHook, abaixo). Se ele já
+     está nela e troca a moeda no header, nada disparava um novo render —
+     os valores ficavam com a moeda antiga até a próxima navegação.
+     kzSyncFromHeader() (wkz-buyer.js) chama esta função sempre que
+     "client-profile" estiver visível, mantendo tudo em sincronia. */
+  /* FIX [meu-perfil-moeda] + FIX [meu-perfil-i18n-2]: initClientProfile()
+     só roda quando o usuário ENTRA na página "Meu Perfil" (via
+     registerNavHook, abaixo). Se ele já está nela e troca a moeda OU o
+     idioma no header, nada disparava um novo render — os valores/textos
+     ficavam desatualizados até a próxima navegação. kzSyncFromHeader()
+     (wkz-buyer.js) chama esta função sempre que "client-profile" estiver
+     visível — tanto em troca de moeda quanto de idioma (updateLang()
+     sempre aciona updateCurrency() em seguida), mantendo tudo em
+     sincronia num único ponto. */
+  window.cpRefreshCurrencyDisplays = function() {
+    var savedFmt = cpFmtAmt(CP_SAVED_EUR);
+    var heroSavedEl = document.getElementById('cpStatHeroSaved');
+    if (heroSavedEl) heroSavedEl.textContent = savedFmt;
+    var negoStatEl = document.getElementById('cpStatNego');
+    if (negoStatEl) negoStatEl.textContent = savedFmt;
+    var copilotSavedEl = document.getElementById('cpCopilotSaved');
+    if (copilotSavedEl) copilotSavedEl.textContent = savedFmt;
+    if (typeof renderWallet === 'function') renderWallet();
+    if (typeof renderOrders === 'function') renderOrders();
+    if (typeof renderDisputes === 'function') renderDisputes();
+    if (typeof renderPurchaseHistory === 'function') renderPurchaseHistory();
+    if (typeof cpRenderReferralStats === 'function') cpRenderReferralStats();
+    if (typeof window.cpRefreshCopilotLanguage === 'function') window.cpRefreshCopilotLanguage();
+    if (typeof window.cpRefreshLevelGuide === 'function') window.cpRefreshLevelGuide();
+    if (typeof window.cpRefreshMissoesLanguage === 'function') window.cpRefreshMissoesLanguage();
+  };
+
   /* ── Nav Hook: init when page opens ── */
   /* FIX (auditoria M3): usa registerNavHook (delega pro WkzBus, ver
      fix de Sprint M1 em WkzApp) em vez de tocar window._wkzNavHooks
@@ -6593,11 +6674,11 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
    síncrono), como pedido. */
 (function() {
   var CP_MISSOES = [
-    { id:'buy',    emoji:'🛒', title:'Fazer uma compra hoje',        sub:'Qualquer produto conta',                pts:50,  done:false },
-    { id:'review', emoji:'⭐', title:'Avaliar um produto',            sub:'Opiniões valem +30 pts bônus',          pts:30,  done:false },
-    { id:'browse', emoji:'🔍', title:'Ver produtos recomendados',     sub:'Acesse 3 produtos da sua categoria',    pts:10,  done:false },
-    { id:'share',  emoji:'📤', title:'Compartilhar um produto',       sub:'Via WhatsApp, link ou redes sociais',   pts:20,  done:false },
-    { id:'coupon', emoji:'🎟️', title:'Usar um cupom numa compra',     sub:'Aplique qualquer cupom no checkout',    pts:25,  done:false },
+    { id:'buy',    emoji:'🛒', get title(){return t('cpMission1Title');}, get sub(){return t('cpMission1Sub');}, pts:50,  done:false },
+    { id:'review', emoji:'⭐', get title(){return t('cpMission2Title');}, get sub(){return t('cpMission2Sub');}, pts:30,  done:false },
+    { id:'browse', emoji:'🔍', get title(){return t('cpMission3Title');}, get sub(){return t('cpMission3Sub');}, pts:10,  done:false },
+    { id:'share',  emoji:'📤', get title(){return t('cpMission4Title');}, get sub(){return t('cpMission4Sub');}, pts:20,  done:false },
+    { id:'coupon', emoji:'🎟️', get title(){return t('cpMission5Title');}, get sub(){return t('cpMission5Sub');}, pts:25,  done:false },
   ];
   var _cpBrowseCount = 0; // produtos distintos vistos nesta sessão (missão 'browse')
   var _cpBrowseSeen  = {};
@@ -6610,7 +6691,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     list.innerHTML = CP_MISSOES.map(function(m) {
       var subLabel = m.sub;
       if (m.id === 'browse' && !m.done) subLabel += ' (' + Math.min(_cpBrowseCount,3) + '/3)';
-      return '<div class="cp-mission-item' + (m.done ? ' done' : '') + '" data-mid="' + m.id + '" onclick="cpMissionGoTo(\'' + m.id + '\')" style="cursor:pointer;" title="' + (m.done ? 'Missão já concluída — obrigado por espalhar felicidade! 🎉' : 'Clique para ir até a ação e concluir esta missão') + '">' +
+      return '<div class="cp-mission-item' + (m.done ? ' done' : '') + '" data-mid="' + m.id + '" onclick="cpMissionGoTo(\'' + m.id + '\')" style="cursor:pointer;" title="' + (m.done ? t('cpMissionDoneTitle') : t('cpMissionTodoTitle')) + '">' +
         '<div class="cp-mission-chk">' +
         (m.done ? '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>' : '') +
         '</div>' +
@@ -6626,15 +6707,19 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     var bar = document.getElementById('cpMissaoBarFill');
     var lbl = document.getElementById('cpMissaoPct');
     if (bar) bar.style.width = pct + '%';
-    if (lbl) lbl.textContent = done + '/' + total + ' concluídas';
+    if (lbl) lbl.textContent = done + '/' + total + ' ' + t('cpMissionsDoneSuffix');
     if (done === total) {
       var wrap = document.getElementById('cpMissoesCard');
       if (wrap && !wrap.dataset.allDoneToasted) {
         wrap.dataset.allDoneToasted = '1';
-        if (typeof showToast === 'function') showToast('🏆 Todas as missões de hoje concluídas! Volta amanhã para mais.');
+        if (typeof showToast === 'function') showToast(t('cpMissionsAllDoneToast'));
       }
     }
   }
+  /* FIX [meu-perfil-i18n-2]: exposta globalmente para o hook de refresh de
+     idioma (cpRefreshCurrencyDisplays, noutra IIFE) poder re-renderizar as
+     missões quando o utilizador troca de idioma já dentro da página. */
+  window.cpRefreshMissoesLanguage = renderMissoes;
 
   /* [FIX-03] Ponto único de conclusão — chamado pelas ações reais em toda
      a app. Credita pontos de verdade (soma a userPoints, a mesma fonte
@@ -7005,18 +7090,49 @@ window.cpShareReferral = function(channel) {
 window.WKZ_REFERRAL_STATE = { activeReferrals: 0, creditsBRL: 0 };
 
 function _cpFmtBRL(v) {
+  /* FIX [meu-perfil-moeda]: antes retornava sempre 'R$ ...', ignorando a
+     moeda selecionada no header (currencyBtn) — os "Créditos WeKz" (carteira
+     + indicação) eram os únicos valores desta página que não convertiam,
+     enquanto "Economizado"/cupons (cpFmtAmt, acima) já convertiam
+     corretamente. formatPrice() é a mesma engine usada no catálogo/carrinho/
+     checkout (definida em wkz-buyer.js, carregado depois deste arquivo —
+     por isso a checagem typeof, mesmo padrão defensivo já usado por
+     cpFmtAmt() logo acima). Ela já recebe o valor em BRL e devolve
+     formatado+convertido para currentCurrency. */
+  if (typeof formatPrice === 'function') return formatPrice(v);
   return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+}
+/* FIX [meu-perfil-moeda]: os valores do programa de indicação (recompensa
+   e mínimo de compra) apareciam como texto fixo "R$15"/"R$100" espalhados
+   pelo copy do card — nunca convertiam para a moeda ativa, mesmo com os
+   créditos (acima) já corrigidos. Centralizamos aqui como constantes +
+   uma função que atualiza todos os spans (ver ids "cpReferralRewardAmt-N"
+   e "cpReferralMinAmt-N" no HTML) usando _cpFmtBRL. */
+var CP_REFERRAL_REWARD_BRL = 15;
+var CP_REFERRAL_MIN_BRL = 100;
+function cpRefreshReferralCopyAmounts() {
+  var rewardFmt = _cpFmtBRL(CP_REFERRAL_REWARD_BRL);
+  var minFmt = _cpFmtBRL(CP_REFERRAL_MIN_BRL);
+  ['cpReferralRewardAmt1', 'cpReferralRewardAmt2', 'cpReferralRewardAmt3', 'cpReferralRewardAmt4'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = rewardFmt;
+  });
+  ['cpReferralMinAmt1', 'cpReferralMinAmt2', 'cpReferralMinAmt3'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = minFmt;
+  });
 }
 function cpRenderReferralStats() {
   var s = window.WKZ_REFERRAL_STATE;
   var activeEl = document.getElementById('cpReferralActiveCount');
-  if (activeEl) activeEl.textContent = s.activeReferrals + (s.activeReferrals === 1 ? ' indicação ativa' : ' indicações ativas');
+  if (activeEl) activeEl.textContent = s.activeReferrals + ' ' + (s.activeReferrals === 1 ? t('cpReferralActiveSingular') : t('cpReferralActivePlural'));
   var totalEl = document.getElementById('cpReferralCreditsTotal');
   if (totalEl) totalEl.textContent = _cpFmtBRL(s.creditsBRL);
   var strip = document.getElementById('cpWalletCreditsStrip');
   var valEl = document.getElementById('cpWalletCreditsValue');
   if (valEl) valEl.textContent = _cpFmtBRL(s.creditsBRL);
   if (strip) strip.style.display = s.creditsBRL > 0 ? 'flex' : 'none';
+  cpRefreshReferralCopyAmounts();
 }
 
 window.cpSimulateReferralConversion = function() {
@@ -7027,12 +7143,14 @@ window.cpSimulateReferralConversion = function() {
      produtos de ticket baixo. R$15 + exigência de compra mínima de R$100
      (ver texto do card) preserva a margem do vendedor e ainda é um
      incentivo real de crescimento viral. */
-  s.creditsBRL += 15;
+  s.creditsBRL += CP_REFERRAL_REWARD_BRL;
   cpRenderReferralStats();
   if (typeof window.cpPushHistoryItem === 'function') {
     window.cpPushHistoryItem({
       emoji: '🎁',
-      text: 'Indicação concluiu a 1ª compra — +R$15 em Créditos WeKz',
+      // FIX [meu-perfil-moeda]: usa _cpFmtBRL (agora convertido pela moeda
+      // ativa) em vez de 'R$15' fixo.
+      text: 'Indicação concluiu a 1ª compra — +' + _cpFmtBRL(CP_REFERRAL_REWARD_BRL) + ' em Créditos WeKz',
       time: 'Agora mesmo',
       action: function() {
         var card = document.getElementById('cpReferralCard');
@@ -7041,7 +7159,7 @@ window.cpSimulateReferralConversion = function() {
       }
     });
   }
-  if (typeof showToast === 'function') showToast('🎉 O teu amigo concluiu a 1ª compra (mín. R$100) — R$15 creditados na tua Carteira WeKz!');
+  if (typeof showToast === 'function') showToast('🎉 O teu amigo concluiu a 1ª compra (mín. ' + _cpFmtBRL(CP_REFERRAL_MIN_BRL) + ') — ' + _cpFmtBRL(CP_REFERRAL_REWARD_BRL) + ' creditados na tua Carteira WeKz!');
 };
 
 /* ── 5. ACESSO RÁPIDO — scroll suave para secções ──────────────── */
