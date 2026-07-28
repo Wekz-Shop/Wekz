@@ -6826,9 +6826,27 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   });
 
   // Also init if page already open
+  /* FIX CRÍTICO [meu-perfil-i18n-bug]: esta chamada acontecia de forma
+     SÍNCRONA, durante a própria execução de wkz-core.js — ou seja, ANTES
+     de wkz-buyer.js (próximo <script>, que define a função global t())
+     sequer ter carregado. Como #cpMissaoList já existe no HTML estático
+     desde o parse inicial da página (independente da página "Meu Perfil"
+     estar visível ou não), esta condição era sempre verdadeira, e
+     renderMissoes() sempre lançava "ReferenceError: t is not defined" —
+     sem try/catch em volta, isso interrompia TODA a execução restante de
+     wkz-core.js a partir deste ponto (qualquer função declarada depois
+     desta linha, no arquivo inteiro, nunca chegava a ser definida —
+     incluindo cpRenderReferralStats, _cpFmtBRL e módulos mais abaixo).
+     É por isso que a troca de idioma parecia "quebrar tudo": não era um
+     problema de tradução, era um script inteiro abortando no primeiro
+     carregamento da página. setTimeout(...,0) adia a chamada para depois
+     que TODOS os <script> síncronos (incluindo wkz-buyer.js) terminarem
+     de rodar, quando t() já existe com segurança. */
   if (document.getElementById('cpMissaoList')) {
-    renderMissoes();
-    startCountdown();
+    setTimeout(function() {
+      renderMissoes();
+      startCountdown();
+    }, 0);
   }
 })();
 
