@@ -3514,22 +3514,22 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-hero-info">
         <div class="cp-name" id="cpUserName">Alexandre Kz</div>
         <div class="cp-email" id="cpUserEmail">alexandre@wekzshop.com</div>
-        <div class="cp-level-badge" onclick="cpOpenLevelGuide()" style="cursor:pointer;" title="Ver Guia de Níveis Kz"><span class="cp-level-dot"></span><span id="cpLevelName">Neon Cyber <span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span></span><span style="font-size:9px;opacity:0.65;margin-left:3px;letter-spacing:0;display:inline-flex;align-items:center;gap:2px;">Guia<svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+        <div class="cp-level-badge" onclick="cpOpenLevelGuide()" style="cursor:pointer;" title="Ver Guia de Níveis Kz"><span class="cp-level-dot"></span><span id="cpLevelName">Neon Cyber <span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span></span><span style="font-size:9px;opacity:0.65;margin-left:3px;letter-spacing:0;display:inline-flex;align-items:center;gap:2px;"><span data-i18n="cpGuideLabel">Guia</span><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="cp-quick-stats">
-          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroOrders">12</span><span class="cp-qs-label">Pedidos</span></div>
-          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroSaved">—</span><span class="cp-qs-label">Economizado</span></div>
-          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroPoints">8.340</span><span class="cp-qs-label">Pontos Kz</span></div>
-          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroSince">Mar 2024</span><span class="cp-qs-label">Membro desde</span></div>
+          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroOrders">12</span><span class="cp-qs-label" data-i18n="cpStatOrdersLabel">Pedidos</span></div>
+          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroSaved">—</span><span class="cp-qs-label" data-i18n="cpStatSavedLabel">Economizado</span></div>
+          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroPoints">8.340</span><span class="cp-qs-label" data-i18n="cpStatPointsLabel">Pontos Kz</span></div>
+          <div class="cp-quick-stat"><span class="cp-qs-value" id="cpStatHeroSince">Mar 2024</span><span class="cp-qs-label" data-i18n="cpStatSinceLabel">Membro desde</span></div>
         </div>
       </div>
       <div class="cp-hero-actions">
-        <button class="cp-hero-btn primary" onclick="cpEditProfile()"><span class="wkz-icon wkz-icon-pencil"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:3px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Editar Perfil</button>
-        <button class="cp-hero-btn secondary" onclick="cpShareProfile()"><span class="wkz-icon wkz-icon-link"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:3px;"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>Partilhar</button>
+        <button class="cp-hero-btn primary" onclick="cpEditProfile()"><span class="wkz-icon wkz-icon-pencil"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:3px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span><span data-i18n="cpEditProfileBtn">Editar Perfil</span></button>
+        <button class="cp-hero-btn secondary" onclick="cpShareProfile()"><span class="wkz-icon wkz-icon-link"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:3px;"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span><span data-i18n="cpShareBtn">Partilhar</span></button>
         <!-- [v2.2.0] Botão Sair movido exclusivamente para a sidebar e menu de perfil — eliminação de redundância -->
         <!-- [v3.1] Substitui o card "Turbinar Perfil": indicador compacto de completude, some quando chega a 100% -->
         <div id="cpProfileCompletionHint" onclick="cpEditProfile()" role="button" tabindex="0" title="Completar perfil" style="margin-top:2px;font-size:11px;color:var(--muted);cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">
           <span class="wkz-icon" style="display:inline-flex;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/></svg></span>
-          Perfil <strong id="cpProfileCompletionPct" style="color:var(--teal);">0%</strong> completo
+          <span data-i18n="cpProfileCompletePre">Perfil</span> <strong id="cpProfileCompletionPct" style="color:var(--teal);">0%</strong> <span data-i18n="cpProfileCompletePost">completo</span>
         </div>
       </div>
     </div>
@@ -3553,9 +3553,9 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="cp-card-title-icon teal" style="width:34px;height:34px;">
             <svg width="30" height="30" viewBox="0 0 100 100" class="kz-svg" style="filter:drop-shadow(0 0 6px rgba(0,180,171,0.6)) drop-shadow(0 0 12px rgba(124,58,237,0.3));" role="img" aria-label="Kz, o Lince Cibernético"><use href="#kz-mascot-full"/></svg>
           </div>
-          Kz Copilot — Análise Pessoal
+          <span data-i18n="cpCopilotCardTitle">Kz Copilot — Análise Pessoal</span>
         </div>
-        <span class="cp-card-link" onclick="cpRefreshCopilot()"><span class="wkz-icon wkz-icon-rotateccw"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span>Novo insight</span>
+        <span class="cp-card-link" onclick="cpRefreshCopilot()"><span class="wkz-icon wkz-icon-rotateccw"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span><span data-i18n="cpNewInsightBtn">Novo insight</span></span>
       </div>
       <div class="cp-card-body">
         <div class="cp-copilot-bubble" id="cpCopilotMsg">
@@ -3564,22 +3564,22 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="cp-stat-grid">
           <div class="cp-stat-item">
             <div class="cp-stat-value teal" id="cpStatNego">—</div>
-            <div class="cp-stat-label">Poupado via Nego.</div>
+            <div class="cp-stat-label" data-i18n="cpStatNegoLabel">Poupado via Nego.</div>
           </div>
           <div class="cp-stat-item">
             <div class="cp-stat-value purple" id="cpStatPoints">8.340 pts</div>
-            <div class="cp-stat-label">Pontos de Lealdade</div>
+            <div class="cp-stat-label" data-i18n="cpStatLoyaltyLabel">Pontos de Lealdade</div>
           </div>
           <div class="cp-stat-item">
             <div class="cp-stat-value green" id="cpStatOrderCount">12 pedidos</div>
-            <div class="cp-stat-label">Total de Compras</div>
+            <div class="cp-stat-label" data-i18n="cpStatPurchasesLabel">Total de Compras</div>
           </div>
           <div class="cp-stat-item" onclick="cpOpenLevelGuide()" style="cursor:pointer;" title="Ver Guia de Níveis Kz">
             <div class="cp-stat-value amber" id="cpStatLvl"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:2px;"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span>Neon</div>
-            <div class="cp-stat-label">Nível Atual ↗</div>
+            <div class="cp-stat-label" data-i18n="cpStatLevelLabel">Nível Atual ↗</div>
           </div>
         </div>
-        <div class="cp-history-title"><span class="wkz-icon wkz-icon-clipboard"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>Micro-Histórico de Interações</div>
+        <div class="cp-history-title"><span class="wkz-icon wkz-icon-clipboard"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span><span data-i18n="cpHistoryTitle">Micro-Histórico de Interações</span></div>
         <div class="cp-history-list" id="cpHistoryList"><!-- JS --></div>
       </div>
     </div>
@@ -3594,7 +3594,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon amber"><span class="wkz-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 4H3v1a4 4 0 004 4"/><path d="M17 4h4v1a4 4 0 01-4 4"/></svg></span></div>
-          Guia de Níveis Kz
+          <span data-i18n="cpLevelGuideTitle">Guia de Níveis Kz</span>
         </div>
       </div>
       <div class="cp-card-body" id="cpLevelGuideBody"><!-- JS: renderLevelGuideSection() --></div>
@@ -3608,15 +3608,15 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon" style="background:rgba(245,158,11,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">🎯</div>
-          Missões do Dia
+          <span data-i18n="cpMissionsTitle">Missões do Dia</span>
         </div>
-        <span class="cp-card-note" id="cpMissoesTimer" style="font-size:11px;color:var(--muted);cursor:default;">Resetam em <strong id="cpMissoesCountdown" style="color:var(--teal);">--:--:--</strong></span>
+        <span class="cp-card-note" id="cpMissoesTimer" style="font-size:11px;color:var(--muted);cursor:default;"><span data-i18n="cpMissionsResetLabel">Resetam em</span> <strong id="cpMissoesCountdown" style="color:var(--teal);">--:--:--</strong></span>
       </div>
       <div class="cp-card-body">
         <div class="cp-mission-list" id="cpMissaoList"><!-- JS --></div>
         <div class="cp-mission-bar-wrap">
           <div class="cp-mission-bar-label">
-            <span>Progresso diário</span>
+            <span data-i18n="cpMissionsProgressLabel">Progresso diário</span>
             <span id="cpMissaoPct" style="color:var(--teal);font-weight:700;">0/5 concluídas</span>
           </div>
           <div class="cp-mission-bar"><div class="cp-mission-bar-fill" id="cpMissaoBarFill" style="width:0%"></div></div>
@@ -3631,9 +3631,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon blue"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 9.4L7.55 4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></span></div>
-          Rastreador de Encomendas
+          <span data-i18n="cpTrackerTitle">Rastreador de Encomendas</span>
         </div>
-        <span class="cp-card-link" onclick="cpRefreshOrders()" title="Sincronizar status de rastreio com as transportadoras"><span class="wkz-icon wkz-icon-rotateccw"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span>Sincronizar</span>
+        <span class="cp-card-link" onclick="cpRefreshOrders()" title="Sincronizar status de rastreio com as transportadoras"><span class="wkz-icon wkz-icon-rotateccw"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span><span data-i18n="cpSyncBtn">Sincronizar</span></span>
       </div>
       <div class="cp-card-body">
         <div class="cp-order-list" id="cpOrderList"><!-- JS --></div>
@@ -3647,9 +3647,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon" style="background:rgba(251,191,36,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">⭐</div>
-          Avaliações Pendentes
+          <span data-i18n="cpPendingReviewsTitle">Avaliações Pendentes</span>
         </div>
-        <span class="cp-card-note" style="font-size:11px;color:#F59E0B;font-weight:700;cursor:default;">+30 pts cada</span>
+        <span class="cp-card-note" style="font-size:11px;color:#F59E0B;font-weight:700;cursor:default;" data-i18n="cpPendingReviewsNote">+30 pts cada</span>
       </div>
       <div class="cp-card-body">
         <div id="cpAvaliacoesList">
@@ -3664,13 +3664,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="cp-review-star">★</span><span class="cp-review-star">★</span>
                 <span class="cp-review-star">★</span>
               </div>
-              <div class="cp-review-pts">🏆 Ganhe +30 pts ao avaliar!</div>
+              <div class="cp-review-pts" data-i18n="cpReviewPtsHint">🏆 Ganhe +30 pts ao avaliar!</div>
             </div>
           </div>
         </div>
         <div style="margin-top:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Suas avaliações ajudam outros compradores e rendem pontos Kz.
+          <span data-i18n="cpReviewsHelpNote">Suas avaliações ajudam outros compradores e rendem pontos Kz.</span>
         </div>
       </div>
     </div>
@@ -3685,9 +3685,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon" style="background:rgba(0,180,171,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div>
-          Histórico de Compras
+          <span data-i18n="cpPurchaseHistoryTitle">Histórico de Compras</span>
         </div>
-        <span class="cp-card-note" style="font-size:11px;cursor:default;">Todos os produtos já comprados</span>
+        <span class="cp-card-note" style="font-size:11px;cursor:default;" data-i18n="cpPurchaseHistoryNote">Todos os produtos já comprados</span>
       </div>
       <div class="cp-card-body">
         <div id="cpPurchaseHistoryList"><!-- JS --></div>
@@ -3701,9 +3701,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon purple"><span class="wkz-icon wkz-icon-scale"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span></div>
-          Central de Disputas do Cliente
+          <span data-i18n="cpDisputesTitle">Central de Disputas do Cliente</span>
         </div>
-        <span class="cp-card-link" onclick="cpOpenNewDispute()">+ Abrir Disputa</span>
+        <span class="cp-card-link" onclick="cpOpenNewDispute()" data-i18n="cpOpenDisputeBtn">+ Abrir Disputa</span>
       </div>
       <div class="cp-card-body">
         <div id="cpDisputeContainer"><!-- JS --></div>
@@ -3717,9 +3717,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon amber"><span class="wkz-icon wkz-icon-creditcard"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span></div>
-          Carteira Multimoedas &amp; Cupons Smart
+          <span data-i18n="cpWalletTitle">Carteira Multimoedas &amp; Cupons Smart</span>
         </div>
-        <span class="cp-card-link" onclick="cpAddCard()">+ Adicionar</span>
+        <span class="cp-card-link" onclick="cpAddCard()" data-i18n="cpAddBtn">+ Adicionar</span>
       </div>
       <div class="cp-card-body">
         <!-- [FIX-07] Removido botão duplicado "+ Adicionar novo cartão / conta" com
@@ -3730,11 +3730,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- [FIX-09] Saldo de Créditos WeKz (ganhos via indicação) — sempre visível
              aqui, respondendo "onde vão os créditos ganhos". -->
         <div id="cpWalletCreditsStrip" style="display:none;margin-bottom:14px;padding:12px 16px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:12px;font-size:12px;color:#c4b5fd;align-items:center;justify-content:space-between;gap:10px;">
-          <span>🎁 <strong>Créditos WeKz</strong> · ganhos com indicações</span>
+          <span>🎁 <strong data-i18n="cpWalletCreditsStrong">Créditos WeKz</strong> · <span data-i18n="cpWalletCreditsSuffix">ganhos com indicações</span></span>
           <strong id="cpWalletCreditsValue" style="font-size:14px;">R$ 0,00</strong>
         </div>
         <div class="cp-wallet-grid" id="cpWalletGrid"><!-- JS --></div>
-        <div class="cp-coupons-title"><span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Cupons gerados pelo Smart Negotiator</div>
+        <div class="cp-coupons-title"><span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span data-i18n="cpCouponsSectionTitle">Cupons gerados pelo Smart Negotiator</span></div>
         <div class="cp-coupon-list" id="cpCouponList"><!-- JS --></div>
       </div>
     </div>
@@ -3749,9 +3749,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon" style="background:rgba(251,191,36,0.15);color:#FBB524;border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;"><span class="wkz-icon wkz-icon-bell"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span></div>
-          Alertas de Queda de Preço
+          <span data-i18n="cpPriceAlertsTitle">Alertas de Queda de Preço</span>
         </div>
-        <span class="cp-card-link" onclick="MapsTo('home');showToast&&showToast('Escolhe um produto e toca em \'Me Avise quando o preço baixar\' na página dele para criar o alerta.')">+ Novo alerta</span>
+        <span class="cp-card-link" onclick="MapsTo('home');showToast&&showToast('Escolhe um produto e toca em \'Me Avise quando o preço baixar\' na página dele para criar o alerta.')" data-i18n="cpNewAlertBtn">+ Novo alerta</span>
       </div>
       <div class="cp-card-body">
         <div id="cpPriceAlertsList"><!-- Preenchido por JS --></div>
@@ -3765,7 +3765,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon teal"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span></div>
-          Acesso Rápido
+          <span data-i18n="cpQuickAccessTitle">Acesso Rápido</span>
         </div>
       </div>
       <div class="cp-card-body">
@@ -3773,25 +3773,25 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="cp-quick-access-grid">
           <button class="cp-qa-btn cp-qa-btn--primary" onclick="MapsTo('tracking')">
             <span class="cp-qa-icon"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 9.4L7.55 4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></span></span>
-            <span class="cp-qa-label">Rastrear Pedido</span>
-            <span class="cp-qa-sub">Ver status em tempo real</span>
+            <span class="cp-qa-label" data-i18n="cpQaTrackLabel">Rastrear Pedido</span>
+            <span class="cp-qa-sub" data-i18n="cpQaTrackSub">Ver status em tempo real</span>
           </button>
           <button class="cp-qa-btn cp-qa-btn--primary" onclick="cpShowActiveCoupons()">
             <span class="cp-qa-icon"><span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span></span>
-            <span class="cp-qa-label">Meus Cupons Ativos</span>
-            <span class="cp-qa-sub">Descontos disponíveis</span>
+            <span class="cp-qa-label" data-i18n="cpQaCouponsLabel">Meus Cupons Ativos</span>
+            <span class="cp-qa-sub" data-i18n="cpQaCouponsSub">Descontos disponíveis</span>
           </button>
           <button class="cp-qa-btn cp-qa-btn--warning" onclick="cpOpenDisputeCenter()">
             <span class="cp-qa-icon"><span class="wkz-icon wkz-icon-shield"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg></span></span>
-            <span class="cp-qa-label">Central de Disputas</span>
-            <span class="cp-qa-sub">Resolver problemas</span>
+            <span class="cp-qa-label" data-i18n="cpQaDisputesLabel">Central de Disputas</span>
+            <span class="cp-qa-sub" data-i18n="cpQaDisputesSub">Resolver problemas</span>
           </button>
         </div>
         <!-- [v2.2.0] Botão Sair: posição discreta na base, sem destaque visual agressivo -->
         <div class="cp-qa-logout-row">
           <button class="cp-qa-logout-btn" onclick="cpLogout()">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Sair da conta
+            <span data-i18n="cpLogoutBtn">Sair da conta</span>
           </button>
         </div>
       </div>
@@ -3805,9 +3805,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon" style="background:rgba(124,58,237,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">🎁</div>
-          Indicação WeKz — Ganhe Juntos
+          <span data-i18n="cpReferralTitle">Indicação WeKz — Ganhe Juntos</span>
         </div>
-        <span class="cp-card-link" style="color:#a78bfa;" onclick="window._cpReferralHowItWorks && window._cpReferralHowItWorks()">Como funciona</span>
+        <span class="cp-card-link" style="color:#a78bfa;" onclick="window._cpReferralHowItWorks && window._cpReferralHowItWorks()" data-i18n="cpHowItWorksLink">Como funciona</span>
       </div>
       <div class="cp-card-body">
         <div class="cp-referral-hero">
@@ -3817,26 +3817,26 @@ document.addEventListener('DOMContentLoaded', function() {
                  invisíveis no tema claro, pois .cp-referral-hero tem fundo translúcido
                  (não sólido) — usa as variáveis de tema (var(--text) / var(--muted)),
                  que já se adaptam corretamente aos dois temas. -->
-            <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Convide amigos e ganhe <span style="color:var(--teal);">R$15</span> cada!</div>
-            <div style="font-size:12px;color:var(--muted);">Seu amigo ganha <strong style="color:var(--teal);">-10% OFF</strong> na 1ª compra. Você recebe <strong style="color:#a78bfa;">R$15 em crédito</strong> quando a compra do seu amigo for de pelo menos <strong style="color:var(--text);">R$100</strong>.</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;"><span data-i18n="cpReferralHeroPre">Convide amigos e ganhe</span> <span style="color:var(--teal);" id="cpReferralRewardAmt1">R$15</span> <span data-i18n="cpReferralHeroPost">cada!</span></div>
+            <div style="font-size:12px;color:var(--muted);"><span data-i18n="cpReferralFriendGetsPre">Seu amigo ganha</span> <strong style="color:var(--teal);">-10% OFF</strong> <span data-i18n="cpReferralFriendGetsPost">na 1ª compra. Você recebe</span> <strong style="color:#a78bfa;"><span id="cpReferralRewardAmt2">R$15</span> <span data-i18n="cpReferralFriendGetsCredit">em crédito</span></strong> <span data-i18n="cpReferralFriendGetsWhen">quando a compra do seu amigo for de pelo menos</span> <strong style="color:var(--text);" id="cpReferralMinAmt1">R$100</strong>.</div>
           </div>
         </div>
         <div style="margin-bottom:14px;">
-          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Seu código de indicação</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;" data-i18n="cpReferralCodeLabel">Seu código de indicação</div>
           <div class="cp-referral-code-wrap">
             <div class="cp-referral-code" id="cpReferralCode">KZWEKZ8340</div>
             <button class="cp-referral-copy" onclick="cpCopyReferralCode()">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              Copiar
+              <span data-i18n="cpCopyBtn">Copiar</span>
             </button>
           </div>
         </div>
         <div style="margin-bottom:14px;">
-          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Como funciona</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;" data-i18n="cpHowItWorksLink">Como funciona</div>
           <div class="cp-referral-steps">
-            <div class="cp-referral-step"><div class="cp-referral-step-num">1</div><div class="cp-referral-step-text">Compartilhe seu código <strong>KZWEKZ8340</strong> com amigos</div></div>
-            <div class="cp-referral-step"><div class="cp-referral-step-num">2</div><div class="cp-referral-step-text">Seu amigo usa o código no cadastro e recebe <strong>-10% OFF</strong></div></div>
-            <div class="cp-referral-step"><div class="cp-referral-step-num">3</div><div class="cp-referral-step-text">Após a 1ª compra do seu amigo (mín. <strong>R$100</strong>), você recebe <strong>R$15 em crédito WeKz</strong></div></div>
+            <div class="cp-referral-step"><div class="cp-referral-step-num">1</div><div class="cp-referral-step-text" data-i18n="cpReferralStep1" data-i18n-html>Compartilhe seu código <strong>KZWEKZ8340</strong> com amigos</div></div>
+            <div class="cp-referral-step"><div class="cp-referral-step-num">2</div><div class="cp-referral-step-text" data-i18n="cpReferralStep2" data-i18n-html>Seu amigo usa o código no cadastro e recebe <strong>-10% OFF</strong></div></div>
+            <div class="cp-referral-step"><div class="cp-referral-step-num">3</div><div class="cp-referral-step-text"><span data-i18n="cpReferralStep3Pre">Após a 1ª compra do seu amigo (mín.</span> <strong id="cpReferralMinAmt2">R$100</strong><span data-i18n="cpReferralStep3Mid">), você recebe</span> <strong><span id="cpReferralRewardAmt3">R$15</span> <span data-i18n="cpReferralStep3Post">em crédito WeKz</span></strong></div></div>
           </div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -3846,20 +3846,20 @@ document.addEventListener('DOMContentLoaded', function() {
           </button>
           <button style="flex:1;min-width:120px;padding:11px 16px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="cpShareReferral('link')">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-            Copiar Link
+            <span data-i18n="cpCopyLinkBtn">Copiar Link</span>
           </button>
         </div>
         <!-- [FIX-09] Onde vão os créditos: explicitado + saldo real, sincronizado com a Carteira Multimoedas. -->
         <div style="margin-top:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text);">
-          <span style="color:#a78bfa;font-weight:700;">💰 Créditos WeKz ganhos: <span id="cpReferralCreditsTotal">R$ 0,00</span></span> disponíveis
-          <div style="margin-top:2px;color:var(--muted);">São somados automaticamente à tua <strong>Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
+          <span style="color:#a78bfa;font-weight:700;"><span data-i18n="cpReferralCreditsEarnedPre">💰 Créditos WeKz ganhos:</span> <span id="cpReferralCreditsTotal">R$ 0,00</span></span> <span data-i18n="cpReferralCreditsEarnedPost">disponíveis</span>
+          <div style="margin-top:2px;color:var(--muted);" data-i18n="cpReferralCreditsSyncNote" data-i18n-html>São somados automaticamente à tua <strong>Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
         </div>
         <div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;">
           <span style="flex-shrink:0;color:#F59E0B;">⭐</span>
-          <span><strong style="color:#F59E0B;" id="cpReferralActiveCount">0 indicações ativas</strong> · Sem limite de indicações! Cada amigo que concluir uma compra de pelo menos R$100 gera R$15 para você.</span>
+          <span><strong style="color:#F59E0B;" id="cpReferralActiveCount">0 indicações ativas</strong> <span data-i18n="cpReferralActiveNotePre">· Sem limite de indicações! Cada amigo que concluir uma compra de pelo menos</span> <span id="cpReferralMinAmt3">R$100</span> <span data-i18n="cpReferralActiveNoteMid">gera</span> <span id="cpReferralRewardAmt4">R$15</span> <span data-i18n="cpReferralActiveNotePost">para você.</span></span>
         </div>
         <!-- Simulação, já que esta fase é 100% front-end (sem backend para confirmar a compra real do amigo indicado) -->
-        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;">
+        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;" data-i18n="cpReferralSimulateBtn">
           🧪 Simular: um amigo indicado concluiu a 1ª compra (demo)
         </button>
       </div>
