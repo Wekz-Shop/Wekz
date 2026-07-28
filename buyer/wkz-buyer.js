@@ -81,16 +81,29 @@ const CAT_KEY_MAP = {
   'Automotivo':'automotivo','Livros':'livros','Saúde':'saude','Ferramentas':'ferramentas'
 };
 
+/* FIX [cats-i18n]: mapa nome-canônico(PT) → chave i18n, usado só para
+   EXIBIÇÃO em renderCats(). c.n continua sendo o identificador interno
+   canônico (usado por filterCatKey/CAT_KEY_MAP/onclick e em outros
+   pontos do app que comparam por nome em PT) — não alteramos isso para
+   não quebrar filtros de categoria/produto que dependem dessa string. */
+const CAT_I18N_MAP = {
+  'Eletrônicos':'catElectronics','Moda':'catFashion','Casa & Deco':'catHome','Beleza':'catBeauty',
+  'Games':'catGames','Esportes':'catSports','Bebê & Kids':'catBaby','Pet Shop':'catPet',
+  'Automotivo':'catAuto','Livros':'catBooks','Saúde':'catHealth','Ferramentas':'catTools'
+};
+
 function renderCats(){
   const g=document.getElementById('catsGrid');
   if(!g)return;
   g.innerHTML=categories.map(c=>{
     const key = CAT_KEY_MAP[c.n] || c.n.toLowerCase().replace(/[\s&]/g,'');
+    const i18nKey = CAT_I18N_MAP[c.n];
+    const displayName = i18nKey ? t(i18nKey) : c.n;
     return `
     <div class="cat-item" data-cat-key="${key}" onclick="filterCatKey('${key}','${c.n}',this)">
       <span class="cat-emoji">${wkzCatIconSVG(c.e)}</span>
-      <div class="cat-name">${c.n}</div>
-      <div class="cat-count">${c.c} itens</div>
+      <div class="cat-name">${displayName}</div>
+      <div class="cat-count">${c.c} ${t('items')}</div>
     </div>`;
   }).join('');
   setTimeout(function(){ if(typeof initAllScrollFades==="function") initAllScrollFades(); }, 60);
@@ -1221,6 +1234,13 @@ const TRANSLATIONS = {
     // Cart
     myCart: '🛒 Meu Carrinho',
     items: 'itens',
+    // FIX [cats-i18n]: nomes de categoria (grade "Explorar Categorias" da home)
+    catElectronics: 'Eletrônicos', catFashion: 'Moda', catHome: 'Casa & Deco',
+    catBeauty: 'Beleza', catGames: 'Games', catSports: 'Esportes',
+    catBaby: 'Bebê & Kids', catPet: 'Pet Shop', catAuto: 'Automotivo',
+    catBooks: 'Livros', catHealth: 'Saúde', catTools: 'Ferramentas',
+    // FIX [meu-perfil-btn-i18n]: label do botão "Meu Perfil" no header
+    myProfile: 'Meu Perfil',
     clearAll: 'Limpar tudo',
     subtotal: 'Subtotal',
     freight: 'Frete',
@@ -1474,6 +1494,11 @@ const TRANSLATIONS = {
     writeReview: '✍️ Write a Review',
     myCart: '🛒 My Cart',
     items: 'items',
+    catElectronics: 'Electronics', catFashion: 'Fashion', catHome: 'Home & Decor',
+    catBeauty: 'Beauty', catGames: 'Games', catSports: 'Sports',
+    catBaby: 'Baby & Kids', catPet: 'Pet Shop', catAuto: 'Automotive',
+    catBooks: 'Books', catHealth: 'Health', catTools: 'Tools',
+    myProfile: 'My Profile',
     clearAll: 'Clear all',
     subtotal: 'Subtotal',
     freight: 'Shipping',
@@ -1724,6 +1749,11 @@ const TRANSLATIONS = {
     writeReview: '✍️ Escribir Reseña',
     myCart: '🛒 Mi Carrito',
     items: 'artículos',
+    catElectronics: 'Electrónicos', catFashion: 'Moda', catHome: 'Hogar y Decoración',
+    catBeauty: 'Belleza', catGames: 'Juegos', catSports: 'Deportes',
+    catBaby: 'Bebés y Niños', catPet: 'Mascotas', catAuto: 'Automotriz',
+    catBooks: 'Libros', catHealth: 'Salud', catTools: 'Herramientas',
+    myProfile: 'Mi Perfil',
     clearAll: 'Limpiar todo',
     subtotal: 'Subtotal',
     freight: 'Envío',
@@ -1974,6 +2004,11 @@ const TRANSLATIONS = {
     writeReview: '✍️ 写评价',
     myCart: '🛒 我的购物车',
     items: '件商品',
+    catElectronics: '电子产品', catFashion: '时尚', catHome: '家居装饰',
+    catBeauty: '美妆', catGames: '游戏', catSports: '运动',
+    catBaby: '母婴用品', catPet: '宠物用品', catAuto: '汽车用品',
+    catBooks: '图书', catHealth: '健康', catTools: '工具',
+    myProfile: '个人中心',
     clearAll: '清空',
     subtotal: '小计',
     freight: '运费',
@@ -2224,6 +2259,11 @@ const TRANSLATIONS = {
     writeReview: '✍️ Écrire un Avis',
     myCart: '🛒 Mon Panier',
     items: 'articles',
+    catElectronics: 'Électronique', catFashion: 'Mode', catHome: 'Maison & Déco',
+    catBeauty: 'Beauté', catGames: 'Jeux', catSports: 'Sports',
+    catBaby: 'Bébé & Enfants', catPet: 'Animalerie', catAuto: 'Automobile',
+    catBooks: 'Livres', catHealth: 'Santé', catTools: 'Outils',
+    myProfile: 'Mon Profil',
     clearAll: 'Tout vider',
     subtotal: 'Sous-total',
     freight: 'Livraison',
@@ -2474,6 +2514,11 @@ const TRANSLATIONS = {
     writeReview: '✍️ Bewertung schreiben',
     myCart: '🛒 Mein Warenkorb',
     items: 'Artikel',
+    catElectronics: 'Elektronik', catFashion: 'Mode', catHome: 'Haus & Deko',
+    catBeauty: 'Beauty', catGames: 'Games', catSports: 'Sport',
+    catBaby: 'Baby & Kids', catPet: 'Tierbedarf', catAuto: 'Auto',
+    catBooks: 'Bücher', catHealth: 'Gesundheit', catTools: 'Werkzeuge',
+    myProfile: 'Mein Profil',
     clearAll: 'Alles leeren',
     subtotal: 'Zwischensumme',
     freight: 'Versand',
@@ -2724,6 +2769,11 @@ const TRANSLATIONS = {
     writeReview: '✍️ レビューを書く',
     myCart: '🛒 カート',
     items: '点の商品',
+    catElectronics: '家電・電子機器', catFashion: 'ファッション', catHome: 'ホーム&デコ',
+    catBeauty: '美容', catGames: 'ゲーム', catSports: 'スポーツ',
+    catBaby: 'ベビー&キッズ', catPet: 'ペット用品', catAuto: '自動車用品',
+    catBooks: '本', catHealth: '健康', catTools: '工具',
+    myProfile: 'マイプロフィール',
     clearAll: '全て削除',
     subtotal: '小計',
     freight: '送料',
@@ -3124,6 +3174,9 @@ function applyTranslations() {
   });
 
   /* ── 16. Re-render para preços e labels de produto/wishlist/carrinho ─ */
+  /* FIX [cats-i18n]: renderCats() estava fora desta lista — a grade
+     "Explorar Categorias" nunca era re-desenhada ao trocar de idioma. */
+  if (typeof renderCats     === 'function') renderCats();
   if (typeof renderProducts === 'function') renderProducts();
   if (typeof renderWishlist === 'function') renderWishlist();
   if (typeof renderCart     === 'function') renderCart();
@@ -6888,27 +6941,31 @@ function toggleWkzPanel(type) {
 }
 
 function wkzSelectCurrency(code) {
+  /* FIX [lang-picker-bridge]: mesma correção aplicada em wkzSelectLang —
+     chama updateCurrency() diretamente em vez de depender do
+     dispatchEvent('change') sintético no <select> escondido. */
   const sel = document.getElementById('currencySelect');
-  if(sel){ sel.value = code; sel.dispatchEvent(new Event('change')); }
-  const lbl = document.getElementById('currencyBtnLabel');
-  if(lbl) lbl.textContent = code;
+  if (sel) sel.value = code;
+  updateCurrency(code);
   _closePanel();
-  showToast('💲 Moeda: ' + code);
-  // ── Bridge Kz ──
-  kzSyncFromHeader(null, code);
 }
 
 function wkzSelectLang(code) {
+  /* FIX [lang-picker-bridge]: antes, esta função só atualizava o <select>
+     escondido e disparava um evento 'change' sintético, torcendo para que
+     o onchange="updateLang(this.value)" do HTML repassasse a chamada.
+     Esse elo indireto era o ponto de falha: header, nav-bar, hero e
+     footer (tudo que só é atualizado dentro de applyTranslations(),
+     chamada por updateLang()) ficava preso no idioma anterior, enquanto
+     só o que esta função tocava diretamente (label do botão, toast)
+     mudava na hora. Agora chamamos updateLang() diretamente — ela já
+     cuida de: currentLang, label do botão, moeda pareada,
+     applyTranslations(), persistência e toast. Não precisamos duplicar
+     nada disso aqui. */
   const sel = document.getElementById('langSelect');
-  if(sel){ sel.value = code; sel.dispatchEvent(new Event('change')); }
-  const item = WKZ_LANGS.find(l => l.code === code);
-  const lbl = document.getElementById('langBtnLabel');
-  if(lbl && item) lbl.textContent = item.label;
+  if (sel) sel.value = code;
+  updateLang(code);
   _closePanel();
-  showToast('🌐 Idioma: ' + (item ? item.name : code));
-  // ── Bridge Kz ──
-  const pairedCurr = LANG_CURRENCY[code] || 'USD';
-  kzSyncFromHeader(code, pairedCurr);
 }
 
 // Sync label on page load
