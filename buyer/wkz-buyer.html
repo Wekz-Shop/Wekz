@@ -3274,9 +3274,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="price-range-labels"><span>R$ 0</span><span id="catPriceLabel">R$ 5.000</span></div>
           </div>
           <div class="filter-price-row" style="margin-top:10px;">
-            <input type="number" id="catPriceMin" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Mín" min="0" inputmode="numeric" oninput="syncCatPriceInputs()">
+            <input type="number" id="catPriceMin" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Mín" min="0" inputmode="numeric" oninput="syncCatPriceInputs()" onkeydown="if(event.key==='Enter'){this.blur();renderCatProducts();}">
             <span style="color:var(--muted);">—</span>
-            <input type="number" id="catPriceMax" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Máx" min="0" inputmode="numeric" oninput="syncCatPriceInputs()">
+            <input type="number" id="catPriceMax" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Máx" min="0" inputmode="numeric" oninput="syncCatPriceInputs()" onkeydown="if(event.key==='Enter'){this.blur();renderCatProducts();}">
           </div>
         </div>
         <div class="sidebar-filter-group">

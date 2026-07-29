@@ -10510,7 +10510,7 @@ function resetCatPriceOnly(){
   const label = document.getElementById('catPriceLabel');
   if(label) label.textContent = `R$ ${roundedMax.toLocaleString('pt-BR')}`;
   const minEl = document.getElementById('catPriceMin');
-  if(minEl){ minEl.value=''; minEl.placeholder='Mín'; }
+  if(minEl){ minEl.value=''; minEl.placeholder='Mín (R$ 0)'; }
   const maxEl = document.getElementById('catPriceMax');
   if(maxEl){ maxEl.value=''; maxEl.placeholder=`Máx (R$ ${roundedMax.toLocaleString('pt-BR')})`; }
 }
