@@ -6847,6 +6847,24 @@ html, body {
   letter-spacing:0.2px;
 }
 .filter-chip.active,.filter-chip:hover{background:rgba(0,180,171,0.18);border-color:rgba(0,180,171,0.6);box-shadow:0 0 10px rgba(0,180,171,0.15);}
+
+/* Chips de filtro ativo (página de categoria) — um por filtro ligado, clicável p/ remover */
+.cat-active-chips{display:flex;gap:8px;flex-wrap:wrap;margin:-6px 0 16px;}
+.cat-active-chips:empty{margin:0;}
+.cat-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(0,180,171,0.08);
+  border:1px solid rgba(0,180,171,0.25);
+  color:var(--teal);
+  padding:6px 10px 6px 13px;border-radius:50px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:all 0.18s ease;font-family:inherit;
+}
+.cat-chip:hover{background:rgba(0,180,171,0.16);border-color:rgba(0,180,171,0.5);}
+.cat-chip-x{font-size:10px;opacity:0.65;}
+.cat-chip:hover .cat-chip-x{opacity:1;}
+.cat-chip-clear{background:var(--card2);border-color:var(--border);color:var(--muted);}
+.cat-chip-clear:hover{background:var(--card2);border-color:var(--c-error);color:var(--c-error);}
 /* Controls row spans full width */
 .filter-controls{
   grid-column:1/-1;
