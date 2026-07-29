@@ -92,16 +92,59 @@ o mesmo estado já lido ali (sem reconsultar o DOM em duplicidade). Visual:
 nova classe `.cat-chip` em `wkz-styles-full.css`, no mesmo padrão pill/teal
 do `.filter-chip` já existente na barra de filtros da home.
 
+## 8. Busca por palavra-chave dentro da categoria (funil de busca)
+
+Novo campo no topo do sidebar ("Buscar nesta categoria"), acima de Faixa de
+Preço. Filtra em tempo real (a cada tecla) por nome do produto, nome da
+loja e qualquer valor de `attrs` (marca, tamanho, plataforma etc. —
+digitar "Sony" acha o Fone Bluetooth mesmo sem "Sony" estar no título).
+Busca ignora acento e maiúscula/minúscula, reaproveitando o helper
+`_wkzNormalizeText()` já existente no projeto (usado hoje na busca de
+FAQ) em vez de criar uma segunda implementação. Ganhou chip removível
+próprio (🔎 "termo") e é limpo por `clearCatFilters()`.
+
+## 9. Bug real encontrado e corrigido: campo de busca do topo "sumindo" em telas ~900–1180px
+
+Reportado com prints em Modo Desktop do Chrome/Android (que simula um
+viewport ~980–1024px). Causa raiz: `.topbar-actions` tem `flex-shrink:0`
+(nunca encolhe) e só ficava compacto (ícone-only, sem "Meu Perfil"/"Vender"
+por extenso) em `@media(max-width:768px)`. Entre 769–1180px essa
+compactação ainda não entrava, então a barra de ações no formato "desktop
+cheio" tomava quase todo o espaço da `.topbar-inner`, e como `.search-bar`
+tem `overflow:hidden`, sobrava só o `<select>` "Todas" (tem `min-width:110px`
+fixo) — o `<input>` de busca (sem min-width) e o botão de lupa eram
+espremidos a ~0px, ficando efetivamente invisíveis. Não era exatamente
+"pequeno", era espremido a zero — mas o efeito percebido bate exatamente
+com o relato.
+
+Correção: o breakpoint que já compacta `.topbar-actions` (mesma regra
+testada e em produção em ≤768px) foi alargado para ≤1180px — resolve na
+raiz, sem CSS novo. Como reforço (defesa em profundidade, caso o layout
+mude de novo no futuro), `.search-wrap-top`/`.search-bar` ganharam
+`min-width:180px` e `.search-bar input` ganhou `min-width:60px`, para que
+esse tipo de "sumiço por espremido" não possa mais acontecer mesmo em
+cenários não previstos.
+
+**Nenhuma mudança no card "O marketplace que evolui com você"**: o campo
+de busca ali (`#heroSearchInput`) já existe e já é funcional — dropdown de
+sugestões em tempo real, Enter dispara a busca, integra com histórico
+de busca. Conferido no código (`heroSearchType`/`heroSearchSubmit` em
+`wkz-buyer.js`); não havia nada quebrado para corrigir aí.
+
 ## Testes
 
 - `npm run test:m1` (`harness-node.js`) e `npm run test:m2`
   (`harness-buyer-test.js`) — suites existentes, sem alteração — **passam**.
 - Suite nova (`filter-test.js`, não commitada — script de verificação usado
-  durante o desenvolvimento) cobre: filtro por categoria nas 12 categorias,
-  preço min/máx, Origem (com Estado), Envio, Condição, facetas dinâmicas,
-  `clearCatFilters()`, estado vazio, e os chips de filtro ativo (aparecer,
-  remover individualmente sem afetar os outros, "Limpar tudo") —
-  **18/18 passam**.
+  durante o desenvolvimento): filtro por categoria nas 12 categorias, preço
+  min/máx, Origem (com Estado), Envio, Condição, facetas dinâmicas,
+  `clearCatFilters()`, estado vazio, chips de filtro ativo e busca por
+  palavra-chave (nome/loja/atributo, acento-insensível, chip próprio) —
+  **23/23 passam**.
+- O fix do CSS da topbar (item 9) foi validado por leitura/raciocínio sobre
+  as regras de flexbox e pela reprodução do cálculo de espaço (não há
+  ferramenta de screenshot/browser real neste ambiente) — vale conferir
+  visualmente em ~980-1024px assim que possível.
 
 ## O que ficou de fora (proposital)
 
