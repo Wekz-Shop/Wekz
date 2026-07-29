@@ -3412,12 +3412,12 @@ img, svg, video, canvas, iframe {
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
 
 /* search-wrap-top gives the search bar its own flex context with margins */
-.search-wrap-top{flex:1;max-width:600px;margin:0 16px;position:relative;}
+.search-wrap-top{flex:1;max-width:600px;min-width:180px;margin:0 16px;position:relative;}
 
-.search-bar{flex:1;max-width:580px;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:50px;overflow:hidden;transition:var(--transition);}
+.search-bar{flex:1;max-width:580px;min-width:180px;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:50px;overflow:hidden;transition:var(--transition);}
 .search-bar:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,180,171,0.15);}
-.search-bar select{background:var(--card2);border:none;border-right:1px solid var(--border);color:var(--text);padding:0 14px;height:46px;font-size:13px;cursor:pointer;outline:none;}
-.search-bar input{flex:1;background:transparent;border:none;color:var(--text);padding:0 16px;height:46px;font-size:14px;outline:none;}
+.search-bar select{background:var(--card2);border:none;border-right:1px solid var(--border);color:var(--text);padding:0 14px;height:46px;font-size:13px;cursor:pointer;outline:none;flex-shrink:0;}
+.search-bar input{flex:1;min-width:60px;background:transparent;border:none;color:var(--text);padding:0 16px;height:46px;font-size:14px;outline:none;}
 .search-bar input::placeholder{color:var(--muted);}
 .search-btn{background:var(--grad1);border:none;color:#fff;padding:0 20px;height:46px;cursor:pointer;font-size:16px;transition:var(--transition);}
 .search-btn:hover{opacity:0.85;}
@@ -3472,7 +3472,19 @@ img, svg, video, canvas, iframe {
   }
 }
 
-@media(max-width:768px){
+/* Breakpoint alargado de 768px → 1180px: entre ~769-1180px (tablets e o
+   viewport ~980-1024px que o "Modo Desktop" do Chrome/Android simula), os
+   botões da topbar-actions ("Meu Perfil", "Vender", login) ainda apareciam
+   no formato full-size (texto + ícone) da regra padrão em .btn-icon-desktop
+   (linha ~3459: display:flex), enquanto a regra ao lado (linha ~3463,
+   @media min-width:769px) já dava .search-wrap-top{flex:1} — os dois juntos
+   competiam pelo mesmo espaço e, como .topbar-actions tem flex-shrink:0,
+   toda a compressão sobrava para a busca: o <select> "Todas" (min-width:110px
+   fixo) sobrevivia, mas o <input> de busca (flex:1, sem min-width) e o botão
+   de lupa ficavam espremidos a ~0px dentro do .search-bar{overflow:hidden}.
+   Reaproveitar aqui o MESMO tratamento compacto já validado em ≤768px
+   resolve na raiz, sem estilo novo. */
+@media(max-width:1180px){
   .btn-icon-desktop{display:none!important;}
   .btn-login-desktop{display:none!important;}
   .btn-login-mobile{display:flex!important;}
