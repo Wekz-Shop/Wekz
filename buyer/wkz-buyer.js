@@ -10488,6 +10488,7 @@ function openCategory(name, icon){
 // Reseta os controles fixos do sidebar (chamado ao abrir categoria e ao limpar filtros)
 function resetCatFilterInputs(){
   resetCatPriceOnly();
+  const kw = document.getElementById('catKeywordSearch'); if(kw) kw.value='';
   document.getElementById('catSortSelect').value='';
   document.querySelectorAll('input[name="catRating"]').forEach((r,i)=>{r.checked=i===2;});
   document.querySelectorAll('input[name="catOrigin"]').forEach((r,i)=>{r.checked=i===0;});
@@ -10584,9 +10585,11 @@ function updateCatFilterCounts(){
 function renderCatActiveChips(state){
   const wrap = document.getElementById('catActiveChips');
   if(!wrap) return;
-  const {minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets} = state;
+  const {keywordRaw, minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets} = state;
   const chips = [];
   const chip = (label, onclick) => chips.push(`<button type="button" class="cat-chip" onclick="${onclick}">${escapeHtml(label)}<span class="cat-chip-x">✕</span></button>`);
+
+  if(keywordRaw && keywordRaw.trim()) chip(`🔎 "${keywordRaw.trim()}"`, 'removeCatKeywordChip()');
 
   const slider = document.getElementById('catPriceSlider');
   const sliderMaxAttr = parseFloat(slider?.max) || Infinity;
@@ -10624,6 +10627,7 @@ function renderCatActiveChips(state){
 }
 
 function removeCatPriceChip(){ resetCatPriceOnly(); renderCatProducts(); }
+function removeCatKeywordChip(){ const el=document.getElementById('catKeywordSearch'); if(el) el.value=''; renderCatProducts(); }
 function removeCatRatingChip(){ document.querySelectorAll('input[name="catRating"]').forEach((r,i)=>{r.checked=i===2;}); renderCatProducts(); }
 function removeCatOriginChip(){
   document.querySelectorAll('input[name="catOrigin"]').forEach((r,i)=>{r.checked=i===0;});
@@ -10650,6 +10654,16 @@ function renderCatProducts(){
   const sort = document.getElementById('catSortSelect').value;
 
   let list = products.filter(p=>p.cat===currentCatId);
+
+  // Busca por palavra-chave dentro da categoria (nome, loja e atributos como marca/tamanho/etc.)
+  const keywordRaw = document.getElementById('catKeywordSearch')?.value || '';
+  const keyword = _wkzNormalizeText(keywordRaw);
+  if(keyword){
+    list = list.filter(p=>{
+      const haystack = [p.n, p.s, ...(p.attrs?Object.values(p.attrs):[])].join(' ');
+      return _wkzNormalizeText(haystack).includes(keyword);
+    });
+  }
 
   // Faixa de preço: campos Mín/Máx têm prioridade; o slider serve como atalho do Máx
   const minInput = parseFloat(document.getElementById('catPriceMin')?.value);
@@ -10699,7 +10713,7 @@ function renderCatProducts(){
 
   rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${list.length}</strong> produto${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}</span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sort||'Relevância'}</span></div>`;
 
-  renderCatActiveChips({minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets});
+  renderCatActiveChips({keywordRaw, minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets});
 
   if(!list.length){
     g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">

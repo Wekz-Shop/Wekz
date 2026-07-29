@@ -3264,6 +3264,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="listing-sidebar">
         <h3>🎯 Filtrar</h3>
         <div class="sidebar-filter-group">
+          <div class="sfg-label">Buscar nesta categoria</div>
+          <input type="text" id="catKeywordSearch" class="wkz-input wkz-input--sm" style="width:100%;" placeholder="Ex.: RTX, 256GB, algodão..." autocomplete="off" oninput="renderCatProducts()" onkeydown="if(event.key==='Escape'){this.value='';renderCatProducts();}">
+        </div>
+        <div class="sidebar-filter-group">
           <div class="sfg-label">Faixa de Preço</div>
           <div class="price-range-wrap">
             <input type="range" class="price-range-slider" id="catPriceSlider" min="0" max="5000" value="5000" oninput="updatePriceRange(this.value)">
