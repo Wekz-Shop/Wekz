@@ -3269,6 +3269,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <input type="range" class="price-range-slider" id="catPriceSlider" min="0" max="5000" value="5000" oninput="updatePriceRange(this.value)">
             <div class="price-range-labels"><span>R$ 0</span><span id="catPriceLabel">R$ 5.000</span></div>
           </div>
+          <div class="filter-price-row" style="margin-top:10px;">
+            <input type="number" id="catPriceMin" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Mín" min="0" inputmode="numeric" oninput="syncCatPriceInputs()">
+            <span style="color:var(--muted);">—</span>
+            <input type="number" id="catPriceMax" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Máx" min="0" inputmode="numeric" oninput="syncCatPriceInputs()">
+          </div>
         </div>
         <div class="sidebar-filter-group">
           <div class="sfg-label">Avaliação</div>
@@ -3277,16 +3282,33 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="sfg-item"><input type="radio" name="catRating" checked value="0" onchange="renderCatProducts()"> <span>Todas</span></div>
         </div>
         <div class="sidebar-filter-group">
+          <div class="sfg-label">Origem</div>
+          <div class="sfg-item"><input type="radio" name="catOrigin" value="" checked onchange="onCatOriginChange()"> <span>Todas</span></div>
+          <div class="sfg-item"><input type="radio" name="catOrigin" value="nacional" onchange="onCatOriginChange()"> <span>🇧🇷 Nacional</span></div>
+          <div class="sfg-item"><input type="radio" name="catOrigin" value="internacional" onchange="onCatOriginChange()"> <span>🌍 Internacional</span></div>
+          <div id="catUfWrap" style="display:none;margin-top:8px;">
+            <select class="wkz-select wkz-select--sm" id="catUfSelect" style="width:100%;" onchange="renderCatProducts()">
+              <option value="">Todos os Estados</option>
+            </select>
+          </div>
+          <div id="catCountryWrap" style="display:none;margin-top:8px;">
+            <select class="wkz-select wkz-select--sm" id="catCountrySelect" style="width:100%;" onchange="renderCatProducts()">
+              <option value="">Todos os Países</option>
+            </select>
+          </div>
+        </div>
+        <div id="catExtraFacets"><!-- facetas dinâmicas da categoria (marca, tamanho, plataforma...) --></div>
+        <div class="sidebar-filter-group">
           <div class="sfg-label">Envio</div>
-          <div class="sfg-item"><input type="checkbox" id="cfFree"> <span>Frete Grátis</span><span class="sfg-count">38</span></div>
-          <div class="sfg-item"><input type="checkbox" id="cfFast"> <span>Entrega Rápida</span><span class="sfg-count">12</span></div>
-          <div class="sfg-item"><input type="checkbox" id="cfNational"> <span>Vendedor Nacional</span><span class="sfg-count">24</span></div>
+          <div class="sfg-item"><input type="checkbox" id="cfFree" onchange="renderCatProducts()"> <span>Frete Grátis</span><span class="sfg-count" id="cfFreeCount">0</span></div>
+          <div class="sfg-item"><input type="checkbox" id="cfFast" onchange="renderCatProducts()"> <span>Entrega Rápida</span><span class="sfg-count" id="cfFastCount">0</span></div>
         </div>
         <div class="sidebar-filter-group">
           <div class="sfg-label">Condição</div>
-          <div class="sfg-item"><input type="radio" name="catCond" value="new" checked> <span>Novo</span></div>
-          <div class="sfg-item"><input type="radio" name="catCond" value="used"> <span>Usado</span></div>
-          <div class="sfg-item"><input type="radio" name="catCond" value="refurb"> <span>Recondicionado</span></div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="" checked onchange="renderCatProducts()"> <span>Todas</span></div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="novo" onchange="renderCatProducts()"> <span>Novo</span></div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="usado" onchange="renderCatProducts()"> <span>Usado</span></div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="recondicionado" onchange="renderCatProducts()"> <span>Recondicionado</span></div>
         </div>
         <button class="filter-apply-btn" style="width:100%;" onclick="renderCatProducts()">Aplicar Filtros</button>
         <button class="filter-clear-btn" style="width:100%;margin-top:8px;" onclick="clearCatFilters()">✕ Limpar</button>

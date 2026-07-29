@@ -10366,13 +10366,26 @@ const DB = {
     {id:'eletronicos',name:'Eletrônicos',icon:'📱',count:'18.4k',desc:'Smartphones, notebooks, tablets, fones e muito mais. Os melhores preços em tecnologia.'},
     {id:'moda',name:'Moda',icon:'👗',count:'42.1k',desc:'Roupas, calçados e acessórios das melhores marcas nacionais e internacionais.'},
     {id:'casa',name:'Casa & Deco',icon:'🏠',count:'29.8k',desc:'Móveis, decoração, utilidades domésticas e itens para transformar sua casa.'},
-    {id:'beleza',name:'Beleza & Saúde',icon:'💄',count:'15.6k',desc:'Cosméticos, perfumes, skincare e produtos de bem-estar.'},
+    {id:'beleza',name:'Beleza',icon:'💄',count:'15.6k',desc:'Cosméticos, perfumes, skincare e produtos de bem-estar.'},
     {id:'games',name:'Games',icon:'🎮',count:'8.9k',desc:'Consoles, jogos, periféricos e acessórios gamer.'},
     {id:'esportes',name:'Esportes',icon:'⚽',count:'11.2k',desc:'Equipamentos esportivos, roupas fitness e artigos para todas as modalidades.'},
     {id:'bebe',name:'Bebê & Kids',icon:'👶',count:'9.7k',desc:'Roupas, brinquedos, berços e tudo para o desenvolvimento do seu filho.'},
     {id:'pet',name:'Pet Shop',icon:'🐾',count:'6.3k',desc:'Rações, acessórios, brinquedos e tudo para o bem-estar do seu pet.'},
-    {id:'auto',name:'Automotivo',icon:'🚗',count:'14.8k',desc:'Peças, acessórios, limpeza e cuidados para seu veículo.'},
+    {id:'automotivo',name:'Automotivo',icon:'🚗',count:'14.8k',desc:'Peças, acessórios, limpeza e cuidados para seu veículo.'},
     {id:'livros',name:'Livros',icon:'📚',count:'22.5k',desc:'Ficção, não-ficção, didáticos, eBooks e muito mais.'},
+    {id:'saude',name:'Saúde',icon:'💊',count:'10.1k',desc:'Suplementos, equipamentos e produtos para cuidar da sua saúde.'},
+    {id:'ferramentas',name:'Ferramentas',icon:'🔧',count:'7.4k',desc:'Ferramentas elétricas, manuais e de medição para todo tipo de projeto.'},
+  ],
+
+  // ─── Estados do Brasil (UF) — usado no filtro "Nacional" das categorias ───
+  ufList: [
+    {uf:'AC',name:'Acre'},{uf:'AL',name:'Alagoas'},{uf:'AP',name:'Amapá'},{uf:'AM',name:'Amazonas'},
+    {uf:'BA',name:'Bahia'},{uf:'CE',name:'Ceará'},{uf:'DF',name:'Distrito Federal'},{uf:'ES',name:'Espírito Santo'},
+    {uf:'GO',name:'Goiás'},{uf:'MA',name:'Maranhão'},{uf:'MT',name:'Mato Grosso'},{uf:'MS',name:'Mato Grosso do Sul'},
+    {uf:'MG',name:'Minas Gerais'},{uf:'PA',name:'Pará'},{uf:'PB',name:'Paraíba'},{uf:'PR',name:'Paraná'},
+    {uf:'PE',name:'Pernambuco'},{uf:'PI',name:'Piauí'},{uf:'RJ',name:'Rio de Janeiro'},{uf:'RN',name:'Rio Grande do Norte'},
+    {uf:'RS',name:'Rio Grande do Sul'},{uf:'RO',name:'Rondônia'},{uf:'RR',name:'Roraima'},{uf:'SC',name:'Santa Catarina'},
+    {uf:'SP',name:'São Paulo'},{uf:'SE',name:'Sergipe'},{uf:'TO',name:'Tocantins'},
   ],
 
   stores: [
@@ -10436,14 +10449,128 @@ const DB = {
 };
 
 // ─── CATEGORY TEMPLATE ───
+
+// Facetas específicas por categoria: chave lida em p.attrs[key], rótulo exibido no filtro.
+// Os valores disponíveis (e suas contagens) são calculados dinamicamente a partir do
+// catálogo — não é preciso manter listas fixas em sincronia com os produtos.
+const CATEGORY_FACETS = {
+  eletronicos: [{key:'marca', label:'Marca'}, {key:'armazenamento', label:'Armazenamento'}],
+  moda:        [{key:'tamanho', label:'Tamanho'}, {key:'cor', label:'Cor'}],
+  beleza:      [{key:'tipo', label:'Tipo de Produto'}],
+  games:       [{key:'plataforma', label:'Plataforma'}],
+  casa:        [{key:'ambiente', label:'Ambiente'}],
+  esportes:    [{key:'modalidade', label:'Modalidade'}],
+  bebe:        [{key:'idade', label:'Faixa Etária'}],
+  pet:         [{key:'tipoPet', label:'Tipo de Pet'}],
+  automotivo:  [{key:'veiculo', label:'Tipo de Veículo'}],
+  livros:      [{key:'genero', label:'Gênero'}],
+  saude:       [{key:'categoria', label:'Categoria'}],
+  ferramentas: [{key:'tipo', label:'Tipo de Ferramenta'}],
+};
+
+let currentCatId = '';
+
 function openCategory(name, icon){
   const cat = DB.categories.find(c=>c.name===name) || {name,icon,count:'—',desc:`Produtos em ${name}`};
+  currentCatId = CAT_KEY_MAP[name] || cat.id || '';
   document.getElementById('catBreadcrumb').textContent = name;
   document.getElementById('catTemplateIcon').innerHTML = wkzCatIconSVG(icon || cat.icon);
   document.getElementById('catTemplateTitle').textContent = name;
   document.getElementById('catTemplateSub').textContent = `${cat.count}+ produtos · Vendedores verificados · Frete grátis em muitos itens`;
+  resetCatFilterInputs();
+  renderCatExtraFacets();
+  renderCatOriginOptions();
+  updateCatFilterCounts();
   renderCatProducts();
   showPage('category');
+}
+
+// Reseta os controles fixos do sidebar (chamado ao abrir categoria e ao limpar filtros)
+function resetCatFilterInputs(){
+  const catProducts = products.filter(p=>p.cat===currentCatId);
+  const maxP = catProducts.length ? Math.max(...catProducts.map(p=>p.p)) : 5000;
+  const roundedMax = Math.max(100, Math.ceil(maxP/100)*100);
+  const slider = document.getElementById('catPriceSlider');
+  if(slider){ slider.min=0; slider.max=roundedMax; slider.value=roundedMax; }
+  const label = document.getElementById('catPriceLabel');
+  if(label) label.textContent = `R$ ${roundedMax.toLocaleString('pt-BR')}`;
+  const minEl = document.getElementById('catPriceMin');
+  if(minEl){ minEl.value=''; minEl.placeholder='Mín'; }
+  const maxEl = document.getElementById('catPriceMax');
+  if(maxEl){ maxEl.value=''; maxEl.placeholder=`Máx (R$ ${roundedMax.toLocaleString('pt-BR')})`; }
+  document.getElementById('catSortSelect').value='';
+  document.querySelectorAll('input[name="catRating"]').forEach((r,i)=>{r.checked=i===2;});
+  document.querySelectorAll('input[name="catOrigin"]').forEach((r,i)=>{r.checked=i===0;});
+  const ufWrap = document.getElementById('catUfWrap'); if(ufWrap) ufWrap.style.display='none';
+  const countryWrap = document.getElementById('catCountryWrap'); if(countryWrap) countryWrap.style.display='none';
+  const cfFree = document.getElementById('cfFree'); if(cfFree) cfFree.checked=false;
+  const cfFast = document.getElementById('cfFast'); if(cfFast) cfFast.checked=false;
+  document.querySelectorAll('input[name="catCond"]').forEach((r,i)=>{r.checked=i===0;});
+}
+
+// Popula os selects de Estado (produtos nacionais) e País (produtos internacionais)
+// só com as opções que de fato existem entre os produtos da categoria aberta.
+function renderCatOriginOptions(){
+  const catProducts = products.filter(p=>p.cat===currentCatId);
+  const ufSel = document.getElementById('catUfSelect');
+  if(ufSel){
+    const ufs = [...new Set(catProducts.filter(p=>p.origin==='nacional' && p.uf).map(p=>p.uf))]
+      .sort((a,b)=>{
+        const na=(DB.ufList.find(u=>u.uf===a)||{}).name||a, nb=(DB.ufList.find(u=>u.uf===b)||{}).name||b;
+        return na.localeCompare(nb,'pt-BR');
+      });
+    ufSel.innerHTML = '<option value="">Todos os Estados</option>' + ufs.map(uf=>{
+      const info = DB.ufList.find(u=>u.uf===uf);
+      return `<option value="${uf}">${escapeHtml(info?info.name:uf)} (${uf})</option>`;
+    }).join('');
+    ufSel.value='';
+  }
+  const countrySel = document.getElementById('catCountrySelect');
+  if(countrySel){
+    const countries = [...new Set(catProducts.filter(p=>p.origin==='internacional' && p.country).map(p=>p.country))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    countrySel.innerHTML = '<option value="">Todos os Países</option>' + countries.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    countrySel.value='';
+  }
+}
+
+function onCatOriginChange(){
+  const val = document.querySelector('input[name="catOrigin"]:checked')?.value || '';
+  const ufWrap = document.getElementById('catUfWrap');
+  const countryWrap = document.getElementById('catCountryWrap');
+  if(ufWrap) ufWrap.style.display = val==='nacional' ? '' : 'none';
+  if(countryWrap) countryWrap.style.display = val==='internacional' ? '' : 'none';
+  if(val!=='nacional' && document.getElementById('catUfSelect')) document.getElementById('catUfSelect').value='';
+  if(val!=='internacional' && document.getElementById('catCountrySelect')) document.getElementById('catCountrySelect').value='';
+  renderCatProducts();
+}
+
+// Monta os grupos de filtro dedicados ao tipo de produto da categoria (ex.: Marca e
+// Armazenamento em Eletrônicos, Tamanho e Cor em Moda) com contagem real por opção.
+function renderCatExtraFacets(){
+  const wrap = document.getElementById('catExtraFacets');
+  if(!wrap) return;
+  const facets = CATEGORY_FACETS[currentCatId] || [];
+  const catProducts = products.filter(p=>p.cat===currentCatId);
+  wrap.innerHTML = facets.map(f=>{
+    const counts = {};
+    catProducts.forEach(p=>{
+      const v = p.attrs && p.attrs[f.key];
+      if(v && v!=='N/A') counts[v] = (counts[v]||0)+1;
+    });
+    const values = Object.keys(counts).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    if(!values.length) return '';
+    return `<div class="sidebar-filter-group">
+      <div class="sfg-label">${escapeHtml(f.label)}</div>
+      ${values.map(v=>`<div class="sfg-item"><input type="checkbox" class="catFacetChk" data-facet="${escapeHtml(f.key)}" data-value="${escapeHtml(v)}" onchange="renderCatProducts()"> <span>${escapeHtml(v)}</span><span class="sfg-count">${counts[v]}</span></div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+// Atualiza as contagens exibidas em Frete Grátis / Entrega Rápida para a categoria atual
+function updateCatFilterCounts(){
+  const catProducts = products.filter(p=>p.cat===currentCatId);
+  const elF = document.getElementById('cfFreeCount'); if(elF) elF.textContent = catProducts.filter(p=>p.frete).length;
+  const elS = document.getElementById('cfFastCount'); if(elS) elS.textContent = catProducts.filter(p=>p.fast).length;
 }
 
 function renderCatProducts(){
@@ -10451,16 +10578,67 @@ function renderCatProducts(){
   const rb = document.getElementById('catResultBar');
   if(!g) return;
   const sort = document.getElementById('catSortSelect').value;
-  let list = [...products];
-  const maxPrice = parseFloat(document.getElementById('catPriceSlider').value)||5000;
+
+  let list = products.filter(p=>p.cat===currentCatId);
+
+  // Faixa de preço: campos Mín/Máx têm prioridade; o slider serve como atalho do Máx
+  const minInput = parseFloat(document.getElementById('catPriceMin')?.value);
+  const maxInput = parseFloat(document.getElementById('catPriceMax')?.value);
+  const sliderMax = parseFloat(document.getElementById('catPriceSlider')?.value);
+  const minPrice = !isNaN(minInput) ? minInput : 0;
+  const maxPrice = !isNaN(maxInput) ? maxInput : (!isNaN(sliderMax) ? sliderMax : Infinity);
+  list = list.filter(p => p.p >= minPrice && p.p <= maxPrice);
+
   const ratingVal = document.querySelector('input[name="catRating"]:checked')?.value||0;
-  list = list.filter(p => p.p <= maxPrice && p.r >= parseFloat(ratingVal));
+  list = list.filter(p => p.r >= parseFloat(ratingVal));
+
+  // Origem: Nacional (com Estado opcional) ou Internacional (com País opcional)
+  const originVal = document.querySelector('input[name="catOrigin"]:checked')?.value || '';
+  if(originVal==='nacional'){
+    list = list.filter(p=>p.origin==='nacional');
+    const uf = document.getElementById('catUfSelect')?.value;
+    if(uf) list = list.filter(p=>p.uf===uf);
+  } else if(originVal==='internacional'){
+    list = list.filter(p=>p.origin==='internacional');
+    const country = document.getElementById('catCountrySelect')?.value;
+    if(country) list = list.filter(p=>p.country===country);
+  }
+
+  // Envio
+  if(document.getElementById('cfFree')?.checked) list = list.filter(p=>p.frete);
+  if(document.getElementById('cfFast')?.checked) list = list.filter(p=>p.fast);
+
+  // Condição
+  const condVal = document.querySelector('input[name="catCond"]:checked')?.value || '';
+  if(condVal) list = list.filter(p=>p.cond===condVal);
+
+  // Facetas específicas da categoria (múltipla seleção dentro de cada faceta = OR; entre facetas = AND)
+  const activeFacets = {};
+  document.querySelectorAll('.catFacetChk:checked').forEach(chk=>{
+    const k = chk.dataset.facet, v = chk.dataset.value;
+    (activeFacets[k] = activeFacets[k]||[]).push(v);
+  });
+  Object.keys(activeFacets).forEach(k=>{
+    list = list.filter(p => p.attrs && activeFacets[k].includes(p.attrs[k]));
+  });
+
   if(sort==='price-asc') list.sort((a,b)=>a.p-b.p);
   else if(sort==='price-desc') list.sort((a,b)=>b.p-a.p);
   else if(sort==='rating') list.sort((a,b)=>b.r-a.r);
   else if(sort==='sales') list.sort((a,b)=>parseFloat(b.sales)-parseFloat(a.sales));
 
-  rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${list.length}</strong> produtos encontrados</span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sort||'Relevância'}</span></div>`;
+  rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${list.length}</strong> produto${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}</span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sort||'Relevância'}</span></div>`;
+
+  if(!list.length){
+    g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px;">🔍</div>
+      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">Nenhum produto encontrado</div>
+      <div style="font-size:13px;">Tente ajustar ou <span style="color:var(--teal);cursor:pointer;font-weight:600;" onclick="clearCatFilters()">limpar os filtros</span>.</div>
+    </div>`;
+    const pagEmpty = document.getElementById('catPagination');
+    if(pagEmpty) pagEmpty.innerHTML='';
+    return;
+  }
 
   g.innerHTML = list.map((p,i)=>`
     <div class="product-card" onclick="openProduct(${products.indexOf(p)})">
@@ -10492,15 +10670,32 @@ function renderCatProducts(){
   ).join('');
 }
 
+// Arrasto do slider: sincroniza o rótulo e o campo "Máx" (não filtra a cada tick — o
+// filtro final acontece ao soltar via Aplicar Filtros, igual ao restante do painel)
 function updatePriceRange(v){
-  document.getElementById('catPriceLabel').textContent = `R$ ${parseFloat(v).toLocaleString()}`;
+  document.getElementById('catPriceLabel').textContent = `R$ ${parseFloat(v).toLocaleString('pt-BR')}`;
+  const maxEl = document.getElementById('catPriceMax');
+  if(maxEl) maxEl.value = v;
+}
+
+// Digitação nos campos Mín/Máx: mantém o slider e o rótulo coerentes com o valor Máx
+function syncCatPriceInputs(){
+  const maxEl = document.getElementById('catPriceMax');
+  const slider = document.getElementById('catPriceSlider');
+  if(!maxEl || !slider) return;
+  const maxVal = parseFloat(maxEl.value);
+  if(!isNaN(maxVal)){
+    slider.value = Math.min(Math.max(maxVal,0), parseFloat(slider.max));
+    document.getElementById('catPriceLabel').textContent = `R$ ${maxVal.toLocaleString('pt-BR')}`;
+  } else {
+    slider.value = slider.max;
+    document.getElementById('catPriceLabel').textContent = `R$ ${parseFloat(slider.max).toLocaleString('pt-BR')}`;
+  }
 }
 
 function clearCatFilters(){
-  document.getElementById('catPriceSlider').value=5000;
-  document.getElementById('catPriceLabel').textContent='R$ 5.000';
-  document.getElementById('catSortSelect').value='';
-  document.querySelectorAll('input[name="catRating"]').forEach((r,i)=>{r.checked=i===2;});
+  resetCatFilterInputs();
+  document.querySelectorAll('.catFacetChk').forEach(chk=>chk.checked=false);
   renderCatProducts();
   showToast('🔄 Filtros limpos');
 }
