@@ -1,0 +1,85 @@
+--- /mnt/project/wkz-core.js	1979-12-31 00:00:00.000000000 +0000
++++ /home/claude/proj/wkz-core.js	2026-07-28 22:41:04.308131737 +0000
+@@ -1152,45 +1152,45 @@
+    código quando as fotos reais forem cadastradas. */
+ const products = [
+   /* ── Eletrônicos (7) ── */
+-  {e:'📱',n:'Smartphone Ultra Pro 5G 256GB — Câmera 200MP',p:1249.90,op:2199.90,off:43,s:'TechStore',r:4.9,sales:'18.4k',badge:'sale', stock:3,  stockMax:120, cat:'eletronicos'},
+-  {e:'💻',n:'Notebook Gamer RTX 4060 — 16GB RAM 1TB SSD',p:3499,op:5299,off:34,s:'NoteShop',r:4.8,sales:'9.2k',badge:'hot',          stock:12, stockMax:80,  cat:'eletronicos'},
+-  {e:'🎧',n:'Fone Bluetooth ANC Pro — 40h bateria',p:289,op:599,off:52,s:'SoundWorld',r:4.7,sales:'31k',badge:'sale',                 stock:0,  stockMax:200, cat:'eletronicos'},
+-  {e:'⌚',n:'Smartwatch Ultra 2 — GPS + NFC',p:799,op:1499,off:47,s:'GadgetHub',r:4.9,sales:'22.1k',badge:'new',                     stock:47, stockMax:100, cat:'eletronicos'},
+-  {e:'📷',n:'Câmera Mirrorless 4K — Lente 24-70mm',p:4299,op:6999,off:39,s:'PhotoPro',r:4.8,sales:'4.7k',badge:'',                   stock:8,  stockMax:60,  cat:'eletronicos'},
+-  {e:'🖥️',n:'Monitor 4K 144Hz 27" — HDR IPS',p:1890,op:2999,off:37,s:'DisplayZone',r:4.7,sales:'8.3k',badge:'sale',                 stock:23, stockMax:90,  cat:'eletronicos'},
++  {e:'📱',n:'Smartphone Ultra Pro 5G 256GB — Câmera 200MP',p:1249.90,op:2199.90,off:43,s:'TechStore',r:4.9,sales:'18.4k',badge:'sale', stock:3,  stockMax:120, cat:'eletronicos',origin:'internacional',country:'Coreia do Sul',cond:'novo',frete:true,fast:false,attrs:{marca:'Samsung',armazenamento:'256GB'}},
++  {e:'💻',n:'Notebook Gamer RTX 4060 — 16GB RAM 1TB SSD',p:3499,op:5299,off:34,s:'NoteShop',r:4.8,sales:'9.2k',badge:'hot',          stock:12, stockMax:80,  cat:'eletronicos',origin:'nacional',uf:'SP',cond:'recondicionado',frete:true,fast:true,attrs:{marca:'Dell',armazenamento:'1TB'}},
++  {e:'🎧',n:'Fone Bluetooth ANC Pro — 40h bateria',p:289,op:599,off:52,s:'SoundWorld',r:4.7,sales:'31k',badge:'sale',                 stock:0,  stockMax:200, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:false,fast:false,attrs:{marca:'Sony',armazenamento:'N/A'}},
++  {e:'⌚',n:'Smartwatch Ultra 2 — GPS + NFC',p:799,op:1499,off:47,s:'GadgetHub',r:4.9,sales:'22.1k',badge:'new',                     stock:47, stockMax:100, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:true,fast:true,attrs:{marca:'Samsung',armazenamento:'N/A'}},
++  {e:'📷',n:'Câmera Mirrorless 4K — Lente 24-70mm',p:4299,op:6999,off:39,s:'PhotoPro',r:4.8,sales:'4.7k',badge:'',                   stock:8,  stockMax:60,  cat:'eletronicos',origin:'internacional',country:'Japão',cond:'recondicionado',frete:false,fast:false,attrs:{marca:'Sony',armazenamento:'128GB'}},
++  {e:'🖥️',n:'Monitor 4K 144Hz 27" — HDR IPS',p:1890,op:2999,off:37,s:'DisplayZone',r:4.7,sales:'8.3k',badge:'sale',                 stock:23, stockMax:90,  cat:'eletronicos',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{marca:'LG',armazenamento:'N/A'}},
+   /* ── Esportes (2) ── */
+-  {e:'👟',n:'Tênis Running Pro Boost — Amortecimento MAX',p:349,op:699,off:50,s:'SportFit',r:4.6,sales:'55k',badge:'hot',             stock:84, stockMax:300, cat:'esportes'},
+-  {e:'🏋️',n:'Kit Musculação Completo — Halteres + Barras',p:479,op:899,off:47,s:'SportFit',r:4.7,sales:'12k',badge:'new',            stock:31, stockMax:150, cat:'esportes'},
++  {e:'👟',n:'Tênis Running Pro Boost — Amortecimento MAX',p:349,op:699,off:50,s:'SportFit',r:4.6,sales:'55k',badge:'hot',             stock:84, stockMax:300, cat:'esportes',origin:'nacional',uf:'RS',cond:'novo',frete:true,fast:true,attrs:{modalidade:'Corrida'}},
++  {e:'🏋️',n:'Kit Musculação Completo — Halteres + Barras',p:479,op:899,off:47,s:'SportFit',r:4.7,sales:'12k',badge:'new',            stock:31, stockMax:150, cat:'esportes',origin:'nacional',uf:'RS',cond:'novo',frete:false,fast:false,attrs:{modalidade:'Musculação'}},
+   /* ── Beleza (2) ── */
+-  {e:'🧴',n:'Kit Skincare Vitamina C — 5 produtos',p:189,op:380,off:50,s:'GlowBeauty',r:4.8,sales:'42k',badge:'new',                 stock:4,  stockMax:150, cat:'beleza'},
+-  {e:'💄',n:'Paleta de Sombras 48 cores — Matte + Shimmer',p:129,op:249,off:48,s:'GlowBeauty',r:4.6,sales:'28k',badge:'hot',        stock:67, stockMax:200, cat:'beleza'},
++  {e:'🧴',n:'Kit Skincare Vitamina C — 5 produtos',p:189,op:380,off:50,s:'GlowBeauty',r:4.8,sales:'42k',badge:'new',                 stock:4,  stockMax:150, cat:'beleza',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{tipo:'Skincare'}},
++  {e:'💄',n:'Paleta de Sombras 48 cores — Matte + Shimmer',p:129,op:249,off:48,s:'GlowBeauty',r:4.6,sales:'28k',badge:'hot',        stock:67, stockMax:200, cat:'beleza',origin:'internacional',country:'Coreia do Sul',cond:'novo',frete:true,fast:true,attrs:{tipo:'Maquiagem'}},
+   /* ── Games (2) ── */
+-  {e:'🎮',n:'Console Next-Gen 1TB — 2 Controles',p:2499,op:3999,off:38,s:'GameWorld',r:4.9,sales:'11.8k',badge:'sale',              stock:1,  stockMax:50,  cat:'games'},
+-  {e:'🕹️',n:'Controle Pro Sem Fio — Hall Effect + Turbo',p:299,op:499,off:40,s:'GameWorld',r:4.7,sales:'19k',badge:'sale',           stock:45, stockMax:180, cat:'games'},
++  {e:'🎮',n:'Console Next-Gen 1TB — 2 Controles',p:2499,op:3999,off:38,s:'GameWorld',r:4.9,sales:'11.8k',badge:'sale',              stock:1,  stockMax:50,  cat:'games',origin:'internacional',country:'Japão',cond:'usado',frete:false,fast:false,attrs:{plataforma:'PlayStation'}},
++  {e:'🕹️',n:'Controle Pro Sem Fio — Hall Effect + Turbo',p:299,op:499,off:40,s:'GameWorld',r:4.7,sales:'19k',badge:'sale',           stock:45, stockMax:180, cat:'games',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{plataforma:'Universal'}},
+   /* ── Casa & Deco (2) ── */
+-  {e:'🪑',n:'Cadeira Gamer Ergonômica — Couro PU',p:699,op:1399,off:50,s:'FurniStyle',r:4.5,sales:'18k',badge:'',                   stock:62, stockMax:120, cat:'casa'},
+-  {e:'🏮',n:'Luminária LED Smart 16M Cores — WiFi + App',p:149,op:299,off:50,s:'FurniStyle',r:4.6,sales:'33k',badge:'new',           stock:88, stockMax:250, cat:'casa'},
++  {e:'🪑',n:'Cadeira Gamer Ergonômica — Couro PU',p:699,op:1399,off:50,s:'FurniStyle',r:4.5,sales:'18k',badge:'',                   stock:62, stockMax:120, cat:'casa',origin:'nacional',uf:'SC',cond:'novo',frete:true,fast:false,attrs:{ambiente:'Escritório'}},
++  {e:'🏮',n:'Luminária LED Smart 16M Cores — WiFi + App',p:149,op:299,off:50,s:'FurniStyle',r:4.6,sales:'33k',badge:'new',           stock:88, stockMax:250, cat:'casa',origin:'internacional',country:'China',cond:'novo',frete:false,fast:false,attrs:{ambiente:'Quarto'}},
+   /* ── Moda (2) ── */
+-  {e:'👗',n:'Vestido Midi Floral Premium — Viscose Eco',p:189,op:379,off:50,s:'ModaVibe',r:4.5,sales:'24k',badge:'new',              stock:38, stockMax:200, cat:'moda'},
+-  {e:'👔',n:'Camisa Social Slim Fit — 100% Algodão Egípcio',p:129,op:259,off:50,s:'ModaVibe',r:4.4,sales:'17k',badge:'sale',         stock:54, stockMax:180, cat:'moda'},
++  {e:'👗',n:'Vestido Midi Floral Premium — Viscose Eco',p:189,op:379,off:50,s:'ModaVibe',r:4.5,sales:'24k',badge:'new',              stock:38, stockMax:200, cat:'moda',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:true,attrs:{tamanho:'M',cor:'Floral'}},
++  {e:'👔',n:'Camisa Social Slim Fit — 100% Algodão Egípcio',p:129,op:259,off:50,s:'ModaVibe',r:4.4,sales:'17k',badge:'sale',         stock:54, stockMax:180, cat:'moda',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{tamanho:'G',cor:'Branco'}},
+   /* ── Bebê & Kids (2) ── */
+-  {e:'🍼',n:'Kit Enxoval Bebê Completo — 20 peças Orgânico',p:349,op:699,off:50,s:'BebeStore',r:4.9,sales:'8k',badge:'new',          stock:22, stockMax:100, cat:'bebe'},
+-  {e:'🧸',n:'Berço Portátil Dobrável — Colchão + Mosquiteiro',p:549,op:999,off:45,s:'BebeStore',r:4.8,sales:'5.3k',badge:'hot',      stock:14, stockMax:80,  cat:'bebe'},
++  {e:'🍼',n:'Kit Enxoval Bebê Completo — 20 peças Orgânico',p:349,op:699,off:50,s:'BebeStore',r:4.9,sales:'8k',badge:'new',          stock:22, stockMax:100, cat:'bebe',origin:'nacional',uf:'MG',cond:'novo',frete:true,fast:false,attrs:{idade:'0-6 meses'}},
++  {e:'🧸',n:'Berço Portátil Dobrável — Colchão + Mosquiteiro',p:549,op:999,off:45,s:'BebeStore',r:4.8,sales:'5.3k',badge:'hot',      stock:14, stockMax:80,  cat:'bebe',origin:'nacional',uf:'MG',cond:'novo',frete:false,fast:false,attrs:{idade:'6-12 meses'}},
+   /* ── Pet Shop (2) ── */
+-  {e:'🐾',n:'Ração Premium Grain Free Cães — 15kg',p:199,op:379,off:47,s:'PetWorld',r:4.8,sales:'31k',badge:'sale',                 stock:70, stockMax:300, cat:'pet'},
+-  {e:'🐱',n:'Arranhador Cat Tower 5 níveis — Sisal Natural',p:259,op:499,off:48,s:'PetWorld',r:4.7,sales:'9.4k',badge:'hot',         stock:29, stockMax:120, cat:'pet'},
++  {e:'🐾',n:'Ração Premium Grain Free Cães — 15kg',p:199,op:379,off:47,s:'PetWorld',r:4.8,sales:'31k',badge:'sale',                 stock:70, stockMax:300, cat:'pet',origin:'nacional',uf:'PR',cond:'novo',frete:true,fast:true,attrs:{tipoPet:'Cão'}},
++  {e:'🐱',n:'Arranhador Cat Tower 5 níveis — Sisal Natural',p:259,op:499,off:48,s:'PetWorld',r:4.7,sales:'9.4k',badge:'hot',         stock:29, stockMax:120, cat:'pet',origin:'nacional',uf:'PR',cond:'novo',frete:true,fast:false,attrs:{tipoPet:'Gato'}},
+   /* ── Automotivo (2) ── */
+-  {e:'🚗',n:'Câmera de Ré 170° HD — Visão Noturna',p:159,op:299,off:47,s:'AutoParts',r:4.6,sales:'14k',badge:'sale',                stock:56, stockMax:200, cat:'automotivo'},
+-  {e:'🔧',n:'Kit Polimento Automotivo Profissional — 8 itens',p:229,op:449,off:49,s:'AutoParts',r:4.5,sales:'7.8k',badge:'new',      stock:33, stockMax:150, cat:'automotivo'},
++  {e:'🚗',n:'Câmera de Ré 170° HD — Visão Noturna',p:159,op:299,off:47,s:'AutoParts',r:4.6,sales:'14k',badge:'sale',                stock:56, stockMax:200, cat:'automotivo',origin:'internacional',country:'China',cond:'novo',frete:false,fast:false,attrs:{veiculo:'Carro'}},
++  {e:'🔧',n:'Kit Polimento Automotivo Profissional — 8 itens',p:229,op:449,off:49,s:'AutoParts',r:4.5,sales:'7.8k',badge:'new',      stock:33, stockMax:150, cat:'automotivo',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{veiculo:'Ambos'}},
+   /* ── Livros (2) ── */
+-  {e:'📚',n:'Box Harry Potter Edição Premium — 7 volumes',p:299,op:579,off:48,s:'LivrariaKz',r:4.9,sales:'11k',badge:'hot',          stock:40, stockMax:200, cat:'livros'},
+-  {e:'📖',n:'Curso Completo de Python — Livro + eBook',p:89,op:179,off:50,s:'LivrariaKz',r:4.7,sales:'22k',badge:'sale',            stock:99, stockMax:500, cat:'livros'},
++  {e:'📚',n:'Box Harry Potter Edição Premium — 7 volumes',p:299,op:579,off:48,s:'LivrariaKz',r:4.9,sales:'11k',badge:'hot',          stock:40, stockMax:200, cat:'livros',origin:'nacional',uf:'RJ',cond:'novo',frete:true,fast:false,attrs:{genero:'Ficção'}},
++  {e:'📖',n:'Curso Completo de Python — Livro + eBook',p:89,op:179,off:50,s:'LivrariaKz',r:4.7,sales:'22k',badge:'sale',            stock:99, stockMax:500, cat:'livros',origin:'nacional',uf:'RJ',cond:'novo',frete:true,fast:true,attrs:{genero:'Técnico'}},
+   /* ── Saúde (2) ── */
+-  {e:'💊',n:'Vitamina D3 + K2 MK7 — 60 cápsulas 2000UI',p:79,op:149,off:47,s:'VidaSaude',r:4.8,sales:'38k',badge:'new',            stock:120,stockMax:400, cat:'saude'},
+-  {e:'🩺',n:'Monitor de Pressão Arterial Digital de Braço',p:189,op:349,off:46,s:'VidaSaude',r:4.7,sales:'15k',badge:'sale',         stock:47, stockMax:200, cat:'saude'},
++  {e:'💊',n:'Vitamina D3 + K2 MK7 — 60 cápsulas 2000UI',p:79,op:149,off:47,s:'VidaSaude',r:4.8,sales:'38k',badge:'new',            stock:120,stockMax:400, cat:'saude',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{categoria:'Suplementos'}},
++  {e:'🩺',n:'Monitor de Pressão Arterial Digital de Braço',p:189,op:349,off:46,s:'VidaSaude',r:4.7,sales:'15k',badge:'sale',         stock:47, stockMax:200, cat:'saude',origin:'internacional',country:'Alemanha',cond:'novo',frete:false,fast:false,attrs:{categoria:'Equipamentos'}},
+   /* ── Ferramentas (2) ── */
+-  {e:'🔨',n:'Furadeira de Impacto 750W — Maleta + Kit 40 Bits',p:299,op:599,off:50,s:'FerraTech',r:4.6,sales:'9.1k',badge:'sale',   stock:27, stockMax:120, cat:'ferramentas'},
+-  {e:'⚙️',n:'Chave de Torque Digital 10-150Nm — LCD + Alarme',p:249,op:479,off:48,s:'FerraTech',r:4.5,sales:'4.2k',badge:'new',     stock:18, stockMax:100, cat:'ferramentas'},
++  {e:'🔨',n:'Furadeira de Impacto 750W — Maleta + Kit 40 Bits',p:299,op:599,off:50,s:'FerraTech',r:4.6,sales:'9.1k',badge:'sale',   stock:27, stockMax:120, cat:'ferramentas',origin:'nacional',uf:'SC',cond:'novo',frete:true,fast:false,attrs:{tipo:'Elétrica'}},
++  {e:'⚙️',n:'Chave de Torque Digital 10-150Nm — LCD + Alarme',p:249,op:479,off:48,s:'FerraTech',r:4.5,sales:'4.2k',badge:'new',     stock:18, stockMax:100, cat:'ferramentas',origin:'internacional',country:'Alemanha',cond:'novo',frete:false,fast:false,attrs:{tipo:'Medição'}},
+   /* [FIX-item4] Produto referenciado pelo pedido mock #WKZ-8990 (Avaliações
+      Pendentes / Rastreador / Disputas do Meu Perfil) — antes não existia no
+      catálogo navegável, então a avaliação feita no perfil nunca conseguia
+@@ -1198,7 +1198,7 @@
+      um toast, nada visível na página do produto). Agora com o nome exato
+      igual ao usado nos pedidos mock, o fluxo perfil → PDP → avaliação
+      publicada funciona de ponta a ponta. */
+-  {e:'⌨️',n:'Teclado Mecânico RGB TKL',p:199,op:399,off:50,s:'SoundWorld',r:4.8,sales:'21k',badge:'hot',           stock:36, stockMax:150, cat:'eletronicos'},
++  {e:'⌨️',n:'Teclado Mecânico RGB TKL',p:199,op:399,off:50,s:'SoundWorld',r:4.8,sales:'21k',badge:'hot',           stock:36, stockMax:150, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{marca:'Logitech',armazenamento:'N/A'}},
+ ];
+ 
+ /* ═══════════════════════════════════════════════════════════════════════════
