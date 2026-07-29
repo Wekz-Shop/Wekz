@@ -10487,6 +10487,20 @@ function openCategory(name, icon){
 
 // Reseta os controles fixos do sidebar (chamado ao abrir categoria e ao limpar filtros)
 function resetCatFilterInputs(){
+  resetCatPriceOnly();
+  document.getElementById('catSortSelect').value='';
+  document.querySelectorAll('input[name="catRating"]').forEach((r,i)=>{r.checked=i===2;});
+  document.querySelectorAll('input[name="catOrigin"]').forEach((r,i)=>{r.checked=i===0;});
+  const ufWrap = document.getElementById('catUfWrap'); if(ufWrap) ufWrap.style.display='none';
+  const countryWrap = document.getElementById('catCountryWrap'); if(countryWrap) countryWrap.style.display='none';
+  const cfFree = document.getElementById('cfFree'); if(cfFree) cfFree.checked=false;
+  const cfFast = document.getElementById('cfFast'); if(cfFast) cfFast.checked=false;
+  document.querySelectorAll('input[name="catCond"]').forEach((r,i)=>{r.checked=i===0;});
+}
+
+// Reseta só a Faixa de Preço (slider + Mín/Máx), preservando os demais filtros —
+// usado tanto no reset completo quanto ao remover o chip "Preço" isoladamente.
+function resetCatPriceOnly(){
   const catProducts = products.filter(p=>p.cat===currentCatId);
   const maxP = catProducts.length ? Math.max(...catProducts.map(p=>p.p)) : 5000;
   const roundedMax = Math.max(100, Math.ceil(maxP/100)*100);
@@ -10498,14 +10512,6 @@ function resetCatFilterInputs(){
   if(minEl){ minEl.value=''; minEl.placeholder='Mín'; }
   const maxEl = document.getElementById('catPriceMax');
   if(maxEl){ maxEl.value=''; maxEl.placeholder=`Máx (R$ ${roundedMax.toLocaleString('pt-BR')})`; }
-  document.getElementById('catSortSelect').value='';
-  document.querySelectorAll('input[name="catRating"]').forEach((r,i)=>{r.checked=i===2;});
-  document.querySelectorAll('input[name="catOrigin"]').forEach((r,i)=>{r.checked=i===0;});
-  const ufWrap = document.getElementById('catUfWrap'); if(ufWrap) ufWrap.style.display='none';
-  const countryWrap = document.getElementById('catCountryWrap'); if(countryWrap) countryWrap.style.display='none';
-  const cfFree = document.getElementById('cfFree'); if(cfFree) cfFree.checked=false;
-  const cfFast = document.getElementById('cfFast'); if(cfFast) cfFast.checked=false;
-  document.querySelectorAll('input[name="catCond"]').forEach((r,i)=>{r.checked=i===0;});
 }
 
 // Popula os selects de Estado (produtos nacionais) e País (produtos internacionais)
@@ -10573,6 +10579,70 @@ function updateCatFilterCounts(){
   const elS = document.getElementById('cfFastCount'); if(elS) elS.textContent = catProducts.filter(p=>p.fast).length;
 }
 
+// Monta os chips de filtro ativo acima da grade (um chip por filtro ligado,
+// clicável para remover só aquele filtro) a partir do estado já lido em renderCatProducts.
+function renderCatActiveChips(state){
+  const wrap = document.getElementById('catActiveChips');
+  if(!wrap) return;
+  const {minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets} = state;
+  const chips = [];
+  const chip = (label, onclick) => chips.push(`<button type="button" class="cat-chip" onclick="${onclick}">${escapeHtml(label)}<span class="cat-chip-x">✕</span></button>`);
+
+  const slider = document.getElementById('catPriceSlider');
+  const sliderMaxAttr = parseFloat(slider?.max) || Infinity;
+  const minActive = !isNaN(minInput) && minInput > 0;
+  const maxActive = !isNaN(maxInput) && maxInput < sliderMaxAttr;
+  if(minActive && maxActive) chip(`R$ ${minInput.toLocaleString('pt-BR')} – R$ ${maxInput.toLocaleString('pt-BR')}`, 'removeCatPriceChip()');
+  else if(minActive) chip(`A partir de R$ ${minInput.toLocaleString('pt-BR')}`, 'removeCatPriceChip()');
+  else if(maxActive) chip(`Até R$ ${maxInput.toLocaleString('pt-BR')}`, 'removeCatPriceChip()');
+
+  if(parseFloat(ratingVal) > 0) chip(`${ratingVal}★ ou mais`, 'removeCatRatingChip()');
+
+  if(originVal==='nacional'){
+    chip('🇧🇷 Nacional', 'removeCatOriginChip()');
+    const uf = document.getElementById('catUfSelect')?.value;
+    if(uf){ const info = DB.ufList.find(u=>u.uf===uf); chip(`📍 ${info?info.name:uf}`, 'removeCatUfChip()'); }
+  } else if(originVal==='internacional'){
+    chip('🌍 Internacional', 'removeCatOriginChip()');
+    const country = document.getElementById('catCountrySelect')?.value;
+    if(country) chip(`📍 ${country}`, `removeCatCountryChip()`);
+  }
+
+  if(document.getElementById('cfFree')?.checked) chip('🚚 Frete Grátis', "removeCatEnvioChip('cfFree')");
+  if(document.getElementById('cfFast')?.checked) chip('⚡ Entrega Rápida', "removeCatEnvioChip('cfFast')");
+
+  if(condVal) chip(condVal==='novo'?'Novo':condVal==='usado'?'Usado':'Recondicionado', 'removeCatCondChip()');
+
+  Object.keys(activeFacets).forEach(k=>{
+    activeFacets[k].forEach(v=>{
+      chip(v, `removeCatFacetChip('${k.replace(/'/g,"\\'")}','${String(v).replace(/'/g,"\\'")}')`);
+    });
+  });
+
+  if(!chips.length){ wrap.innerHTML=''; return; }
+  wrap.innerHTML = chips.join('') + `<button type="button" class="cat-chip cat-chip-clear" onclick="clearCatFilters()">Limpar tudo ✕</button>`;
+}
+
+function removeCatPriceChip(){ resetCatPriceOnly(); renderCatProducts(); }
+function removeCatRatingChip(){ document.querySelectorAll('input[name="catRating"]').forEach((r,i)=>{r.checked=i===2;}); renderCatProducts(); }
+function removeCatOriginChip(){
+  document.querySelectorAll('input[name="catOrigin"]').forEach((r,i)=>{r.checked=i===0;});
+  const ufWrap=document.getElementById('catUfWrap'); if(ufWrap) ufWrap.style.display='none';
+  const countryWrap=document.getElementById('catCountryWrap'); if(countryWrap) countryWrap.style.display='none';
+  const ufSel=document.getElementById('catUfSelect'); if(ufSel) ufSel.value='';
+  const countrySel=document.getElementById('catCountrySelect'); if(countrySel) countrySel.value='';
+  renderCatProducts();
+}
+function removeCatUfChip(){ const el=document.getElementById('catUfSelect'); if(el) el.value=''; renderCatProducts(); }
+function removeCatCountryChip(){ const el=document.getElementById('catCountrySelect'); if(el) el.value=''; renderCatProducts(); }
+function removeCatEnvioChip(id){ const el=document.getElementById(id); if(el) el.checked=false; renderCatProducts(); }
+function removeCatCondChip(){ document.querySelectorAll('input[name="catCond"]').forEach((r,i)=>{r.checked=i===0;}); renderCatProducts(); }
+function removeCatFacetChip(facetKey, value){
+  const chk = [...document.querySelectorAll('.catFacetChk')].find(c=>c.dataset.facet===facetKey && c.dataset.value===value);
+  if(chk) chk.checked=false;
+  renderCatProducts();
+}
+
 function renderCatProducts(){
   const g = document.getElementById('catProductsGrid');
   const rb = document.getElementById('catResultBar');
@@ -10628,6 +10698,8 @@ function renderCatProducts(){
   else if(sort==='sales') list.sort((a,b)=>parseFloat(b.sales)-parseFloat(a.sales));
 
   rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${list.length}</strong> produto${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}</span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sort||'Relevância'}</span></div>`;
+
+  renderCatActiveChips({minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets});
 
   if(!list.length){
     g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
