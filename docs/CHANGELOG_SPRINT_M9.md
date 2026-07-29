@@ -1,7 +1,7 @@
 # Sprint M9 — Filtros de Categoria: Origem (Nacional/Internacional), Faixa de
-Preço editável e Facetas dedicadas por tipo de produto
+Preço editável, Facetas dedicadas por tipo de produto e Chips de filtro ativo
 
-Arquivos alterados: `wkz-buyer.html`, `wkz-buyer.js`, `wkz-core.js`.
+Arquivos alterados: `wkz-buyer.html`, `wkz-buyer.js`, `wkz-core.js`, `wkz-styles-full.css`.
 
 ## Contexto
 
@@ -80,15 +80,28 @@ Sem resultados após filtrar, o grid mostra uma mensagem de "Nenhum produto
 encontrado" com atalho para limpar os filtros, em vez de uma grade em
 branco sem explicação.
 
+## 7. Chips de filtro ativo
+
+Acima da grade de produtos (`#catActiveChips`), um chip por filtro ligado —
+preço, avaliação, origem, estado, país, envio, condição, cada faceta de
+categoria marcada — cada um com "✕" para remover **só aquele filtro**, sem
+afetar os demais (ex.: remover o chip do Estado mantém "Nacional" ligado).
+Quando há filtro ativo, aparece também "Limpar tudo" no fim da fileira.
+`renderCatActiveChips()` é chamado dentro de `renderCatProducts()` e reusa
+o mesmo estado já lido ali (sem reconsultar o DOM em duplicidade). Visual:
+nova classe `.cat-chip` em `wkz-styles-full.css`, no mesmo padrão pill/teal
+do `.filter-chip` já existente na barra de filtros da home.
+
 ## Testes
 
 - `npm run test:m1` (`harness-node.js`) e `npm run test:m2`
   (`harness-buyer-test.js`) — suites existentes, sem alteração — **passam**.
 - Suite nova (`filter-test.js`, não commitada — script de verificação usado
   durante o desenvolvimento) cobre: filtro por categoria nas 12 categorias,
-  preço min/máx, Origem (com Estado), Envio, Condição, facetas dinâmicas
-  (incluindo clique simulado em checkbox de faceta), `clearCatFilters()` e
-  estado vazio — **12/12 passam**.
+  preço min/máx, Origem (com Estado), Envio, Condição, facetas dinâmicas,
+  `clearCatFilters()`, estado vazio, e os chips de filtro ativo (aparecer,
+  remover individualmente sem afetar os outros, "Limpar tudo") —
+  **18/18 passam**.
 
 ## O que ficou de fora (proposital)
 
