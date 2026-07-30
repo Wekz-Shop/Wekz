@@ -100,7 +100,7 @@ function renderCats(){
     const i18nKey = CAT_I18N_MAP[c.n];
     const displayName = i18nKey ? t(i18nKey) : c.n;
     return `
-    <div class="cat-item" data-cat-key="${key}" onclick="filterCatKey('${key}','${c.n}',this)">
+    <div class="cat-item" data-cat-key="${key}" onclick="openCategory('${c.n}','${c.e}')">
       <span class="cat-emoji">${wkzCatIconSVG(c.e)}</span>
       <div class="cat-name">${displayName}</div>
       <div class="cat-count">${c.c} ${t('items')}</div>
@@ -309,6 +309,17 @@ function addFlashToCart(i){
     showToast('⚡ "' + f.n + '" adicionado ao carrinho!');
   }
   updateCartUI();
+}
+
+// Setas de canto (desktop) do carrossel Flash Sale da Home — rola ~2 cards
+// por clique. No mobile as setas ficam ocultas (CSS) e o usuário arrasta
+// com o dedo normalmente, já que #flashHeroGrid é overflow-x:auto nativo.
+function scrollFlashHero(dir){
+  const g = document.getElementById('flashHeroGrid');
+  if(!g) return;
+  const card = g.querySelector(':scope > div');
+  const step = card ? (card.getBoundingClientRect().width + 14) * 2 : 420;
+  g.scrollBy({ left: dir * step, behavior: 'smooth' });
 }
 
 function renderFlashHero(){
@@ -10647,7 +10658,12 @@ function removeCatFacetChip(facetKey, value){
   renderCatProducts();
 }
 
-function renderCatProducts(){
+// Página atual da listagem de categoria — reseta para 1 sempre que um filtro/busca/
+// ordenação muda (renderCatProducts() chamada sem argumento); só é preservada quando
+// renderCatProducts(n) é chamada explicitamente pelos botões de paginação.
+let catCurrentPage = 1;
+
+function renderCatProducts(page){
   const g = document.getElementById('catProductsGrid');
   const rb = document.getElementById('catResultBar');
   if(!g) return;
@@ -10711,9 +10727,25 @@ function renderCatProducts(){
   else if(sort==='rating') list.sort((a,b)=>b.r-a.r);
   else if(sort==='sales') list.sort((a,b)=>parseFloat(b.sales)-parseFloat(a.sales));
 
-  rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${list.length}</strong> produto${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}</span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sort||'Relevância'}</span></div>`;
+  // Paginação: qtd/página vem do seletor (10/20/30 — padrão 10). Chamar
+  // renderCatProducts() sem argumento (qualquer mudança de filtro/busca/ordenação)
+  // sempre reseta para a página 1; só um clique nos botões de paginação
+  // (renderCatProducts(n)) preserva/avança a página.
+  catCurrentPage = (typeof page === 'number' && page > 0) ? page : 1;
+  const perPage = parseInt(document.getElementById('catPerPageSelect')?.value, 10) || 10;
+  const totalItems = list.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  if(catCurrentPage > totalPages) catCurrentPage = totalPages;
+  const startIdx = (catCurrentPage - 1) * perPage;
+  const pageList = list.slice(startIdx, startIdx + perPage);
+  const rangeStart = totalItems ? startIdx + 1 : 0;
+  const rangeEnd = Math.min(startIdx + perPage, totalItems);
+
+  rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${list.length}</strong> produto${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}${totalItems?` <span style="color:var(--muted);font-weight:400;">(mostrando ${rangeStart}–${rangeEnd})</span>`:''}</span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sort||'Relevância'}</span></div>`;
 
   renderCatActiveChips({keywordRaw, minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets});
+
+  const pag = document.getElementById('catPagination');
 
   if(!list.length){
     g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
@@ -10721,13 +10753,14 @@ function renderCatProducts(){
       <div style="font-weight:700;margin-bottom:6px;color:var(--text);">Nenhum produto encontrado</div>
       <div style="font-size:13px;">Tente ajustar ou <span style="color:var(--teal);cursor:pointer;font-weight:600;" onclick="clearCatFilters()">limpar os filtros</span>.</div>
     </div>`;
-    const pagEmpty = document.getElementById('catPagination');
-    if(pagEmpty) pagEmpty.innerHTML='';
+    if(pag) pag.innerHTML='';
     return;
   }
 
-  g.innerHTML = list.map((p,i)=>`
-    <div class="product-card" onclick="openProduct(${products.indexOf(p)})">
+  g.innerHTML = pageList.map((p)=>{
+    const realIdx = products.indexOf(p);
+    return `
+    <div class="product-card" onclick="openProduct(${realIdx})">
       <div class="product-img"><wkz-product-image src="${p.img||''}" emoji="${p.e}" alt="${p.n}"></wkz-product-image>
         <div class="product-badges">
           ${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}
@@ -10737,23 +10770,56 @@ function renderCatProducts(){
           ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">🚚 Grátis</span>':''}
           ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">🏷️ Cupom</span>':''}
         </div>
-        <button class="product-wish" onclick="event.stopPropagation();event.preventDefault();wishToggle(this,${products.indexOf(p)},event)">♡</button>
+        <button class="product-wish" onclick="event.stopPropagation();event.preventDefault();wishToggle(this,${realIdx},event)">♡</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.n}</div>
         <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?'<span class="store-official-tag">🏅 Loja Oficial</span>':''}</div>
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span><span class="price-old">${formatPrice(p.op)}</span><span class="price-off">-${p.off}%</span></div>
         <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales} vendidos</div></div>
-        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${i}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> Adicionar ao carrinho</span></button>
-        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${i});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> Comprar Agora</span></button>
+        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> Adicionar ao carrinho</span></button>
+        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> Comprar Agora</span></button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
-  // Pagination
-  const pag = document.getElementById('catPagination');
-  pag.innerHTML = [1,2,3,'...',8,9,10].map(n=>
-    `<button style="padding:8px 14px;border-radius:8px;border:1px solid ${n===1?'var(--teal)':'var(--border)'};background:${n===1?'rgba(0,180,171,0.1)':'var(--card)'};color:${n===1?'var(--teal)':'var(--muted)'};cursor:pointer;font-size:13px;transition:var(--transition);" onclick="showToast('📄 Página ${n}')">${n}</button>`
-  ).join('');
+  // Paginação real: Anterior/Próxima + números de página (com reticências
+  // quando há muitas páginas), cada botão chama renderCatProducts(n).
+  if(pag) pag.innerHTML = buildCatPaginationHTML(catCurrentPage, totalPages);
+
+  // Rola para o topo da grade ao trocar de página (não no carregamento inicial da
+  // categoria, page===undefined nesse caso — evita um scroll indesejado ao abrir).
+  if(typeof page === 'number') g.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Monta os botões de paginação (Anterior / números / Próxima) da página de categoria.
+// Até 7 páginas: mostra todos os números. Mais que isso: sempre 1ª, atual ±1 e
+// última, com "…" entre os grupos — padrão comum em listagens de e-commerce.
+function buildCatPaginationHTML(current, total){
+  if(total <= 1) return '';
+  const pageBtn = (label, targetPage, opts) => {
+    opts = opts || {};
+    const isActive = targetPage === current && !opts.isNav;
+    const isDisabled = !!opts.disabled;
+    return `<button ${isDisabled?'disabled':''} style="padding:8px 14px;border-radius:8px;border:1px solid ${isActive?'var(--teal)':'var(--border)'};background:${isActive?'rgba(0,180,171,0.1)':'var(--card)'};color:${isActive?'var(--teal)':'var(--muted)'};cursor:${isDisabled?'default':'pointer'};font-size:13px;opacity:${isDisabled?'0.4':'1'};transition:var(--transition);" ${isDisabled?'':`onclick="renderCatProducts(${targetPage})"`}>${label}</button>`;
+  };
+  const ellipsis = '<span style="padding:0 4px;color:var(--muted);">…</span>';
+
+  let nums = [];
+  if(total <= 7){
+    for(let n=1; n<=total; n++) nums.push(n);
+  } else {
+    nums.push(1);
+    if(current > 3) nums.push('...');
+    for(let n=Math.max(2,current-1); n<=Math.min(total-1,current+1); n++) nums.push(n);
+    if(current < total-2) nums.push('...');
+    nums.push(total);
+  }
+
+  let html = pageBtn('‹ Anterior', current-1, {isNav:true, disabled: current===1});
+  html += nums.map(n => n==='...' ? ellipsis : pageBtn(String(n), n)).join('');
+  html += pageBtn('Próxima ›', current+1, {isNav:true, disabled: current===total});
+  return html;
 }
 
 // Arrasto do slider: sincroniza o rótulo e o campo "Máx" (não filtra a cada tick — o

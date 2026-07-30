@@ -726,8 +726,16 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <button onclick="showPage('pg-flash')" style="background:none;border:1px solid rgba(255,107,53,0.5);color:#FF6B35;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.1)'" onmouseout="this.style.background='none'">Ver todas as ofertas →</button>
       </div>
-      <!-- products row -->
-      <div id="flashHeroGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
+      <!-- products row: rolagem horizontal — arrasta com o dedo no mobile,
+           setas nos cantos no desktop. Mantém renderFlashHero() intocada:
+           os cards continuam sendo os filhos diretos de #flashHeroGrid. -->
+      <div class="flashhero-scroll-wrap">
+        <button type="button" class="flashhero-arrow flashhero-arrow-left" onclick="scrollFlashHero(-1)" aria-label="Ver ofertas anteriores">‹</button>
+        <div class="flashhero-scroll-track">
+          <div id="flashHeroGrid" class="flashhero-scroll"></div>
+        </div>
+        <button type="button" class="flashhero-arrow flashhero-arrow-right" onclick="scrollFlashHero(1)" aria-label="Ver mais ofertas">›</button>
+      </div>
     </div>
   </div>
 
@@ -3257,6 +3265,11 @@ document.addEventListener('DOMContentLoaded', function() {
           <option value="rating">Melhor avaliação</option>
           <option value="sales">Mais vendidos</option>
         </select>
+        <select class="form-select wkz-select wkz-select--lg" id="catPerPageSelect" data-title="Por página" data-icon="📄" onchange="renderCatProducts()">
+          <option value="10">10 por página</option>
+          <option value="20">20 por página</option>
+          <option value="30">30 por página</option>
+        </select>
       </div>
     </div>
     <div class="listing-layout">
@@ -3323,7 +3336,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="catActiveChips" class="cat-active-chips"></div>
         <div class="products-grid" id="catProductsGrid"></div>
         <!-- Pagination -->
-        <div style="display:flex;justify-content:center;gap:6px;margin-top:32px;" id="catPagination"></div>
+        <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:32px;" id="catPagination"></div>
       </div>
     </div>
   </div>
