@@ -3406,7 +3406,15 @@ img, svg, video, canvas, iframe {
 @keyframes fadeIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
 /* ─── TOPBAR ─── */
-.topbar{background:var(--card);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1000;padding:0 32px;}
+/* FIX [scroll-paint-cost]: .topbar é sticky e fica com backdrop-filter ativo
+   durante TODA a rolagem da página. Em telas de taxa de atualização alta
+   (ex.: 165Hz/AUTO_HZ do ROG Phone 6), recompor esse blur a cada frame é bem
+   mais caro que em 60Hz, e pode gerar um lag de pintura visível durante
+   rolagens rápidas em páginas longas (sintoma: "buraco" em branco que some
+   ao parar de rolar). will-change + translateZ promovem o elemento pra sua
+   própria camada de composição na GPU, tirando esse custo do caminho crítico
+   de pintura do resto da página. Efeito visual: nenhum (mesmo blur/posição).*/
+.topbar{background:var(--card);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1000;padding:0 32px;will-change:backdrop-filter;transform:translateZ(0);}
 .topbar-inner{display:flex;align-items:center;gap:16px;height:70px;max-width:1400px;margin:0 auto;}
 
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
@@ -3743,6 +3751,35 @@ img, svg, video, canvas, iframe {
 .flash-item-name{font-size:12px;font-weight:500;white-space:nowrap;}
 .flash-item-price{font-size:13px;font-weight:700;color:#FF6B35;}
 .flash-item-old{font-size:11px;color:var(--muted);text-decoration:line-through;}
+
+/* ─── FLASH SALE HERO — carrossel horizontal (Problema 5) ───
+   #flashHeroGrid é preenchido por renderFlashHero() (wkz-buyer.js) com
+   divs de cartão sem classe própria (só estilo inline) — por isso os
+   filhos diretos são estilizados aqui via combinador `>`, sem precisar
+   tocar na função de renderização. */
+.flashhero-scroll-wrap{position:relative;display:flex;align-items:center;gap:6px;}
+.flashhero-scroll-track{flex:1 1 auto;min-width:0;overflow:hidden;}
+.flashhero-scroll{
+  display:flex;gap:14px;overflow-x:auto;
+  scroll-snap-type:x proximity;scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;padding-bottom:2px;
+}
+.flashhero-scroll::-webkit-scrollbar{display:none;}
+.flashhero-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+.flashhero-scroll > div{flex:0 0 200px;width:200px;scroll-snap-align:start;}
+.flashhero-arrow{
+  flex:0 0 auto;width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(255,107,53,0.4);background:var(--card);color:#FF6B35;
+  font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;opacity:0.55;transition:var(--transition);
+}
+.flashhero-arrow:hover{opacity:1;background:rgba(255,107,53,0.12);}
+@media(max-width:768px){
+  /* Mobile: arrasta com o dedo (comportamento nativo do overflow-x:auto);
+     as setas de canto somem para não competir com o gesto de swipe. */
+  .flashhero-arrow{display:none;}
+  .flashhero-scroll > div{flex-basis:168px;width:168px;}
+}
 
 /* ─── SECTION WRAPPER ─── */
 .section{padding:48px 32px;}
@@ -5726,6 +5763,20 @@ html, body {
     max-width: 100%;
   }
 
+  /* FIX [tpl-page-mobile-padding]: .tpl-page (páginas internas de
+     categoria/ajuda/rastreio/etc.) mantinha os mesmos 32px de padding do
+     desktop em qualquer largura de tela — sem override aqui, diferente de
+     .section acima. Nas páginas de categoria isso reduzia a largura útil
+     do grid de produtos o suficiente para a regra de auto-fill (mais abaixo,
+     ≤768px, minmax(160px,1fr)) sobrar espaço pra só 1 coluna em telas de
+     360–412px, mesmo a página usando o mesmo .products-grid de "Em
+     Destaque" (que já cabe 2 colunas por herdar o padding de 12px de
+     .section). Alinhando .tpl-page ao mesmo padding lateral do resto do
+     mobile resolve na raiz, sem tocar no grid em si. */
+  .tpl-page {
+    padding: 20px 12px;
+  }
+
   /* ── Nav Strip ── */
   .nav-strip {
     padding: 0 12px;
@@ -7560,6 +7611,19 @@ html, body {
   }
 }
 
+/* FIX [narrow-screen-2col]: a regra !important logo acima (≤768px, auto-fill
+   minmax(160px,1fr)) sobrescrevia sem querer a regra "mínimo 2 colunas mesmo
+   em telas estreitas" (≤480px, mais acima no arquivo) em aparelhos bem
+   pequenos (~320px de largura CSS, ex. iPhone SE), onde 160px×2 + gap não
+   cabe e o auto-fill cai pra 1 coluna só. Reforça aqui, depois, com a mesma
+   especificidade + !important, garantindo 2 colunas mesmo nesses aparelhos —
+   sem alterar .product-card nem qualquer outra regra do bloco acima. */
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 
 
 
@@ -8972,6 +9036,8 @@ body.kzlive-active .bottom-nav {
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
+    will-change: backdrop-filter; /* ver nota em .topbar (scroll-paint-cost) */
+    transform: translateZ(0);
 }
 
 @media (max-width: 768px) {
