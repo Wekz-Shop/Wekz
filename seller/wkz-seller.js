@@ -901,6 +901,11 @@ function _wkzModal(id, innerHtml, opts){
     <button class="modal-close" onclick="document.getElementById('${escapeHtml(id)}').classList.remove('open')" style="top:14px;right:14px;">✕</button>
     ${safeHtml}
   </div>`;
+  // [FIX] Qualquer <select class="form-select"> injetado dentro de um modal
+  // aberto por _wkzModal() precisa ser (re)convertido no botão customizado
+  // da WeKz — initFormSelects() só converte o que já está no DOM na hora
+  // em que é chamada, e o conteúdo do modal só existe a partir daqui.
+  if(typeof initFormSelects === 'function') initFormSelects();
   ov.classList.add('open');
   return ov;
 }
@@ -2478,8 +2483,7 @@ function openDispatchModal(pedidoId) {
     </div>
     <div style="margin-bottom:18px;">
       <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Transportadora</label>
-      <select id="wkzDispatchCarrierSelect"
-        style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;">
+      <select id="wkzDispatchCarrierSelect" class="form-select wkz-select wkz-select--lg" data-title="Transportadora" data-icon="🚚">
         <option value="Correios PAC">Correios PAC</option>
         <option value="Correios SEDEX">Correios SEDEX</option>
         <option value="Jadlog">Jadlog</option>
