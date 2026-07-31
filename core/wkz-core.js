@@ -3103,7 +3103,7 @@ var WkzDisputeTickets = (function() {
         '</div>' +
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;">*Tipo de Problema</label>' +
-          '<select id="disputeProblem" class="wkz-select" style="width:100%;padding:10px;" required>' +
+          '<select id="disputeProblem" class="form-select wkz-select" data-title="Tipo de Problema" data-icon="🚨" style="width:100%;padding:10px;" required>' +
             '<option value="">Selecione...</option>' +
             '<option value="nao-recebido">📦 Não Recebi o Produto</option>' +
             '<option value="nao-conforme">🔍 Produto Não Conforme (diferente do anunciado)</option>' +
@@ -3452,7 +3452,7 @@ var WkzNoticeAndTakeDown = (function() {
         // Campo 4: Tipo de violação
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">*Tipo de Violação</label>' +
-          '<select id="denunciaTipo" class="wkz-select" style="width:100%;padding:10px;font-size:13px;" required>' +
+          '<select id="denunciaTipo" class="form-select wkz-select" data-title="Tipo de Violação" data-icon="©️" style="width:100%;padding:10px;font-size:13px;" required>' +
             '<option value="">Selecione uma opção...</option>' +
             '<option value="falsificacao">Produto Falsificado / Contrafação</option>' +
             '<option value="marca_registrada">Violação de Marca Registrada</option>' +
@@ -5996,7 +5996,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         + _cpField('Banco / Instituição','<input id="cpNewBankName" type="text" placeholder="Ex: Millennium BCP, Caixa Geral..." '+_cpInStyle()+'>')
         + _cpField('IBAN','<input id="cpNewBankIBAN" type="text" maxlength="34" placeholder="PT50 0000 0000 0000 0000 0000 0" oninput="cpFmtIBAN(this)" '+_cpInStyle('font-family:monospace;letter-spacing:1.5px;')+'>')
         + _cpField('Titular da Conta','<input id="cpNewBankHolder" type="text" placeholder="Nome completo" '+_cpInStyle()+'>')
-        + _cpField('Moeda preferida','<select id="cpNewBankCurrency" '+_cpSelStyle()+'>'
+        + _cpField('Moeda preferida','<select id="cpNewBankCurrency" class="form-select wkz-select wkz-select--lg" data-title="Moeda preferida" data-icon="💲" '+_cpSelStyle()+'>'
             +'<option value="EUR">🇪🇺 EUR — Euro</option>'
             +'<option value="BRL">🇧🇷 BRL — Real Brasileiro</option>'
             +'<option value="USD">🇺🇸 USD — Dólar</option>'
@@ -6027,7 +6027,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         + '<div style="font-size:30px;color:#10b981;">' + CP_ICO.zap + '</div>'
         + '<div><div style="font-size:13px;font-weight:700;color:var(--text);">Pix</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Transferências instantâneas — Banco Central do Brasil</div></div>'
         + '</div>'
-        + _cpField('Tipo de Chave Pix','<select id="cpNewPixKeyType" onchange="cpUpdatePixPlaceholder(this.value)" '+_cpSelStyle()+'>'
+        + _cpField('Tipo de Chave Pix','<select id="cpNewPixKeyType" class="form-select wkz-select wkz-select--lg" data-title="Tipo de Chave Pix" data-icon="🔑" onchange="cpUpdatePixPlaceholder(this.value)" '+_cpSelStyle()+'>'
             +'<option value="cpf">CPF</option>'
             +'<option value="cnpj">CNPJ</option>'
             +'<option value="phone">Telefone</option>'
@@ -6099,6 +6099,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       setTimeout(function() {
         fields.innerHTML = _cpCardForms[idx]();
         fields.style.opacity = '1';
+        if (typeof initFormSelects === 'function') initFormSelects();
       }, 180);
     }
   };
@@ -6294,6 +6295,10 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     box.innerHTML = topBar + bodyHtml + footerHtml;
     overlay.appendChild(box);
     document.body.appendChild(overlay);
+    // [FIX] Converte qualquer <select class="form-select"> recém-injetado
+    // (ex.: moeda/tipo de chave Pix no modal "Adicionar Método de
+    // Pagamento") no botão customizado da WeKz em vez de deixá-lo nativo.
+    if (typeof initFormSelects === 'function') initFormSelects();
     /* Store callback */
     overlay._cpOnConfirm = opts.onConfirm || null;
     /* Prevent body scroll */
