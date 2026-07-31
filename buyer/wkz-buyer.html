@@ -3386,11 +3386,30 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Store Products -->
     <div class="section-header" style="margin-bottom:20px;">
       <h2 class="section-title"><span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> Produtos da <span id="storeTplNameTitle">Loja</span></h2>
-      <select class="form-select wkz-select wkz-select--lg" id="storeSortSelect" data-title="Ordenar por" data-icon="↕️" onchange="showToast('Ordenando...')">
-        <option value="sales">Mais vendidos</option><option value="price-asc">Menor preço</option><option value="price-desc">Maior preço</option><option value="new">Mais novos</option>
-      </select>
+      <!-- [FIX v?] Selects agora ficam num container flex dedicado (igual ao
+           cabeçalho de Eletrônicos) em vez de soltos direto no
+           .section-header. Isso resolve dois problemas de uma vez: (1) o
+           select "Ordenar por" parava muito largo no desktop porque, sozinho,
+           ele herdava quase 100% do espaço livre de .section-header
+           (justify-content:space-between); dividindo o espaço com o novo
+           select de paginação, os dois ficam do mesmo tamanho visto em
+           Eletrônicos. (2) Prepara a página para volumes grandes de produtos
+           por loja (visão futura) com o mesmo padrão de 10/20/30 por página. -->
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        <select class="form-select wkz-select wkz-select--lg" id="storeSortSelect" data-title="Ordenar por" data-icon="↕️" onchange="renderStoreProducts()">
+          <option value="sales">Mais vendidos</option><option value="price-asc">Menor preço</option><option value="price-desc">Maior preço</option><option value="new">Mais novos</option>
+        </select>
+        <select class="form-select wkz-select wkz-select--lg" id="storePerPageSelect" data-title="Por página" data-icon="📄" onchange="renderStoreProducts()">
+          <option value="10">10 por página</option>
+          <option value="20">20 por página</option>
+          <option value="30">30 por página</option>
+        </select>
+      </div>
     </div>
+    <div id="storeResultBar" style="margin-bottom:16px;"></div>
     <div class="products-grid" id="storeProductsGrid"></div>
+    <!-- Pagination -->
+    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:32px;" id="storePagination"></div>
     <!-- Store Reviews -->
     <div style="margin-top:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;">
       <h3 style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="#F59E0B" stroke="#F59E0B" stroke-width="1" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> Avaliações da Loja</h3>

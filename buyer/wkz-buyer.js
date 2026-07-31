@@ -10895,32 +10895,16 @@ function openStore(storeId){
       <div style="font-size:12px;font-weight:600;">${p.t}</div>
     </div>`).join('');
 
-  document.getElementById('storeProductsGrid').innerHTML = products.slice(0,6).map((p,i)=>`
-    <div class="product-card" onclick="openProduct(${i})">
-      <div class="product-img"><wkz-product-image src="${p.img||''}" emoji="${p.e}" alt="${p.n}"></wkz-product-image>
-        <div class="product-badges">${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">${p.n}</div>
-        <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span></div>
-        <div style="display:flex;gap:6px;margin-top:10px;">
-          <button class="btn-add" style="flex:1;" onclick="event.stopPropagation();addToCart();showToast('Adicionado ao carrinho!')">
-            <span class="btn-spinner"></span>
-            <span class="btn-check">&#10003;</span>
-            <span class="btn-label" style="display:flex;align-items:center;justify-content:center;gap:5px;">
-              <span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span>
-              Adicionar
-            </span>
-          </button>
-          <button class="btn-buy" style="flex:1;" onclick="event.stopPropagation();openProduct(${i});showToast('Redirecionando para compra...')">
-            <span style="display:flex;align-items:center;justify-content:center;gap:5px;">
-              <span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span>
-              Comprar
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>`).join('');
+  // [PENDENTE — próxima etapa combinada com o cliente] "Produtos da Loja"
+  // ainda não filtra pela loja de fato (currentStoreName fica pronto aqui
+  // para quando isso for implementado; hoje renderStoreProducts() usa a
+  // lista inteira de products, igual ao comportamento anterior).
+  currentStoreName = s.name;
+  const sortSel = document.getElementById('storeSortSelect');
+  const perPageSel = document.getElementById('storePerPageSelect');
+  if(sortSel) sortSel.value = 'sales';
+  if(perPageSel) perPageSel.value = '10';
+  renderStoreProducts(1);
 
   document.getElementById('storeReviewsList').innerHTML = DB.reviews.map(r=>`
     <div style="border-top:1px solid var(--border);padding:16px 0;display:flex;gap:14px;">
@@ -10946,6 +10930,114 @@ function openStore(storeId){
 
   setTimeout(initFormSelects, 30); // converte storeSortSelect ao abrir loja
   showPage('store-detail');
+}
+
+// Nome da loja atualmente aberta em page-store-detail e página atual da
+// paginação de "Produtos da Loja". [PENDENTE] currentStoreName ainda não é
+// usado para filtrar — ver comentário em openStore().
+let currentStoreName = '';
+let storeCurrentPage = 1;
+
+// Ordena, pagina (10/20/30 por página, igual à página de Eletrônicos) e
+// renderiza os "Produtos da Loja". Mesmo padrão de renderCatProducts(),
+// sem a parte de filtros de categoria (a loja não tem sidebar de filtro).
+// [PENDENTE] `list` hoje é `products` inteiro (mesmo comportamento de
+// antes da paginação) — quando "Produtos da Loja" for corrigido para
+// mostrar só os produtos daquela loja, troque a linha abaixo por algo como
+// `let list = products.filter(p => p.s === currentStoreName);`
+function renderStoreProducts(page){
+  const g = document.getElementById('storeProductsGrid');
+  const rb = document.getElementById('storeResultBar');
+  if(!g) return;
+  const sort = document.getElementById('storeSortSelect')?.value || 'sales';
+
+  let list = products.slice();
+
+  if(sort==='price-asc') list.sort((a,b)=>a.p-b.p);
+  else if(sort==='price-desc') list.sort((a,b)=>b.p-a.p);
+  else if(sort==='new') list.sort((a,b)=>(b.badge==='new'?1:0)-(a.badge==='new'?1:0));
+  else list.sort((a,b)=>parseFloat(b.sales)-parseFloat(a.sales)); // 'sales' (Mais vendidos, padrão)
+
+  storeCurrentPage = (typeof page === 'number' && page > 0) ? page : 1;
+  const perPage = parseInt(document.getElementById('storePerPageSelect')?.value, 10) || 10;
+  const totalItems = list.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  if(storeCurrentPage > totalPages) storeCurrentPage = totalPages;
+  const startIdx = (storeCurrentPage - 1) * perPage;
+  const pageList = list.slice(startIdx, startIdx + perPage);
+  const rangeStart = totalItems ? startIdx + 1 : 0;
+  const rangeEnd = Math.min(startIdx + perPage, totalItems);
+
+  if(rb) rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${totalItems}</strong> produto${totalItems!==1?'s':''}${totalItems?` <span style="color:var(--muted);font-weight:400;">(mostrando ${rangeStart}–${rangeEnd})</span>`:''}</span></div>`;
+
+  const pag = document.getElementById('storePagination');
+
+  if(!list.length){
+    g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px;">🔍</div>
+      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">Nenhum produto encontrado</div>
+    </div>`;
+    if(pag) pag.innerHTML='';
+    return;
+  }
+
+  /* Mesma estrutura canônica de card usada em "Em Destaque"/Categoria. */
+  g.innerHTML = pageList.map((p)=>{
+    const realIdx = products.indexOf(p);
+    return `
+    <div class="product-card" onclick="openProduct(${realIdx})">
+      <div class="product-img"><wkz-product-image src="${p.img||''}" emoji="${p.e}" alt="${p.n}"></wkz-product-image>
+        <div class="product-badges">
+          ${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}
+          ${p.badge==='new'?'<span class="badge badge-new">NOVO</span>':''}
+          ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
+          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">🚚 Grátis</span>':''}
+        </div>
+        <button class="product-wish" onclick="event.stopPropagation();event.preventDefault();wishToggle(this,${realIdx},event)">♡</button>
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.n}</div>
+        <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?'<span class="store-official-tag">🏅 Loja Oficial</span>':''}</div>
+        <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span><span class="price-old">${formatPrice(p.op)}</span><span class="price-off">-${p.off}%</span></div>
+        <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales} vendidos</div></div>
+        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> Adicionar ao carrinho</span></button>
+        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> Comprar Agora</span></button>
+      </div>
+    </div>`;
+  }).join('');
+
+  if(pag) pag.innerHTML = buildStorePaginationHTML(storeCurrentPage, totalPages);
+
+  if(typeof page === 'number') g.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Mesmos botões (Anterior/números/Próxima) de buildCatPaginationHTML, só
+// que chamando renderStoreProducts(n) em vez de renderCatProducts(n).
+function buildStorePaginationHTML(current, total){
+  if(total <= 1) return '';
+  const pageBtn = (label, targetPage, opts) => {
+    opts = opts || {};
+    const isActive = targetPage === current && !opts.isNav;
+    const isDisabled = !!opts.disabled;
+    return `<button ${isDisabled?'disabled':''} style="padding:8px 14px;border-radius:8px;border:1px solid ${isActive?'var(--teal)':'var(--border)'};background:${isActive?'rgba(0,180,171,0.1)':'var(--card)'};color:${isActive?'var(--teal)':'var(--muted)'};cursor:${isDisabled?'default':'pointer'};font-size:13px;opacity:${isDisabled?'0.4':'1'};transition:var(--transition);" ${isDisabled?'':`onclick="renderStoreProducts(${targetPage})"`}>${label}</button>`;
+  };
+  const ellipsis = '<span style="padding:0 4px;color:var(--muted);">…</span>';
+
+  let nums = [];
+  if(total <= 7){
+    for(let n=1; n<=total; n++) nums.push(n);
+  } else {
+    nums.push(1);
+    if(current > 3) nums.push('...');
+    for(let n=Math.max(2,current-1); n<=Math.min(total-1,current+1); n++) nums.push(n);
+    if(current < total-2) nums.push('...');
+    nums.push(total);
+  }
+
+  let html = pageBtn('‹ Anterior', current-1, {isNav:true, disabled: current===1});
+  html += nums.map(n => n==='...' ? ellipsis : pageBtn(String(n), n)).join('');
+  html += pageBtn('Próxima ›', current+1, {isNav:true, disabled: current===total});
+  return html;
 }
 
 // patch stores grid to open store detail
