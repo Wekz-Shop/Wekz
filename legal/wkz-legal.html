@@ -1228,7 +1228,7 @@
     <div style="display:flex;flex-direction:column;gap:12px;">
       <div>
         <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Formato desejado</label>
-        <select id="lgpdPortFormato" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;">
+        <select id="lgpdPortFormato" class="form-select wkz-select wkz-select--lg" data-title="Formato desejado" data-icon="📄">
           <option value="json">JSON (recomendado)</option>
           <option value="csv">CSV</option>
           <option value="xml">XML</option>
@@ -1377,6 +1377,7 @@
 
   <script src="../core/wkz-bus.js"></script>
   <script src="../core/wkz-core.js"></script>
+  <script src="../core/wkz-form-select.js"></script>
   <script>
     /* Bootstrap deste módulo: lê o hash da URL (ex.: wkz-legal.html#pg-terms)
        e navega direto pra página pedida; senão cai na primeira página
