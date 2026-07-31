@@ -51,7 +51,7 @@
 
     <div class="search-wrap-top">
       <div class="search-bar">
-        <select id="searchCat" class="selector wkz-select wkz-select--searchbar" style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);height:46px;min-width:110px;">
+        <select id="searchCat" class="form-select selector wkz-select wkz-select--searchbar" data-title="Categoria" data-icon="🗂️" style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);height:46px;min-width:110px;">
           <option value="">Todas</option>
           <option value="Eletrônicos">📱 Eletrôn.</option>
           <option value="Moda"><span class="wkz-icon wkz-icon-shirt"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></span> Moda</option>
@@ -2022,7 +2022,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="ckout-field">
               <label for="cardInst">Parcelas</label>
-              <select id="cardInst" aria-label="Número de Parcelas">
+              <select id="cardInst" class="form-select wkz-select wkz-select--lg" data-title="Parcelas" data-icon="💳" aria-label="Número de Parcelas">
                 <option>1x de R$ 1.249,90 (sem juros)</option>
                 <option>2x de R$ 624,95 (sem juros)</option>
                 <option>3x de R$ 416,63 (sem juros)</option>
@@ -3304,12 +3304,12 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="sfg-item"><input type="radio" name="catOrigin" value="nacional" onchange="onCatOriginChange()"> <span>🇧🇷 Nacional</span></div>
           <div class="sfg-item"><input type="radio" name="catOrigin" value="internacional" onchange="onCatOriginChange()"> <span>🌍 Internacional</span></div>
           <div id="catUfWrap" style="display:none;margin-top:8px;">
-            <select class="wkz-select wkz-select--sm" id="catUfSelect" style="width:100%;" onchange="renderCatProducts()">
+            <select class="form-select wkz-select wkz-select--sm" id="catUfSelect" data-title="Estado" data-icon="📍" style="width:100%;" onchange="renderCatProducts()">
               <option value="">Todos os Estados</option>
             </select>
           </div>
           <div id="catCountryWrap" style="display:none;margin-top:8px;">
-            <select class="wkz-select wkz-select--sm" id="catCountrySelect" style="width:100%;" onchange="renderCatProducts()">
+            <select class="form-select wkz-select wkz-select--sm" id="catCountrySelect" data-title="País" data-icon="🌍" style="width:100%;" onchange="renderCatProducts()">
               <option value="">Todos os Países</option>
             </select>
           </div>
@@ -5512,7 +5512,7 @@ body.kzlive-active .bottom-nav {
       </div>
 
       <div class="rm-label">Motivo da denúncia</div>
-      <select class="wkz-select wkz-select--lg wkz-select--danger rm-select" id="rmReason">
+      <select class="form-select wkz-select wkz-select--lg wkz-select--danger rm-select" id="rmReason" data-title="Motivo da denúncia" data-icon="⚑">
         <option value="">Selecione o motivo...</option>
         <option value="produto_falsificado">🚫 Produto falsificado</option>
         <option value="anuncio_enganoso">⚠️ Anúncio enganoso</option>
@@ -5726,7 +5726,7 @@ body.kzlive-active .bottom-nav {
     <div style="display:flex;flex-direction:column;gap:12px;">
       <div>
         <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Formato desejado</label>
-        <select id="lgpdPortFormato" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;">
+        <select id="lgpdPortFormato" class="form-select wkz-select wkz-select--lg" data-title="Formato desejado" data-icon="📄">
           <option value="json">JSON (recomendado)</option>
           <option value="csv">CSV</option>
           <option value="xml">XML</option>
@@ -5894,6 +5894,7 @@ body.kzlive-active .bottom-nav {
 
 <script src="../core/wkz-bus.js"></script>
 <script src="../core/wkz-core.js"></script>
+<script src="../core/wkz-form-select.js"></script>
 <script src="wkz-buyer.js"></script>
 <script src="wkz-flashsale-modal.js"></script>
 </body>
