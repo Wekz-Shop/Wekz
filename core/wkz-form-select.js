@@ -176,6 +176,38 @@ function _fsIcon(labelStr){
   return '📋';
 }
 
+/* ─── Sincroniza o label do botão com o estado atual do <select> ───
+   Usada tanto na conversão inicial quanto pelos hooks de value/
+   selectedIndex/innerHTML abaixo. Também atualiza o item ativo no
+   painel, se ele já tiver sido montado antes (evita o painel abrir
+   mostrando o check na opção errada depois de um reset externo). */
+function _wkzSyncFormSelectLabel(sel){
+  const btn = document.querySelector(`.wkz-form-select-btn[data-select-id="${sel.id}"]`);
+  if(!btn) return;
+  const opt        = sel.options[sel.selectedIndex];
+  const labelText  = opt ? opt.text : '';
+  const isPlaceholder = opt && (
+    labelText.toLowerCase().includes('selecione') ||
+    labelText.toLowerCase().includes('selecionar') ||
+    opt.value === ''
+  );
+  const lbl = btn.querySelector('.fsb-label');
+  if(lbl){
+    lbl.textContent = labelText || 'Selecione...';
+    lbl.classList.toggle('placeholder', !!isPlaceholder);
+  }
+  const panelId = 'wkzFSPanel_' + btn.dataset.fsId;
+  const panel = document.getElementById(panelId);
+  if(panel){
+    panel.querySelectorAll('.wkz-panel-item').forEach(it => {
+      const active = it.dataset.val === sel.value;
+      it.classList.toggle('active', active);
+      const check = it.querySelector('.wkz-panel-item-check');
+      if(check) check.textContent = active ? '✓' : '';
+    });
+  }
+}
+
 /* ─── Inicializa: converte select.form-select → botão customizado ─── */
 function initFormSelects() {
   document.querySelectorAll('select.form-select').forEach((sel) => {
@@ -224,6 +256,36 @@ function initFormSelects() {
     btn.addEventListener('click', function(e){ e.preventDefault(); openFormSelect(this); });
 
     sel.parentNode.insertBefore(btn, sel);
+
+    /* [FIX v? — label desatualizado] Mantém o label do botão sempre em
+       sincronia com o <select> escondido, não importa COMO o valor muda:
+       - pelo painel (wkzFormSelectItem, já atualizava o label na mão)
+       - por código externo fazendo `sel.value = 'x'` direto (ex.: reset
+         de filtro ao abrir uma categoria/loja nova)
+       - por `sel.selectedIndex = n`
+       - substituindo as <option> inteiras via innerHTML (ex.: lista de
+         Estado/País populada depois, por renderCatOriginOptions())
+       Antes disso, qualquer um desses três casos deixava o botão
+       "congelado" mostrando um valor antigo até o usuário abrir o
+       painel de novo. Interceptar o setter de value/selectedIndex cobre
+       os dois primeiros; o MutationObserver cobre a troca de opções. */
+    _wkzSyncFormSelectLabel(sel);
+    try {
+      const nativeValueDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+      const nativeIdxDesc   = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+      Object.defineProperty(sel, 'value', {
+        get(){ return nativeValueDesc.get.call(sel); },
+        set(v){ nativeValueDesc.set.call(sel, v); _wkzSyncFormSelectLabel(sel); },
+        configurable: true
+      });
+      Object.defineProperty(sel, 'selectedIndex', {
+        get(){ return nativeIdxDesc.get.call(sel); },
+        set(v){ nativeIdxDesc.set.call(sel, v); _wkzSyncFormSelectLabel(sel); },
+        configurable: true
+      });
+    } catch(e) { /* select de outro widget já ter sobrescrito value/selectedIndex — ignora, não quebra o resto */ }
+    const mo = new MutationObserver(() => _wkzSyncFormSelectLabel(sel));
+    mo.observe(sel, { childList: true, subtree: true });
   });
 }
 

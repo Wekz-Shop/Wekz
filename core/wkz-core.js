@@ -23,6 +23,51 @@ function escapeHtml(str) {
 }
 // ── Debug flag — Sprint 0.1 fix A5 ───────────────────────────────────
 window.WKZ_DEBUG = false; // Mudar para true localmente para dev
+
+/* ── BLOCO 1a: _wkzModal — fábrica de modal genérico ────────────────────
+   [MOVIDO v? — pendência "mover pro core"] Antes vivia só em
+   wkz-seller.js, mas era chamada em 9 pontos de wkz-core.js (ticket de
+   disputa, denúncia de propriedade intelectual, saque) e 1 em
+   wkz-admin.js — nenhum dos dois arquivos a definia. Resultado: abrir
+   qualquer um desses modais fora da página do seller lançava
+   "_wkzModal is not defined" e nada acontecia. Como o app tem 3 pontos
+   de entrada (buyer/seller/admin) que precisam se comportar de forma
+   idêntica para o mesmo tipo de ação (aqui, "abrir um modal"), a fábrica
+   pertence ao core — única fonte, sem risco dos três divergirem.
+   Continua chamável como `_wkzModal(id, innerHtml, opts)` de qualquer
+   lugar; passar `id` vazio fecha todos os modais abertos.
+   ─────────────────────────────────────────────────────────────────────── */
+function _wkzModal(id, innerHtml, opts){
+  // Chamado com null/undefined = fechar todos os modais abertos
+  if (!id) {
+    document.querySelectorAll('.modal-overlay.open').forEach(function(m){ m.classList.remove('open'); });
+    return null;
+  }
+  opts = opts || {};
+  // C2: sanitiza o conteúdo antes de injetar no DOM
+  var safeHtml = (typeof wkzSanitizeHTML === 'function') ? wkzSanitizeHTML(innerHtml) : innerHtml;
+  let ov = document.getElementById(id);
+  if(!ov){
+    ov = document.createElement('div');
+    ov.id = id;
+    ov.className = 'modal-overlay';
+    ov.style.zIndex = opts.zIndex || '2200';
+    ov.onclick = function(e){ if(e.target===ov) ov.classList.remove('open'); };
+    document.body.appendChild(ov);
+  }
+  const mw = opts.maxWidth || '500px';
+  ov.innerHTML = `<div class="modal" style="max-width:${mw};width:94%;max-height:92vh;overflow-y:auto;padding:28px;position:relative;">
+    <button class="modal-close" onclick="document.getElementById('${escapeHtml(id)}').classList.remove('open')" style="top:14px;right:14px;">✕</button>
+    ${safeHtml}
+  </div>`;
+  // Qualquer <select class="form-select"> injetado dentro do modal precisa
+  // ser (re)convertido no botão customizado da WeKz — initFormSelects() só
+  // converte o que já está no DOM na hora em que é chamada, e o conteúdo
+  // do modal só existe a partir daqui.
+  if(typeof initFormSelects === 'function') initFormSelects();
+  ov.classList.add('open');
+  return ov;
+}
 function wkzLog(...args) { if (window.WKZ_DEBUG) console.log(...args); }
 
 /* ── WkzApp: Gerenciador de Estado Único ─────────────────────────────── */
@@ -1062,12 +1107,13 @@ const WKZ_ICON_PATHS = {
   settings:  '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>',
 };
 
-function wkzCatIconSVG(emojiOrName) {
+function wkzCatIconSVG(emojiOrName, size) {
+  const px = size || 28;
   const name = WKZ_CAT_ICONS[emojiOrName] || emojiOrName;
   const paths = WKZ_ICON_PATHS[name];
   if (!paths) return emojiOrName; // fallback to emoji if unknown
   return '<span class="wkz-icon wkz-icon-cat wkz-icon-' + name + '">' +
-    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" ' +
+    '<svg viewBox="0 0 24 24" width="' + px + '" height="' + px + '" fill="none" stroke="currentColor" ' +
     'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     paths + '</svg></span>';
 }
@@ -1087,6 +1133,98 @@ const categories = [
   {e:'💊',n:'Saúde',c:'7.4k'},
   {e:'🧰',n:'Ferramentas',c:'5.1k'},
 ];
+
+// Mapa nome canônico(PT) → chave interna (data-category / currentCatId).
+// [MOVIDO para core em v?] Antes vivia só em wkz-buyer.js — mas o array
+// `categories` já é compartilhado (core) e várias listas de categoria
+// (dropdown de busca, nav-strip) precisam existir tanto no buyer quanto
+// no seller. Ficando junto de `categories`, os dois consomem a mesma
+// fonte sem duplicar/divergir.
+const CAT_KEY_MAP = {
+  'Eletrônicos':'eletronicos','Moda':'moda','Casa & Deco':'casa','Beleza':'beleza',
+  'Games':'games','Esportes':'esportes','Bebê & Kids':'bebe','Pet Shop':'pet',
+  'Automotivo':'automotivo','Livros':'livros','Saúde':'saude','Ferramentas':'ferramentas'
+};
+
+// Mapa nome-canônico(PT) → chave i18n, usado só para EXIBIÇÃO (renderCats(),
+// populateSearchCatOptions(), renderNavCategories()). c.n continua sendo o
+// identificador interno canônico (usado por filterCatKey/CAT_KEY_MAP/onclick
+// e em outros pontos do app que comparam por nome em PT) — não alteramos
+// isso para não quebrar filtros de categoria/produto que dependem dessa
+// string.
+const CAT_I18N_MAP = {
+  'Eletrônicos':'catElectronics','Moda':'catFashion','Casa & Deco':'catHome','Beleza':'catBeauty',
+  'Games':'catGames','Esportes':'catSports','Bebê & Kids':'catBaby','Pet Shop':'catPet',
+  'Automotivo':'catAuto','Livros':'catBooks','Saúde':'catHealth','Ferramentas':'catTools'
+};
+
+/* [FIX v? — categorias-divergentes] Popula o <select id="searchCat"> (o
+   dropdown "Categoria" da barra de busca do topo) a partir do MESMO array
+   `categories` usado por "Explorar Categorias" (renderCats(), em
+   wkz-buyer.js) e pelo nav-strip (renderNavCategories(), idem). Antes essa
+   lista era HTML fixo, direto no <select> — 8 opções, fora de ordem, com
+   nomes abreviados ("Eletrôn.", "Casa") e faltando 5 categorias inteiras
+   (Bebê & Kids, Pet Shop, Livros, Saúde, Ferramentas). O value="Casa"
+   também estava errado (deveria ser "Casa & Deco", o nome real da
+   categoria) — na prática, buscar com esse filtro selecionado não batia
+   com nenhum produto. Reutilizável pelo buyer e pelo seller (ambos têm
+   #searchCat); funciona com ou sem o sistema de tradução `t()` (só
+   presente no buyer) — no seller, cai automaticamente para o nome em PT. */
+function populateSearchCatOptions(){
+  const sel = document.getElementById('searchCat');
+  if(!sel) return;
+  const current = sel.value; // preserva seleção, se já havia uma
+  const hasT = typeof t === 'function';
+  sel.innerHTML = '<option value="">' + (hasT ? t('searchCatAll') : 'Todas') + '</option>' +
+    categories.map(c => {
+      const label = hasT && CAT_I18N_MAP[c.n] ? t(CAT_I18N_MAP[c.n]) : c.n;
+      return `<option value="${c.n}">${c.e} ${label}</option>`;
+    }).join('');
+  if(current) sel.value = current;
+  // Se o <select> já tiver sido convertido no botão customizado da WeKz
+  // (initFormSelects já rodou antes desta função), reconverte para o
+  // label do botão refletir as opções novas em vez de ficar parado na
+  // primeira conversão.
+  if(sel.dataset.fsId){
+    delete sel.dataset.fsId;
+    const oldBtn = document.querySelector(`.wkz-form-select-btn[data-select-id="${sel.id}"]`);
+    if(oldBtn) oldBtn.remove();
+    if(typeof initFormSelects === 'function') initFormSelects();
+  }
+}
+
+/* [FIX v? — categorias-divergentes] Gera os links de categoria da
+   "nav-strip" (a faixa "Todas as Categorias | Eletrônicos | Moda | ...")
+   a partir do mesmo array `categories`. Antes eram 10 <div class="nav-link">
+   fixos no HTML, copiados em wkz-buyer.html E wkz-seller.html — faltavam
+   "Saúde" e "Ferramentas" nos dois (a lista parou em "Livros"). Os
+   demais nav-links da faixa que NÃO são categoria (Lojas Oficiais, Kz
+   Live, Rastrear Pedido, Ajuda — e "Home", só no seller) continuam
+   fixos no HTML; esta função só cuida do trecho de categorias,
+   marcado com o atributo data-cat-nav, e é chamada de novo sempre que
+   o idioma muda (o texto já sai traduzido, reaproveitando CAT_I18N_MAP —
+   por isso os links de categoria não entram mais na lista posicional
+   `navKeys` usada por applyTranslations()). onOpenCategory permite ao
+   buyer usar openCategory(...) e ao seller redirecionar pro buyer.
+   catHrefPrefix (ex.: '../buyer/wkz-buyer.html') é opcional. */
+function renderNavCategories(onOpenCategory, catHrefPrefix){
+  const track = document.querySelector('.nav-strip-inner');
+  if(!track) return;
+  const hasT = typeof t === 'function';
+  const handler = onOpenCategory || 'openCategory';
+  track.querySelectorAll('.nav-link[data-cat-nav]').forEach(el => el.remove());
+  const html = categories.map(c => {
+    const label = hasT && CAT_I18N_MAP[c.n] ? t(CAT_I18N_MAP[c.n]) : c.n;
+    const icon  = wkzCatIconSVG(c.e, 16);
+    const click = catHrefPrefix
+      ? `window.location.href='${catHrefPrefix}'`
+      : `${handler}('${c.n}','${c.e}')`;
+    return `<div class="nav-link" data-cat-nav="1" data-page="category" onclick="${click}">${icon} ${label}</div>`;
+  }).join('');
+  const allBtn = track.querySelector('.wkz-cat-all-btn');
+  if(allBtn) allBtn.insertAdjacentHTML('afterend', html);
+  else track.insertAdjacentHTML('afterbegin', html);
+}
 
 /* ══════════════════════════════════════════
    WKZ-PRODUCT-IMAGE — Custom Element (v2.9.26)
