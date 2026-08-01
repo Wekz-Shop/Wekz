@@ -873,42 +873,14 @@ function filterOrders(type, el){
 ═══════════════════════════════════════════════════════════════════ */
 
 /* ── 3.3: Utilitários de UI + Saque Pix + Extrato ─────────────────
-   _wkzModal/_wkzRadio/_wkzDropToggle/_wkzDropPick (modais genéricos do
+   _wkzRadio/_wkzDropToggle/_wkzDropPick (modais genéricos do
    vendedor), openSaqueModal,
    confirmarSaque, openExtratoModal, exportarExtrato.
+   [MOVIDO v?] _wkzModal agora vive em wkz-core.js — compartilhada com
+   buyer/admin, que já dependiam dela sem tê-la definida (ver comentário
+   lá). Continua chamável normalmente aqui, sem nenhuma mudança de uso.
    Origem monólito: linhas 31068–31508
    ─────────────────────────────────────────────────────────────────────── */
-function _wkzModal(id, innerHtml, opts){
-  // Chamado com null/undefined = fechar todos os modais abertos
-  if (!id) {
-    document.querySelectorAll('.modal-overlay.open').forEach(function(m){ m.classList.remove('open'); });
-    return null;
-  }
-  opts = opts || {};
-  // C2: sanitiza o conteúdo antes de injetar no DOM
-  var safeHtml = (typeof wkzSanitizeHTML === 'function') ? wkzSanitizeHTML(innerHtml) : innerHtml;
-  let ov = document.getElementById(id);
-  if(!ov){
-    ov = document.createElement('div');
-    ov.id = id;
-    ov.className = 'modal-overlay';
-    ov.style.zIndex = opts.zIndex || '2200';
-    ov.onclick = function(e){ if(e.target===ov) ov.classList.remove('open'); };
-    document.body.appendChild(ov);
-  }
-  const mw = opts.maxWidth || '500px';
-  ov.innerHTML = `<div class="modal" style="max-width:${mw};width:94%;max-height:92vh;overflow-y:auto;padding:28px;position:relative;">
-    <button class="modal-close" onclick="document.getElementById('${escapeHtml(id)}').classList.remove('open')" style="top:14px;right:14px;">✕</button>
-    ${safeHtml}
-  </div>`;
-  // [FIX] Qualquer <select class="form-select"> injetado dentro de um modal
-  // aberto por _wkzModal() precisa ser (re)convertido no botão customizado
-  // da WeKz — initFormSelects() só converte o que já está no DOM na hora
-  // em que é chamada, e o conteúdo do modal só existe a partir daqui.
-  if(typeof initFormSelects === 'function') initFormSelects();
-  ov.classList.add('open');
-  return ov;
-}
 
 /* ─── WeKz Custom Radio Helper ─── */
 /* Usage: onclick="_wkzRadio('groupId','hiddenInputId','value',this)" */
