@@ -65,6 +65,7 @@ function getKzWisdom(context) {
 // ─── RENDER ───
 function renderAll(){
   renderCats();renderProducts();renderStores();renderFlash();renderFlashHero();renderWishlist();
+  populateSearchCatOptions();renderNavCategories();
   // Cart starts empty, updateCartUI initializes badge=0 and clears display
   updateCartUI();
   // Init wishlist tab counts
@@ -74,23 +75,10 @@ function renderAll(){
   if(cntS) cntS.textContent = followedStores.length;
 }
 
-// Map category display names to data-category keys
-const CAT_KEY_MAP = {
-  'Eletrônicos':'eletronicos','Moda':'moda','Casa & Deco':'casa','Beleza':'beleza',
-  'Games':'games','Esportes':'esportes','Bebê & Kids':'bebe','Pet Shop':'pet',
-  'Automotivo':'automotivo','Livros':'livros','Saúde':'saude','Ferramentas':'ferramentas'
-};
-
-/* FIX [cats-i18n]: mapa nome-canônico(PT) → chave i18n, usado só para
-   EXIBIÇÃO em renderCats(). c.n continua sendo o identificador interno
-   canônico (usado por filterCatKey/CAT_KEY_MAP/onclick e em outros
-   pontos do app que comparam por nome em PT) — não alteramos isso para
-   não quebrar filtros de categoria/produto que dependem dessa string. */
-const CAT_I18N_MAP = {
-  'Eletrônicos':'catElectronics','Moda':'catFashion','Casa & Deco':'catHome','Beleza':'catBeauty',
-  'Games':'catGames','Esportes':'catSports','Bebê & Kids':'catBaby','Pet Shop':'catPet',
-  'Automotivo':'catAuto','Livros':'catBooks','Saúde':'catHealth','Ferramentas':'catTools'
-};
+// [MOVIDO para core.js v?] CAT_KEY_MAP e CAT_I18N_MAP agora vivem junto do
+// array `categories` em wkz-core.js — compartilhados com wkz-seller.js.
+// Continuam disponíveis aqui como globais normais (core.js carrega antes
+// deste arquivo).
 
 function renderCats(){
   const g=document.getElementById('catsGrid');
@@ -1249,7 +1237,7 @@ const TRANSLATIONS = {
     catElectronics: 'Eletrônicos', catFashion: 'Moda', catHome: 'Casa & Deco',
     catBeauty: 'Beleza', catGames: 'Games', catSports: 'Esportes',
     catBaby: 'Bebê & Kids', catPet: 'Pet Shop', catAuto: 'Automotivo',
-    catBooks: 'Livros', catHealth: 'Saúde', catTools: 'Ferramentas',
+    catBooks: 'Livros', catHealth: 'Saúde', catTools: 'Ferramentas', searchCatAll: 'Todas',
     // FIX [meu-perfil-btn-i18n]: label do botão "Meu Perfil" no header
     myProfile: 'Meu Perfil',
     clearAll: 'Limpar tudo',
@@ -1508,7 +1496,7 @@ const TRANSLATIONS = {
     catElectronics: 'Electronics', catFashion: 'Fashion', catHome: 'Home & Decor',
     catBeauty: 'Beauty', catGames: 'Games', catSports: 'Sports',
     catBaby: 'Baby & Kids', catPet: 'Pet Shop', catAuto: 'Automotive',
-    catBooks: 'Books', catHealth: 'Health', catTools: 'Tools',
+    catBooks: 'Books', catHealth: 'Health', catTools: 'Tools', searchCatAll: 'All',
     myProfile: 'My Profile',
     clearAll: 'Clear all',
     subtotal: 'Subtotal',
@@ -1763,7 +1751,7 @@ const TRANSLATIONS = {
     catElectronics: 'Electrónicos', catFashion: 'Moda', catHome: 'Hogar y Decoración',
     catBeauty: 'Belleza', catGames: 'Juegos', catSports: 'Deportes',
     catBaby: 'Bebés y Niños', catPet: 'Mascotas', catAuto: 'Automotriz',
-    catBooks: 'Libros', catHealth: 'Salud', catTools: 'Herramientas',
+    catBooks: 'Libros', catHealth: 'Salud', catTools: 'Herramientas', searchCatAll: 'Todas',
     myProfile: 'Mi Perfil',
     clearAll: 'Limpiar todo',
     subtotal: 'Subtotal',
@@ -2018,7 +2006,7 @@ const TRANSLATIONS = {
     catElectronics: '电子产品', catFashion: '时尚', catHome: '家居装饰',
     catBeauty: '美妆', catGames: '游戏', catSports: '运动',
     catBaby: '母婴用品', catPet: '宠物用品', catAuto: '汽车用品',
-    catBooks: '图书', catHealth: '健康', catTools: '工具',
+    catBooks: '图书', catHealth: '健康', catTools: '工具', searchCatAll: '全部',
     myProfile: '个人中心',
     clearAll: '清空',
     subtotal: '小计',
@@ -2273,7 +2261,7 @@ const TRANSLATIONS = {
     catElectronics: 'Électronique', catFashion: 'Mode', catHome: 'Maison & Déco',
     catBeauty: 'Beauté', catGames: 'Jeux', catSports: 'Sports',
     catBaby: 'Bébé & Enfants', catPet: 'Animalerie', catAuto: 'Automobile',
-    catBooks: 'Livres', catHealth: 'Santé', catTools: 'Outils',
+    catBooks: 'Livres', catHealth: 'Santé', catTools: 'Outils', searchCatAll: 'Toutes',
     myProfile: 'Mon Profil',
     clearAll: 'Tout vider',
     subtotal: 'Sous-total',
@@ -2528,7 +2516,7 @@ const TRANSLATIONS = {
     catElectronics: 'Elektronik', catFashion: 'Mode', catHome: 'Haus & Deko',
     catBeauty: 'Beauty', catGames: 'Games', catSports: 'Sport',
     catBaby: 'Baby & Kids', catPet: 'Tierbedarf', catAuto: 'Auto',
-    catBooks: 'Bücher', catHealth: 'Gesundheit', catTools: 'Werkzeuge',
+    catBooks: 'Bücher', catHealth: 'Gesundheit', catTools: 'Werkzeuge', searchCatAll: 'Alle',
     myProfile: 'Mein Profil',
     clearAll: 'Alles leeren',
     subtotal: 'Zwischensumme',
@@ -2783,7 +2771,7 @@ const TRANSLATIONS = {
     catElectronics: '家電・電子機器', catFashion: 'ファッション', catHome: 'ホーム&デコ',
     catBeauty: '美容', catGames: 'ゲーム', catSports: 'スポーツ',
     catBaby: 'ベビー&キッズ', catPet: 'ペット用品', catAuto: '自動車用品',
-    catBooks: '本', catHealth: '健康', catTools: '工具',
+    catBooks: '本', catHealth: '健康', catTools: '工具', searchCatAll: 'すべて',
     myProfile: 'マイプロフィール',
     clearAll: '全て削除',
     subtotal: '小計',
@@ -3024,13 +3012,17 @@ function applyTranslations() {
   const askInput = document.querySelector('.ask-seller-input');
   if (askInput) askInput.placeholder = t('askSellerPlaceholder');
 
-  /* ── 4. Nav links (categorias de rolamento) ────────────────────────── */
-  const navKeys = [
-    'navElec','navFashion','navHome2','navBeauty',
-    'navGames','navSports','navBaby','navPet','navAuto',
-    'navBooks','navStores','navLive','navTrack','navHelp'
-  ];
-  document.querySelectorAll('.nav-link').forEach((el, i) => {
+  /* ── 4. Nav links fixos (não-categoria) ──────────────────────────────
+     [FIX v? — categorias-divergentes] Os 10 primeiros nav-links (categoria)
+     saíram desta lista posicional: agora são recriados do zero por
+     renderNavCategories() (chamada abaixo, junto de renderCats()), já
+     com o texto traduzido — não existem mais no momento em que este
+     forEach roda, então não fazem mais parte da contagem por índice.
+     Sobraram só os 4 links fixos (Lojas Oficiais/Kz Live/Rastrear
+     Pedido/Ajuda), selecionados por :not([data-cat-nav]) para nunca
+     mais colidir com os de categoria. */
+  const navKeys = ['navStores','navLive','navTrack','navHelp'];
+  document.querySelectorAll('.nav-link:not([data-cat-nav])').forEach((el, i) => {
     if (navKeys[i]) el.innerHTML = t(navKeys[i]);
   });
 
@@ -3187,7 +3179,9 @@ function applyTranslations() {
   /* ── 16. Re-render para preços e labels de produto/wishlist/carrinho ─ */
   /* FIX [cats-i18n]: renderCats() estava fora desta lista — a grade
      "Explorar Categorias" nunca era re-desenhada ao trocar de idioma. */
-  if (typeof renderCats     === 'function') renderCats();
+  if (typeof renderCats             === 'function') renderCats();
+  if (typeof renderNavCategories    === 'function') renderNavCategories();
+  if (typeof populateSearchCatOptions === 'function') populateSearchCatOptions();
   if (typeof renderProducts === 'function') renderProducts();
   if (typeof renderWishlist === 'function') renderWishlist();
   if (typeof renderCart     === 'function') renderCart();
@@ -5142,6 +5136,13 @@ function _ckoutPopulateSidebar() {
   var totalDiscount = promoDiscount + couponDiscount + disc + walletDiscount;
   var total = Math.max(0, subFull - totalDiscount);
 
+  // [FIX v? — pendência #4] #cardInst (parcelas) era uma lista fixa,
+  // sempre mostrando "R$ 1.249,90" independente do que estivesse no
+  // carrinho. Agora recalcula a cada vez que o resumo do checkout é
+  // atualizado (aberto, cupom aplicado, créditos ativados/desativados,
+  // troca de step), sempre em cima do `total` de verdade.
+  _ckoutPopulateInstallments(total);
+
   var fmt = v => typeof formatPrice==='function' ? formatPrice(v) : 'R$ '+v.toFixed(2).replace('.',',');
   var sbSub = document.getElementById('ckoutSbSub'); if(sbSub) sbSub.textContent = fmt(subFull);
   var sbTot = document.getElementById('ckoutSbTotal'); if(sbTot) sbTot.textContent = fmt(total);
@@ -5181,6 +5182,32 @@ function _ckoutPopulateSidebar() {
   var revPayIcon = document.getElementById('ckoutRevPayIcon'); if(revPayIcon) revPayIcon.textContent = pm.icon;
   var revPayName = document.getElementById('ckoutRevPayName'); if(revPayName) revPayName.textContent = pm.name;
   var revPayDesc = document.getElementById('ckoutRevPayDesc'); if(revPayDesc) revPayDesc.textContent = pm.desc;
+}
+
+/* [FIX v? — pendência #4] Gera as opções de #cardInst (parcelas no
+   cartão) a partir do total real do checkout, em vez do texto fixo
+   "R$ 1.249,90" que aparecia sempre, não importa o que estivesse no
+   carrinho. Regra: até 12x sem juros (mesma promessa já anunciada na
+   trust strip do topo — "Parcelamento — Até 12x sem juros"), parcela
+   mínima de R$ 5 (abaixo disso, a maioria das adquirentes não libera
+   parcelamento — trava o número de parcelas nesse ponto). Preserva a
+   parcela selecionada quando possível (ex.: usuário escolheu 6x, total
+   mudou um pouco por causa de cupom, mas ainda cabe em 6x → mantém). */
+function _ckoutPopulateInstallments(total) {
+  var sel = document.getElementById('cardInst');
+  if (!sel || !(total > 0)) return;
+  var MIN_INSTALLMENT = 5;
+  var MAX_N = 12;
+  var maxN = Math.max(1, Math.min(MAX_N, Math.floor(total / MIN_INSTALLMENT) || 1));
+  var prevN = parseInt(sel.dataset.selectedN || '1', 10);
+  var fmt = function(v){ return typeof formatPrice === 'function' ? formatPrice(v) : 'R$ ' + v.toFixed(2).replace('.', ','); };
+  var html = '';
+  for (var n = 1; n <= maxN; n++) {
+    html += '<option value="' + n + '">' + n + 'x de ' + fmt(total / n) + ' (sem juros)</option>';
+  }
+  sel.innerHTML = html;
+  sel.dataset.selectedN = String(Math.min(prevN, maxN));
+  sel.value = String(Math.min(prevN, maxN));
 }
 
 function _ckoutGoto(step) {
@@ -10213,10 +10240,18 @@ const DB = {
   ],
 
   stores: [
-    {id:'techstore',name:'TechStore Brasil',avatar:'T',category:'<span class="wkz-icon wkz-icon-phone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span> Eletrônicos',rating:4.9,sales:'18.4k',followers:'12.8k',products:247,since:'2021',banner:'📱',desc:'Especialistas em eletrônicos premium. Vendedor oficial das principais marcas.',tags:['Apple','Samsung','Xiaomi'],policies:[{i:'↩️',t:'30 dias devolução'},{i:'✅',t:'Produto original'},{i:'🚚',t:'Envio em 24h'},{i:'💬',t:'Resp. imediata'}]},
-    {id:'gameworld',name:'GameWorld',avatar:'G',category:'<span class="wkz-icon wkz-icon-gamepad"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg></span> Games',rating:4.9,sales:'11.8k',followers:'8.2k',products:183,since:'2020',banner:'🎮',desc:'Tudo para gamers: consoles, jogos, headsets e muito mais com garantia.',tags:['PlayStation','Xbox','Nintendo'],policies:[{i:'🎮',t:'Lacrado garantido'},{i:'✅',t:'Serial válido'},{i:'🚚',t:'Envio expresso'},{i:'🛡️',t:'Anti-fraude ativo'}]},
-    {id:'sportfit',name:'SportFit',avatar:'S',category:'<span class="wkz-icon wkz-icon-dribbble"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg></span> Esportes',rating:4.6,sales:'55k',followers:'31k',products:892,since:'2019',banner:'⚽',desc:'A maior loja de artigos esportivos do WeKz. Marcas nacionais e importadas.',tags:['Nike','Adidas','Puma'],policies:[{i:'📏',t:'Troca de tamanho'},{i:'✅',t:'Original certif.'},{i:'🚚',t:'Frete grátis'},{i:'⭐',t:'+50k avaliações'}]},
-    {id:'glowbeauty',name:'GlowBeauty',avatar:'B',category:'<span class="wkz-icon wkz-icon-sparkles"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85L5 14z"/><path d="M17 1l.85 2 2 .85-2 .85L17 7l-.85-2-2-.85 2-.85L17 1z"/></svg></span> Beleza',rating:4.8,sales:'42k',followers:'28k',products:634,since:'2021',banner:'💄',desc:'Cosméticos, skincare e perfumes importados com autenticidade certificada.',tags:['Lancôme','Dior','L\'Oréal'],policies:[{i:'💄',t:'Produto autêntico'},{i:'✅',t:'Nota fiscal'},{i:'🚚',t:'Embalagem premium'},{i:'🌱',t:'Cruelty-free'}]},
+    // [FIX v? — pendência #3 "Produtos da Loja"] sellerKey é o valor exato
+    // usado em products[].s (o catálogo compartilhado, em wkz-core.js) —
+    // adicionado agora para permitir filtrar de verdade os produtos de
+    // cada loja. Ficou separado de `name` porque em 1 dos 4 casos os dois
+    // já divergiam (name:'TechStore Brasil' vs products[].s:'TechStore')
+    // — sellerKey documenta essa ligação explicitamente em vez de tentar
+    // casar string por aproximação (frágil: mudar o `name` de exibição no
+    // futuro não pode silenciosamente quebrar o filtro de produtos).
+    {id:'techstore',name:'TechStore Brasil',sellerKey:'TechStore',avatar:'T',category:'<span class="wkz-icon wkz-icon-phone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span> Eletrônicos',rating:4.9,sales:'18.4k',followers:'12.8k',products:247,since:'2021',banner:'📱',desc:'Especialistas em eletrônicos premium. Vendedor oficial das principais marcas.',tags:['Apple','Samsung','Xiaomi'],policies:[{i:'↩️',t:'30 dias devolução'},{i:'✅',t:'Produto original'},{i:'🚚',t:'Envio em 24h'},{i:'💬',t:'Resp. imediata'}]},
+    {id:'gameworld',name:'GameWorld',sellerKey:'GameWorld',avatar:'G',category:'<span class="wkz-icon wkz-icon-gamepad"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg></span> Games',rating:4.9,sales:'11.8k',followers:'8.2k',products:183,since:'2020',banner:'🎮',desc:'Tudo para gamers: consoles, jogos, headsets e muito mais com garantia.',tags:['PlayStation','Xbox','Nintendo'],policies:[{i:'🎮',t:'Lacrado garantido'},{i:'✅',t:'Serial válido'},{i:'🚚',t:'Envio expresso'},{i:'🛡️',t:'Anti-fraude ativo'}]},
+    {id:'sportfit',name:'SportFit',sellerKey:'SportFit',avatar:'S',category:'<span class="wkz-icon wkz-icon-dribbble"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg></span> Esportes',rating:4.6,sales:'55k',followers:'31k',products:892,since:'2019',banner:'⚽',desc:'A maior loja de artigos esportivos do WeKz. Marcas nacionais e importadas.',tags:['Nike','Adidas','Puma'],policies:[{i:'📏',t:'Troca de tamanho'},{i:'✅',t:'Original certif.'},{i:'🚚',t:'Frete grátis'},{i:'⭐',t:'+50k avaliações'}]},
+    {id:'glowbeauty',name:'GlowBeauty',sellerKey:'GlowBeauty',avatar:'B',category:'<span class="wkz-icon wkz-icon-sparkles"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85L5 14z"/><path d="M17 1l.85 2 2 .85-2 .85L17 7l-.85-2-2-.85 2-.85L17 1z"/></svg></span> Beleza',rating:4.8,sales:'42k',followers:'28k',products:634,since:'2021',banner:'💄',desc:'Cosméticos, skincare e perfumes importados com autenticidade certificada.',tags:['Lancôme','Dior','L\'Oréal'],policies:[{i:'💄',t:'Produto autêntico'},{i:'✅',t:'Nota fiscal'},{i:'🚚',t:'Embalagem premium'},{i:'🌱',t:'Cruelty-free'}]},
   ],
 
 
@@ -10695,10 +10730,16 @@ function openStore(storeId){
   document.getElementById('storeTplTitle').textContent = s.name;
   document.getElementById('storeTplNameTitle').textContent = s.name;
 
+  // [FIX v? — pendência #3] Contagem real de produtos desta loja no card
+  // de estatísticas (antes usava s.products, um número mockado fixo que
+  // não tinha nenhuma relação com o que a grade abaixo realmente mostra
+  // — ficava, por exemplo, "247 Produtos" no topo e só 1 card na grade).
+  const realProductCount = products.filter(p => p.s === s.sellerKey).length;
+
   document.getElementById('storeTplStats').innerHTML = [
     {v:s.sales,l:'Vendas'},
     {v:s.followers,l:'Seguidores'},
-    {v:s.products,l:'Produtos'},
+    {v:realProductCount,l:'Produtos'},
     {v:s.rating+'★',l:'Avaliação'},
   ].map(st=>`<div class="store-stat"><div class="store-stat-val">${st.v}</div><div class="store-stat-label">${st.l}</div></div>`).join('');
 
@@ -10708,11 +10749,11 @@ function openStore(storeId){
       <div style="font-size:12px;font-weight:600;">${p.t}</div>
     </div>`).join('');
 
-  // [PENDENTE — próxima etapa combinada com o cliente] "Produtos da Loja"
-  // ainda não filtra pela loja de fato (currentStoreName fica pronto aqui
-  // para quando isso for implementado; hoje renderStoreProducts() usa a
-  // lista inteira de products, igual ao comportamento anterior).
+  // [FIX v? — pendência #3 "Produtos da Loja"] Filtra de verdade agora:
+  // currentStoreSellerKey é usado por renderStoreProducts() para mostrar
+  // só os produtos desta loja (products[].s === sellerKey).
   currentStoreName = s.name;
+  currentStoreSellerKey = s.sellerKey;
   const sortSel = document.getElementById('storeSortSelect');
   const perPageSel = document.getElementById('storePerPageSelect');
   if(sortSel) sortSel.value = 'sales';
@@ -10745,26 +10786,28 @@ function openStore(storeId){
   showPage('store-detail');
 }
 
-// Nome da loja atualmente aberta em page-store-detail e página atual da
-// paginação de "Produtos da Loja". [PENDENTE] currentStoreName ainda não é
-// usado para filtrar — ver comentário em openStore().
+// Loja atualmente aberta em page-store-detail (nome de exibição + chave
+// de vendedor usada para filtrar products[].s) e página atual da
+// paginação de "Produtos da Loja".
 let currentStoreName = '';
+let currentStoreSellerKey = '';
 let storeCurrentPage = 1;
 
 // Ordena, pagina (10/20/30 por página, igual à página de Eletrônicos) e
 // renderiza os "Produtos da Loja". Mesmo padrão de renderCatProducts(),
 // sem a parte de filtros de categoria (a loja não tem sidebar de filtro).
-// [PENDENTE] `list` hoje é `products` inteiro (mesmo comportamento de
-// antes da paginação) — quando "Produtos da Loja" for corrigido para
-// mostrar só os produtos daquela loja, troque a linha abaixo por algo como
-// `let list = products.filter(p => p.s === currentStoreName);`
+// [FIX v? — pendência #3] Agora filtra de verdade por
+// currentStoreSellerKey (setado em openStore()) em vez de mostrar o
+// catálogo inteiro. Times sem sellerKey correspondente (nenhum produto
+// cadastrado ainda para essa loja) caem no estado vazio já existente
+// abaixo, em vez de mostrar produtos de outras lojas.
 function renderStoreProducts(page){
   const g = document.getElementById('storeProductsGrid');
   const rb = document.getElementById('storeResultBar');
   if(!g) return;
   const sort = document.getElementById('storeSortSelect')?.value || 'sales';
 
-  let list = products.slice();
+  let list = products.filter(p => p.s === currentStoreSellerKey);
 
   if(sort==='price-asc') list.sort((a,b)=>a.p-b.p);
   else if(sort==='price-desc') list.sort((a,b)=>b.p-a.p);
@@ -10787,8 +10830,8 @@ function renderStoreProducts(page){
 
   if(!list.length){
     g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
-      <div style="font-size:40px;margin-bottom:12px;">🔍</div>
-      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">Nenhum produto encontrado</div>
+      <div style="font-size:40px;margin-bottom:12px;">🏪</div>
+      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">Esta loja ainda não tem produtos publicados</div>
     </div>`;
     if(pag) pag.innerHTML='';
     return;
