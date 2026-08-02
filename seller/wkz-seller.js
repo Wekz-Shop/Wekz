@@ -2592,6 +2592,17 @@ function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
   }
   var trk = trackingCode.trim().toUpperCase();
 
+  /* 0 — Fecha o modal e confirma IMEDIATAMENTE, antes de qualquer
+     sincronia secundária. Isso garante que a tela sempre feche ao
+     clicar em "Confirmar Envio", mesmo que alguma etapa de propagação
+     abaixo (tabela/comprador/admin/push) falhe silenciosamente — a
+     UI não pode ficar refém de efeitos colaterais não-críticos. */
+  var modal = document.getElementById('wkzDispatchModal');
+  if (modal) modal.classList.remove('open');
+  showToast('✅ Pedido ' + orderId + ' despachado! Comprador notificado. Rastreio: ' + trk);
+
+  try {
+
   /* 1 — Atualiza _WKZ_ORDERS (estado global) */
   if (window._WKZ_ORDERS) {
     var go = window._WKZ_ORDERS.find(function(o) { return o.id === orderId; });
@@ -2650,16 +2661,17 @@ function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
     if (admStatus) admStatus.textContent = 'Despachado';
   }
 
-  /* 6 — Fecha modal e exibe confirmação */
-  var modal = document.getElementById('wkzDispatchModal');
-  if (modal) modal.classList.remove('open');
-  showToast('✅ Pedido ' + orderId + ' despachado! Comprador notificado. Rastreio: ' + trk);
-
-  /* 7 — Atualiza botão na tabela para "Ver Rastreio" */
+  /* 6 — Atualiza botão na tabela para "Ver Rastreio" */
   document.querySelectorAll('button[onclick*="marcarEnviado(\'' + orderId + '\'"]').forEach(function(b) {
     b.textContent = '📍 Rastreio';
     b.onclick = function() { showToast('📦 Rastreio ' + orderId + ': ' + trk + ' (' + carrier + ')'); };
   });
+
+  } catch (err) {
+    // Falha em sincronia secundária (tabela/comprador/admin/push) não deve
+    // impedir o fechamento do modal, que já ocorreu no passo 0 acima.
+    if (window.WKZ_DEBUG) console.error('wkzSellerConfirmDispatch: falha na sincronia secundária', err);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
