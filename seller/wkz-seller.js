@@ -47,6 +47,19 @@ function switchDashTab(tab, el){
   document.documentElement.scrollTop = 0; window.scrollTo({top:0,behavior:'instant'});
 }
 
+/* [FIX v? — pendência painel geral] Atalho pra navegar pra uma aba do
+   dashboard a partir de QUALQUER botão fora da sidebar (ex.: "Ver
+   todos", cards de estatística). Antes cada botão desses reconstruía a
+   busca do item da sidebar na mão, direto no onclick, com escaping de
+   aspas frágil (ex.: document.querySelector('.sidebar-nav-item[onclick*=\'products\']')
+   — fácil de quebrar num editor de HTML) ou por índice posicional
+   (document.querySelectorAll('.sidebar-nav-item')[2] — quebra se algum
+   item for adicionado/removido da sidebar). Cada .sidebar-nav-item agora
+   tem data-tab="X", então basta goToDashTab('X'). */
+function goToDashTab(tab){
+  switchDashTab(tab, document.querySelector('.sidebar-nav-item[data-tab="'+tab+'"]'));
+}
+
 function initDashOverview(forceRefresh){
   const topEl = document.getElementById('overviewTopProducts');
   if(!topEl) return;
@@ -128,14 +141,71 @@ function affCopyLink(btn) {
   setTimeout(function(){ btn.innerHTML = orig; }, 2000);
 }
 
+// [FIX v? — pendência #4 "Meus Produtos: inserir paginação"] Estado do
+// filtro/página atual. defaultStatusMap populado uma única vez (idem
+// comportamento anterior).
+let myProductsFilter = 'all';
+let myProductsPage = 1;
+const _MY_PRODUCTS_STATUS_DEFAULT = ['active','active','active','active','active','active','active','active','paused','out-of-stock'];
+
 function initMyProducts(forceRefresh){
   const g = document.getElementById('myProductsList');
-  if(!g || (g.innerHTML.trim() && !forceRefresh)) return;
-  // Status simulado: maioria ativo, alguns pausados/sem estoque
-  const defaultStatusMap = ['active','active','active','active','active','active','active','active','paused','out-of-stock'];
-  g.innerHTML = products.map((p,i)=>{
-    if(window._productStatusMap[i] === undefined) window._productStatusMap[i] = defaultStatusMap[i] || 'active';
-    const status = window._productStatusMap[i];
+  if(!g || (g.dataset.rendered === '1' && !forceRefresh)) return;
+  products.forEach((p,i)=>{ if(window._productStatusMap[i] === undefined) window._productStatusMap[i] = _MY_PRODUCTS_STATUS_DEFAULT[i] || 'active'; });
+  // Se já havia uma página renderizada (ex.: refreshProductEverywhere
+  // depois de pausar um produto), mantém nela em vez de voltar pra 1.
+  renderMyProducts(g.dataset.rendered === '1' ? myProductsPage : 1);
+}
+
+/* Filtra por status, pagina (10/20/30 por página — mesmo padrão de
+   Eletrônicos/Produtos da Loja) e (re)desenha a grade + os contadores da
+   barra de filtro. [FIX] Os contadores "Todos (247)/Ativos (231)/
+   Pausados (12)/Sem estoque (4)" eram texto fixo no HTML, sem nenhuma
+   relação com os produtos reais (o catálogo tem 24 itens) — agora saem
+   de window._productStatusMap, ao vivo, incluindo depois de pausar/
+   reativar um produto. */
+function renderMyProducts(page){
+  const g = document.getElementById('myProductsList');
+  if(!g) return;
+  g.dataset.rendered = '1';
+
+  const counts = { all: products.length, active: 0, paused: 0, 'out-of-stock': 0 };
+  products.forEach((p,i) => {
+    const s = window._productStatusMap[i] || 'active';
+    if(counts[s] !== undefined) counts[s]++;
+  });
+  const setCount = (id, n) => { const el = document.getElementById(id); if(el) el.textContent = '('+n+')'; };
+  setCount('mpCountAll', counts.all);
+  setCount('mpCountActive', counts.active);
+  setCount('mpCountPaused', counts.paused);
+  setCount('mpCountOOS', counts['out-of-stock']);
+
+  const filtered = products
+    .map((p,i) => ({p,i}))
+    .filter(({i}) => myProductsFilter === 'all' || (window._productStatusMap[i] || 'active') === myProductsFilter);
+
+  const perPage = parseInt(document.getElementById('myProductsPerPage')?.value, 10) || 12;
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  myProductsPage = Math.min(Math.max(1, (typeof page === 'number' && page > 0) ? page : 1), totalPages);
+  const start = (myProductsPage - 1) * perPage;
+  const pageItems = filtered.slice(start, start + perPage);
+
+  const rb = document.getElementById('myProductsResultBar');
+  if(rb) rb.textContent = totalItems ? `Mostrando ${start+1}–${Math.min(start+perPage,totalItems)} de ${totalItems} produto${totalItems!==1?'s':''}` : '';
+
+  if(!pageItems.length){
+    g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--muted);">
+      <div style="font-size:38px;margin-bottom:10px;">📦</div>
+      <div style="font-weight:700;color:var(--text);">Nenhum produto neste filtro</div>
+    </div>`;
+    const pag = document.getElementById('myProductsPagination');
+    if(pag) pag.innerHTML = '';
+    return;
+  }
+
+  g.innerHTML = pageItems.map(({p,i})=>{
+    const status = window._productStatusMap[i] || 'active';
     const isPaused = status === 'paused';
     const isOOS = status === 'out-of-stock';
     const statusBadge = isPaused
@@ -165,6 +235,42 @@ function initMyProducts(forceRefresh){
       </div>
     </div>`;
   }).join('');
+
+  const pag = document.getElementById('myProductsPagination');
+  if(pag) pag.innerHTML = buildMyProductsPaginationHTML(myProductsPage, totalPages);
+}
+
+function filterProductsAndRender(tipo, el){
+  document.querySelectorAll('#dash-products .rev-filter').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  myProductsFilter = tipo;
+  renderMyProducts(1);
+}
+
+// Mesmo padrão visual de buildStorePaginationHTML (wkz-buyer.js), aqui
+// chamando renderMyProducts(n).
+function buildMyProductsPaginationHTML(current, total){
+  if(total <= 1) return '';
+  const pageBtn = (label, targetPage, opts) => {
+    opts = opts || {};
+    const isActive = targetPage === current && !opts.isNav;
+    const isDisabled = !!opts.disabled;
+    return `<button ${isDisabled?'disabled':''} style="padding:8px 14px;border-radius:8px;border:1px solid ${isActive?'var(--teal)':'var(--border)'};background:${isActive?'rgba(0,180,171,0.1)':'var(--card)'};color:${isActive?'var(--teal)':'var(--muted)'};cursor:${isDisabled?'default':'pointer'};font-size:13px;opacity:${isDisabled?'0.4':'1'};transition:var(--transition);" ${isDisabled?'':`onclick="renderMyProducts(${targetPage})"`}>${label}</button>`;
+  };
+  const ellipsis = '<span style="padding:0 4px;color:var(--muted);">…</span>';
+  let nums = [];
+  if(total <= 7){ for(let n=1;n<=total;n++) nums.push(n); }
+  else {
+    nums.push(1);
+    if(current > 3) nums.push('...');
+    for(let n=Math.max(2,current-1); n<=Math.min(total-1,current+1); n++) nums.push(n);
+    if(current < total-2) nums.push('...');
+    nums.push(total);
+  }
+  let html = pageBtn('‹ Anterior', current-1, {isNav:true, disabled: current===1});
+  html += nums.map(n => n==='...' ? ellipsis : pageBtn(String(n), n)).join('');
+  html += pageBtn('Próxima ›', current+1, {isNav:true, disabled: current===total});
+  return html;
 }
 
 function togglePauseProduct(idx){
@@ -374,7 +480,7 @@ function initDashReviews(forceRefresh){
   if(!g || (g.innerHTML.trim() && !forceRefresh)) return;
   // Keep track of replied reviews
   if(!window._repliedReviews) window._repliedReviews = new Set();
-  g.innerHTML = DB.reviews.map((r, idx) => {
+  g.innerHTML = sellerReviews.map((r, idx) => {
     const replied = window._repliedReviews.has(idx);
     const safeNome = (r.name||'').replace(/'/g, '\\u0027').replace(/"/g, '&quot;');
     const safeText = (r.text||'').slice(0,120).replace(/'/g, '\\u0027').replace(/"/g, '&quot;');
@@ -2715,14 +2821,11 @@ function filterMyDisputes(status, btn) {
    nunca via o que o comprador realmente abria. Insere o card na lista de
    "Abertas" com o botão "Responder Agora" já funcional.
 ─────────────────────────────────────────────────────────────────────────── */
-function filterProducts(tipo, el){
-  document.querySelectorAll('#dash-products .rev-filter').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('#myProductsList .product-card').forEach(card=>{
-    card.style.display = (tipo === 'all' || card.dataset.status === tipo) ? '' : 'none';
-  });
-  showToast('🔍 Filtrando produtos: '+el.textContent);
-}
+// [REMOVIDO v? — pendência #4] filterProducts() antiga (só escondia
+// cards já renderizados via display:none) foi substituída por
+// filterProductsAndRender(), que integra filtro + paginação real —
+// ver início do arquivo, junto de renderMyProducts().
+
 
 /* ── 3.6: Registro do Vendedor (multi-step) ──────────────────────────────
    validateCNPJ, sellerNextStep, sellerGoBack, sellerGoStep. Reconecta o
