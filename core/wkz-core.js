@@ -1339,6 +1339,23 @@ const products = [
   {e:'⌨️',n:'Teclado Mecânico RGB TKL',p:199,op:399,off:50,s:'SoundWorld',r:4.8,sales:'21k',badge:'hot',           stock:36, stockMax:150, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{marca:'Logitech',armazenamento:'N/A'}},
 ];
 
+// [MOVIDO v? — pendência #7 "Avaliações: verificar falhas"] Antes vivia
+// só como DB.reviews em wkz-buyer.js (DB não existe no seller, que não
+// carrega wkz-buyer.js) — initDashReviews() em wkz-seller.js sempre
+// lançava "DB is not defined" ao tentar abrir a aba Avaliações, e o
+// painel ficava permanentemente em branco. Agora é um array próprio,
+// compartilhado (buyer referencia via DB.reviews: sellerReviews).
+// Chamado sellerReviews (não `reviews`) porque já existia um `reviews`
+// global aqui em core.js, com campos diferentes (a/n/r/t) e usado como
+// fallback em renderReviews() no buyer — manter os dois separados evita
+// misturar formatos incompatíveis.
+const sellerReviews = [
+  {a:'J',name:'João S.',r:5,text:'Produto incrível! Chegou em 10 dias e exatamente como descrito. Vendedor super atencioso.',verified:true},
+  {a:'M',name:'Maria L.',r:5,text:'Excelente qualidade! Recomendo muito. Já comprei 3 vezes nessa loja.',verified:true},
+  {a:'C',name:'Carlos R.',r:4,text:'Bom produto, porém a embalagem veio um pouco amassada. Funciona perfeitamente.',verified:true},
+  {a:'A',name:'Ana P.',r:5,text:'Superou minhas expectativas! Chegou antes do prazo e embalagem impecável.',verified:true},
+];
+
 /* ═══════════════════════════════════════════════════════════════════════════
    [v2.9.31] REGRA DE PREÇO EXATO — wkzExactPrice
    ─────────────────────────────────────────────────────────────────────────
