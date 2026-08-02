@@ -2151,7 +2151,7 @@
       <p style="font-size:13px;color:var(--muted);margin-bottom:22px;">Comissão menor, pagamento mais rápido e mais visibilidade pros seus produtos. Escolha o plano ideal pra sua loja.</p>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">
-        <div id="premiumPlanCard-starter" onclick="selectPremiumPlan('starter')" style="cursor:pointer;border:1.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;background:var(--card2);transition:var(--transition);">
+        <div id="premiumPlanCard-starter" onclick="selectPremiumPlan('starter')" style="cursor:pointer;display:flex;flex-direction:column;height:100%;border:1.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;background:var(--card2);transition:var(--transition);">
           <div style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:14px;margin-bottom:4px;">Starter</div>
           <div style="font-size:20px;font-weight:800;color:var(--teal);margin-bottom:10px;">R$49,90<span style="font-size:11px;color:var(--muted);font-weight:400;">/mês</span></div>
           <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);margin-bottom:16px;">
@@ -2159,10 +2159,10 @@
             <div>✅ Pagamento em <strong style="color:var(--text);">10 dias</strong></div>
             <div>✅ Badge Premium</div>
           </div>
-          <button style="width:100%;padding:9px;border-radius:50px;border:1.5px solid var(--teal);background:transparent;color:var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;">Escolher</button>
+          <button style="width:100%;padding:9px;border-radius:50px;border:1.5px solid var(--teal);background:transparent;color:var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;margin-top:auto;">Escolher</button>
         </div>
 
-        <div id="premiumPlanCard-pro" onclick="selectPremiumPlan('pro')" style="cursor:pointer;position:relative;border:1.5px solid rgba(124,58,237,0.5);border-radius:14px;padding:18px;background:linear-gradient(160deg,rgba(124,58,237,0.08),var(--card2));transition:var(--transition);">
+        <div id="premiumPlanCard-pro" onclick="selectPremiumPlan('pro')" style="cursor:pointer;position:relative;display:flex;flex-direction:column;height:100%;border:1.5px solid rgba(124,58,237,0.5);border-radius:14px;padding:18px;background:linear-gradient(160deg,rgba(124,58,237,0.08),var(--card2));transition:var(--transition);">
           <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7C3AED,#00B4AB);color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 10px;border-radius:50px;white-space:nowrap;">Mais popular</span>
           <div style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:14px;margin-bottom:4px;margin-top:4px;">Pro</div>
           <div style="font-size:20px;font-weight:800;color:#c4b5fd;margin-bottom:10px;">R$129,90<span style="font-size:11px;color:var(--muted);font-weight:400;">/mês</span></div>
@@ -2172,10 +2172,10 @@
             <div>✅ Anúncios patrocinados</div>
             <div>✅ Badge Premium</div>
           </div>
-          <button style="width:100%;padding:9px;border-radius:50px;border:none;background:linear-gradient(135deg,#7C3AED,#00B4AB);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;">Escolher</button>
+          <button style="width:100%;padding:9px;border-radius:50px;border:none;background:linear-gradient(135deg,#7C3AED,#00B4AB);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;margin-top:auto;">Escolher</button>
         </div>
 
-        <div id="premiumPlanCard-enterprise" onclick="selectPremiumPlan('enterprise')" style="cursor:pointer;border:1.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;background:var(--card2);transition:var(--transition);">
+        <div id="premiumPlanCard-enterprise" onclick="selectPremiumPlan('enterprise')" style="cursor:pointer;display:flex;flex-direction:column;height:100%;border:1.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;background:var(--card2);transition:var(--transition);">
           <div style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:14px;margin-bottom:4px;">Enterprise</div>
           <div style="font-size:20px;font-weight:800;color:#22D3EE;margin-bottom:10px;">R$299,90<span style="font-size:11px;color:var(--muted);font-weight:400;">/mês</span></div>
           <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);margin-bottom:16px;">
@@ -2184,7 +2184,7 @@
             <div>✅ Gerente de conta dedicado</div>
             <div>✅ Badge Premium</div>
           </div>
-          <button style="width:100%;padding:9px;border-radius:50px;border:1.5px solid #22D3EE;background:transparent;color:#22D3EE;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;">Escolher</button>
+          <button style="width:100%;padding:9px;border-radius:50px;border:1.5px solid #22D3EE;background:transparent;color:#22D3EE;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;margin-top:auto;">Escolher</button>
         </div>
       </div>
     </div>
@@ -2272,10 +2272,9 @@
     <div id="wkzLabelPreview">
       <div class="etq-header-band">
         <div class="etq-logo-block">
-          <svg class="etq-logo-mark" viewBox="0 0 24 24" fill="none" stroke="#00B4AB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2l1.5 3h9L18 2"/><path d="M3.5 6h17l-1.4 13.4a2 2 0 01-2 1.6H6.9a2 2 0 01-2-1.6L3.5 6z"/><path d="M9 10a3 3 0 006 0"/></svg>
+          <img class="etq-logo-mark" src="../shared/assets/logo/logotipo-wekz.png" alt="WeKz">
           <div>
-            <div class="etq-brand-name">WeKz Shop</div>
-            <div class="etq-brand-tagline">Logística</div>
+            <div class="etq-brand-name">WeKz</div>
           </div>
         </div>
         <div class="etq-tracking-badge">
