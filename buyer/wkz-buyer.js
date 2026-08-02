@@ -10255,12 +10255,7 @@ const DB = {
   ],
 
 
-  reviews: [
-    {a:'J',name:'João S.',r:5,text:'Produto incrível! Chegou em 10 dias e exatamente como descrito. Vendedor super atencioso.',verified:true},
-    {a:'M',name:'Maria L.',r:5,text:'Excelente qualidade! Recomendo muito. Já comprei 3 vezes nessa loja.',verified:true},
-    {a:'C',name:'Carlos R.',r:4,text:'Bom produto, porém a embalagem veio um pouco amassada. Funciona perfeitamente.',verified:true},
-    {a:'A',name:'Ana P.',r:5,text:'Superou minhas expectativas! Chegou antes do prazo e embalagem impecável.',verified:true},
-  ],
+  reviews: sellerReviews, // [MOVIDO v? — pendência #7] ver core.js: sellerReviews agora é compartilhado com o seller
 
   faqs: [
     {q:'Como rastrear meu pedido?',a:'Acesse "Meus Pedidos" no painel ou use a página Rastrear Pedido com o código #WKZ-XXXX.'},
