@@ -4033,11 +4033,36 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         const container = document.getElementById('kzSocialProofContainer');
         if (container) container.innerHTML = '';
       };
+      /* FIX M10: o toggle #kzSocialProofToggle só existe no DOM do painel do
+         Vendedor (wkz-seller.html). Em qualquer outra página (Buyer, Admin,
+         Legal) o seletor sempre retornava null e a sync caía silenciosamente
+         em "desativado" — inclusive no Buyer, que é onde os pop-ups de
+         prova social deveriam de fato aparecer pros clientes. Agora, na
+         ausência do toggle, a preferência persistida pelo vendedor
+         (salvarProvaSocial, em wkz-seller.js) é usada como fonte da verdade. */
       window.kzSocialProofSync = function() {
         const toggle = document.getElementById('kzSocialProofToggle');
-        if (toggle && toggle.checked) window.kzSocialProofStart();
-        else window.kzSocialProofStop();
+        if (toggle) {
+          if (toggle.checked) window.kzSocialProofStart(); else window.kzSocialProofStop();
+          return;
+        }
+        try {
+          const pref = (typeof wkzSecureStorage !== 'undefined')
+            ? wkzSecureStorage.get('wkz_social_proof', null)
+            : JSON.parse(localStorage.getItem('wkz_s_wkz_social_proof') || 'null');
+          if (pref && pref.ativo) window.kzSocialProofStart(); else window.kzSocialProofStop();
+        } catch (e) { window.kzSocialProofStop(); }
       };
+
+      /* FIX M10: até aqui kzSocialProofStart() nunca era chamada
+         automaticamente em lugar nenhum — a feature só "funcionava" se
+         alguém clicasse manualmente em "Pré-visualizar" no painel do
+         Vendedor. Isso significa que a prova social nunca aparecia de
+         verdade pra um comprador navegando o marketplace, mesmo com o
+         vendedor tendo "ativado e salvo" a opção. Aplica a preferência
+         persistida assim que qualquer página termina de carregar este
+         módulo compartilhado. */
+      window.kzSocialProofSync();
 
       // ══════════════════════════════════════════════════════════
       // KZ GLOBAL LOCALIZER v2 — Inteligência Internacional na PDP
