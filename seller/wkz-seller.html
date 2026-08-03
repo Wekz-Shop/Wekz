@@ -401,7 +401,13 @@
     <div class="sidebar-scroll-track" id="sidebarScrollTrack">
     <div class="dashboard-sidebar">
       <div class="sidebar-user">
-        <div class="sidebar-avatar">M</div>
+        <div id="sidebarAvatarWrap" style="position:relative;width:56px;margin-bottom:10px;">
+          <div class="sidebar-avatar" id="sidebarAvatar" style="margin-bottom:0;">M</div>
+          <button type="button" onclick="document.getElementById('sellerLogoInput').click()" title="Alterar logotipo" style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:var(--teal);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#04201e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>
+          </button>
+          <input type="file" id="sellerLogoInput" accept="image/*" style="display:none;" onchange="handleSellerLogoUpload(this)">
+        </div>
         <div class="sidebar-name">Minha Loja Pro</div>
         <div class="sidebar-role">✅ Vendedor Verificado</div>
       </div>
@@ -442,12 +448,12 @@
               <div>
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
                   <span style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;">WeKz Seller Premium</span>
-                  <span style="background:linear-gradient(90deg,rgba(124,58,237,0.2),rgba(0,180,171,0.15));border:1px solid rgba(124,58,237,0.4);color:#c4b5fd;font-size:9px;font-weight:800;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:1.5px;padding:2px 8px;border-radius:50px;">DISPONÍVEL</span>
+                  <span id="premiumWidgetBadge" style="background:linear-gradient(90deg,rgba(124,58,237,0.2),rgba(0,180,171,0.15));border:1px solid rgba(124,58,237,0.4);color:#c4b5fd;font-size:9px;font-weight:800;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:1.5px;padding:2px 8px;border-radius:50px;">DISPONÍVEL</span>
                 </div>
-                <div style="font-size:12px;color:var(--muted);line-height:1.5;">Comissão reduzida para <strong style="color:var(--teal);">5%</strong> · Pagamento em <strong style="color:var(--teal);">7 dias</strong> · Anúncios patrocinados · Suporte prioritário 24h</div>
+                <div id="premiumWidgetDesc" style="font-size:12px;color:var(--muted);line-height:1.5;">Comissão reduzida para <strong style="color:var(--teal);">5%</strong> · Pagamento em <strong style="color:var(--teal);">7 dias</strong> · Anúncios patrocinados · Suporte prioritário 24h</div>
               </div>
             </div>
-            <button onclick="openPremiumPlansModal()" style="background:linear-gradient(135deg,#7C3AED,#00B4AB);border:none;color:#fff;padding:10px 20px;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:var(--transition);white-space:nowrap;flex-shrink:0;" onmouseover="this.style.opacity='0.88';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform=''">
+            <button id="premiumWidgetBtn" onclick="openPremiumPlansModal()" style="background:linear-gradient(135deg,#7C3AED,#00B4AB);border:none;color:#fff;padding:10px 20px;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:var(--transition);white-space:nowrap;flex-shrink:0;" onmouseover="this.style.opacity='0.88';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform=''">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/></svg>Ver Planos
             </button>
           </div>
@@ -1020,12 +1026,12 @@
           <div data-dispute-status="open" data-order-id="#WKZ-8818" style="background:var(--card);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:18px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8818 · Teclado Mecânico · Ana P.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Produto não chegou como descrito · Aberta: 10/05</div></div><button class="btn-primary" style="font-size:12px;padding:8px 16px;" onclick="openDisputeReplyModal('#WKZ-8818','Teclado Mecânico','Ana P.','Produto não chegou como descrito','10/05')">Responder Agora</button></div></div>
           <div data-dispute-status="open" data-order-id="#WKZ-8815" style="background:var(--card);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:18px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8815 · Monitor 4K · Ricardo T.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Atraso na entrega · Aberta: 08/05</div></div><button class="btn-primary" style="font-size:12px;padding:8px 16px;" onclick="openDisputeReplyModal('#WKZ-8815','Monitor 4K','Ricardo T.','Atraso na entrega','08/05')">Responder Agora</button></div></div>
 
-          <div data-dispute-status="resolved" style="display:none;background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8790 · Fone Bluetooth ANC Pro · Marcos L.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Atraso na entrega · Resolvida: 02/05</div></div><span style="font-size:11px;font-weight:700;color:#22C55E;background:rgba(34,197,94,0.12);padding:6px 12px;border-radius:20px;">✓ Favorável ao Vendedor</span></div></div>
-          <div data-dispute-status="resolved" style="display:none;background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8761 · Mouse Gamer RGB · Bia S.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Produto com defeito · Resolvida: 28/04</div></div><span style="font-size:11px;font-weight:700;color:#F59E0B;background:rgba(245,158,11,0.12);padding:6px 12px;border-radius:20px;">◐ Resolução Parcial (reembolso 50%)</span></div></div>
-          <div data-dispute-status="resolved" style="display:none;background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8744 · Capa para Notebook · Diego F.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Produto diferente do anunciado · Resolvida: 20/04</div></div><span style="font-size:11px;font-weight:700;color:#22C55E;background:rgba(34,197,94,0.12);padding:6px 12px;border-radius:20px;">✓ Favorável ao Vendedor</span></div></div>
+          <div data-dispute-status="resolved" style="display:none;background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;cursor:pointer;" onclick="openDisputeDetailModal('#WKZ-8790','Fone Bluetooth ANC Pro','Marcos L.','Atraso na entrega','Resolvida em 02/05','✓ Favorável ao Vendedor','success')"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8790 · Fone Bluetooth ANC Pro · Marcos L.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Atraso na entrega · Resolvida: 02/05</div></div><span style="font-size:11px;font-weight:700;color:#22C55E;background:rgba(34,197,94,0.12);padding:6px 12px;border-radius:20px;">✓ Favorável ao Vendedor</span></div></div>
+          <div data-dispute-status="resolved" style="display:none;background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;cursor:pointer;" onclick="openDisputeDetailModal('#WKZ-8761','Mouse Gamer RGB','Bia S.','Produto com defeito','Resolvida em 28/04','◐ Resolução Parcial (reembolso 50%)','warning')"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8761 · Mouse Gamer RGB · Bia S.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Produto com defeito · Resolvida: 28/04</div></div><span style="font-size:11px;font-weight:700;color:#F59E0B;background:rgba(245,158,11,0.12);padding:6px 12px;border-radius:20px;">◐ Resolução Parcial (reembolso 50%)</span></div></div>
+          <div data-dispute-status="resolved" style="display:none;background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;cursor:pointer;" onclick="openDisputeDetailModal('#WKZ-8744','Capa para Notebook','Diego F.','Produto diferente do anunciado','Resolvida em 20/04','✓ Favorável ao Vendedor','success')"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8744 · Capa para Notebook · Diego F.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Produto diferente do anunciado · Resolvida: 20/04</div></div><span style="font-size:11px;font-weight:700;color:#22C55E;background:rgba(34,197,94,0.12);padding:6px 12px;border-radius:20px;">✓ Favorável ao Vendedor</span></div></div>
 
-          <div data-dispute-status="closed" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8702 · Carregador Portátil · Júlia M.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Pedido duplicado · Fechada: 15/04</div></div><span style="font-size:11px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.06);padding:6px 12px;border-radius:20px;">Encerrada · acordo direto</span></div></div>
-          <div data-dispute-status="closed" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8688 · Suporte para Celular · Tiago R.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Dúvida sobre garantia · Fechada: 10/04</div></div><span style="font-size:11px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.06);padding:6px 12px;border-radius:20px;">Encerrada · sem mediação necessária</span></div></div>
+          <div data-dispute-status="closed" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;" onclick="openDisputeDetailModal('#WKZ-8702','Carregador Portátil','Júlia M.','Pedido duplicado','Fechada em 15/04','Encerrada · acordo direto','neutral')"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8702 · Carregador Portátil · Júlia M.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Pedido duplicado · Fechada: 15/04</div></div><span style="font-size:11px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.06);padding:6px 12px;border-radius:20px;">Encerrada · acordo direto</span></div></div>
+          <div data-dispute-status="closed" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;" onclick="openDisputeDetailModal('#WKZ-8688','Suporte para Celular','Tiago R.','Dúvida sobre garantia','Fechada em 10/04','Encerrada · sem mediação necessária','neutral')"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:700;">#WKZ-8688 · Suporte para Celular · Tiago R.</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: Dúvida sobre garantia · Fechada: 10/04</div></div><span style="font-size:11px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.06);padding:6px 12px;border-radius:20px;">Encerrada · sem mediação necessária</span></div></div>
         </div>
       </div>
 
@@ -1052,6 +1058,7 @@
             <div style="display:flex;align-items:center;justify-content:center;width:52px;height:52px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:14px;margin:0 auto 12px;"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#a78bfa" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></div>
             <div style="font-weight:700;margin-bottom:6px;">Anúncios Patrocinados</div>
             <div style="font-size:12px;color:var(--muted);">Destaque seu produto nas buscas</div>
+            <div id="mkAdsLockNote" style="margin-top:8px;font-size:10.5px;color:#c4b5fd;display:flex;align-items:center;justify-content:center;gap:4px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#c4b5fd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Requer plano Pro ou Enterprise</div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='rgba(34,197,94,0.35)'" onmouseout="this.style.borderColor='var(--border)'" onclick="openMarketingModal('frete')">
             <div style="display:flex;align-items:center;justify-content:center;width:52px;height:52px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:14px;margin:0 auto 12px;"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
@@ -1146,6 +1153,16 @@
         <div style="display:flex;flex-direction:column;gap:16px;">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
             <div style="font-weight:700;margin-bottom:14px;"><span class="wkz-icon wkz-icon-store"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><rect x="9" y="13" width="6" height="9"/></svg></span> Dados da Loja</div>
+            <div class="form-group">
+              <label class="form-label">Logotipo da Loja</label>
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div class="sidebar-avatar" id="settingsLogoPreview" style="margin:0;width:52px;height:52px;font-size:20px;flex-shrink:0;">M</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <button type="button" class="btn-add-cart" style="padding:8px 16px;font-size:12px;" onclick="document.getElementById('sellerLogoInput').click()">📤 Alterar Logotipo</button>
+                  <span style="font-size:11px;color:var(--muted);">PNG ou JPG, até 2MB. Aparece na sidebar e no seu perfil público.</span>
+                </div>
+              </div>
+            </div>
             <div class="form-group"><label class="form-label">Nome da Loja</label><input class="form-input wkz-input" id="sellerStoreNameInput" value="Minha Loja Pro" type="text"></div>
             <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-input wkz-input" rows="3">Especialistas em eletrônicos premium com os melhores preços.</textarea></div>
             <button class="btn-primary" onclick="salvarConfiguracoes(this)">Salvar Alterações</button>
@@ -1254,6 +1271,22 @@
             <button class="btn-primary" style="background:linear-gradient(135deg,#22C55E,#16A34A);width:100%;padding:12px;font-weight:700;font-size:14px;" onclick="wkzOpenKYCModal()">
               📤 Enviar Documentação de Verificação
             </button>
+          </div>
+
+          <!-- ── PRIVACIDADE & DADOS (LGPD) — NEW M10 ── -->
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;">
+            <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:6px;"><span class="wkz-icon" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Privacidade &amp; Dados (LGPD)</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;">Conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), você pode solicitar uma cópia de todos os dados da sua loja a qualquer momento.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn-add-cart" style="padding:10px 18px;font-size:12px;" onclick="baixarMeusDadosVendedor()">⬇️ Baixar meus dados (JSON)</button>
+            </div>
+          </div>
+
+          <!-- ── ZONA DE RISCO — NEW M10 ── -->
+          <div style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius);padding:22px;">
+            <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:6px;color:#EF4444;"><span class="wkz-icon" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Zona de Risco</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;">Encerrar sua conta de vendedor remove seus produtos do marketplace e desativa o painel. Pedidos e disputas em aberto precisam ser resolvidos antes.</div>
+            <button class="btn-add-cart" style="padding:10px 18px;font-size:12px;border-color:rgba(239,68,68,0.4);color:#EF4444;" onclick="abrirModalDeixarDeVender()">🚪 Deixar de ser vendedor</button>
           </div>
         </div>
       </div>
@@ -2361,6 +2394,13 @@
     if (typeof populateSearchCatOptions === 'function') populateSearchCatOptions();
     if (typeof renderNavCategories === 'function') renderNavCategories(null, '../buyer/wkz-buyer.html');
     if (window.WkzBus) window.WkzBus.emit('module:ready', { module: 'seller' });
+    /* FIX M10: contadores/estado que dependiam de o vendedor já ter clicado
+       na aba pelo menos uma vez — agora refletem a realidade assim que o
+       painel carrega (igual ao badge de Pedidos, que já era assim). */
+    if (typeof updateDenunciasCount === 'function') updateDenunciasCount();
+    if (typeof updateDisputeTabCounts === 'function') updateDisputeTabCounts();
+    if (typeof refreshSellerPremiumUI === 'function') refreshSellerPremiumUI();
+    if (typeof restoreSellerLogo === 'function') restoreSellerLogo();
   });
 </script>
 </body>

@@ -44,6 +44,12 @@ function switchDashTab(tab, el){
   if(tab==='add-product') initAddProductPage();
   if(tab==='affiliates') initAffiliates();
   if(tab==='settings') initDashSettings();
+  /* FIX M10 — abas que antes dependiam só do HTML estático agora recebem
+     dados/contadores reais ao serem abertas: */
+  if(tab==='disputes') updateDisputeTabCounts();
+  if(tab==='marketing-social') initDashSocialProof();
+  if(tab==='denuncias') { updateDenunciasCount(); renderReports(window._denunciasActiveFilter || 'all'); }
+  if(typeof refreshSellerPremiumUI === 'function') refreshSellerPremiumUI();
   document.documentElement.scrollTop = 0; window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -123,6 +129,28 @@ function initAffiliates(forceRefresh) {
       + '<td style="padding:8px 12px;color:#A78BFA;font-weight:700;">' + (r.points ? '+' + r.points : '—') + '</td>'
       + '</tr>';
   }).join('');
+
+  /* FIX M10: os 4 cards de estatística acima da tabela ("2.450 Pontos Kz",
+     "7 Indicados", "19 Vendas", "3 Pendentes") eram texto fixo no HTML que
+     só por coincidência batia com a soma do mock — qualquer alteração em
+     AFFILIATE_REFERRALS ficaria dessincronizada silenciosamente. Agora
+     somam os dados reais, mesmo padrão de correção já aplicado a outros
+     contadores do painel (Disputas, Denúncias). */
+  const totals = AFFILIATE_REFERRALS.reduce(function(acc, r) {
+    acc.points += r.points || 0;
+    acc.sales += r.sales || 0;
+    if (r.status === 'pending') acc.pending++;
+    return acc;
+  }, { points: 0, sales: 0, pending: 0 });
+
+  const elPoints = document.getElementById('affStatPoints');
+  const elIndicated = document.getElementById('affStatIndicated');
+  const elSales = document.getElementById('affStatSales');
+  const elPending = document.getElementById('affStatPending');
+  if (elPoints) elPoints.textContent = totals.points.toLocaleString('pt-BR');
+  if (elIndicated) elIndicated.textContent = AFFILIATE_REFERRALS.length;
+  if (elSales) elSales.textContent = totals.sales;
+  if (elPending) elPending.textContent = totals.pending;
 }
 
 function affCopyLink(btn) {
@@ -1370,7 +1398,19 @@ function enviarRespostaDisputa(pedido){
       btn.style.color = '#22C55E';
       btn.onclick = null;
     }
+    /* FIX M10: marca a disputa como "respondida, aguardando veredito" — sem isso
+       ela continuava contando pra sempre como "aguardando resposta" no banner e
+       na aba "Abertas", mesmo depois do vendedor já ter respondido. */
+    card.dataset.answered = '1';
+    if(!card.querySelector('.dispute-pending-note')){
+      const note = document.createElement('div');
+      note.className = 'dispute-pending-note';
+      note.style.cssText = 'margin-top:10px;font-size:11px;color:#F59E0B;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:8px 10px;';
+      note.textContent = '⏳ Resposta enviada — aguardando decisão da WeKz.';
+      card.appendChild(note);
+    }
   }
+  if(typeof updateDisputeTabCounts === 'function') updateDisputeTabCounts();
 
   /* FIX: propaga mensagem do vendedor para a Central de Mediação do admin */
   if(typeof ADMIN_DISPUTES !== 'undefined'){
@@ -1395,6 +1435,23 @@ function enviarRespostaDisputa(pedido){
 
 /* ─── MARKETING: Modal unificado ─── */
 function openMarketingModal(tipo){
+  /* FIX M10: "Anúncios Patrocinados" tem selo Premium na tela, mas nada
+     verificava se o vendedor de fato assinou o WeKz Seller Premium (plano
+     Pro ou Enterprise — ver PLANS acima). Antes disso, qualquer vendedor
+     conseguia abrir e ativar anúncios pagos sem ter assinado nada. */
+  if(tipo === 'ads' && !sellerHasAdsAccess()){
+    _wkzModal('wkzMarketingModal', `
+      <div class="modal-title" style="font-size:18px;margin-bottom:4px;display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Anúncios Patrocinados é Premium</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;">
+        Essa ferramenta faz parte dos planos <strong style="color:#c4b5fd;">Pro</strong> e <strong style="color:#c4b5fd;">Enterprise</strong> do WeKz Seller Premium. Assine um desses planos para liberar CPC nos resultados de busca e páginas de categoria.
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Agora não</button>
+        <button class="btn-primary" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open'); openPremiumPlansModal();">⭐ Ver Planos</button>
+      </div>
+    `, {maxWidth:'440px'});
+    return;
+  }
   const configs = {
     cupom: {
       title: '<span style="display:inline-flex;align-items:center;gap:7px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7" stroke-width="3"/></svg> Criar Cupom de Desconto</span>',
@@ -1675,6 +1732,10 @@ function salvarMarketing(tipo){
       return `⚡ Flash Sale ativada! <strong>${prod.n || 'Produto'}</strong> já aparece na vitrine com ${offPct > 0 ? offPct+'% OFF' : 'desconto especial'}!`;
     },
     ads: ()=>{
+      if(typeof sellerHasAdsAccess === 'function' && !sellerHasAdsAccess()){
+        showToast('⚠️ Anúncios Patrocinados exigem o plano Pro ou Enterprise.');
+        return false;
+      }
       const cpc    = document.getElementById('mk-ads-cpc')?.value;
       const budget = document.getElementById('mk-ads-budget')?.value;
       const prodEl = document.getElementById('mk-ads-prod');
@@ -2782,6 +2843,54 @@ function salvarNotificacoes(btn){
   }, 600);
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   Prova Social — FIX M10
+   Achados na varredura: o toggle "Ativar notificações" chamava
+   kzSocialProofToggleChange(this) no onchange, e o botão "Guardar"
+   (salvarProvaSocial, abaixo) chamava window.kzSocialAdminStatus() — as
+   DUAS funções eram referenciadas mas nunca definidas em lugar nenhum do
+   projeto. Resultado: clicar no toggle lançava um erro no console e o
+   selo de status (#kzSocialStatusBadge) nunca saía de "Desativado", mesmo
+   depois de salvar como ativo. Além disso, o valor salvo nunca era lido de
+   volta ao reabrir a aba — o toggle sempre voltava desmarcado.
+   ════════════════════════════════════════════════════════════════════════ */
+function _kzSocialProofBadgeHTML(cor, texto){
+  return '<svg viewBox="0 0 24 24" width="9" height="9" fill="'+cor+'" stroke="none"><circle cx="12" cy="12" r="10"/></svg> ' + texto;
+}
+
+/* Feedback imediato ao mexer no toggle, antes de salvar. */
+window.kzSocialProofToggleChange = function(el){
+  var badge = document.getElementById('kzSocialStatusBadge');
+  if(!badge) return;
+  badge.innerHTML = el.checked
+    ? _kzSocialProofBadgeHTML('#22C55E', 'Ativo (clique em Guardar para aplicar)')
+    : _kzSocialProofBadgeHTML('#6B7280', 'Desativado');
+};
+
+/* Estado "definitivo" do selo, aplicado depois de salvar. */
+window.kzSocialAdminStatus = function(){
+  var toggle = document.getElementById('kzSocialProofToggle');
+  var badge = document.getElementById('kzSocialStatusBadge');
+  if(!toggle || !badge) return;
+  badge.innerHTML = toggle.checked
+    ? _kzSocialProofBadgeHTML('#22C55E', 'Ativo no marketplace')
+    : _kzSocialProofBadgeHTML('#6B7280', 'Desativado');
+};
+
+/* Restaura o toggle + selo com a última preferência salva, ao abrir a aba
+   "Prova Social" — sem isso, o toggle voltava desmarcado toda vez, mesmo
+   que o vendedor já tivesse ativado a feature numa sessão anterior. */
+function initDashSocialProof(){
+  var toggle = document.getElementById('kzSocialProofToggle');
+  if(!toggle) return;
+  var pref = null;
+  try {
+    pref = (typeof wkzSecureStorage!=='undefined') ? wkzSecureStorage.get('wkz_social_proof', null) : JSON.parse(localStorage.getItem('wkz_social_proof')||'null');
+  } catch(e){ pref = null; }
+  toggle.checked = !!(pref && pref.ativo);
+  window.kzSocialAdminStatus();
+}
+
 function salvarProvaSocial(btn){
   const toggle = document.getElementById('kzSocialProofToggle');
   const ativo = toggle ? toggle.checked : false;
@@ -2821,9 +2930,78 @@ function filterMyDisputes(status, btn) {
 
   var warning = document.getElementById('disputesOpenWarning');
   if (warning) warning.style.display = (status === 'open') ? '' : 'none';
+  /* FIX M10: o toast a cada clique de filtro era ruído — nenhum outro filtro
+     do painel (filterOrders, filterMyProducts, filterDenuncias) notifica a
+     cada troca de aba. Removido para consistência. */
+}
 
-  var labels = { open: 'Abertas', resolved: 'Resolvidas', closed: 'Fechadas' };
-  showToast('🔍 Exibindo disputas: ' + (labels[status] || status));
+/* ── updateDisputeTabCounts ────────────────────────────────────────────────
+   FIX M10: os números "Abertas (2)"/"Resolvidas (3)"/"Fechadas (2)" e o
+   banner "Você tem N disputas aguardando resposta" eram texto fixo no HTML,
+   nunca recalculados — mesmo depois do vendedor responder a uma disputa
+   (enviarRespostaDisputa) ou de uma nova disputa chegar via
+   wkzNotifySellerNewDispute, os contadores continuavam mostrando os valores
+   do mock inicial para sempre. Esta função lê o estado real do DOM
+   (data-dispute-status + data-answered) e atualiza tudo. Chamada ao entrar
+   na aba e sempre que o estado de uma disputa muda.
+─────────────────────────────────────────────────────────────────────────── */
+function updateDisputeTabCounts() {
+  var panel = document.getElementById('dash-disputes');
+  if (!panel) return;
+  var items = panel.querySelectorAll('[data-dispute-status]');
+  var counts = { open: 0, resolved: 0, closed: 0 };
+  var awaitingReply = 0;
+  items.forEach(function(item) {
+    var st = item.dataset.disputeStatus;
+    if (counts[st] !== undefined) counts[st]++;
+    if (st === 'open' && item.dataset.answered !== '1') awaitingReply++;
+  });
+
+  var btnOpen = document.getElementById('df-disp-open');
+  var btnResolved = document.getElementById('df-disp-resolved');
+  var btnClosed = document.getElementById('df-disp-closed');
+  if (btnOpen) btnOpen.textContent = 'Abertas (' + counts.open + ')';
+  if (btnResolved) btnResolved.textContent = 'Resolvidas (' + counts.resolved + ')';
+  if (btnClosed) btnClosed.textContent = 'Fechadas (' + counts.closed + ')';
+
+  var warning = document.getElementById('disputesOpenWarning');
+  var countEl = document.getElementById('disputesOpenCount');
+  if (countEl) countEl.textContent = awaitingReply + (awaitingReply === 1 ? ' disputa' : ' disputas');
+  if (warning) warning.style.display = awaitingReply > 0 ? '' : 'none';
+
+  var statCard = document.getElementById('statValueDisputas');
+  if (statCard) statCard.textContent = awaitingReply;
+}
+
+/* ── openDisputeDetailModal ────────────────────────────────────────────────
+   FIX M10: disputas resolvidas/fechadas não tinham nenhuma interação — o
+   vendedor não conseguia consultar o histórico/veredito depois do caso
+   encerrado (todo grande marketplace mantém esse histórico consultável).
+   Modal somente-leitura, reaproveita _wkzModal.
+─────────────────────────────────────────────────────────────────────────── */
+function openDisputeDetailModal(pedido, produto, comprador, motivo, statusInfo, veredito, tipo) {
+  var cores = {
+    success: { bg: 'rgba(34,197,94,0.1)',  border: 'rgba(34,197,94,0.3)',  text: '#22C55E' },
+    warning: { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)', text: '#F59E0B' },
+    neutral: { bg: 'rgba(255,255,255,0.06)', border: 'var(--border)',      text: 'var(--muted)' }
+  };
+  var cor = cores[tipo] || cores.neutral;
+  _wkzModal('wkzDisputeDetailModal', `
+    <div class="modal-title" style="font-size:18px;margin-bottom:4px;display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Detalhes da Disputa</div>
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div><span style="color:var(--muted);">Pedido:</span> <strong>${escapeHtml(pedido)}</strong></div>
+        <div><span style="color:var(--muted);">Status:</span> <strong>${escapeHtml(statusInfo)}</strong></div>
+        <div><span style="color:var(--muted);">Produto:</span> <strong>${escapeHtml(produto)}</strong></div>
+        <div><span style="color:var(--muted);">Comprador:</span> <strong>${escapeHtml(comprador)}</strong></div>
+      </div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><span style="color:var(--muted);">Motivo:</span> <strong>${escapeHtml(motivo)}</strong></div>
+    </div>
+    <div style="background:${cor.bg};border:1px solid ${cor.border};border-radius:10px;padding:14px;text-align:center;color:${cor.text};font-weight:700;font-size:13px;">${escapeHtml(veredito)}</div>
+    <div style="margin-top:16px;text-align:right;">
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzDisputeDetailModal').classList.remove('open')">Fechar</button>
+    </div>
+  `, {maxWidth:'480px'});
 }
 
 /* ── wkzNotifySellerNewDispute ─────────────────────────────────────────────
@@ -3190,6 +3368,16 @@ function sellerGoStep(step){ sellerGoBack(step); }
       // Restaura botão
       if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Assinar Agora'; }
 
+      /* FIX M10: até aqui a "assinatura" era só uma animação — nenhum lugar
+         guardava QUAL plano o vendedor tinha, então "Anúncios Patrocinados"
+         (que promete exigir Pro/Enterprise) nunca checava nada e liberava
+         pra qualquer um. Persiste o plano (mesma origin do Buyer, então
+         sobrevive à navegação entre módulos) e atualiza a UI dependente. */
+      if (typeof wkzSecureStorage !== 'undefined') {
+        wkzSecureStorage.set('seller_premium_plan', _selectedPlan);
+      }
+      if (typeof refreshSellerPremiumUI === 'function') refreshSellerPremiumUI();
+
       showToast('⭐ Plano Premium ' + planData.label + ' ativado!');
     }, 1600);
   };
@@ -3203,6 +3391,62 @@ function sellerGoStep(step){ sellerGoBack(step); }
   });
 
 })();
+
+/* ════════════════════════════════════════════════════════════════════════
+   WeKz Seller Premium ↔ Anúncios Patrocinados — FIX M10
+   Antes: o card "Anúncios Patrocinados" exibia um selo "PREMIUM" e o modal
+   "Anúncios Patrocinados" tinha um selo "Premium" no cabeçalho, mas
+   `salvarMarketing('ads')` ativava o anúncio pra QUALQUER vendedor — não
+   existia, em lugar nenhum do código, uma variável guardando qual plano o
+   vendedor tinha assinado. O selo era só decoração. Agora o plano é
+   persistido (ver confirmPremiumSubscription) e checado aqui.
+   ════════════════════════════════════════════════════════════════════════ */
+var SELLER_PREMIUM_PLAN_LABELS = {
+  starter:    { label: 'Starter',    commission: '8%', days: '10' },
+  pro:        { label: 'Pro',        commission: '5%', days: '7'  },
+  enterprise: { label: 'Enterprise', commission: '3%', days: '3'  }
+};
+
+function getSellerPremiumPlan() {
+  try {
+    return (typeof wkzSecureStorage !== 'undefined') ? wkzSecureStorage.get('seller_premium_plan', null) : null;
+  } catch (e) { return null; }
+}
+
+/* Anúncios patrocinados só entram no benefício dos planos Pro/Enterprise
+   (ver PLANS.pro/enterprise.benefits acima — "Anúncios patrocinados
+   liberados" não aparece no Starter). */
+function sellerHasAdsAccess() {
+  var plan = getSellerPremiumPlan();
+  return plan === 'pro' || plan === 'enterprise';
+}
+
+/* Atualiza o widget "WeKz Seller Premium" (Painel Geral) e o card de
+   Anúncios Patrocinados (Marketing) para refletir o plano realmente ativo,
+   sem precisar recarregar a página. Chamada ao trocar de aba e logo após
+   uma assinatura ser confirmada. */
+function refreshSellerPremiumUI() {
+  var plan = getSellerPremiumPlan();
+  var planInfo = SELLER_PREMIUM_PLAN_LABELS[plan];
+
+  var badge = document.getElementById('premiumWidgetBadge');
+  var desc  = document.getElementById('premiumWidgetDesc');
+  var btn   = document.getElementById('premiumWidgetBtn');
+  if (badge && desc && btn) {
+    if (planInfo) {
+      badge.textContent = 'PLANO ' + planInfo.label.toUpperCase() + ' ATIVO';
+      desc.innerHTML = 'Comissão <strong style="color:var(--teal);">' + planInfo.commission + '</strong> · Pagamento em <strong style="color:var(--teal);">' + planInfo.days + ' dias</strong>' + (sellerHasAdsAccess() ? ' · Anúncios patrocinados liberados' : '') + ' · Suporte prioritário 24h';
+      btn.innerHTML = btn.innerHTML.replace(/Ver Planos|Gerenciar Plano/, 'Gerenciar Plano');
+    } else {
+      badge.textContent = 'DISPONÍVEL';
+      desc.innerHTML = 'Comissão reduzida para <strong style="color:var(--teal);">5%</strong> · Pagamento em <strong style="color:var(--teal);">7 dias</strong> · Anúncios patrocinados · Suporte prioritário 24h';
+      btn.innerHTML = btn.innerHTML.replace(/Ver Planos|Gerenciar Plano/, 'Ver Planos');
+    }
+  }
+
+  var adsLock = document.getElementById('mkAdsLockNote');
+  if (adsLock) adsLock.style.display = sellerHasAdsAccess() ? 'none' : '';
+}
 
 /* ── WkzKYC — Verificação KYC/KYB do vendedor (Upload+OCR mock+CNPJ) ─────
    origem 47701–48013 ── */
@@ -3581,14 +3825,333 @@ function initDashSettings() {
   if (cfg && cfg.maxPct) kzNegSetMargin(cfg.maxPct);
 }
 
-/* filterDenuncias: botões dentro da aba "Denúncias" do dashboard (HTML
-   estático, sempre no DOM). O dado (reportsStore) e a renderização real
-   (renderReports) ficaram em wkz-buyer.js no Sprint M2 — arquivo
-   diferente, sem acesso cross-file possível sem redesenho. Ver
-   CHANGELOG_SPRINT_M3.md. Stub apenas evita o crash ao clicar. */
+/* ════════════════════════════════════════════════════════════════════════
+   Logotipo do painel do vendedor — NEW M10
+   Antes o avatar da sidebar (".sidebar-avatar") era só a inicial "M" fixa
+   no HTML, sem nenhuma forma de troca — pedido explícito do vendedor.
+   Usa o mesmo padrão FileReader→dataURL já usado no upload de imagens de
+   produto (openAddProductPage), persistido via wkzSecureStorage pra
+   sobreviver a reloads (mesma origin do Buyer/Admin).
+   ════════════════════════════════════════════════════════════════════════ */
+function handleSellerLogoUpload(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ showToast('⚠️ Selecione um arquivo de imagem (PNG ou JPG).'); return; }
+  if(file.size > 2*1024*1024){ showToast('⚠️ Imagem muito grande — o limite é 2MB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var dataUrl = e.target.result;
+    applySellerLogo(dataUrl);
+    try { if(typeof wkzSecureStorage!=='undefined') wkzSecureStorage.set('seller_logo', dataUrl); } catch(err){}
+    showToast('✅ Logotipo atualizado!');
+  };
+  reader.readAsDataURL(file);
+}
+
+function applySellerLogo(dataUrl){
+  [document.getElementById('sidebarAvatar'), document.getElementById('settingsLogoPreview')].forEach(function(el){
+    if(el) el.innerHTML = '<img src="'+dataUrl+'" alt="Logotipo da loja" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+  });
+}
+
+/* Restaura o logotipo salvo ao carregar o painel (chamada no bootstrap,
+   DOMContentLoaded, em wkz-seller.html). */
+function restoreSellerLogo(){
+  try {
+    var saved = (typeof wkzSecureStorage!=='undefined') ? wkzSecureStorage.get('seller_logo', null) : null;
+    if(saved) applySellerLogo(saved);
+  } catch(e){}
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   Privacidade & Dados (LGPD) — NEW M10
+   Exportação de dados a pedido do titular (Lei 13.709/2018, art. 18, II —
+   direito de acesso/portabilidade). Front-end puro: monta um JSON com o
+   que já existe em memória e dispara o download via Blob, sem chamada de
+   rede — mesma filosofia "sem back-end" do resto do projeto nesta fase.
+   ════════════════════════════════════════════════════════════════════════ */
+function baixarMeusDadosVendedor(){
+  var payload = {
+    loja: {
+      nome: (document.getElementById('sellerStoreNameInput') || {}).value || (currentSeller && currentSeller.store) || 'Minha Loja Pro',
+      id: (currentSeller && currentSeller.id) || null
+    },
+    produtos: (typeof products !== 'undefined') ? products.map(function(p){ return {nome:p.n, preco:p.p, categoria:p.cat}; }) : [],
+    disputas_abertas: (typeof updateDisputeTabCounts === 'function') ? document.querySelectorAll('#dash-disputes [data-dispute-status]').length : 0,
+    denuncias: (typeof reportsStore !== 'undefined') ? reportsStore.map(function(r){ return {id:r.id, status:r.status, produto:r.productName}; }) : [],
+    plano_premium: (typeof getSellerPremiumPlan === 'function') ? getSellerPremiumPlan() : null,
+    exportado_em: new Date().toISOString()
+  };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'wekz-meus-dados-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  showToast('⬇️ Seus dados foram exportados em JSON.');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   Deixar de ser vendedor — NEW M10 (pedido explícito)
+   Antes de encerrar, valida se há pendências que impediriam o encerramento
+   em qualquer marketplace real (pedidos não resolvidos, disputas em
+   aberto) e avisa o vendedor em vez de deixar "sumir" com pendências.
+   ════════════════════════════════════════════════════════════════════════ */
+function abrirModalDeixarDeVender(){
+  var pendingOrders = document.querySelectorAll('#ordersTableBody tr[data-status="pending"], #ordersTableBody tr[data-status="dispute"]').length;
+  var openDisputes = document.querySelectorAll('#dash-disputes [data-dispute-status="open"]:not([data-answered="1"])').length;
+
+  if(pendingOrders > 0 || openDisputes > 0){
+    _wkzModal('wkzLeaveSellerModal', `
+      <div class="modal-title" style="font-size:18px;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:#EF4444;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Ainda não é possível encerrar</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;">
+        Você tem pendências que precisam ser resolvidas antes de deixar de ser vendedor:
+        <ul style="margin:10px 0 0 18px;padding:0;">
+          ${pendingOrders > 0 ? '<li>'+pendingOrders+' pedido(s) pendente(s) ou em disputa</li>' : ''}
+          ${openDisputes > 0 ? '<li>'+openDisputes+' disputa(s) aguardando sua resposta</li>' : ''}
+        </ul>
+      </div>
+      <div style="text-align:right;"><button class="btn-primary" style="padding:10px 20px;font-size:13px;" onclick="document.getElementById('wkzLeaveSellerModal').classList.remove('open')">Entendi</button></div>
+    `, {maxWidth:'440px'});
+    return;
+  }
+
+  _wkzModal('wkzLeaveSellerModal', `
+    <div class="modal-title" style="font-size:18px;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:#EF4444;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Deixar de ser vendedor?</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;">
+      Isso vai <strong style="color:var(--text);">remover todos os seus produtos do marketplace</strong> e desativar o painel do vendedor. Sua conta de comprador continua ativa normalmente.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Digite <strong>ENCERRAR</strong> para confirmar</label>
+      <input class="form-input" id="leaveSellerConfirmInput" type="text" placeholder="ENCERRAR" style="text-transform:uppercase;">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px;">
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzLeaveSellerModal').classList.remove('open')">Cancelar</button>
+      <button class="btn-primary" style="padding:11px 22px;font-size:13px;background:#EF4444;" onclick="confirmarDeixarDeVender()">Encerrar Conta de Vendedor</button>
+    </div>
+  `, {maxWidth:'440px'});
+}
+
+function confirmarDeixarDeVender(){
+  var input = document.getElementById('leaveSellerConfirmInput');
+  if(!input || input.value.trim().toUpperCase() !== 'ENCERRAR'){
+    showToast('⚠️ Digite ENCERRAR para confirmar.');
+    return;
+  }
+  document.getElementById('wkzLeaveSellerModal').classList.remove('open');
+  showToast('👋 Conta de vendedor encerrada. Redirecionando...');
+  setTimeout(function(){
+    window.location.href = '../buyer/wkz-buyer.html';
+  }, 1800);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   Denúncias — FIX M10 (reavaliação da decisão do Sprint M5)
+   O CHANGELOG_SPRINT_M5 registrou que "reportsStore (Buyer) e
+   ADMIN_REPORTS (Admin) são estruturas genuinamente diferentes" e que não
+   existiria uma terceira estrutura "visão do vendedor". Nova varredura
+   (Sprint M10) achou o contrário: wkz-buyer.js tem uma implementação
+   COMPLETA — reportsStore + renderReports + filterDenuncias + toggleDenuncia
+   + updateDenunciasCount + toggleDefesaForm + submitDefesa + advanceStatus —
+   que renderiza especificamente nos IDs #dash-denuncias / #denunciasList /
+   #denunciasCount. Esses IDs só existem em wkz-seller.html — não existem em
+   wkz-buyer.html. Ou seja: essa lógica sempre foi "visão do vendedor sobre
+   denúncias recebidas", só que ficou fisicamente no arquivo errado durante
+   a divisão do monólito (Sprint M2/M3), e wkz-seller.html não carrega
+   wkz-buyer.js. Resultado prático: a aba "Denúncias" do painel do vendedor
+   ficou vazia pra sempre (#denunciasList nunca preenchido) e os botões de
+   filtro eram um stub que só trocava a classe "active" sem filtrar nada.
+   Porta-se aqui a implementação real, adaptada ao contexto do vendedor
+   (mesmos IDs de DOM, mesmo shape de dados — reaproveita reportsStore como
+   dados mock "visão do vendedor", já que Buyer e Seller são documentos/
+   contextos JS separados e não compartilham memória em tempo de execução,
+   só localStorage). Ver CHANGELOG_SPRINT_M10.md. */
+var reportsStore = [
+  {
+    id: 'RPT-001',
+    productName: 'Smartphone Ultra Pro 5G 256GB',
+    productEmoji: '📱',
+    storeName: (typeof currentSeller !== 'undefined' && currentSeller.store) || 'Minha Loja Pro',
+    reason: 'produto_falsificado',
+    reasonLabel: '🚫 Produto falsificado',
+    details: 'O comprador relata ter recebido um produto que parece ser uma réplica de baixa qualidade. O número de série não confere com o original.',
+    status: 'analise',
+    defesaSubmitted: false,
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    logs: [
+      { text: 'Denúncia recebida pelo sistema WeKz.', color: '#22C55E', time: new Date(Date.now() - 86400000 * 2).toISOString(), images: [] },
+      { text: 'Denúncia em análise pela equipe de segurança WeKz. Prazo: 24h.', color: '#F59E0B', time: new Date(Date.now() - 86400000 * 1).toISOString(), images: [] }
+    ]
+  },
+  {
+    id: 'RPT-002',
+    productName: 'Fone Bluetooth ANC Pro',
+    productEmoji: '🎧',
+    storeName: (typeof currentSeller !== 'undefined' && currentSeller.store) || 'Minha Loja Pro',
+    reason: 'diferente_anuncio',
+    reasonLabel: '↩️ Produto diferente do anunciado',
+    details: 'O produto foi anunciado com 40h de bateria. Na prática, dura no máximo 8h segundo o comprador.',
+    status: 'resolvida',
+    defesaSubmitted: true,
+    createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+    logs: [
+      { text: 'Denúncia recebida pelo sistema WeKz.', color: '#22C55E', time: new Date(Date.now() - 86400000 * 10).toISOString(), images: [] },
+      { text: 'Em análise pela equipe de proteção ao consumidor.', color: '#F59E0B', time: new Date(Date.now() - 86400000 * 9).toISOString(), images: [] },
+      { text: 'Vendedor apresentou defesa: "Erro na descrição técnica, estamos corrigindo o anúncio."', color: '#A78BFA', time: new Date(Date.now() - 86400000 * 7).toISOString(), images: [] },
+      { text: 'Caso resolvido pela equipe WeKz. Reembolso total processado ao comprador. Anúncio suspenso até correção.', color: '#EF4444', time: new Date(Date.now() - 86400000 * 5).toISOString(), images: [] }
+    ]
+  }
+];
+
+function formatLogTime(iso){
+  var d = new Date(iso);
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'}) + ' às ' +
+         d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+}
+
+function updateDenunciasCount(){
+  var el = document.getElementById('denunciasCount');
+  if(!el) return;
+  var open = reportsStore.filter(function(r){ return r.status !== 'resolvida'; }).length;
+  el.textContent = open;
+  el.style.display = open > 0 ? 'inline-flex' : 'none';
+}
+
+function renderReports(filter){
+  filter = filter || 'all';
+  var list = document.getElementById('denunciasList');
+  if(!list) return;
+
+  var data = reportsStore.slice();
+  if(filter === 'open') data = data.filter(function(r){ return r.status !== 'resolvida'; });
+  if(filter === 'closed') data = data.filter(function(r){ return r.status === 'resolvida'; });
+
+  if(!data.length){
+    list.innerHTML = '<div class="denuncias-empty"><div class="big-icon">🛡️</div><p>Nenhuma denúncia encontrada.</p></div>';
+    return;
+  }
+
+  var statusInfo = {
+    recebida:  { label: '🟢 Recebida',          cls: 'status-recebida'  },
+    analise:   { label: '🟡 Em Análise',         cls: 'status-analise'   },
+    defesa:    { label: '🟣 Defesa do Vendedor', cls: 'status-defesa'    },
+    resolvida: { label: '🔴 Resolvida',          cls: 'status-resolvida' }
+  };
+  var pipelineSteps = [
+    { key: 'recebida',  label: 'Recebida'  },
+    { key: 'analise',   label: 'Análise'   },
+    { key: 'defesa',    label: 'Defesa'    },
+    { key: 'resolvida', label: 'Resolvida' }
+  ];
+  var flow = ['recebida','analise','defesa','resolvida'];
+
+  list.innerHTML = data.map(function(r){
+    var si = statusInfo[r.status] || statusInfo.recebida;
+    var statusIdx = flow.indexOf(r.status);
+
+    var pipelineHTML = pipelineSteps.map(function(step, i){
+      var cls = '';
+      if(i < statusIdx) cls = 'done';
+      if(i === statusIdx) cls = 'active';
+      var line = i < pipelineSteps.length - 1 ? '<div class="pipeline-line"></div>' : '';
+      return '<div class="pipeline-step '+cls+'"><div class="pipeline-dot"></div>'+escapeHtml(step.label)+'</div>'+line;
+    }).join('');
+
+    var actionHTML = '';
+    if(r.status === 'defesa'){
+      actionHTML = r.defesaSubmitted
+        ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">🛡️ Defesa enviada. Aguardando análise da equipe WeKz.</div>'
+        : '<div style="margin-top:14px;">'
+          + '<button onclick="toggleDefesaForm(\''+r.id+'\')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">🛡️ Apresentar Defesa</button>'
+          + '<div id="defesa-form-'+r.id+'" style="display:none;margin-top:10px;">'
+          + '<textarea id="defesa-text-'+r.id+'" placeholder="Explique sua versão dos fatos sobre esta denúncia..." style="width:100%;min-height:90px;padding:10px;font-size:12px;font-family:inherit;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;"></textarea>'
+          + '<button onclick="submitDefesa(\''+r.id+'\')" style="margin-top:8px;width:100%;padding:8px;background:var(--teal);border:none;color:#04201e;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Enviar Defesa</button>'
+          + '</div></div>';
+    } else if(r.status !== 'resolvida'){
+      actionHTML = '<button onclick="advanceStatus(\''+r.id+'\')" style="margin-top:14px;width:100%;padding:8px;background:rgba(0,180,171,0.08);border:1px dashed rgba(0,180,171,0.3);color:var(--teal);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" title="Simula o avanço da análise interna da equipe WeKz">⚡ [Demo] Simular avanço da análise WeKz</button>';
+    }
+
+    var logsHTML = r.logs.map(function(log){
+      return '<div class="log-entry"><div class="log-dot" style="background:'+log.color+';box-shadow:0 0 6px '+log.color+'55;"></div>'
+        + '<div class="log-content"><div class="log-text">'+escapeHtml(log.text)+'</div>'
+        + '<div class="log-time">🕐 '+formatLogTime(log.time)+'</div></div></div>';
+    }).join('');
+
+    return '<div class="denuncia-item" id="dItem-'+r.id+'">'
+      + '<div class="denuncia-header" onclick="toggleDenuncia(\''+r.id+'\')">'
+      + '<span style="font-size:24px;flex-shrink:0;">'+r.productEmoji+'</span>'
+      + '<div class="denuncia-info"><div class="denuncia-title">'+escapeHtml(r.productName)+'</div>'
+      + '<div class="denuncia-meta"><span>📋 '+r.id+'</span><span>'+r.reasonLabel+'</span><span>🕐 '+formatLogTime(r.createdAt)+'</span></div></div>'
+      + '<span class="denuncia-status '+si.cls+'">'+si.label+'</span>'
+      + '<span class="denuncia-chevron">▼</span></div>'
+      + '<div class="denuncia-logs"><div class="status-pipeline">'+pipelineHTML+'</div>'
+      + '<div style="margin-top:14px;padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;margin-bottom:14px;">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Motivo da denúncia (relato do comprador)</div>'
+      + '<div style="font-size:13px;line-height:1.6;color:var(--text);">'+escapeHtml(r.details)+'</div></div>'
+      + '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Histórico de atualizações</div>'
+      + logsHTML + actionHTML + '</div></div>';
+  }).join('');
+}
+
+function toggleDefesaForm(reportId){
+  var el = document.getElementById('defesa-form-' + reportId);
+  if(el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+function submitDefesa(reportId){
+  var ta = document.getElementById('defesa-text-' + reportId);
+  var text = ta ? ta.value.trim() : '';
+  if(!text){ showToast('⚠️ Escreva sua defesa antes de enviar.'); return; }
+
+  var r = reportsStore.find(function(x){ return x.id === reportId; });
+  if(!r) return;
+
+  r.logs.push({ text: 'Vendedor apresentou defesa: "' + text + '"', color: '#A78BFA', time: new Date().toISOString(), images: [] });
+  r.defesaSubmitted = true;
+  renderReports(window._denunciasActiveFilter || 'all');
+  showToast('✅ Defesa enviada! A equipe WeKz irá analisar e notificar ambas as partes.');
+
+  // Simula a equipe WeKz analisando a defesa e encerrando o caso
+  setTimeout(function(){ advanceStatus(reportId); }, 4000);
+}
+
+function toggleDenuncia(id){
+  var el = document.getElementById('dItem-' + id);
+  if(el) el.classList.toggle('open');
+}
+
+function advanceStatus(reportId){
+  var r = reportsStore.find(function(x){ return x.id === reportId; });
+  if(!r) return;
+
+  var flow = ['recebida', 'analise', 'defesa', 'resolvida'];
+  var idx = flow.indexOf(r.status);
+  if(idx === -1 || idx >= flow.length - 1) return;
+
+  var next = flow[idx + 1];
+  var logsMap = {
+    analise:   { text: 'Denúncia em análise pela equipe de segurança WeKz. Prazo: 24h.', color: '#F59E0B' },
+    defesa:    { text: 'Vendedor notificado. Aguardando resposta de defesa (prazo: 72h).', color: '#A78BFA' },
+    resolvida: { text: 'Caso encerrado pela equipe WeKz. Medidas aplicadas conforme política da plataforma.', color: '#EF4444' }
+  };
+
+  r.status = next;
+  r.logs.push({ text: logsMap[next].text, color: logsMap[next].color, time: new Date().toISOString(), images: [] });
+
+  updateDenunciasCount();
+  var panel = document.getElementById('dash-denuncias');
+  if(panel && panel.style.display !== 'none') renderReports(window._denunciasActiveFilter || 'all');
+}
+
+/* filterDenuncias: botões dentro da aba "Denúncias" do dashboard. */
 window.filterDenuncias = function (status, btn) {
-  document.querySelectorAll('.rev-filter').forEach(function (b) { b.classList.remove('active'); });
+  document.querySelectorAll('#dash-denuncias .rev-filter').forEach(function (b) { b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
+  window._denunciasActiveFilter = status;
+  renderReports(status);
 };
 
 
