@@ -2268,6 +2268,44 @@ function wkzCreateTrilateralDispute(opts) {
   }
 }
 
+/* [FIX-item4] Carrega disputas abertas pelo comprador noutra página/aba
+   (persistidas via wkzShareNewDispute, em wkz-core.js — chamada a partir
+   de "Meu Perfil" no comprador) para dentro de ADMIN_DISPUTES. Antes, a
+   única forma de uma disputa chegar à Central de Mediação era
+   wkzCreateTrilateralDispute — que só roda de fato se o admin.js estiver
+   carregado na mesma página que criou a disputa, o que nunca acontece
+   (comprador e admin são páginas HTML separadas). Chamada no bootstrap
+   (DOMContentLoaded, wkz-admin.html) e também escuta novas disputas em
+   tempo real caso a aba do comprador esteja aberta ao mesmo tempo (via
+   WkzBus/BroadcastChannel). */
+function wkzLoadSharedDisputesForAdmin() {
+  if (typeof wkzGetSharedDisputes !== 'function' || typeof ADMIN_DISPUTES === 'undefined') return;
+  function toAdminDispute(d) {
+    var initials = (d.buyerName || '?').trim().charAt(0).toUpperCase();
+    var sellerName = d.seller || 'Tecnologia Brasil';
+    return {
+      id: d.orderId, severity: 'open', title: (d.reason || '') + ' — ' + (d.productName || ''),
+      motivo: d.reason, valor: d.valor || '—', prazo: '5 dias',
+      buyer: { name: d.buyerName, id: '#NOVO', avatar: initials },
+      seller: { name: sellerName, id: '#SPRO01', avatar: sellerName.trim().charAt(0).toUpperCase() },
+      msgs: [{ who: 'buyer', text: d.description || ('Disputa aberta: ' + d.reason), time: d.dateStr || '—' }]
+    };
+  }
+  wkzGetSharedDisputes().forEach(function (d) {
+    if (ADMIN_DISPUTES.some(function (x) { return x.id === d.orderId; })) return; // já existe (mock ou já carregada)
+    ADMIN_DISPUTES.push(toAdminDispute(d));
+  });
+  if (window.WkzBus) {
+    WkzBus.on('dispute:opened', function (d) {
+      if (ADMIN_DISPUTES.some(function (x) { return x.id === d.orderId; })) return;
+      ADMIN_DISPUTES.unshift(toAdminDispute(d));
+      if (typeof renderDisputas === 'function' && document.getElementById('disputasList')) renderDisputas();
+      var navBadge = document.getElementById('navBadgeDisputas');
+      if (navBadge) navBadge.textContent = ADMIN_DISPUTES.filter(function (x) { return x.severity !== 'resolved'; }).length;
+    });
+  }
+}
+
 /* ── wkzPropagateResolutionToSeller ────────────────────────────────────────
    Quando o admin resolve uma disputa criada pelo comprador, move o card
    correspondente no painel do vendedor de "Abertas" para "Resolvidas",

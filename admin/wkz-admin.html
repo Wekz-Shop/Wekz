@@ -1083,6 +1083,9 @@
     if (typeof renderAdminKyc === 'function') renderAdminKyc();
     if (typeof renderAdminReports === 'function') renderAdminReports();
     if (typeof renderAdminKzBanner === 'function') renderAdminKzBanner();
+    // [FIX-item4] Carrega disputas que o comprador já tenha aberto noutra
+    // página antes desta aba existir, e só então renderiza a lista.
+    if (typeof wkzLoadSharedDisputesForAdmin === 'function') wkzLoadSharedDisputesForAdmin();
     if (typeof renderDisputas === 'function') renderDisputas();
     if (typeof renderSaques === 'function') renderSaques();
     if (typeof renderSecurityPanel === 'function') renderSecurityPanel();
