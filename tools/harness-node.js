@@ -142,12 +142,25 @@ const assertions = `
   assert('wkzUid gera IDs únicos', function() { return wkzUid('t') !== wkzUid('t'); });
   assert('showToast está definida (versão única)', function() { return typeof showToast === 'function'; });
   assert('wkzExactPrice(100,50) === 50', function() { return wkzExactPrice(100, 50) === 50; });
-  /* [FIX-item4 / Meu Perfil] Catálogo passou de 28 para 29 itens: adicionado
-     "Teclado Mecânico RGB TKL" (produto referenciado pelo pedido mock
-     #WKZ-8990 em Avaliações Pendentes / Rastreador / Disputas do Meu Perfil,
-     que antes não existia no catálogo navegável e fazia o fluxo de avaliação
-     falhar silenciosamente). Mudança intencional — ver CHANGELOG do sprint. */
-  assert('products[] tem 29 itens', function() { return Array.isArray(products) && products.length === 29; });
+  /* [FIX-item1/3/4 → ajuste posterior] Este teste chegou a travar a
+     contagem exata de produtos (28 → 29 → 30), e cada novo produto de
+     teste do front-end quebrava o CI por causa de um número mágico.
+     Trocado por uma checagem estrutural: não importa QUANTOS produtos
+     existem, e sim que o array não está vazio/corrompido e que cada item
+     tem os campos mínimos que o resto do site depende (nome, loja, preço
+     válido). Isso continua pegando erros reais — array esvaziado,
+     "products" virando outra coisa, item colado com campo faltando — sem
+     exigir editar este arquivo toda vez que um produto de teste é
+     adicionado ou removido. */
+  assert('products[] existe e todo item tem nome, loja e preço válidos', function() {
+    if (!Array.isArray(products) || products.length === 0) return false;
+    return products.every(function(p) {
+      return !!p
+        && typeof p.n === 'string' && p.n.trim().length > 0
+        && typeof p.s === 'string' && p.s.trim().length > 0
+        && typeof p.p === 'number' && p.p > 0;
+    });
+  });
   assert('cartItemsData é reativo (Proxy)', function() {
     var fired = false;
     WkzBus.on('cart:change', function() { fired = true; });
