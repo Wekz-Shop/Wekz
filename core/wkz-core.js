@@ -1337,6 +1337,15 @@ const products = [
      igual ao usado nos pedidos mock, o fluxo perfil → PDP → avaliação
      publicada funciona de ponta a ponta. */
   {e:'⌨️',n:'Teclado Mecânico RGB TKL',p:199,op:399,off:50,s:'SoundWorld',r:4.8,sales:'21k',badge:'hot',           stock:36, stockMax:150, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{marca:'Logitech',armazenamento:'N/A'}},
+  /* [FIX-item1/3/4] Produto referenciado pelo pedido/disputa mock #WKZ-9042
+     (Rastreador de Encomendas / Central de Disputas do Meu Perfil) — antes
+     não existia no catálogo navegável (nome "fantasma"), então a PDP nunca
+     abria e não havia nenhuma loja vendendo-o de verdade. Atribuído à loja
+     de testes "Tecnologia Brasil" (a loja do próprio fundador no painel do
+     vendedor) para permitir testar de ponta a ponta: comprador encontra o
+     produto → compra/disputa → o painel do vendedor Tecnologia Brasil vê a
+     disputa (ver wkzShareNewDispute/wkzLoadSharedDisputesForSeller). */
+  {e:'📱',n:'Smartphone Pro X 256GB Grafite',p:1799,op:2999,off:40,s:'Tecnologia Brasil',r:4.8,sales:'312',badge:'new', stock:18, stockMax:60, cat:'eletronicos',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:true,attrs:{marca:'TecBR',armazenamento:'256GB'}},
 ];
 
 // [MOVIDO v? — pendência #7 "Avaliações: verificar falhas"] Antes vivia
@@ -1355,6 +1364,110 @@ const sellerReviews = [
   {a:'C',name:'Carlos R.',r:4,text:'Bom produto, porém a embalagem veio um pouco amassada. Funciona perfeitamente.',verified:true},
   {a:'A',name:'Ana P.',r:5,text:'Superou minhas expectativas! Chegou antes do prazo e embalagem impecável.',verified:true},
 ];
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   [FIX-item2/3/4/5] PONTE ENTRE PÁGINAS (Comprador ↔ Vendedor ↔ Admin)
+   ─────────────────────────────────────────────────────────────────────────
+   O site é multi-página (buyer/seller/admin são HTMLs separados, cada um
+   com o seu próprio JS carregado do zero) e, nesta fase do projeto,
+   propositalmente sem back-end. Sem alguma persistência, qualquer coisa
+   criada numa página — o vendedor ativa uma Flash Sale, ou o comprador
+   abre uma disputa — só existia na memória daquela aba e desaparecia ao
+   navegar para outra. Isso NÃO é uma limitação de back-end: é só falta de
+   uma camada de persistência local. localStorage é compartilhado entre
+   TODAS as páginas da mesma origem (wekz-shop.github.io) e sobrevive a
+   navegações — por isso serve para simular, 100% no front-end, o que um
+   back-end real faria aqui. wkz-core.js carrega em buyer/seller/admin,
+   então estas funções ficam disponíveis nas três pontas. WkzBus (BroadcastChannel)
+   complementa isso com atualização ao vivo quando duas abas estão abertas
+   ao mesmo tempo na mesma sessão.
+   ═══════════════════════════════════════════════════════════════════════ */
+var WKZ_SHARED_KEYS = { seller: 'wkz_seller_profile', disputes: 'kzDisputas_v1', flash: 'kzContracts_v1' };
+
+function wkzReadShared(key, fallback) {
+  try {
+    var raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) { return fallback; }
+}
+function wkzWriteShared(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+window.wkzReadShared = wkzReadShared;
+window.wkzWriteShared = wkzWriteShared;
+
+/* Perfil da loja de testes do vendedor — gravado em salvarConfiguracoes()
+   (wkz-seller.js) e lido pelo comprador (wkzInjectSellerStore, em
+   wkz-buyer.js) para exibir a loja em "Lojas Oficiais". Valor padrão =
+   a mesma loja de testes já usada nos pedidos/disputas mock acima. */
+function wkzGetSellerProfile() {
+  return wkzReadShared(WKZ_SHARED_KEYS.seller, { store: 'Tecnologia Brasil', id: '#SPRO01' });
+}
+function wkzSaveSellerProfile(profile) {
+  wkzWriteShared(WKZ_SHARED_KEYS.seller, profile);
+  if (window.WkzBus) WkzBus.emit('seller:profile:change', profile);
+}
+window.wkzGetSellerProfile = wkzGetSellerProfile;
+window.wkzSaveSellerProfile = wkzSaveSellerProfile;
+
+/* Disputas abertas pelo comprador — gravadas em cpOpenNewDispute (mais
+   abaixo neste ficheiro) e lidas pelo painel do vendedor/admin ao carregar. */
+function wkzShareNewDispute(entry) {
+  var list = wkzReadShared(WKZ_SHARED_KEYS.disputes, []);
+  list.unshift(entry);
+  wkzWriteShared(WKZ_SHARED_KEYS.disputes, list);
+  if (window.WkzBus) WkzBus.emit('dispute:opened', entry);
+}
+function wkzGetSharedDisputes() { return wkzReadShared(WKZ_SHARED_KEYS.disputes, []); }
+window.wkzShareNewDispute = wkzShareNewDispute;
+window.wkzGetSharedDisputes = wkzGetSharedDisputes;
+
+/* Itens de Flash Sale ativados pelo vendedor (Marketing → Promoção
+   Relâmpago, salvarMarketing('flash') em wkz-seller.js) — gravados aqui e
+   lidos pelo comprador (wkzLoadSharedFlashItems, em wkz-buyer.js). */
+function wkzShareNewFlashItem(item) {
+  var list = wkzReadShared(WKZ_SHARED_KEYS.flash, []);
+  list.unshift(item);
+  wkzWriteShared(WKZ_SHARED_KEYS.flash, list);
+  if (window.WkzBus) WkzBus.emit('seller:flash:created', item);
+}
+function wkzGetSharedFlashItems() { return wkzReadShared(WKZ_SHARED_KEYS.flash, []); }
+window.wkzShareNewFlashItem = wkzShareNewFlashItem;
+window.wkzGetSharedFlashItems = wkzGetSharedFlashItems;
+
+/* Insere o card de uma disputa na lista do painel do vendedor.
+   [MOVIDO para core.js] Antes só existia em wkz-admin.js, então nunca
+   rodava nas páginas onde a disputa realmente é criada (comprador) ou
+   onde precisa aparecer (vendedor) — só funcionaria se, por acaso, o
+   admin.js estivesse carregado na mesma página, o que nunca é o caso.
+   wkz-admin.js mantém a sua própria cópia local (mesmo comportamento);
+   como carrega depois de core.js, ela simplesmente prevalece na página
+   do Admin, sem conflito. */
+function wkzNotifySellerNewDispute(orderId, productName, buyerName, reason, dateStr) {
+  var list = document.getElementById('sellerDisputesList');
+  if (!list) return;
+  if (list.querySelector('[data-order-id="' + orderId + '"]')) return; // evita duplicar
+  var card = document.createElement('div');
+  card.setAttribute('data-dispute-status', 'open');
+  card.setAttribute('data-order-id', orderId);
+  card.style.cssText = 'background:var(--card);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:18px;';
+  card.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">' +
+      '<div><div style="font-weight:700;">' + orderId + ' · ' + productName + ' · ' + buyerName + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: ' + reason + ' · Aberta: ' + dateStr + '</div></div>' +
+      '<button class="btn-primary" style="font-size:12px;padding:8px 16px;" onclick="openDisputeReplyModal(\'' + orderId + '\',\'' + productName + '\',\'' + buyerName + '\',\'' + reason + '\',\'' + dateStr + '\')">Responder Agora</button>' +
+    '</div>';
+  list.insertBefore(card, list.firstChild);
+  var openCount = list.querySelectorAll('[data-dispute-status="open"]').length;
+  var btnOpen = document.getElementById('df-disp-open');
+  if (btnOpen) btnOpen.textContent = 'Abertas (' + openCount + ')';
+  var countEl = document.getElementById('disputesOpenCount');
+  if (countEl) countEl.textContent = openCount + (openCount === 1 ? ' disputa' : ' disputas');
+  var statEl = document.getElementById('statValueDisputas');
+  if (statEl) statEl.textContent = openCount;
+  if (typeof showToast === 'function') showToast('🔔 Nova disputa recebida no painel do vendedor: ' + orderId);
+}
+window.wkzNotifySellerNewDispute = wkzNotifySellerNewDispute;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    [v2.9.31] REGRA DE PREÇO EXATO — wkzExactPrice
@@ -4702,7 +4815,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   }
 
   var CP_ORDERS = [
-    { id:'#WKZ-9042', name:'Smartphone Pro X 256GB Grafite', amountEUR: 329.99,
+    { id:'#WKZ-9042', name:'Smartphone Pro X 256GB Grafite', amountEUR: 329.99, seller:'Tecnologia Brasil',
       status:'shipping', progress:85,
       activeStep:3, eta:'27 Mai 2026',
       carrier:'DHL Express Internacional', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
@@ -4713,7 +4826,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         { title:'Em trânsito internacional', desc:'Objeto em voo para distribuição no Brasil.', time:'23 Mai 21:30', location:'Aeroporto GRU — Guarulhos/SP', done:true, active:false },
         { title:'Pedido confirmado', desc:'Pagamento via Pix aprovado em 12 segundos.', time:'20 Mai 09:12', location:'WeKz Shop', done:true, active:false },
       ] },
-    { id:'#WKZ-9038', name:'Fone ANC Pro Bluetooth 5.3', amountEUR: 89.50,
+    { id:'#WKZ-9038', name:'Fone Bluetooth ANC Pro — 40h bateria', amountEUR: 89.50, seller:'SoundWorld',
       status:'customs', progress:55,
       activeStep:2, eta:'02 Jun 2026',
       carrier:'Correios — Importado', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
@@ -4723,7 +4836,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         { title:'Em trânsito internacional', desc:'Encomenda embarcada em voo internacional.', time:'28 Mai 11:00', location:'HKIA — Hong Kong', done:true, active:false },
         { title:'Pedido confirmado', desc:'Pagamento via cartão aprovado.', time:'26 Mai 10:45', location:'WeKz Shop', done:true, active:false },
       ] },
-    { id:'#WKZ-9011', name:'Smartwatch Ultra Series 9', amountEUR: 214.00,
+    { id:'#WKZ-9011', name:'Smartwatch Ultra 2 — GPS + NFC', amountEUR: 214.00, seller:'GadgetHub',
       status:'processing', progress:25,
       activeStep:1, eta:'08 Jun 2026',
       carrier:'Transportadora WeKz', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
@@ -4731,7 +4844,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         { title:'Em separação no hub', desc:'Pedido está a ser conferido e embalado para envio internacional.', time:'Hoje 08:30', location:'Hub Central WeKz — Shenzhen, CN', done:true, active:true },
         { title:'Pedido confirmado', desc:'Pagamento via Pix aprovado.', time:'Ontem 19:05', location:'WeKz Shop', done:true, active:false },
       ] },
-    { id:'#WKZ-8990', name:'Teclado Mecânico RGB TKL', amountEUR: 74.99,
+    { id:'#WKZ-8990', name:'Teclado Mecânico RGB TKL', amountEUR: 74.99, seller:'SoundWorld',
       status:'delivered', progress:100,
       activeStep:4, eta:'Entregue 18 Mai 2026',
       carrier:'Jadlog — .Package', address:'Rua das Flores, 42, Ap 12 — São Paulo/SP',
@@ -4765,7 +4878,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       verdict:'buyer', verdictAmtEUR:89.50,
       verdictTpl:CP_ICO.check+' Veredito a seu favor — Reembolso de {AMT} processado em 2 dias úteis.',
       icon:CP_ICO.smartphone, productName:'Smartphone Pro X 256GB Grafite',
-      productCat:'Electrónicos', seller:'TechZone Store', amountEUR:329.99,
+      productCat:'Electrónicos', seller:'Tecnologia Brasil', amountEUR:329.99,
       timeline:[
         {date:'14 Mai 2026',event:'Pedido entregue pelo transportador'},
         {date:'19 Mai 2026',event:'Disputa aberta pelo comprador'},
@@ -4776,8 +4889,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     },
     { id:'#WKZ-8777', reason:'Artigo não corresponde à descrição (cor diferente)', date:'12 Mai 2026',
       verdict:'pending', verdictText:CP_ICO.hourglass+' Admin a analisar — Prazo: até 28 Mai 2026.', icon:CP_ICO.shirt,
-      productName:'Hoodie Oversized Neon Edition — Azul',
-      productCat:'Moda', seller:'UrbanKz Wear', amountEUR:42.00,
+      productName:'Camisa Social Slim Fit — 100% Algodão Egípcio',
+      productCat:'Moda', seller:'ModaVibe', amountEUR:42.00,
       timeline:[
         {date:'08 Mai 2026',event:'Pedido entregue pelo transportador'},
         {date:'12 Mai 2026',event:'Disputa aberta pelo comprador'},
@@ -4789,7 +4902,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     { id:'#WKZ-8720', reason:'Demora na entrega — ultrapassou prazo garantido', date:'3 Mai 2026',
       verdict:'partial', verdictAmtEUR:15.00,
       verdictTpl:CP_ICO.dot+' Resolução parcial — Cupom de {AMT} concedido como compensação.',
-      icon:CP_ICO.truck, productName:'Fone Over-Ear Studio Pro — Preto',
+      icon:CP_ICO.truck, productName:'Fone Bluetooth ANC Pro — 40h bateria',
       productCat:'Áudio', seller:'SoundWorld', amountEUR:118.00,
       timeline:[
         {date:'18 Abr 2026',event:'Pedido confirmado — entrega estimada: 28 Abr'},
@@ -5966,20 +6079,25 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         renderDisputes();
         showToast && showToast('Disputa submetida com sucesso! ID: ' + order);
 
-        // Espelha a disputa no painel do vendedor E na Central de Mediação do
-        // admin — sem isso, o vendedor e o admin nunca veem o que o
-        // comprador realmente abre (eram 3 painéis desconectados).
+        // [FIX-item4] Espelha a disputa no painel do vendedor e na Central
+        // de Mediação do admin via localStorage (wkzShareNewDispute, ver
+        // topo deste ficheiro). Antes chamava wkzCreateTrilateralDispute,
+        // uma função que só existe em wkz-admin.js — nesta página
+        // (comprador) ela nunca estava definida, então o `typeof` dava
+        // 'undefined', o bloco inteiro era pulado em silêncio (nenhum
+        // erro no console) e a disputa nunca saía daqui.
         var relatedOrder = CP_ORDERS.find(function(o) { return o.id === order; });
         var buyerDisplayName = document.getElementById('cpUserName') ? document.getElementById('cpUserName').textContent : 'Alexandre Kz';
-        if (typeof wkzCreateTrilateralDispute === 'function') {
-          wkzCreateTrilateralDispute({
+        if (typeof wkzShareNewDispute === 'function') {
+          wkzShareNewDispute({
             orderId: order,
             productName: relatedOrder ? relatedOrder.name : 'Produto do pedido',
             buyerName: buyerDisplayName,
             reason: reasonLabels[reason] || reason,
             dateStr: newDispute.date,
             valor: relatedOrder ? cpFmtAmt(relatedOrder.amountEUR) : '—',
-            description: desc
+            description: desc,
+            seller: relatedOrder ? relatedOrder.seller : null
           });
         }
       }
