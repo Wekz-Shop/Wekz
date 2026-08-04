@@ -1410,17 +1410,83 @@ function wkzSaveSellerProfile(profile) {
 window.wkzGetSellerProfile = wkzGetSellerProfile;
 window.wkzSaveSellerProfile = wkzSaveSellerProfile;
 
-/* Disputas abertas pelo comprador — gravadas em cpOpenNewDispute (mais
-   abaixo neste ficheiro) e lidas pelo painel do vendedor/admin ao carregar. */
+/* ═══════════════════════════════════════════════════════════════════════
+   [FIX-disputas v3.0] Disputas abertas pelo comprador — fonte única de
+   verdade (kzDisputas_v1) consultada e ATUALIZADA pelos 3 painéis.
+   ───────────────────────────────────────────────────────────────────────
+   Problema anterior: cada disputa era só um registo "append-only" (criado
+   uma vez em cpOpenNewDispute e nunca mais tocado). Isso causava 3 falhas
+   reais observadas em produção:
+     1) O comprador podia abrir 2 disputas para o MESMO pedido (ex.: testar
+        duas vezes) — ficavam 2 entradas divergentes no mesmo array.
+     2) wkz-seller.js repetia a lista com .reverse() (mais antiga primeiro)
+        enquanto wkz-admin.js repetia sem reverse (mais nova primeiro) — com
+        2 entradas do mesmo pedido, cada painel ficava a "ganhar" com uma
+        entrada DIFERENTE (o vendedor via o motivo antigo, o admin/comprador
+        via o motivo novo). Resultado: 3 telas mostrando 3 histórias.
+     3) Quando o admin resolvia (admResolveDispute), o veredito só existia
+        na memória da aba do admin — nunca era escrito de volta no
+        localStorage. Vendedor e comprador nunca ficavam a saber do
+        resultado, nem ao vivo nem depois de recarregar a página.
+   Solução: cada pedido tem NO MÁXIMO uma disputa não resolvida (dedupe por
+   orderId em wkzShareNewDispute — reabrir atualiza a existente em vez de
+   duplicar) e o ciclo de vida completo (open → answered → resolved) é
+   persistido no MESMO registo, lido por wkzGetSharedDisputes() e alterado
+   por wkzUpdateSharedDispute() a partir de qualquer painel. */
 function wkzShareNewDispute(entry) {
   var list = wkzReadShared(WKZ_SHARED_KEYS.disputes, []);
+  var now = new Date().toISOString();
+  var existing = list.find(function(d) { return d.orderId === entry.orderId && d.status !== 'resolved'; });
+  if (existing) {
+    /* Já existe uma disputa em aberto para este pedido — atualiza os dados
+       em vez de criar uma segunda entrada concorrente para o mesmo orderId. */
+    for (var k in entry) { if (entry.hasOwnProperty(k)) existing[k] = entry[k]; }
+    existing.updatedAt = now;
+    wkzWriteShared(WKZ_SHARED_KEYS.disputes, list);
+    if (window.WkzBus) WkzBus.emit('dispute:updated', existing);
+    return { entry: existing, isNew: false };
+  }
+  entry.status = 'open';         // 'open' | 'answered' | 'resolved'
+  entry.verdict = null;          // null | 'buyer' | 'seller' | 'partial'
+  entry.verdictText = null;
+  entry.sellerReply = null;      // { position, positionLabel, text, time }
+  entry.timeline = [{ date: entry.dateStr, event: 'Disputa aberta pelo comprador' }];
+  entry.createdAt = now;
+  entry.updatedAt = now;
   list.unshift(entry);
   wkzWriteShared(WKZ_SHARED_KEYS.disputes, list);
   if (window.WkzBus) WkzBus.emit('dispute:opened', entry);
+  return { entry: entry, isNew: true };
 }
 function wkzGetSharedDisputes() { return wkzReadShared(WKZ_SHARED_KEYS.disputes, []); }
+/* Encontra a disputa partilhada de um pedido (usada para bloquear disputas
+   duplicadas e para hidratar os painéis a partir do estado real). */
+function wkzFindSharedDispute(orderId) {
+  return wkzGetSharedDisputes().find(function(d) { return d.orderId === orderId; }) || null;
+}
+/* Atualiza (merge) uma disputa já existente — usada pelo vendedor ao
+   responder e pelo admin ao resolver. Emite 'dispute:updated' para que
+   qualquer aba aberta (comprador/vendedor/admin) reflita a mudança ao vivo,
+   e persiste em localStorage para sobreviver a reload/navegação. */
+function wkzUpdateSharedDispute(orderId, patch) {
+  var list = wkzReadShared(WKZ_SHARED_KEYS.disputes, []);
+  var d = list.find(function(x) { return x.orderId === orderId; });
+  if (!d) return null;
+  for (var k in patch) { if (patch.hasOwnProperty(k)) d[k] = patch[k]; }
+  if (patch.timelineEvent) {
+    d.timeline = d.timeline || [];
+    d.timeline.push(patch.timelineEvent);
+    delete d.timelineEvent;
+  }
+  d.updatedAt = new Date().toISOString();
+  wkzWriteShared(WKZ_SHARED_KEYS.disputes, list);
+  if (window.WkzBus) WkzBus.emit('dispute:updated', d);
+  return d;
+}
 window.wkzShareNewDispute = wkzShareNewDispute;
 window.wkzGetSharedDisputes = wkzGetSharedDisputes;
+window.wkzFindSharedDispute = wkzFindSharedDispute;
+window.wkzUpdateSharedDispute = wkzUpdateSharedDispute;
 
 /* Itens de Flash Sale ativados pelo vendedor (Marketing → Promoção
    Relâmpago, salvarMarketing('flash') em wkz-seller.js) — gravados aqui e
@@ -1435,39 +1501,106 @@ function wkzGetSharedFlashItems() { return wkzReadShared(WKZ_SHARED_KEYS.flash, 
 window.wkzShareNewFlashItem = wkzShareNewFlashItem;
 window.wkzGetSharedFlashItems = wkzGetSharedFlashItems;
 
-/* Insere o card de uma disputa na lista do painel do vendedor.
-   [MOVIDO para core.js] Antes só existia em wkz-admin.js, então nunca
-   rodava nas páginas onde a disputa realmente é criada (comprador) ou
-   onde precisa aparecer (vendedor) — só funcionaria se, por acaso, o
-   admin.js estivesse carregado na mesma página, o que nunca é o caso.
-   wkz-admin.js mantém a sua própria cópia local (mesmo comportamento);
-   como carrega depois de core.js, ela simplesmente prevalece na página
-   do Admin, sem conflito. */
-function wkzNotifySellerNewDispute(orderId, productName, buyerName, reason, dateStr) {
+/* ═══════════════════════════════════════════════════════════════════════
+   [FIX-disputas v3.0] wkzRenderSellerDisputeCard — UPSERT (insere OU
+   atualiza) o card de uma disputa no painel "Disputas" do vendedor.
+   ───────────────────────────────────────────────────────────────────────
+   Substitui a antiga wkzNotifySellerNewDispute, que só sabia CRIAR um
+   card e, se um card com o mesmo orderId já existisse, desistia em
+   silêncio ("evita duplicar") — então uma disputa que mudasse de estado
+   (respondida pelo vendedor, resolvida pelo admin) nunca se refletia
+   aqui; só a versão "aberta" original ficava visível para sempre.
+   Agora esta função é chamada toda vez que o registo partilhado da
+   disputa muda (abertura, resposta do vendedor, veredito do admin) e
+   decide sozinha se cria um card novo ou atualiza o existente, sempre
+   em função do `status` atual do registo ('open' | 'answered' |
+   'resolved') — nunca há dessincronia entre o que está gravado e o que
+   o vendedor vê.
+   Existe também em wkz-admin.js uma cópia histórica desta função —
+   removida no FIX-disputas v3.0 porque divergia desta (é a causa de o
+   vendedor e o admin mostrarem motivos diferentes para o mesmo pedido,
+   ver CHANGELOG). Agora há uma única implementação, carregada uma vez
+   aqui em core.js e usada por todos os painéis. */
+function wkzRenderSellerDisputeCard(d) {
   var list = document.getElementById('sellerDisputesList');
   if (!list) return;
-  if (list.querySelector('[data-order-id="' + orderId + '"]')) return; // evita duplicar
-  var card = document.createElement('div');
-  card.setAttribute('data-dispute-status', 'open');
-  card.setAttribute('data-order-id', orderId);
-  card.style.cssText = 'background:var(--card);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:18px;';
-  card.innerHTML =
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">' +
-      '<div><div style="font-weight:700;">' + orderId + ' · ' + productName + ' · ' + buyerName + '</div>' +
-      '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: ' + reason + ' · Aberta: ' + dateStr + '</div></div>' +
-      '<button class="btn-primary" style="font-size:12px;padding:8px 16px;" onclick="openDisputeReplyModal(\'' + orderId + '\',\'' + productName + '\',\'' + buyerName + '\',\'' + reason + '\',\'' + dateStr + '\')">Responder Agora</button>' +
-    '</div>';
-  list.insertBefore(card, list.firstChild);
-  var openCount = list.querySelectorAll('[data-dispute-status="open"]').length;
-  var btnOpen = document.getElementById('df-disp-open');
-  if (btnOpen) btnOpen.textContent = 'Abertas (' + openCount + ')';
-  var countEl = document.getElementById('disputesOpenCount');
-  if (countEl) countEl.textContent = openCount + (openCount === 1 ? ' disputa' : ' disputas');
-  var statEl = document.getElementById('statValueDisputas');
-  if (statEl) statEl.textContent = openCount;
-  if (typeof showToast === 'function') showToast('🔔 Nova disputa recebida no painel do vendedor: ' + orderId);
+  var status = d.status || 'open';
+  var card = list.querySelector('[data-order-id="' + d.orderId + '"]');
+  var isNew = !card;
+  if (isNew) {
+    card = document.createElement('div');
+    card.setAttribute('data-order-id', d.orderId);
+    list.insertBefore(card, list.firstChild);
+  }
+
+  if (status === 'resolved') {
+    var vLabelMap = {
+      buyer:   { txt: '✓ Favorável ao Comprador (reembolso total)', color: '#22C55E' },
+      seller:  { txt: '✓ Favorável ao Vendedor', color: '#22C55E' },
+      partial: { txt: '◐ Resolução Parcial (divisão 50/50)', color: '#F59E0B' }
+    };
+    var vl = vLabelMap[d.verdict] || { txt: 'Resolvida', color: 'var(--muted)' };
+    var resolvedDateStr = d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('pt-BR') : (d.dateStr || '');
+    card.setAttribute('data-dispute-status', 'resolved');
+    card.setAttribute('data-answered', '1');
+    card.style.cssText = 'background:var(--card);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;cursor:pointer;';
+    card.setAttribute('onclick',
+      "openDisputeDetailModal('" + wkzJsEsc(d.orderId) + "','" + wkzJsEsc(d.productName||'') + "','" + wkzJsEsc(d.buyerName||'') + "','" + wkzJsEsc(d.reason||'') + "','Resolvida em " + wkzJsEsc(resolvedDateStr) + "','" + wkzJsEsc(vl.txt) + "','" + (d.verdict === 'partial' ? 'warning' : 'success') + "')"
+    );
+    card.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">' +
+        '<div><div style="font-weight:700;">' + d.orderId + ' · ' + (d.productName||'') + ' · ' + (d.buyerName||'') + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: ' + (d.reason||'') + ' · Resolvida: ' + resolvedDateStr + '</div></div>' +
+        '<span style="font-size:11px;font-weight:700;color:' + vl.color + ';background:rgba(34,197,94,0.12);padding:6px 12px;border-radius:20px;">' + vl.txt + '</span>' +
+      '</div>';
+  } else {
+    var answered = status === 'answered';
+    card.setAttribute('data-dispute-status', 'open');
+    card.setAttribute('data-answered', answered ? '1' : '0');
+    card.removeAttribute('onclick');
+    card.style.cssText = 'background:var(--card);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:18px;';
+    var actionHtml = answered
+      ? '<span style="font-size:11px;font-weight:700;color:#22C55E;background:rgba(34,197,94,0.12);padding:6px 12px;border-radius:20px;">✅ Respondido</span>'
+      : '<button class="btn-primary" style="font-size:12px;padding:8px 16px;" onclick="openDisputeReplyModal(\'' + d.orderId + '\',\'' + (d.productName||'') + '\',\'' + (d.buyerName||'') + '\',\'' + (d.reason||'') + '\',\'' + (d.dateStr||'') + '\')">Responder Agora</button>';
+    card.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">' +
+        '<div><div style="font-weight:700;">' + d.orderId + ' · ' + (d.productName||'') + ' · ' + (d.buyerName||'') + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: ' + (d.reason||'') + ' · Aberta: ' + (d.dateStr||'') + '</div></div>' +
+        actionHtml +
+      '</div>' +
+      (answered ? '<div class="dispute-pending-note" style="margin-top:10px;font-size:11px;color:#F59E0B;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:8px 10px;">⏳ Resposta enviada — aguardando decisão da WeKz.</div>' : '');
+  }
+
+  if (typeof updateDisputeTabCounts === 'function') {
+    updateDisputeTabCounts();
+  } else {
+    var openCount = list.querySelectorAll('[data-dispute-status="open"]:not([data-answered="1"])').length;
+    var btnOpen = document.getElementById('df-disp-open');
+    if (btnOpen) btnOpen.textContent = 'Abertas (' + openCount + ')';
+    var countEl = document.getElementById('disputesOpenCount');
+    if (countEl) countEl.textContent = openCount + (openCount === 1 ? ' disputa' : ' disputas');
+    var statEl = document.getElementById('statValueDisputas');
+    if (statEl) statEl.textContent = openCount;
+  }
+
+  if (typeof showToast === 'function') {
+    if (isNew && status === 'open') showToast('🔔 Nova disputa recebida no painel do vendedor: ' + d.orderId);
+    else if (!isNew && status === 'resolved') showToast('⚖️ A disputa ' + d.orderId + ' foi resolvida pela equipa WeKz.');
+  }
+}
+window.wkzRenderSellerDisputeCard = wkzRenderSellerDisputeCard;
+
+/* Compat: mantém a assinatura antiga (5 args posicionais) para qualquer
+   chamador externo que ainda a use — delega para a nova função unificada. */
+function wkzNotifySellerNewDispute(orderId, productName, buyerName, reason, dateStr) {
+  wkzRenderSellerDisputeCard({ orderId: orderId, productName: productName, buyerName: buyerName, reason: reason, dateStr: dateStr, status: 'open' });
 }
 window.wkzNotifySellerNewDispute = wkzNotifySellerNewDispute;
+
+/* Pequeno helper para escapar aspas simples ao montar onclick="..." inline
+   a partir de texto dinâmico (nomes de produto/comprador podem conter '). */
+function wkzJsEsc(s) { return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+window.wkzJsEsc = wkzJsEsc;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    [v2.9.31] REGRA DE PREÇO EXATO — wkzExactPrice
@@ -5197,7 +5330,13 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     renderLevelGuideSection();
     renderOrders();
     renderPurchaseHistory();
-    renderDisputes();
+    /* [FIX-disputas v3.0] Sincroniza CP_DISPUTES com o registo partilhado
+       (kzDisputas_v1) toda vez que "Meu Perfil" é aberto — inclui tanto
+       disputas que o comprador abriu nesta sessão (antes eram perdidas ao
+       recarregar a página) quanto o resultado já decidido pelo admin
+       (antes nunca chegava até aqui, ver wkzHydrateBuyerDisputes). */
+    if (typeof wkzHydrateBuyerDisputes === 'function') wkzHydrateBuyerDisputes();
+    else renderDisputes();
     renderWallet();
     if (typeof cpRenderReferralStats === 'function') cpRenderReferralStats();
     /* Set logo as default avatar on first load */
@@ -6066,14 +6205,37 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         if (!order) { showToast && showToast('Seleciona o pedido relacionado!'); return false; }
         if (!reason) { showToast && showToast('Seleciona o motivo da disputa!'); return false; }
         if (!desc || desc.length < 10) { showToast && showToast('Descreve o problema em pelo menos 10 caracteres!'); return false; }
+
+        /* [FIX-disputas v3.0] Bloqueia uma 2ª disputa para o mesmo pedido
+           enquanto a primeira ainda não foi resolvida — antes era possível
+           abrir várias, o que deixava vendedor/admin com registos
+           divergentes para o mesmo orderId (ver CHANGELOG). */
+        var already = (typeof wkzFindSharedDispute === 'function') ? wkzFindSharedDispute(order) : null;
+        if (already && already.status !== 'resolved') {
+          var statusLabel = already.status === 'answered' ? 'já foi respondida pelo vendedor e está' : 'está';
+          showToast && showToast('⚠️ Já existe uma disputa aberta para o pedido ' + order + ' — ela ' + statusLabel + ' em análise. Consulta-a em "Minhas Disputas".');
+          return false;
+        }
+
         var reasonLabels = { damaged:'Produto chegou danificado', notreceived:'Produto não recebido', wrong:'Produto diferente do anunciado', delay:'Atraso na entrega além do prazo', refund:'Reembolso não processado', other:'Outro motivo' };
+        var relatedOrder = CP_ORDERS.find(function(o) { return o.id === order; });
+        var buyerDisplayName = document.getElementById('cpUserName') ? document.getElementById('cpUserName').textContent : 'Alexandre Kz';
         var newDispute = {
           id: order,
           reason: reasonLabels[reason] || reason,
           date: new Date().toLocaleDateString('pt-PT', {day:'2-digit',month:'short',year:'numeric'}),
           verdict: 'pending',
           verdictText: CP_ICO.hourglass+' Disputa submetida — A ser analisada pela equipa WeKz (prazo: 5 dias úteis).',
-          icon: CP_ICO.scale
+          icon: CP_ICO.scale,
+          /* [FIX-disputas v3.0] Estes 4 campos faltavam antes — como
+             cpViewDisputeProduct() ("Ver Produto/Detalhe") os lê para
+             montar o modal, uma disputa recém-criada aparecia sem
+             produto, loja, valor ou descrição até a página recarregar. */
+          productName: relatedOrder ? relatedOrder.name : 'Produto do pedido',
+          seller: relatedOrder ? relatedOrder.seller : null,
+          amountEUR: relatedOrder ? relatedOrder.amountEUR : null,
+          description: desc,
+          timeline: [{ date: 'Hoje', event: 'Disputa aberta pelo comprador — aguardando análise da WeKz.' }]
         };
         CP_DISPUTES.unshift(newDispute);
         renderDisputes();
@@ -6086,18 +6248,17 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         // (comprador) ela nunca estava definida, então o `typeof` dava
         // 'undefined', o bloco inteiro era pulado em silêncio (nenhum
         // erro no console) e a disputa nunca saía daqui.
-        var relatedOrder = CP_ORDERS.find(function(o) { return o.id === order; });
-        var buyerDisplayName = document.getElementById('cpUserName') ? document.getElementById('cpUserName').textContent : 'Alexandre Kz';
         if (typeof wkzShareNewDispute === 'function') {
           wkzShareNewDispute({
             orderId: order,
-            productName: relatedOrder ? relatedOrder.name : 'Produto do pedido',
+            productName: newDispute.productName,
             buyerName: buyerDisplayName,
-            reason: reasonLabels[reason] || reason,
+            reason: newDispute.reason,
             dateStr: newDispute.date,
             valor: relatedOrder ? cpFmtAmt(relatedOrder.amountEUR) : '—',
+            amountEUR: newDispute.amountEUR,
             description: desc,
-            seller: relatedOrder ? relatedOrder.seller : null
+            seller: newDispute.seller
           });
         }
       }
@@ -6198,6 +6359,81 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       confirmLabel:null
     });
   };
+
+  /* ═══════════════════════════════════════════════════════════════════
+     [FIX-disputas v3.0] Ponte entre o registo partilhado (kzDisputas_v1,
+     lido/escrito também pelo vendedor e pelo admin) e a lista local
+     CP_DISPUTES usada por renderDisputes()/cpViewDisputeProduct().
+     Idempotente: pode ser chamada tanto na hidratação inicial (uma vez
+     por disputa) quanto a cada evento 'dispute:updated' vindo do
+     WkzBus — cria a entrada se ainda não existir, ou só atualiza o
+     veredito/linha do tempo se já existir. ═══════════════════════════ */
+  function _wkzApplySharedDisputeToCp(shared) {
+    if (!shared || !shared.orderId) return null;
+    var d = CP_DISPUTES.find(function(x) { return x.id === shared.orderId; });
+    var verdict = shared.status === 'resolved' ? (shared.verdict || 'seller') : 'pending';
+    var verdictText;
+    if (shared.status === 'resolved') {
+      verdictText = shared.verdictText || (CP_ICO.scale + ' Disputa resolvida pela equipa WeKz.');
+    } else if (shared.status === 'answered' && shared.sellerReply) {
+      verdictText = CP_ICO.chat + ' Vendedor respondeu: <em>' + (shared.sellerReply.positionLabel || '') + '</em> — Em análise pela equipa WeKz.';
+    } else {
+      verdictText = CP_ICO.hourglass + ' Disputa submetida — A ser analisada pela equipa WeKz (prazo: 5 dias úteis).';
+    }
+    var timeline = (shared.timeline || []).map(function(t) { return { date: t.date, event: t.event }; });
+    if (!d) {
+      d = {
+        id: shared.orderId,
+        reason: shared.reason,
+        date: shared.dateStr,
+        verdict: verdict,
+        verdictText: verdictText,
+        icon: CP_ICO.scale,
+        productName: shared.productName,
+        seller: shared.seller,
+        amountEUR: shared.amountEUR,
+        description: shared.description,
+        timeline: timeline
+      };
+      CP_DISPUTES.unshift(d);
+    } else {
+      d.verdict = verdict;
+      d.verdictText = verdictText;
+      delete d.verdictTpl;
+      delete d.verdictAmtEUR;
+      if (shared.productName) d.productName = shared.productName;
+      if (shared.seller) d.seller = shared.seller;
+      if (shared.amountEUR != null) d.amountEUR = shared.amountEUR;
+      if (timeline.length) d.timeline = timeline;
+    }
+    return d;
+  }
+
+  /* Roda ao entrar em "Meu Perfil" (ver initClientProfile). Faz a lista de
+     disputas do comprador refletir o estado REAL guardado em
+     kzDisputas_v1 — corrige o bug em que uma disputa aberta pelo
+     comprador "desaparecia" ao voltar à página (CP_DISPUTES reiniciava
+     sempre nos 3 exemplos fixos) e o veredito do admin nunca chegava. */
+  function wkzHydrateBuyerDisputes() {
+    if (typeof wkzGetSharedDisputes !== 'function') { renderDisputes(); return; }
+    wkzGetSharedDisputes().forEach(_wkzApplySharedDisputeToCp);
+    renderDisputes();
+  }
+  window.wkzHydrateBuyerDisputes = wkzHydrateBuyerDisputes;
+
+  /* Atualização ao vivo: se o comprador estiver com "Meu Perfil" aberto
+     numa aba enquanto o vendedor responde ou o admin resolve noutra aba,
+     o WkzBus (BroadcastChannel) entrega o evento aqui na hora, sem
+     precisar recarregar a página. */
+  if (window.WkzBus) {
+    WkzBus.on('dispute:updated', function(shared) {
+      _wkzApplySharedDisputeToCp(shared);
+      renderDisputes();
+      if (typeof showToast !== 'function') return;
+      if (shared.status === 'resolved') showToast('⚖️ A tua disputa ' + shared.orderId + ' foi resolvida! Toca em "Ver Produto/Detalhe" para veres o resultado.');
+      else if (shared.status === 'answered') showToast('📩 O vendedor respondeu à tua disputa ' + shared.orderId + '.');
+    });
+  }
 
   /* [FIX-08] Helper genérico: rola até um cartão do perfil e dá um
      destaque visual temporário (usado pelos botões de disputa e pelo
