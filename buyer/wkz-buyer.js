@@ -64,6 +64,13 @@ function getKzWisdom(context) {
 
 // ─── RENDER ───
 function renderAll(){
+  // [FIX-item3/5] Injeta a loja de testes do vendedor (se já configurada em
+  // Configurações do painel do vendedor) e qualquer Flash Sale ativada por
+  // lá — ambas vêm de localStorage (ver WKZ_SHARED_KEYS em wkz-core.js),
+  // a única forma de um dado criado numa página (o painel do vendedor)
+  // chegar a esta outra página (o comprador) sem um back-end real.
+  if (typeof wkzInjectSellerStore === 'function') wkzInjectSellerStore();
+  if (typeof wkzLoadSharedFlashItems === 'function') wkzLoadSharedFlashItems();
   renderCats();renderProducts();renderStores();renderFlash();renderFlashHero();renderWishlist();
   populateSearchCatOptions();renderNavCategories();
   // Cart starts empty, updateCartUI initializes badge=0 and clears display
@@ -10892,6 +10899,61 @@ function buildStorePaginationHTML(current, total){
 }
 
 // patch stores grid to open store detail
+/* [FIX-item3] Injeta a loja de testes do vendedor (currentSeller.store,
+   configurada em Configurações no painel do vendedor e persistida via
+   wkzSaveSellerProfile) na lista de Lojas Oficiais, caso ainda não esteja
+   lá. Chamada em renderAll() antes de renderStores(). */
+function wkzInjectSellerStore(){
+  if (typeof DB === 'undefined' || !DB.stores || typeof wkzGetSellerProfile !== 'function') return;
+  var profile = wkzGetSellerProfile();
+  if (!profile || !profile.store) return;
+  if (DB.stores.some(function(s){ return s.name === profile.store; })) return;
+  var initial = profile.store.trim().charAt(0).toUpperCase() || 'T';
+  var qtd = (typeof products !== 'undefined') ? products.filter(function(p){ return p.s === profile.store; }).length : 0;
+  DB.stores.push({
+    id:'sellertest', name:profile.store, sellerKey:profile.store, avatar:initial,
+    category:'<span class="wkz-icon wkz-icon-phone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span> Eletrônicos',
+    rating:4.8, sales:'312', followers:'48', products:qtd, since:'2026', banner:'🧪',
+    desc:'Loja de testes usada para validar de ponta a ponta o fluxo comprador ↔ vendedor do WeKz Shop.',
+    tags:['Teste','Demo'],
+    policies:[{i:'✅',t:'Loja de testes'},{i:'🚚',t:'Envio em 24h'},{i:'💬',t:'Resp. imediata'},{i:'🔧',t:'Ambiente de dev'}]
+  });
+}
+
+/* [FIX-item5] Sincroniza itens de Flash Sale ativados no painel do
+   vendedor (Marketing → Promoção Relâmpago). Sem isto, `flashItems.unshift`
+   dentro de salvarMarketing('flash') (wkz-seller.js) só alterava a cópia
+   em memória DAQUELA aba — esta página (comprador), carregada à parte,
+   nunca sabia que algo tinha sido ativado. */
+function wkzLoadSharedFlashItems(){
+  if (typeof wkzGetSharedFlashItems !== 'function' || typeof flashItems === 'undefined') return;
+  wkzGetSharedFlashItems().slice().reverse().forEach(function(item){
+    var exists = flashItems.some(function(f){ return f.n === item.n && f.s === item.s; });
+    if (!exists) flashItems.unshift(item);
+  });
+}
+
+/* Atualização ao vivo (mesma sessão, múltiplas abas abertas ao mesmo
+   tempo) — sem isto, uma Flash Sale ativada só apareceria aqui depois de
+   recarregar a página do comprador. */
+if (window.WkzBus) {
+  WkzBus.on('seller:flash:created', function(item){
+    if (typeof flashItems === 'undefined') return;
+    var exists = flashItems.some(function(f){ return f.n === item.n && f.s === item.s; });
+    if (exists) return;
+    flashItems.unshift(item);
+    if (typeof renderFlash === 'function') renderFlash();
+    if (typeof renderFlashHero === 'function') renderFlashHero();
+    var flashPageEl = document.getElementById('page-pg-flash');
+    if (flashPageEl && flashPageEl.classList.contains('active') && typeof renderFlashPage === 'function') renderFlashPage();
+    if (typeof showToast === 'function') showToast('⚡ Nova Flash Sale disponível: ' + item.n);
+  });
+  WkzBus.on('seller:profile:change', function(){
+    if (typeof wkzInjectSellerStore === 'function') wkzInjectSellerStore();
+    if (typeof renderStores === 'function') renderStores();
+  });
+}
+
 function renderStores(){
   ['storesGrid','storesGridFull'].forEach(id=>{
     const g=document.getElementById(id);
