@@ -3851,6 +3851,29 @@ img, svg, video, canvas, iframe {
    default do CSS Grid, então os cards já saem com a mesma altura sem
    precisar declarar a propriedade. */
 .products-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:24px;}
+
+/* ─── STORE PAGE — cards de tamanho fixo (Desktop) ───
+   Bug: #storeProductsGrid herda .products-grid acima, cujo auto-fit
+   deixa o(s) card(s) real(is) esticarem para preencher as colunas
+   "fantasma" vazias — ótimo quando a loja tem muitos produtos, péssimo
+   quando tem 1–2: o card vira quase a largura inteira do container e,
+   como .product-img usa aspect-ratio:1/1, a altura explode junto (o
+   "card gigante" reportado nas lojas com 1 produto). Loja com produtos
+   suficientes para preencher a fileira (ex.: GameWorld, 2 produtos)
+   sofre o mesmo bug, só que de forma mais sutil.
+   Fix: troca só a MAX do minmax (de 1fr, elástico, para um valor fixo
+   em px) apenas no grid da página de loja — o resto do site continua
+   usando .products-grid normalmente, preservando o fix de v2.9.23
+   acima. Com max fixo, auto-fit ainda colapsa colunas vazias, mas o(s)
+   card(s) real(is) param de crescer ao atingir o teto — sobra espaço
+   em branco à direita em vez de esticar. Resultado: todo card de loja
+   sai do mesmo tamanho, tenha a loja 1 produto ou 30. */
+@media (min-width: 769px) {
+  #storeProductsGrid.products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 260px));
+  }
+}
+
 .product-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:var(--transition);position:relative;}
 .product-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,0.4),var(--glow-teal);border-color:rgba(0,180,171,0.3);}
 /* aspect-ratio substitui height fixo: a caixa agora escala com a largura
