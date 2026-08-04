@@ -540,7 +540,7 @@ function initDashReviews(forceRefresh){
 // genérico). Agora existe de verdade e é mantida em sincronia com
 // o campo "Nome da Loja" em Configurações (ver salvarConfiguracoes).
 // ═══════════════════════════════════════
-var currentSeller = { store: 'Minha Loja Pro', id: '#SPRO01' };
+var currentSeller = { store: 'Tecnologia Brasil', id: '#SPRO01' };
 
 // ═══════════════════════════════════════
 // ─── ADD PRODUCT PAGE ──────────────────
@@ -895,7 +895,11 @@ function publishProduct(){
     p: price,
     op: parseFloat(document.getElementById('ap-old-price')?.value)||price,
     off: 0,
-    s: 'Minha Loja Pro',
+    // [FIX-item1] Antes gravava sempre a string fixa 'Minha Loja Pro',
+    // mesmo depois de o vendedor renomear a loja em Configurações — os
+    // produtos cadastrados ficavam associados a uma loja que não existia
+    // mais em lugar nenhum. Agora usa o nome atual de verdade.
+    s: (typeof currentSeller !== 'undefined' && currentSeller.store) || 'Tecnologia Brasil',
     r: 5.0,
     sales: '0',
     badge: 'new',
@@ -1717,10 +1721,19 @@ function salvarMarketing(tipo){
         _prodIdx: prodIdx,
       };
 
-      // Insere no início do array para aparecer primeiro
+      // Insere no início do array para aparecer primeiro (efeito local
+      // apenas nesta aba — o painel do vendedor não tem vitrine de Flash Sale).
       flashItems.unshift(newFlashItem);
 
-      // Re-renderiza todas as superfícies Flash Sale
+      // [FIX-item5] Persiste em localStorage para que a página do
+      // comprador (outra aba/página, sem back-end) também veja esta
+      // promoção. Sem isto, o item só existia na cópia em memória de
+      // `flashItems` desta aba e sumia ao navegar para o wkz-buyer.html.
+      if (typeof wkzShareNewFlashItem === 'function') wkzShareNewFlashItem(newFlashItem);
+
+      // Re-renderiza todas as superfícies Flash Sale (não fazem nada
+      // aqui, pois esta página não carrega wkz-buyer.js — mantidas por
+      // segurança caso um dia haja preview de Flash Sale neste painel).
       if(typeof renderFlash === 'function') renderFlash();
       if(typeof renderFlashHero === 'function') renderFlashHero();
       // Só re-renderiza a página se ela estiver ativa
@@ -1729,7 +1742,7 @@ function salvarMarketing(tipo){
         renderFlashPage();
       }
 
-      return `⚡ Flash Sale ativada! <strong>${prod.n || 'Produto'}</strong> já aparece na vitrine com ${offPct > 0 ? offPct+'% OFF' : 'desconto especial'}!`;
+      return `⚡ Flash Sale ativada! <strong>${prod.n || 'Produto'}</strong> já aparece na vitrine com ${offPct > 0 ? offPct+'% OFF' : 'desconto especial'}! Abra (ou atualize) a página do comprador para conferir.`;
     },
     ads: ()=>{
       if(typeof sellerHasAdsAccess === 'function' && !sellerHasAdsAccess()){
@@ -2816,16 +2829,59 @@ function salvarConfiguracoes(btn){
   // é essa referência que salvarMarketing('cupom') e o Kz Negotiator usam
   // para saber a qual loja um cupom/margem pertence.
   const nameInput = document.getElementById('sellerStoreNameInput');
+  const oldStoreName = currentSeller.store;
   if (nameInput && nameInput.value.trim()) {
-    currentSeller.store = nameInput.value.trim();
+    const newStoreName = nameInput.value.trim();
+    // [FIX-item2] Faltava aplicar o nome novo em algum lugar visível — só
+    // era gravado em currentSeller.store (uma variável em memória) e
+    // nenhum elemento da tela lia isso de volta, então o botão "Salvar"
+    // parecia não fazer nada.
+    if (typeof applySellerStoreName === 'function') applySellerStoreName(newStoreName);
+    // Mantém os produtos já cadastrados por esta loja de teste apontando
+    // para o novo nome (efeito visível só nesta aba/sessão — outra aba já
+    // aberta só verá a mudança ao recarregar, pois lê de localStorage).
+    if (newStoreName !== oldStoreName && typeof products !== 'undefined') {
+      products.forEach(function(p){ if (p.s === oldStoreName) p.s = newStoreName; });
+    }
   }
   setTimeout(()=>{
     // SEC-01 [negócio — TODO]: configurações de vendedor a migrar para /api/seller/settings
     try { if(typeof wkzSecureStorage!=='undefined'){wkzSecureStorage.set('wkz_seller_settings',saved);}else{localStorage.setItem('wkz_seller_settings',JSON.stringify(saved));} } catch(e){}
+    // [FIX-item2/3] Persiste um perfil "limpo" da loja (nome + id) em
+    // localStorage, lido pelo comprador em wkzInjectSellerStore()
+    // (wkz-buyer.js) para exibir esta loja em "Lojas Oficiais" — sem
+    // isto, a mudança de nome nunca saía desta página.
+    if (typeof wkzSaveSellerProfile === 'function') {
+      wkzSaveSellerProfile({ store: currentSeller.store, id: currentSeller.id });
+    }
     btn.disabled = false;
     btn.innerHTML = orig;
     showToast('✅ Configurações do vendedor salvas com sucesso!');
   }, 800);
+}
+
+/* [FIX-item2] Aplica o nome da loja em todos os lugares que o exibem —
+   sidebar e o próprio input de Configurações — e mantém currentSeller.store
+   em sincronia. Usada tanto ao salvar (salvarConfiguracoes) quanto ao
+   restaurar (restoreSellerStoreName, chamada no boot da página). */
+function applySellerStoreName(name){
+  if (!name) return;
+  currentSeller.store = name;
+  const sidebarEl = document.getElementById('sellerSidebarStoreName');
+  if (sidebarEl) sidebarEl.textContent = name;
+  const nameInput = document.getElementById('sellerStoreNameInput');
+  if (nameInput && nameInput.value !== name) nameInput.value = name;
+}
+
+/* [FIX-item2] Restaura o nome da loja salvo ao carregar o painel (chamada
+   no bootstrap, DOMContentLoaded, em wkz-seller.html) — sem isto, um
+   simples refresh da página sempre voltava para o valor estático do HTML,
+   mesmo depois de salvar um nome novo, porque wkz_seller_settings nunca
+   era lido de volta (só era gravado). */
+function restoreSellerStoreName(){
+  if (typeof wkzGetSellerProfile !== 'function') return;
+  const profile = wkzGetSellerProfile();
+  if (profile && profile.store) applySellerStoreName(profile.store);
 }
 
 function salvarNotificacoes(btn){
@@ -3861,6 +3917,32 @@ function restoreSellerLogo(){
     var saved = (typeof wkzSecureStorage!=='undefined') ? wkzSecureStorage.get('seller_logo', null) : null;
     if(saved) applySellerLogo(saved);
   } catch(e){}
+}
+
+/* [FIX-item4] Carrega disputas abertas pelo comprador noutra página/aba
+   (persistidas em localStorage por wkzShareNewDispute, em wkz-core.js —
+   chamada a partir de "Abrir Nova Disputa" em Meu Perfil) para dentro do
+   painel de Disputas do vendedor. Sem isto, uma disputa criada pelo
+   comprador nunca chegava aqui: cada painel é uma página HTML separada,
+   sem back-end, e o comprador só escrevia num array em memória da SUA
+   própria aba, que se perdia ao navegar para o painel do vendedor.
+   Chamada no bootstrap (DOMContentLoaded, wkz-seller.html) e também
+   escuta novas disputas em tempo real caso a aba do comprador esteja
+   aberta ao mesmo tempo (via WkzBus/BroadcastChannel). */
+function wkzLoadSharedDisputesForSeller(){
+  if (typeof wkzGetSharedDisputes !== 'function' || typeof wkzNotifySellerNewDispute !== 'function') return;
+  var myStore = (currentSeller && currentSeller.store) || 'Tecnologia Brasil';
+  wkzGetSharedDisputes().slice().reverse().forEach(function(d){
+    if (d.seller && d.seller !== myStore) return; // disputa de outra loja de teste
+    wkzNotifySellerNewDispute(d.orderId, d.productName, d.buyerName, d.reason, d.dateStr);
+  });
+  if (window.WkzBus) {
+    WkzBus.on('dispute:opened', function(d){
+      var store = (currentSeller && currentSeller.store) || 'Tecnologia Brasil';
+      if (d.seller && d.seller !== store) return;
+      wkzNotifySellerNewDispute(d.orderId, d.productName, d.buyerName, d.reason, d.dateStr);
+    });
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════════
