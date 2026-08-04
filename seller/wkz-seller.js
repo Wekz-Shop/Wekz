@@ -1389,47 +1389,65 @@ function enviarRespostaDisputa(pedido){
   const posLabels = {refund:'Reembolso aceito', partial:'Reembolso parcial proposto', contest:'Contestação enviada'};
   const posLabel = posLabels[pos] || 'Resposta enviada';
   document.getElementById('wkzDisputaModal').classList.remove('open');
+  const time = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
-  /* FIX: seletor robusto por data-order-id — jamais quebra por normalização de style */
-  const card = document.querySelector('#sellerDisputesList [data-order-id="'+pedido+'"]');
-  if(card){
-    const btn = card.querySelector('.btn-primary');
-    if(btn){
-      btn.textContent = '✅ Respondido';
-      btn.disabled = true;
-      btn.style.background = 'rgba(34,197,94,0.15)';
-      btn.style.border = '1px solid rgba(34,197,94,0.3)';
-      btn.style.color = '#22C55E';
-      btn.onclick = null;
+  /* [FIX-disputas v3.0] Antes esta resposta só mexia no DOM do próprio
+     card (perdido em qualquer reload) e tentava avisar o admin/comprador
+     através de variáveis (ADMIN_DISPUTES, window.cpNotifyBuyerSellerResponded)
+     que só existem DENTRO da mesma aba — nunca alcançavam a aba real do
+     admin ou do comprador. Agora a resposta é gravada no registo
+     partilhado (kzDisputas_v1); wkzRenderSellerDisputeCard() redesenha
+     este card a partir do MESMO dado que o admin e o comprador vão ler,
+     e o evento 'dispute:updated' avisa as outras abas na hora, se
+     estiverem abertas. */
+  var updated = (typeof wkzUpdateSharedDispute === 'function')
+    ? wkzUpdateSharedDispute(pedido, {
+        status: 'answered',
+        sellerReply: { position: pos, positionLabel: posLabel, text: txt, time: time },
+        timelineEvent: { date: 'Hoje ' + time, event: 'Vendedor respondeu: ' + posLabel + ' — "' + txt + '"' }
+      })
+    : null;
+
+  if (updated && typeof wkzRenderSellerDisputeCard === 'function') {
+    wkzRenderSellerDisputeCard(updated);
+  } else {
+    /* Sem o registo partilhado (ex.: página antiga em cache) cai de volta
+       para a atualização local, apenas do card já visível. */
+    const card = document.querySelector('#sellerDisputesList [data-order-id="'+pedido+'"]');
+    if(card){
+      card.dataset.answered = '1';
+      const btn = card.querySelector('.btn-primary');
+      if(btn){
+        btn.textContent = '✅ Respondido';
+        btn.disabled = true;
+        btn.style.background = 'rgba(34,197,94,0.15)';
+        btn.style.border = '1px solid rgba(34,197,94,0.3)';
+        btn.style.color = '#22C55E';
+        btn.onclick = null;
+      }
+      if(!card.querySelector('.dispute-pending-note')){
+        const note = document.createElement('div');
+        note.className = 'dispute-pending-note';
+        note.style.cssText = 'margin-top:10px;font-size:11px;color:#F59E0B;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:8px 10px;';
+        note.textContent = '⏳ Resposta enviada — aguardando decisão da WeKz.';
+        card.appendChild(note);
+      }
     }
-    /* FIX M10: marca a disputa como "respondida, aguardando veredito" — sem isso
-       ela continuava contando pra sempre como "aguardando resposta" no banner e
-       na aba "Abertas", mesmo depois do vendedor já ter respondido. */
-    card.dataset.answered = '1';
-    if(!card.querySelector('.dispute-pending-note')){
-      const note = document.createElement('div');
-      note.className = 'dispute-pending-note';
-      note.style.cssText = 'margin-top:10px;font-size:11px;color:#F59E0B;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:8px 10px;';
-      note.textContent = '⏳ Resposta enviada — aguardando decisão da WeKz.';
-      card.appendChild(note);
-    }
+    if(typeof updateDisputeTabCounts === 'function') updateDisputeTabCounts();
   }
-  if(typeof updateDisputeTabCounts === 'function') updateDisputeTabCounts();
 
-  /* FIX: propaga mensagem do vendedor para a Central de Mediação do admin */
+  /* Mantido como reforço para quando, por acaso, admin/comprador estejam
+     na MESMA aba de testes (harness manual) — no fluxo real entre 3 abas
+     separadas, quem garante a entrega é o wkzUpdateSharedDispute acima. */
   if(typeof ADMIN_DISPUTES !== 'undefined'){
     const disp = ADMIN_DISPUTES.find(function(d){ return d.id === pedido; });
     if(disp){
-      const time = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
       disp.msgs.push({ who:'seller', text:'['+posLabel+'] '+txt, time:time });
-      /* Se o chat do admin estiver aberto nesta disputa, re-renderiza em tempo real */
       if(typeof _activeDisputaId !== 'undefined' && _activeDisputaId === pedido && typeof renderDisputaChat === 'function'){
         renderDisputaChat(disp);
       }
     }
   }
-
-  /* FIX: notifica o comprador que o vendedor respondeu (Central de Disputas do Cliente) */
   if(typeof window.cpNotifyBuyerSellerResponded === 'function'){
     window.cpNotifyBuyerSellerResponded(pedido, posLabel, txt);
   }
@@ -3930,17 +3948,36 @@ function restoreSellerLogo(){
    escuta novas disputas em tempo real caso a aba do comprador esteja
    aberta ao mesmo tempo (via WkzBus/BroadcastChannel). */
 function wkzLoadSharedDisputesForSeller(){
-  if (typeof wkzGetSharedDisputes !== 'function' || typeof wkzNotifySellerNewDispute !== 'function') return;
-  var myStore = (currentSeller && currentSeller.store) || 'Tecnologia Brasil';
-  wkzGetSharedDisputes().slice().reverse().forEach(function(d){
-    if (d.seller && d.seller !== myStore) return; // disputa de outra loja de teste
-    wkzNotifySellerNewDispute(d.orderId, d.productName, d.buyerName, d.reason, d.dateStr);
+  if (typeof wkzGetSharedDisputes !== 'function' || typeof wkzRenderSellerDisputeCard !== 'function') return;
+  var myStore = function(){ return (currentSeller && currentSeller.store) || 'Tecnologia Brasil'; };
+  /* [FIX-disputas v3.0] Antes usava .slice().reverse() (mais antiga
+     primeiro) e wkzNotifySellerNewDispute desistia em silêncio se já
+     existisse um card com o mesmo orderId ("evita duplicar"). Quando um
+     pedido tinha mais de um registo salvo (ex.: o comprador testou 2x),
+     o vendedor ficava travado no registo MAIS ANTIGO — enquanto o admin
+     (que lê sem reverse) mostrava o mais recente. Cada painel exibia um
+     motivo/estado diferente para a MESMA disputa. Agora cada pedido tem
+     no máximo 1 registo (dedupe já feito em wkzShareNewDispute), então
+     percorremos na ordem natural (mais recente primeiro) e usamos a
+     função de UPSERT — que também reflete corretamente os estados
+     'answered' e 'resolved', não só 'open'. */
+  wkzGetSharedDisputes().forEach(function(d){
+    if (d.seller && d.seller !== myStore()) return; // disputa de outra loja de teste
+    wkzRenderSellerDisputeCard(d);
   });
   if (window.WkzBus) {
     WkzBus.on('dispute:opened', function(d){
-      var store = (currentSeller && currentSeller.store) || 'Tecnologia Brasil';
-      if (d.seller && d.seller !== store) return;
-      wkzNotifySellerNewDispute(d.orderId, d.productName, d.buyerName, d.reason, d.dateStr);
+      if (d.seller && d.seller !== myStore()) return;
+      wkzRenderSellerDisputeCard(d);
+    });
+    /* [FIX-disputas v3.0] Sem isto, se o admin resolvesse uma disputa
+       enquanto o vendedor estivesse com o painel "Disputas" aberto
+       (outra aba), o card continuava mostrando "Responder Agora" para
+       sempre — só se atualizaria num reload, e mesmo assim só porque
+       agora persistimos o veredito (ver wkzUpdateSharedDispute). */
+    WkzBus.on('dispute:updated', function(d){
+      if (d.seller && d.seller !== myStore()) return;
+      wkzRenderSellerDisputeCard(d);
     });
   }
 }
