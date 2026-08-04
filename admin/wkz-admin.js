@@ -1732,6 +1732,24 @@ function admResolveDispute(id, resolution) {
   };
   const vm = verdictMap[resolution];
   if (vm) {
+    /* [FIX-disputas v3.0] Este era o elo que faltava: tudo abaixo
+       (wkzPropagateResolutionToSeller, cpUpdateDisputeVerdict,
+       wkzNotifyBuyerDisputeVerdict) só atualiza memória/DOM DESTA aba —
+       nunca alcança a aba real do vendedor ou do comprador, e o próprio
+       admin perderia o veredito ao recarregar. wkzUpdateSharedDispute
+       grava o resultado em kzDisputas_v1 (lido por todos os painéis ao
+       carregar) e emite 'dispute:updated' via WkzBus para quem estiver
+       com a aba aberta agora mesmo. Se `id` for uma disputa mock (sem
+       registo partilhado), a chamada simplesmente não encontra nada e
+       não faz nada — sem efeitos colaterais. */
+    if (typeof wkzUpdateSharedDispute === 'function') {
+      wkzUpdateSharedDispute(id, {
+        status: 'resolved',
+        verdict: vm.buyerKey,
+        verdictText: vm.buyerText,
+        timelineEvent: { date: 'Hoje ' + time, event: 'WeKz decidiu: ' + m.audit }
+      });
+    }
     if (typeof wkzPropagateResolutionToSeller === 'function') {
       wkzPropagateResolutionToSeller(id, vm.sellerLabel, vm.sellerColor);
     }
@@ -2200,33 +2218,15 @@ function handleDisputaAttach(input) {
    Origem monólito: linhas 33061–33341 (pulando filterProducts,
    33172–33186, já extraída em wkz-seller.js no M3)
    ─────────────────────────────────────────────────────────────────────── */
-function wkzNotifySellerNewDispute(orderId, productName, buyerName, reason, dateStr) {
-  var list = document.getElementById('sellerDisputesList');
-  if (!list) return;
-
-  var card = document.createElement('div');
-  card.setAttribute('data-dispute-status', 'open');
-  card.setAttribute('data-order-id', orderId); /* FIX: seletor robusto para enviarRespostaDisputa */
-  card.style.cssText = 'background:var(--card);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:18px;';
-  card.innerHTML =
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">' +
-      '<div><div style="font-weight:700;">' + orderId + ' · ' + productName + ' · ' + buyerName + '</div>' +
-      '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Motivo: ' + reason + ' · Aberta: ' + dateStr + '</div></div>' +
-      '<button class="btn-primary" style="font-size:12px;padding:8px 16px;" onclick="openDisputeReplyModal(\'' + orderId + '\',\'' + productName + '\',\'' + buyerName + '\',\'' + reason + '\',\'' + dateStr + '\')">Responder Agora</button>' +
-    '</div>';
-  list.insertBefore(card, list.firstChild);
-
-  // Sincroniza contadores em todos os pontos do painel do vendedor
-  var openCount = list.querySelectorAll('[data-dispute-status="open"]').length;
-  var btnOpen = document.getElementById('df-disp-open');
-  if (btnOpen) btnOpen.textContent = 'Abertas (' + openCount + ')';
-  var countEl = document.getElementById('disputesOpenCount');
-  if (countEl) countEl.textContent = openCount + (openCount === 1 ? ' disputa' : ' disputas');
-  var statEl = document.getElementById('statValueDisputas');
-  if (statEl) statEl.textContent = openCount;
-
-  if (typeof showToast === 'function') showToast('🔔 Nova disputa recebida no painel do vendedor: ' + orderId);
-}
+/* [FIX-disputas v3.0] A cópia de wkzNotifySellerNewDispute que existia
+   aqui foi REMOVIDA — divergia da versão em wkz-core.js (que já é
+   carregada antes deste ficheiro em todas as páginas) e era a causa
+   direta de o painel do vendedor mostrar um motivo/estado de disputa
+   diferente do que o admin/comprador viam para o MESMO pedido (duas
+   implementações de "criar card" que podiam ficar fora de sincronia).
+   Agora existe uma única implementação (wkzRenderSellerDisputeCard, em
+   wkz-core.js), usada por todos os painéis; wkzNotifySellerNewDispute
+   continua disponível como wrapper de compatibilidade — ver core.js. */
 
 /* ── wkzCreateTrilateralDispute ────────────────────────────────────────────
    Ponto único de entrada quando o COMPRADOR abre uma disputa. Sem isso,
@@ -2280,16 +2280,37 @@ function wkzCreateTrilateralDispute(opts) {
    WkzBus/BroadcastChannel). */
 function wkzLoadSharedDisputesForAdmin() {
   if (typeof wkzGetSharedDisputes !== 'function' || typeof ADMIN_DISPUTES === 'undefined') return;
+
+  /* [FIX-disputas v3.0] Antes só usava d.description como ÚNICA mensagem
+     do chat, sempre com severity:'open' — mesmo depois de o próprio admin
+     resolver a disputa, um reload desta página perdia o "resolved" (nunca
+     era escrito de volta em kzDisputas_v1) e voltava a mostrar como
+     aberta, sem a resposta do vendedor nem a nota de resolução. Agora o
+     registo partilhado é a fonte de verdade também aqui: severity e
+     histórico completo (comprador → vendedor → resolução do admin) são
+     reconstruídos a partir dele sempre que a página carrega. */
   function toAdminDispute(d) {
     var initials = (d.buyerName || '?').trim().charAt(0).toUpperCase();
     var sellerName = d.seller || 'Tecnologia Brasil';
+    var msgs = [{ who: 'buyer', text: d.description || ('Disputa aberta: ' + d.reason), time: d.dateStr || '—' }];
+    if (d.sellerReply) {
+      msgs.push({ who: 'seller', text: '[' + d.sellerReply.positionLabel + '] ' + d.sellerReply.text, time: d.sellerReply.time || '—' });
+    }
+    if (d.status === 'resolved' && d.verdictText) {
+      msgs.push({ who: 'admin', text: '✅ Resolução: ' + d.verdictText, time: d.updatedAt ? new Date(d.updatedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '—' });
+    }
     return {
-      id: d.orderId, severity: 'open', title: (d.reason || '') + ' — ' + (d.productName || ''),
+      id: d.orderId, severity: d.status === 'resolved' ? 'resolved' : 'open', title: (d.reason || '') + ' — ' + (d.productName || ''),
       motivo: d.reason, valor: d.valor || '—', prazo: '5 dias',
       buyer: { name: d.buyerName, id: '#NOVO', avatar: initials },
       seller: { name: sellerName, id: '#SPRO01', avatar: sellerName.trim().charAt(0).toUpperCase() },
-      msgs: [{ who: 'buyer', text: d.description || ('Disputa aberta: ' + d.reason), time: d.dateStr || '—' }]
+      msgs: msgs
     };
+  }
+  function refreshBadgeAndList() {
+    if (typeof renderDisputas === 'function' && document.getElementById('disputasList')) renderDisputas(_disputasActiveFilter);
+    var navBadge = document.getElementById('navBadgeDisputas');
+    if (navBadge) navBadge.textContent = ADMIN_DISPUTES.filter(function (x) { return x.severity !== 'resolved'; }).length;
   }
   wkzGetSharedDisputes().forEach(function (d) {
     if (ADMIN_DISPUTES.some(function (x) { return x.id === d.orderId; })) return; // já existe (mock ou já carregada)
@@ -2299,9 +2320,21 @@ function wkzLoadSharedDisputesForAdmin() {
     WkzBus.on('dispute:opened', function (d) {
       if (ADMIN_DISPUTES.some(function (x) { return x.id === d.orderId; })) return;
       ADMIN_DISPUTES.unshift(toAdminDispute(d));
-      if (typeof renderDisputas === 'function' && document.getElementById('disputasList')) renderDisputas();
-      var navBadge = document.getElementById('navBadgeDisputas');
-      if (navBadge) navBadge.textContent = ADMIN_DISPUTES.filter(function (x) { return x.severity !== 'resolved'; }).length;
+      refreshBadgeAndList();
+    });
+    /* [FIX-disputas v3.0] Sem isto, uma resposta do vendedor (enviada
+       noutra aba, depois de o admin já ter carregado a Central de
+       Mediação) nunca aparecia no chat trilateral — o admin só saberia
+       recarregando a página inteira. */
+    WkzBus.on('dispute:updated', function (d) {
+      var idx = ADMIN_DISPUTES.findIndex(function (x) { return x.id === d.orderId; });
+      var rebuilt = toAdminDispute(d);
+      if (idx === -1) ADMIN_DISPUTES.unshift(rebuilt);
+      else ADMIN_DISPUTES[idx] = rebuilt;
+      refreshBadgeAndList();
+      if (typeof _activeDisputaId !== 'undefined' && _activeDisputaId === d.orderId && typeof renderDisputaChat === 'function') {
+        renderDisputaChat(rebuilt);
+      }
     });
   }
 }
