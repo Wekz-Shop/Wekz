@@ -1382,7 +1382,7 @@ const sellerReviews = [
    complementa isso com atualização ao vivo quando duas abas estão abertas
    ao mesmo tempo na mesma sessão.
    ═══════════════════════════════════════════════════════════════════════ */
-var WKZ_SHARED_KEYS = { seller: 'wkz_seller_profile', disputes: 'kzDisputas_v1', flash: 'kzContracts_v1' };
+var WKZ_SHARED_KEYS = { seller: 'wkz_seller_profile', disputes: 'kzDisputas_v1', flash: 'kzContracts_v1', broadcasts: 'kzComunicados_v1' };
 
 function wkzReadShared(key, fallback) {
   try {
@@ -2708,6 +2708,9 @@ function wkzInjectMobileBell() {
 
 /* ══════════════════════════════════════════════════════════════
    PONTO DE INTEGRAÇÃO — sendBroadcast() no Admin chama esta função
+   PARA A PRÓPRIA aba do admin (preview local — inbox/push/banner).
+   Para chegar às abas REAIS de comprador/vendedor, ver
+   wkzShareBroadcast()/wkzSyncBroadcastsForRole() logo abaixo.
    ══════════════════════════════════════════════════════════════ */
 function wkzDeliverBroadcast(title, msg, channelsArr, audience) {
   const type = wkzAutoType(title, msg);
@@ -2731,32 +2734,88 @@ function wkzDeliverBroadcast(title, msg, channelsArr, audience) {
   }
 }
 
-/* ── Hook no sendBroadcast do admin ── */
-(function patchSendBroadcastForNotif() {
-  const _origSendBroadcast = window.sendBroadcast;
-  window.sendBroadcast = function() {
-    /* Captura título, mensagem e canais ANTES de chamar o original */
-    const ti = document.getElementById('commTitle');
-    const bi = document.getElementById('commBody');
-    const title = ti ? ti.value.trim() : '';
-    const msg   = bi ? bi.value.trim() : '';
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-comunicados v1.0] Entrega REAL de comunicados entre abas.
+   ───────────────────────────────────────────────────────────────────────
+   O que existia antes (removido): um IIFE aqui em core.js tentava
+   "empacotar" window.sendBroadcast com um wrapper que chamava
+   wkzDeliverBroadcast(). Como wkz-core.js carrega ANTES de wkz-admin.js
+   em todas as páginas, e wkz-admin.js declara `function sendBroadcast(){}`
+   no topo do próprio ficheiro, essa declaração SOBRESCREVE silenciosamente
+   o wrapper assim que wkz-admin.js termina de carregar — sem erro nenhum
+   no console. Resultado: clicar em "Enviar Comunicado" sempre executava
+   a versão SEM o hook, então wkzDeliverBroadcast() nunca era chamada de
+   verdade. Confirmado reproduzindo a ordem de carregamento dos scripts.
+   Mesmo corrigindo essa sobrescrita, o problema de fundo continuaria: as
+   3 páginas (comprador/vendedor/admin) são abas separadas — uma função
+   só ativa na aba do admin nunca alcançaria as OUTRAS abas. Por isso a
+   correção segue o mesmo padrão já usado nas Disputas (ver FIX-disputas
+   v3.0 acima): persistir o comunicado em localStorage (kzComunicados_v1)
+   e avisar as outras abas via WkzBus, em vez de depender de uma função
+   "emprestada" de outra página. ══════════════════════════════════════ */
 
-    const channels = [];
-    if (document.getElementById('chPush')   && document.getElementById('chPush').checked)   channels.push('Push');
-    if (document.getElementById('chEmail')  && document.getElementById('chEmail').checked)   channels.push('E-mail');
-    if (document.getElementById('chBanner') && document.getElementById('chBanner').checked)  channels.push('Banner');
+/* Grava um comunicado no histórico partilhado, lido pelo comprador e pelo
+   vendedor. Mantém só os últimos 50 para não inchar o localStorage. */
+function wkzShareBroadcast(entry) {
+  var list = wkzReadShared(WKZ_SHARED_KEYS.broadcasts, []);
+  entry.id = entry.id || ('BC-' + Date.now());
+  entry.sentAt = new Date().toISOString();
+  list.unshift(entry);
+  if (list.length > 50) list.length = 50;
+  wkzWriteShared(WKZ_SHARED_KEYS.broadcasts, list);
+  if (window.WkzBus) WkzBus.emit('broadcast:sent', entry);
+  return entry;
+}
+function wkzGetSharedBroadcasts() { return wkzReadShared(WKZ_SHARED_KEYS.broadcasts, []); }
+window.wkzShareBroadcast = wkzShareBroadcast;
+window.wkzGetSharedBroadcasts = wkzGetSharedBroadcasts;
 
-    const audEl = document.querySelector('.adm-aud-btn.active');
-    const audience = audEl ? audEl.textContent.replace(/\(.*\)/, '').trim() : 'Todos';
+/* 'all'/'todos' sempre bate; caso contrário, só entrega ao papel certo —
+   um vendedor nunca deveria receber um comunicado endereçado só a
+   "Compradores", e vice-versa. */
+function _wkzBroadcastMatchesRole(entry, role) {
+  var aud = String(entry.audience || 'all').toLowerCase();
+  if (aud === 'all' || aud === 'todos') return true;
+  if (role === 'seller') return aud === 'sellers' || aud === 'vendedores';
+  if (role === 'buyer') return aud === 'buyers' || aud === 'compradores';
+  return false;
+}
 
-    if (typeof _origSendBroadcast === 'function') _origSendBroadcast();
+/* Chamada uma vez no bootstrap do comprador e do vendedor (ver
+   wkz-buyer.html / wkz-seller.html). Faz 2 coisas:
+   1) Hidratação: qualquer comunicado enviado enquanto esta aba estava
+      fechada entra silenciosamente na caixa de entrada (sino) — sem
+      reabrir o card flutuante/banner de um aviso que já é "passado".
+   2) Ao vivo: se um comunicado for enviado AGORA, com a aba aberta, o
+      card flutuante + banner aparecem na hora, via WkzBus. */
+function wkzSyncBroadcastsForRole(role) {
+  if (typeof wkzGetSharedBroadcasts !== 'function') return;
+  var seenKey = 'wkz_broadcast_seen_' + role;
+  var seen;
+  try { seen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch (e) { seen = []; }
+  var seenSet = {};
+  seen.forEach(function (id) { seenSet[id] = true; });
 
-    /* Entrega a notificação após o delay simulado de envio (1.2s) */
-    if (title && msg) {
-      setTimeout(() => wkzDeliverBroadcast(title, msg, channels, audience), 1400);
-    }
-  };
-})();
+  wkzGetSharedBroadcasts().forEach(function (entry) {
+    if (seenSet[entry.id] || !_wkzBroadcastMatchesRole(entry, role)) return;
+    seenSet[entry.id] = true;
+    var type = wkzAutoType(entry.title, entry.msg);
+    wkzAddToInbox(entry.title, entry.msg, type, (entry.channels || ['Push']).join(' + '));
+  });
+  try { localStorage.setItem(seenKey, JSON.stringify(Object.keys(seenSet))); } catch (e) {}
+
+  if (window.WkzBus) {
+    WkzBus.on('broadcast:sent', function (entry) {
+      if (!_wkzBroadcastMatchesRole(entry, role)) return;
+      wkzDeliverBroadcast(entry.title, entry.msg, entry.channels, entry.audienceLabel);
+      try {
+        var seen2 = JSON.parse(localStorage.getItem(seenKey) || '[]');
+        if (seen2.indexOf(entry.id) === -1) { seen2.push(entry.id); localStorage.setItem(seenKey, JSON.stringify(seen2)); }
+      } catch (e) {}
+    });
+  }
+}
+window.wkzSyncBroadcastsForRole = wkzSyncBroadcastsForRole;
 
 /* NOTA (Sprint M1): a injeção do sino (wkzInjectBellBtn/wkzInjectMobileBell)
    deve ser chamada pelo script de INIT de cada módulo que tiver UI de sino
