@@ -620,6 +620,11 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
     if (typeof window.updateCartUI === 'function') window.updateCartUI();
   }, 150);
+
+  /* [FIX-comunicados v1.0] Sincroniza comunicados do admin endereçados a
+     "Compradores" ou "Todos" — sino/inbox recebe o histórico na hora e
+     passa a atualizar ao vivo (WkzBus) enquanto esta aba estiver aberta. */
+  if (typeof wkzSyncBroadcastsForRole === 'function') wkzSyncBroadcastsForRole('buyer');
 });
 </script>
 
