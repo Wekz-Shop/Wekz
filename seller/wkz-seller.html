@@ -2406,6 +2406,10 @@
     // aba existir (ver wkz-core.js / wkz-seller.js).
     if (typeof restoreSellerStoreName === 'function') restoreSellerStoreName();
     if (typeof wkzLoadSharedDisputesForSeller === 'function') wkzLoadSharedDisputesForSeller();
+    // [FIX-comunicados v1.0] Sincroniza comunicados do admin endereçados
+    // a "Vendedores" ou "Todos" — sino/inbox recebe o histórico na hora
+    // e passa a atualizar ao vivo (WkzBus) enquanto esta aba estiver aberta.
+    if (typeof wkzSyncBroadcastsForRole === 'function') wkzSyncBroadcastsForRole('seller');
   });
 </script>
 </body>
