@@ -131,9 +131,40 @@ function renderAdminStores(filter = 'all') {
     if (!store) return;
     if (action === 'approve')     admApproveStore(sid, store.name);
     if (action === 'reject')      admRejectStore(sid, store.name);
-    if (action === 'docs')        showToast('📋 Abrindo dossiê da loja ' + store.name + '...');
+    if (action === 'docs')        admShowStoreDocs(sid);
     if (action === 'requestdocs') { showToast('📨 E-mail enviado para ' + store.owner); admAuditAdd('🏪', 'Loja "' + store.name + '" — solicitação de documentos enviada', 'Admin WeKz'); }
   };
+}
+
+/* [FIX-admin-audit v1.0] "Ver Docs" só mostrava um toast ("Abrindo
+   dossiê...") e não abria documento nenhum — o gestor não tinha como
+   revisar CNPJ/comprovantes antes de decidir Aprovar/Recusar, então a
+   aprovação virava um clique "às cegas". Reaproveita o #admInfoModal
+   (mesmo criado para os cards de Status/NPS na Visão Geral) para montar
+   um dossiê com os documentos exigidos no KYB de um marketplace. */
+function admShowStoreDocs(sid) {
+  const s = ADMIN_STORES.find(x => x.id === sid);
+  if (!s) return;
+  const docItems = [
+    { label: 'Cartão CNPJ',              ok: s.docs },
+    { label: 'Contrato social / MEI',    ok: s.docs },
+    { label: 'Comprovante de endereço',  ok: s.docs },
+    { label: 'RG/CPF do responsável',    ok: s.docs },
+  ];
+  const rows = docItems.map(d => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+      <div style="width:34px;height:34px;border-radius:8px;background:${d.ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)'};display:flex;align-items:center;justify-content:center;font-size:15px;">${d.ok ? '📄' : '⏳'}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;">${d.label}</div>
+        <div style="font-size:11px;color:${d.ok ? '#22C55E' : '#EF4444'};">${d.ok ? 'Recebido — pronto para conferência' : 'Ainda não enviado pelo lojista'}</div>
+      </div>
+      ${d.ok ? `<button class="adm-btn-view" style="padding:6px 10px;font-size:11px;" onclick="showToast('🔍 Pré-visualização simulada — em produção abriria o arquivo enviado pelo lojista.')">Ver</button>` : ''}
+    </div>`).join('');
+  const body = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">CNPJ informado: <strong style="color:${s.docs ? 'var(--teal)' : '#EF4444'}">${s.cnpj}</strong></div>
+    ${rows}
+    ${!s.docs ? `<div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);font-size:12px;">⚠ Documentação incompleta — use "Solicitar Docs" no card da loja para reenviar o pedido ao lojista.</div>` : ''}`;
+  openAdmInfoModal('Dossiê — ' + s.name, s.owner + ' · Solicitado em ' + s.date, body);
 }
 
 /* ── admSyncStoreBadge: atualiza badge nav, KPI overview e contadores de filtro ── */
@@ -803,6 +834,10 @@ function sendBroadcast() {
   const audText = audEl ? audEl.textContent.trim() : 'Todos';
   // Extrai somente o label sem a contagem
   const audience = audText.replace(/\s*\(.*\)/, '').trim();
+  // Chave estável p/ o registo partilhado — o texto do botão pode ganhar
+  // acentos/plurais diferentes, o id não muda (ver [FIX-comunicados v1.0])
+  const audienceKeyMap = { audAll: 'all', audSellers: 'sellers', audBuyers: 'buyers' };
+  const audienceKey = audienceKeyMap[audEl ? audEl.id : 'audAll'] || 'all';
 
   // Canal selecionado
   const channels = [];
@@ -815,20 +850,46 @@ function sendBroadcast() {
   const reachMap = { 'Todos':'318K', 'Vendedores':'12,8K', 'Compradores':'305K' };
   const reach = reachMap[audience] || '—';
 
-  if (btn) { btn.disabled = true; btn.innerHTML = '<svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Enviando...'; }
+  /* [FIX-comunicados v1.0] Um comunicado é uma ação de alto alcance
+     (até 318 mil contas de uma vez) e irreversível — não existe "desfazer
+     envio". Antes não pedia nenhuma confirmação; um clique acidental no
+     template errado, por exemplo, já enviava na hora. Reaproveita o
+     mesmo modal de confirmação usado em Config (window._wkzConfirm) em
+     vez de um confirm() nativo, para manter a identidade visual. */
+  window._wkzConfirm(
+    'Isto vai enviar "' + title + '" para <strong>' + audience + '</strong> (~' + reach + ' usuários) via ' + canal + '. Esta ação não pode ser desfeita.',
+    { title: 'Enviar comunicado agora?', icon: '📣', variant: audienceKey === 'all' ? 'warning' : 'info', confirmLabel: 'Enviar', cancelLabel: 'Revisar' }
+  ).then(function (confirmed) {
+    if (!confirmed) return;
 
-  setTimeout(function() {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + ' — ' + now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-    COMM_HISTORY.unshift({ icon:'📣', title, msg, audience, canal, date: dateStr, reach });
-    if (ti) ti.value = '';
-    if (bi) bi.value = '';
-    updatePreview(); updateCommChars();
-    renderCommHistory();
-    admAuditAdd('📣', 'Comunicado "' + title + '" enviado para ' + audience + ' (' + reach + ')', 'Admin WeKz');
-    showToast('✅ Comunicado enviado para ' + audience + ' · ~' + reach + ' usuários!');
-    if (btn) { btn.disabled = false; btn.innerHTML = '<svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Comunicado'; }
-  }, 1200);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Enviando...'; }
+
+    setTimeout(function() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + ' — ' + now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+      COMM_HISTORY.unshift({ icon:'📣', title, msg, audience, canal, date: dateStr, reach });
+
+      /* [FIX-comunicados v1.0] Este é o passo que faltava por completo:
+         grava o comunicado no registo partilhado (kzComunicados_v1) para
+         que as abas REAIS do comprador e do vendedor o recebam — ao vivo
+         (WkzBus), se estiverem abertas agora, e no próximo carregamento,
+         se não estiverem. Antes, nada saía desta função além de mexer no
+         COMM_HISTORY local (perdido em qualquer reload do próprio admin)
+         e disparar wkzDeliverBroadcast só na aba do admin — que nem
+         chegava a ser chamada de verdade (ver nota em wkz-core.js). */
+      if (typeof wkzShareBroadcast === 'function') {
+        wkzShareBroadcast({ title, msg, audience: audienceKey, audienceLabel: audience, channels, canal, reach });
+      }
+
+      if (ti) ti.value = '';
+      if (bi) bi.value = '';
+      updatePreview(); updateCommChars();
+      renderCommHistory();
+      admAuditAdd('📣', 'Comunicado "' + title + '" enviado para ' + audience + ' (' + reach + ')', 'Admin WeKz');
+      showToast('✅ Comunicado enviado para ' + audience + ' · ~' + reach + ' usuários!');
+      if (btn) { btn.disabled = false; btn.innerHTML = '<svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Comunicado'; }
+    }, 1200);
+  });
 }
 
 function renderCommHistory() {
@@ -1186,10 +1247,55 @@ function saveRates() {
   showToast('💾 Taxas de comissão salvas com sucesso!');
 }
 
+/* [FIX-admin-audit v1.0] Antes, "Salvar Limites" só mostrava um toast de
+   sucesso e gravava uma linha no log de auditoria — os 5 campos nem
+   tinham `id`, então não havia como a função ler o que o gestor
+   realmente digitou. O admin podia mudar "Máx. produtos por loja" para
+   5000, clicar em salvar, ver "✅ salvo com sucesso"... e nada era lido,
+   nada era persistido. Agora os valores são validados contra os próprios
+   min/max de cada campo e gravados em localStorage — sobrevivem a reload
+   desta página (o mesmo padrão de "config da plataforma" que Faturamento
+   e Usuários ainda não têm, ver relatório). */
+const WKZ_ADMIN_LIMITS_KEY = 'wkz_admin_platform_limits';
+const WKZ_ADMIN_LIMITS_FIELDS = [
+  { id: 'limitMaxProdutos',     label: 'Máx. produtos por loja' },
+  { id: 'limitMaxImagens',      label: 'Máx. imagens por produto' },
+  { id: 'limitPrazoMinEntrega', label: 'Prazo mín. de entrega (dias)' },
+  { id: 'limitValorMinPedido',  label: 'Valor mínimo de pedido (R$)' },
+  { id: 'limitChargebackMax',   label: 'Taxa de chargeback máx. (%)' },
+];
 function saveLimits() {
-  admAuditAdd('⚙️', 'Limites operacionais da plataforma atualizados', 'Admin WeKz');
+  const changed = [];
+  const values = {};
+  for (const f of WKZ_ADMIN_LIMITS_FIELDS) {
+    const el = document.getElementById(f.id);
+    if (!el) continue;
+    const min = el.min !== '' ? parseFloat(el.min) : -Infinity;
+    const max = el.max !== '' ? parseFloat(el.max) : Infinity;
+    let val = parseFloat(el.value);
+    if (isNaN(val)) { showToast('⚠️ "' + f.label + '" precisa de um número válido.'); return; }
+    val = Math.min(max, Math.max(min, val));
+    el.value = val; // reflete o clamp de volta no campo, se o admin digitou fora do intervalo
+    values[f.id] = val;
+    changed.push(f.label + ': ' + val);
+  }
+  try { localStorage.setItem(WKZ_ADMIN_LIMITS_KEY, JSON.stringify(values)); } catch (e) {}
+  admAuditAdd('⚙️', 'Limites operacionais atualizados — ' + changed.join(' · '), 'Admin WeKz');
   showToast('💾 Limites operacionais salvos com sucesso!');
 }
+/* Restaura os limites salvos ao (re)carregar a página — sem isto, um
+   reload voltava sempre para os 5 valores fixos do HTML, mesmo depois de
+   "salvar". */
+function loadSavedLimits() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(WKZ_ADMIN_LIMITS_KEY) || 'null'); } catch (e) { saved = null; }
+  if (!saved) return;
+  for (const f of WKZ_ADMIN_LIMITS_FIELDS) {
+    const el = document.getElementById(f.id);
+    if (el && saved[f.id] !== undefined) el.value = saved[f.id];
+  }
+}
+document.addEventListener('DOMContentLoaded', function() { setTimeout(loadSavedLimits, 50); });
 
 /* ══════════════════════════════════════════════════════════════
    📈 KZ FX GUARD — Gestão de Spread/Risco Cambial
@@ -1878,7 +1984,7 @@ function renderSaques(filter) {
           </div>` : '<span style="color:var(--muted);font-size:12px;">—</span>'}
         </td>
         <td style="color:var(--muted);font-size:12px;">${s.data}</td>
-        <td><span class="adm-saque-status ${s.status}">${statusLabel[s.status]}</span></td>
+        <td><span class="adm-saque-status ${s.status}">${s.antecipado ? '⚡ ' : ''}${statusLabel[s.status]}</span></td>
         <td>
           <div class="adm-saque-action-btns" onclick="event.stopPropagation()">
             ${s.status !== 'approved' ? `<button class="adm-btn-approve" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();admApprovePayout('${s.id}')">✅ Aprovar</button>` : ''}
@@ -1915,6 +2021,34 @@ function admHoldPayout(id) {
   admAuditAdd('🔒', `Saque ${id} retido para análise — ${s.loja} (${fmtBRL(s.solicitado)})`, 'Admin WeKz');
   showToast(`🔒 Saque ${id} retido para análise. Loja notificada.`);
   renderSaques(_saquesActiveFilter);
+}
+
+/* ── Antecipar saque (liberação expressa, com taxa de 3%) ──
+   [FIX-admin-audit v1.0] Botão existia na tabela (com o valor líquido já
+   calculado e exibido: "−3% · desc. R$ X") mas onclick="admAnteciparSaque(...)"
+   chamava uma função que nunca foi definida — clicar lançava
+   "ReferenceError: admAnteciparSaque is not defined" no console e nada
+   acontecia na tela, sem qualquer aviso para o gestor. */
+function admAnteciparSaque(id) {
+  const s = ADMIN_PAYOUTS.find(x => x.id === id);
+  if (!s || s.status === 'approved') return;
+  const comissaoVal    = s.solicitado * (s.comissao / 100);
+  const liquido         = s.solicitado - comissaoVal;
+  const taxaExpress     = 0.03;
+  const taxaExpressVal  = liquido * taxaExpress;
+  const liquidoExpress  = liquido - taxaExpressVal;
+
+  window._wkzConfirm(
+    'A loja <strong>' + s.loja + '</strong> receberá ' + fmtBRL(liquidoExpress) + ' agora (em vez de ' + fmtBRL(liquido) + ' no prazo normal). A diferença de ' + fmtBRL(taxaExpressVal) + ' (3%) fica como receita de antecipação da WeKz.',
+    { title: 'Antecipar saque ' + id + '?', icon: '⚡', variant: 'info', confirmLabel: 'Antecipar agora', cancelLabel: 'Cancelar' }
+  ).then(function (confirmed) {
+    if (!confirmed) return;
+    s.status = 'approved';
+    s.antecipado = true;
+    admAuditAdd('⚡', `Saque ${id} ANTECIPADO — ${s.loja}: ${fmtBRL(liquidoExpress)} liberado agora (taxa expressa de ${fmtBRL(taxaExpressVal)} retida)`, 'Admin WeKz');
+    showToast(`⚡ Saque ${id} antecipado! ${fmtBRL(liquidoExpress)} transferido agora para ${s.loja}.`);
+    renderSaques(_saquesActiveFilter);
+  });
 }
 
 /* ── Modal de detalhe ── */
@@ -2080,6 +2214,88 @@ function syncOverviewKPIs(flash) {
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => syncOverviewKPIs(false), 400);
 });
+
+/* ════════════════════════════════════════════════════════════════
+   [FIX-admin-audit v1.0] "Status →" e "Detalhes →" (cards de Uptime e
+   NPS na Visão Geral) não tinham onclick nenhum — botões puramente
+   decorativos. Aqui entram como modais informativos, no mesmo padrão
+   visual do modal de detalhe de saque (#admInfoModal, em wkz-admin.html).
+   ════════════════════════════════════════════════════════════════ */
+function openAdmInfoModal(title, sub, bodyHtml) {
+  const modal = document.getElementById('admInfoModal');
+  if (!modal) return;
+  document.getElementById('admInfoModalTitle').textContent = title;
+  document.getElementById('admInfoModalSub').textContent = sub;
+  document.getElementById('admInfoModalBody').innerHTML = bodyHtml;
+  modal.style.display = 'flex';
+  modal.classList.add('open');
+}
+function closeAdmInfoModal() {
+  const modal = document.getElementById('admInfoModal');
+  if (!modal) return;
+  modal.style.display = 'none';
+  modal.classList.remove('open');
+}
+
+function admShowUptimeDetail() {
+  const services = [
+    { name: 'Checkout & Pagamentos', up: '99.98%', color: '#22C55E' },
+    { name: 'Busca & Catálogo',      up: '99.91%', color: '#22C55E' },
+    { name: 'API / Painéis (Comprador, Vendedor, Admin)', up: '99.85%', color: '#22C55E' },
+    { name: 'Notificações Push/E-mail', up: '97.40%', color: '#F59E0B' },
+  ];
+  const rows = services.map(s => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:13px;">${s.name}</span>
+      <span style="font-size:13px;font-weight:700;color:${s.color};">${s.up}</span>
+    </div>`).join('');
+  const body = `
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:14px;">
+      <div style="font-size:28px;font-weight:800;color:#22C55E;">98.7%</div>
+      <div style="font-size:12px;color:var(--muted);">uptime médio · últimos 30 dias</div>
+    </div>
+    <div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">Por serviço</div>
+    ${rows}
+    <div style="margin-top:16px;padding:12px;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);font-size:12px;color:var(--text);">
+      ⚠ <strong>1 incidente nos últimos 30 dias:</strong> instabilidade em notificações Push por 42min em 28/07 (fila de envio sobrecarregada). Resolvido — sem impacto em pedidos ou pagamentos.
+    </div>`;
+  openAdmInfoModal('Status da Plataforma', 'Disponibilidade dos últimos 30 dias, por serviço', body);
+}
+
+function admShowNpsDetail() {
+  const seg = [
+    { label: 'Compradores', val: '4.92', n: '289K respostas' },
+    { label: 'Vendedores',  val: '4.71', n: '9,4K respostas' },
+  ];
+  const dist = [
+    { label: 'Promotores (9–10)', pct: 78, color: '#22C55E' },
+    { label: 'Neutros (7–8)',     pct: 16, color: '#F59E0B' },
+    { label: 'Detratores (0–6)',  pct: 6,  color: '#EF4444' },
+  ];
+  const segRows = seg.map(s => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:13px;">${s.label} <span style="color:var(--muted);font-size:11px;">(${s.n})</span></span>
+      <span style="font-size:13px;font-weight:700;">${s.val}</span>
+    </div>`).join('');
+  const distBars = dist.map(d => `
+    <div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>${d.label}</span><span style="font-weight:700;">${d.pct}%</span></div>
+      <div style="height:6px;border-radius:4px;background:var(--border);overflow:hidden;"><div style="height:100%;width:${d.pct}%;background:${d.color};"></div></div>
+    </div>`).join('');
+  const body = `
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:14px;">
+      <div style="font-size:28px;font-weight:800;color:#22C55E;">4.89</div>
+      <div style="font-size:12px;color:var(--muted);">↑ +0,12 vs abril</div>
+    </div>
+    <div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">Por segmento</div>
+    ${segRows}
+    <div style="margin:16px 0 6px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">Distribuição</div>
+    ${distBars}
+    <div style="margin-top:14px;padding:12px;border-radius:10px;background:var(--card2,rgba(255,255,255,0.03));border:1px solid var(--border);font-size:12px;color:var(--text);">
+      💬 <strong>Comentário recente (vendedor, nota 6):</strong> "Repasse do saque podia ser mais rápido — o resto funciona bem."
+    </div>`;
+  openAdmInfoModal('NPS da Plataforma', 'Satisfação — mês corrente, por segmento', body);
+}
 
 /* ════════════════════════════════════════════════════════════════
    PATCH — admResolveDispute: sincroniza KPIs ao fechar disputa

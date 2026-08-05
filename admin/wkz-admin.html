@@ -254,12 +254,12 @@
           <div class="adm-kpi">
             <div class="adm-kpi-num adm-kpi-ok">98.7%</div>
             <div class="adm-kpi-label">Uptime da plataforma (30d)</div>
-            <button class="adm-kpi-btn">Status →</button>
+            <button class="adm-kpi-btn" onclick="admShowUptimeDetail()">Status →</button>
           </div>
           <div class="adm-kpi">
             <div class="adm-kpi-num adm-kpi-ok">4.89</div>
             <div class="adm-kpi-label">NPS médio da plataforma</div>
-            <button class="adm-kpi-btn">Detalhes →</button>
+            <button class="adm-kpi-btn" onclick="admShowNpsDetail()">Detalhes →</button>
           </div>
         </div>
 
@@ -320,6 +320,24 @@
               <div class="adm-bar adm-bar-gross" style="height:100%"></div>
               <div class="adm-bar adm-bar-net"   style="height:80%"></div>
               <div class="adm-bar-label" style="color:var(--teal)">Mai ✦</div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal genérico de detalhe (Status da Plataforma / NPS) —
+             [FIX-admin-audit v1.0] "Status →" e "Detalhes →" não tinham
+             onclick nenhum; reaproveita este modal para os dois. -->
+        <div id="admInfoModal" class="adm-modal-overlay" style="display:none;" onclick="if(event.target===this)closeAdmInfoModal()">
+          <div class="adm-modal-box" style="max-width:520px;">
+            <div class="adm-modal-header">
+              <div>
+                <div class="adm-modal-title" id="admInfoModalTitle">—</div>
+                <div class="adm-modal-sub" id="admInfoModalSub">—</div>
+              </div>
+              <button class="adm-modal-close" onclick="closeAdmInfoModal()">✕</button>
+            </div>
+            <div id="admInfoModalBody" style="padding:20px 24px;"></div>
+            <div style="padding:0 24px 20px;">
+              <button class="adm-btn-view" onclick="closeAdmInfoModal()" style="width:100%;">Fechar</button>
             </div>
           </div>
         </div>
@@ -508,7 +526,7 @@
           </div>
           <div class="adm-comm-field">
             <label class="adm-comm-label">Mensagem</label>
-            <textarea id="commBody" class="adm-comm-textarea wkz-input" rows="3" placeholder="Descreva o comunicado de forma clara e objetiva..."></textarea>
+            <textarea id="commBody" class="adm-comm-textarea wkz-input" rows="3" maxlength="280" placeholder="Descreva o comunicado de forma clara e objetiva..."></textarea>
             <div class="adm-comm-chars" id="commChars">0 / 280</div>
           </div>
 
@@ -742,23 +760,23 @@
         <div class="adm-config-card">
           <div class="adm-limit-row">
             <span class="adm-limit-label">Máx. produtos por loja</span>
-            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="500" min="10" max="5000">
+            <input type="number" id="limitMaxProdutos" class="adm-limit-input wkz-input wkz-input--sm" value="500" min="10" max="5000">
           </div>
           <div class="adm-limit-row">
             <span class="adm-limit-label">Máx. imagens por produto</span>
-            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="8" min="1" max="20">
+            <input type="number" id="limitMaxImagens" class="adm-limit-input wkz-input wkz-input--sm" value="8" min="1" max="20">
           </div>
           <div class="adm-limit-row">
             <span class="adm-limit-label">Prazo mín. de entrega (dias)</span>
-            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="1" min="1" max="30">
+            <input type="number" id="limitPrazoMinEntrega" class="adm-limit-input wkz-input wkz-input--sm" value="1" min="1" max="30">
           </div>
           <div class="adm-limit-row">
             <span class="adm-limit-label">Valor mínimo de pedido (R$)</span>
-            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="10" min="0" max="1000">
+            <input type="number" id="limitValorMinPedido" class="adm-limit-input wkz-input wkz-input--sm" value="10" min="0" max="1000">
           </div>
           <div class="adm-limit-row">
             <span class="adm-limit-label">Taxa de chargeback máx. (%)</span>
-            <input type="number" class="adm-limit-input wkz-input wkz-input--sm" value="1.5" min="0.5" max="5" step="0.1">
+            <input type="number" id="limitChargebackMax" class="adm-limit-input wkz-input wkz-input--sm" value="1.5" min="0.5" max="5" step="0.1">
           </div>
           <button class="adm-config-save" onclick="saveLimits()">💾 Salvar Limites</button>
         </div>
