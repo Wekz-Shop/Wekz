@@ -3563,7 +3563,7 @@ var WkzDisputeTickets = (function() {
         '</div>' +
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;">*Tipo de Problema</label>' +
-          '<select id="disputeProblem" class="form-select wkz-select" data-title="Tipo de Problema" data-icon="🚨" style="width:100%;padding:10px;" required>' +
+          '<select id="disputeProblem" class="form-select wkz-select" data-title="Tipo de Problema" style="width:100%;padding:10px;" required>' +
             '<option value="">Selecione...</option>' +
             '<option value="nao-recebido">📦 Não Recebi o Produto</option>' +
             '<option value="nao-conforme">🔍 Produto Não Conforme (diferente do anunciado)</option>' +
@@ -3912,7 +3912,7 @@ var WkzNoticeAndTakeDown = (function() {
         // Campo 4: Tipo de violação
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">*Tipo de Violação</label>' +
-          '<select id="denunciaTipo" class="form-select wkz-select" data-title="Tipo de Violação" data-icon="©️" style="width:100%;padding:10px;font-size:13px;" required>' +
+          '<select id="denunciaTipo" class="form-select wkz-select" data-title="Tipo de Violação" style="width:100%;padding:10px;font-size:13px;" required>' +
             '<option value="">Selecione uma opção...</option>' +
             '<option value="falsificacao">Produto Falsificado / Contrafação</option>' +
             '<option value="marca_registrada">Violação de Marca Registrada</option>' +
@@ -4979,7 +4979,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     cpu:      _ico('<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>'),
     target:   _ico('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/>'),
     money:    _ico('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),
-    mail:     _ico('<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/>')
+    mail:     _ico('<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/>'),
+    cart:     _ico('<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>')
   };
   /* Rótulos curtos por ícone — usados em toasts (texto simples, sem HTML) */
   var CP_ICO_LABEL = { lynx:'Lince Kz', zap:'Raio', star:'Estrela', hexagon:'Hexágono', gem:'Gema', shield:'Escudo', crown:'Coroa', eye:'Olho Cyber', cpu:'Chip', trophy:'Troféu', flame:'Chama', target:'Mira' };
@@ -5200,7 +5201,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   window.cpBuyAgain = function(productIdx) {
     if (typeof addToCart === 'function') addToCart(productIdx);
     if (typeof openProduct === 'function') openProduct(productIdx);
-    showToast && showToast('🛒 Adicionado ao carrinho — a mostrar o produto!');
+    showToast && showToast(CP_ICO.cart + ' Adicionado ao carrinho — a mostrar o produto!');
   };
 
   /* [FIX-item7] Registo real de uma compra recém-concluída no checkout.
@@ -5802,8 +5803,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       onConfirm: function() {
         var newName  = document.getElementById('cpEditName')  ? document.getElementById('cpEditName').value.trim()  : '';
         var newEmail = document.getElementById('cpEditEmail') ? document.getElementById('cpEditEmail').value.trim() : '';
-        if (!newName)  { showToast && showToast('⚠ Informa um nome de utilizador.'); return false; }
-        if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { showToast && showToast('⚠ Informa um email válido.'); return false; }
+        if (!newName)  { showToast && showToast(CP_ICO.warning + ' Informa um nome de utilizador.'); return false; }
+        if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { showToast && showToast(CP_ICO.warning + ' Informa um email válido.'); return false; }
         var nameEl = document.getElementById('cpUserName');
         if (nameEl) nameEl.textContent = newName;
         var emailEl = document.getElementById('cpUserEmail');
@@ -5820,7 +5821,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
         var pct = cpUpdateProfileCompletion();
         var msg = pct >= 100
-          ? '🎉 Perfil 100% completo! +100 pts bônus creditados e recomendações turbinadas.'
+          ? CP_ICO.award + ' Perfil 100% completo! +100 pts bônus creditados e recomendações turbinadas.'
           : 'Perfil atualizado com sucesso' + (pct ? ' — ' + pct + '% completo' : '') + '!';
         showToast && showToast(msg);
         if (pct === 100) {
@@ -6272,7 +6273,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         var already = (typeof wkzFindSharedDispute === 'function') ? wkzFindSharedDispute(order) : null;
         if (already && already.status !== 'resolved') {
           var statusLabel = already.status === 'answered' ? 'já foi respondida pelo vendedor e está' : 'está';
-          showToast && showToast('⚠️ Já existe uma disputa aberta para o pedido ' + order + ' — ela ' + statusLabel + ' em análise. Consulta-a em "Minhas Disputas".');
+          showToast && showToast(CP_ICO.warning + ' Já existe uma disputa aberta para o pedido ' + order + ' — ela ' + statusLabel + ' em análise. Consulta-a em "Minhas Disputas".');
           return false;
         }
 
@@ -6352,7 +6353,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       d.verdictText = CP_ICO.chat + ' Vendedor respondeu: <em>' + posLabel + '</em> — Em análise pela equipa WeKz.';
     }
     renderDisputes();
-    if (typeof showToast === 'function') showToast('📩 O vendedor respondeu à disputa ' + disputeId + '.');
+    if (typeof showToast === 'function') showToast(CP_ICO.mail + ' O vendedor respondeu à disputa ' + disputeId + '.');
   };
 
   /* ══════════════════════════════════════════
@@ -6489,8 +6490,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       _wkzApplySharedDisputeToCp(shared);
       renderDisputes();
       if (typeof showToast !== 'function') return;
-      if (shared.status === 'resolved') showToast('⚖️ A tua disputa ' + shared.orderId + ' foi resolvida! Toca em "Ver Produto/Detalhe" para veres o resultado.');
-      else if (shared.status === 'answered') showToast('📩 O vendedor respondeu à tua disputa ' + shared.orderId + '.');
+      if (shared.status === 'resolved') showToast(CP_ICO.scale + ' A tua disputa ' + shared.orderId + ' foi resolvida! Toca em "Ver Produto/Detalhe" para veres o resultado.');
+      else if (shared.status === 'answered') showToast(CP_ICO.mail + ' O vendedor respondeu à tua disputa ' + shared.orderId + '.');
     });
   }
 
@@ -6532,7 +6533,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       receipt.innerHTML = CP_ICO.check + '<span><strong>Reembolso confirmado' + (amt ? (' — ' + amt) : '') + '</strong><br><span style="color:var(--muted);">Creditado no ' + cardLabel + (d ? (' · Disputa ' + d.id) : '') + '</span></span>';
       grid.parentNode.insertBefore(receipt, grid);
       setTimeout(function(){ if (receipt && receipt.parentNode) receipt.remove(); }, 9000);
-      showToast && showToast('💰 Reembolso confirmado' + (amt ? (' — ' + amt) : '') + '!');
+      showToast && showToast(CP_ICO.coin + ' Reembolso confirmado' + (amt ? (' — ' + amt) : '') + '!');
     }, 350);
   };
 
@@ -6561,7 +6562,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       var list = document.getElementById('cpCouponList');
       if (!list) return;
       _cpScrollAndFlash(list);
-      showToast && showToast('🎟️ Cupom de compensação disponível na tua carteira de cupons!');
+      showToast && showToast(CP_ICO.tag + ' Cupom de compensação disponível na tua carteira de cupons!');
     }, 350);
   };
 
@@ -6589,7 +6590,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         + _cpField('Banco / Instituição','<input id="cpNewBankName" type="text" placeholder="Ex: Millennium BCP, Caixa Geral..." '+_cpInStyle()+'>')
         + _cpField('IBAN','<input id="cpNewBankIBAN" type="text" maxlength="34" placeholder="PT50 0000 0000 0000 0000 0000 0" oninput="cpFmtIBAN(this)" '+_cpInStyle('font-family:monospace;letter-spacing:1.5px;')+'>')
         + _cpField('Titular da Conta','<input id="cpNewBankHolder" type="text" placeholder="Nome completo" '+_cpInStyle()+'>')
-        + _cpField('Moeda preferida','<select id="cpNewBankCurrency" class="form-select wkz-select wkz-select--lg" data-title="Moeda preferida" data-icon="💲" '+_cpSelStyle()+'>'
+        + _cpField('Moeda preferida','<select id="cpNewBankCurrency" class="form-select wkz-select wkz-select--lg" data-title="Moeda preferida" '+_cpSelStyle()+'>'
             +'<option value="EUR">🇪🇺 EUR — Euro</option>'
             +'<option value="BRL">🇧🇷 BRL — Real Brasileiro</option>'
             +'<option value="USD">🇺🇸 USD — Dólar</option>'
@@ -6620,7 +6621,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         + '<div style="font-size:30px;color:#10b981;">' + CP_ICO.zap + '</div>'
         + '<div><div style="font-size:13px;font-weight:700;color:var(--text);">Pix</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Transferências instantâneas — Banco Central do Brasil</div></div>'
         + '</div>'
-        + _cpField('Tipo de Chave Pix','<select id="cpNewPixKeyType" class="form-select wkz-select wkz-select--lg" data-title="Tipo de Chave Pix" data-icon="🔑" onchange="cpUpdatePixPlaceholder(this.value)" '+_cpSelStyle()+'>'
+        + _cpField('Tipo de Chave Pix','<select id="cpNewPixKeyType" class="form-select wkz-select wkz-select--lg" data-title="Tipo de Chave Pix" onchange="cpUpdatePixPlaceholder(this.value)" '+_cpSelStyle()+'>'
             +'<option value="cpf">CPF</option>'
             +'<option value="cnpj">CNPJ</option>'
             +'<option value="phone">Telefone</option>'
