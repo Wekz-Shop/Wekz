@@ -76,7 +76,7 @@ function initDashOverview(forceRefresh){
   topEl.innerHTML = topProds.map((p, i) => {
     const status = window._productStatusMap ? (window._productStatusMap[i] || 'active') : 'active';
     const statusColor = status === 'paused' ? '#F59E0B' : status === 'out-of-stock' ? '#EF4444' : '#22C55E';
-    const statusLabel = status === 'paused' ? '⏸ Pausado' : status === 'out-of-stock' ? '❌ Sem estoque' : '✅ Ativo';
+    const statusLabel = status === 'paused' ? WKZ_ICO.pause + ' Pausado' : status === 'out-of-stock' ? WKZ_ICO.xCircle + ' Sem estoque' : WKZ_ICO.check + ' Ativo';
     return `
     <div style="display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;">
       <div style="width:44px;height:44px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;"><wkz-product-image src="${p.img||''}" emoji="${p.e}" alt="${p.n}"></wkz-product-image></div>
@@ -85,7 +85,7 @@ function initDashOverview(forceRefresh){
         <div style="font-size:12px;color:var(--muted);margin-top:2px;">${formatPrice(p.p)} · <span style="color:${statusColor};font-weight:600;">${statusLabel}</span></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;" onclick="openEditProductModal(${i})">✏️ Editar</button>
+        <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil}️ Editar</button>
       </div>
     </div>`;
   }).join('');
@@ -101,13 +101,13 @@ if(!window._productStatusMap) window._productStatusMap = {};
 //  por fetch('/api/affiliates/me') após integração com backend.
 // ══════════════════════════════════════════════════════
 const AFFILIATE_REFERRALS = [
-  { name:'Loja PixelWorks', type:'🏪 Vendedor', status:'active',  sales:8, points:1240 },
-  { name:'Ana Beatriz',     type:'🛍️ Comprador', status:'active',  sales:3, points:340  },
-  { name:'TechNova Store',  type:'🏪 Vendedor', status:'active',  sales:6, points:870  },
-  { name:'Rui Pereira',     type:'🛍️ Comprador', status:'pending', sales:0, points:0    },
-  { name:'Loja Boa Vista',  type:'🏪 Vendedor', status:'pending', sales:0, points:0    },
-  { name:'Joana Mendes',    type:'🛍️ Comprador', status:'active',  sales:2, points:0    },
-  { name:'Marco Aurélio',   type:'🛍️ Comprador', status:'pending', sales:0, points:0    },
+  { name:'Loja PixelWorks', type:WKZ_ICO.store + ' Vendedor', status:'active',  sales:8, points:1240 },
+  { name:'Ana Beatriz',     type:WKZ_ICO.bag + '️ Comprador', status:'active',  sales:3, points:340  },
+  { name:'TechNova Store',  type:WKZ_ICO.store + ' Vendedor', status:'active',  sales:6, points:870  },
+  { name:'Rui Pereira',     type:WKZ_ICO.bag + '️ Comprador', status:'pending', sales:0, points:0    },
+  { name:'Loja Boa Vista',  type:WKZ_ICO.store + ' Vendedor', status:'pending', sales:0, points:0    },
+  { name:'Joana Mendes',    type:WKZ_ICO.bag + '️ Comprador', status:'active',  sales:2, points:0    },
+  { name:'Marco Aurélio',   type:WKZ_ICO.bag + '️ Comprador', status:'pending', sales:0, points:0    },
 ];
 
 function initAffiliates(forceRefresh) {
@@ -115,8 +115,8 @@ function initAffiliates(forceRefresh) {
   if (!list || (list.innerHTML.trim() && !forceRefresh)) return;
 
   const statusMap = {
-    active:  { label:'✅ Ativo',    color:'#22C55E' },
-    pending: { label:'⏳ Pendente', color:'#F59E0B' },
+    active:  { label:WKZ_ICO.check + ' Ativo',    color:'#22C55E' },
+    pending: { label:WKZ_ICO.clock + ' Pendente', color:'#F59E0B' },
   };
 
   list.innerHTML = AFFILIATE_REFERRALS.map(function(r) {
@@ -165,7 +165,7 @@ function affCopyLink(btn) {
   }
   const orig = btn.innerHTML;
   btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copiado!</span>';
-  showToast('🔗 Link de indicação copiado!');
+  showToast(WKZ_ICO.link + ' Link de indicação copiado!');
   setTimeout(function(){ btn.innerHTML = orig; }, 2000);
 }
 
@@ -224,7 +224,7 @@ function renderMyProducts(page){
 
   if(!pageItems.length){
     g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--muted);">
-      <div style="font-size:38px;margin-bottom:10px;">📦</div>
+      <div style="font-size:38px;margin-bottom:10px;">${WKZ_ICO.package}</div>
       <div style="font-weight:700;color:var(--text);">Nenhum produto neste filtro</div>
     </div>`;
     const pag = document.getElementById('myProductsPagination');
@@ -237,11 +237,11 @@ function renderMyProducts(page){
     const isPaused = status === 'paused';
     const isOOS = status === 'out-of-stock';
     const statusBadge = isPaused
-      ? `<span style="position:absolute;top:8px;left:8px;background:rgba(245,158,11,0.9);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;">⏸ PAUSADO</span>`
+      ? `<span style="position:absolute;top:8px;left:8px;background:rgba(245,158,11,0.9);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;">${WKZ_ICO.pause} PAUSADO</span>`
       : isOOS
-      ? `<span style="position:absolute;top:8px;left:8px;background:rgba(239,68,68,0.9);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;">❌ SEM ESTOQUE</span>`
+      ? `<span style="position:absolute;top:8px;left:8px;background:rgba(239,68,68,0.9);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;">${WKZ_ICO.xCircle} SEM ESTOQUE</span>`
       : '';
-    const pauseLabel = isPaused ? '▶️' : '⏸';
+    const pauseLabel = isPaused ? '▶️' : WKZ_ICO.pause + '';
     const pauseTitle = isPaused ? 'Reativar produto' : 'Pausar produto';
     const pauseBg = isPaused ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)';
     const pauseBorder = isPaused ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
@@ -257,7 +257,7 @@ function renderMyProducts(page){
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span></div>
         <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales}</div></div>
         <div style="display:flex;gap:6px;margin-top:8px;">
-          <button class="btn-cart" style="flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:12px;" onclick="openEditProductModal(${i})">✏️ Editar</button>
+          <button class="btn-cart" style="flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:12px;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil}️ Editar</button>
           <button class="btn-cart" title="${pauseTitle}" style="flex:0;padding:10px 12px;background:${pauseBg};border:1px solid ${pauseBorder};color:${pauseColor};font-size:14px;" onclick="togglePauseProduct(${i})">${pauseLabel}</button>
         </div>
       </div>
@@ -305,14 +305,14 @@ function togglePauseProduct(idx){
   const current = window._productStatusMap[idx] || 'active';
   const next = (current === 'paused') ? 'active' : 'paused';
   window._productStatusMap[idx] = next;
-  const msg = (next === 'paused') ? '⏸️ Produto pausado com sucesso!' : '▶️ Produto reativado com sucesso!';
+  const msg = (next === 'paused') ? WKZ_ICO.pause + '️ Produto pausado com sucesso!' : '▶️ Produto reativado com sucesso!';
   showToast(msg);
   refreshProductEverywhere(idx);
 }
 
 function openEditProductModal(idx){
   const p = products[idx];
-  if(!p){ showToast('⚠️ Produto não encontrado.'); return; }
+  if(!p){ showToast(WKZ_ICO.warning + '️ Produto não encontrado.'); return; }
   // Build or reuse modal
   let modal = document.getElementById('editProductOverlay');
   if(!modal){
@@ -326,7 +326,7 @@ function openEditProductModal(idx){
   modal.innerHTML = `
   <div class="modal" style="max-width:520px;width:94%;max-height:90vh;overflow-y:auto;padding:28px;">
     <button class="modal-close" onclick="closeEditProductModal()" style="top:14px;right:14px;">✕</button>
-    <div class="modal-title" style="font-size:18px;margin-bottom:4px;">✏️ Editar Produto</div>
+    <div class="modal-title" style="font-size:18px;margin-bottom:4px;">${WKZ_ICO.pencil}️ Editar Produto</div>
     <div class="modal-sub" style="margin-bottom:20px;">Altere os dados e clique em Salvar</div>
     <div class="form-group">
       <label class="form-label">Título do Produto <span class="req">*</span></label>
@@ -344,18 +344,18 @@ function openEditProductModal(idx){
       <label class="form-label">Status do Produto</label>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-          <input type="radio" name="ep-status" value="active" ${(window._productStatusMap[idx]||'active')==='active'?'checked':''}> ✅ Ativo
+          <input type="radio" name="ep-status" value="active" ${(window._productStatusMap[idx]||'active')==='active'?'checked':''}> ${WKZ_ICO.check} Ativo
         </label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-          <input type="radio" name="ep-status" value="paused" ${(window._productStatusMap[idx])==='paused'?'checked':''}> ⏸️ Pausado
+          <input type="radio" name="ep-status" value="paused" ${(window._productStatusMap[idx])==='paused'?'checked':''}> ${WKZ_ICO.pause}️ Pausado
         </label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-          <input type="radio" name="ep-status" value="out-of-stock" ${(window._productStatusMap[idx])==='out-of-stock'?'checked':''}> ❌ Sem Estoque
+          <input type="radio" name="ep-status" value="out-of-stock" ${(window._productStatusMap[idx])==='out-of-stock'?'checked':''}> ${WKZ_ICO.xCircle} Sem Estoque
         </label>
       </div>
     </div>
     <hr style="border-color:var(--border);margin:18px 0;">
-    <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">📦 Dados de Catálogo & Logística</div>
+    <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">${WKZ_ICO.package} Dados de Catálogo & Logística</div>
     ${_epField('ep-sku','SKU / Código de barras',p.sku,'text')}
     ${_epField('ep-brand','Marca',p.brand,'text')}
     ${_epField('ep-stock','Estoque (un)',p.stock,'number')}
@@ -372,7 +372,7 @@ function openEditProductModal(idx){
     ${_epField('ep-desc','Descrição completa',p.desc,'textarea')}
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap;">
       <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="closeEditProductModal()">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="saveEditProduct(${idx})">💾 Salvar Alterações</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="saveEditProduct(${idx})">${WKZ_ICO.save} Salvar Alterações</button>
     </div>
   </div>`;
   modal.classList.add('open');
@@ -386,7 +386,7 @@ function _epField(id, label, value, type){
   const val = (value === undefined || value === null) ? '' : value;
   const borderStyle = isEmpty ? 'border-color:#F59E0B;' : '';
   const tooltip = isEmpty ? 'title="Este campo está vazio — não foi preenchido na publicação do produto"' : '';
-  const warnIcon = isEmpty ? ' <span style="color:#F59E0B;font-size:11px;" title="Campo vazio">⚠️ vazio na publicação</span>' : '';
+  const warnIcon = isEmpty ? ' <span style="color:#F59E0B;font-size:11px;" title="Campo vazio">${WKZ_ICO.warning}️ vazio na publicação</span>' : '';
   if(type === 'textarea'){
     return `<div class="form-group">
       <label class="form-label">${label}${warnIcon}</label>
@@ -404,8 +404,8 @@ function saveEditProduct(idx){
   const price = parseFloat(document.getElementById('ep-price')?.value);
   const oldPrice = parseFloat(document.getElementById('ep-oldprice')?.value)||0;
   const status = document.querySelector('input[name="ep-status"]:checked')?.value || 'active';
-  if(!title){ showToast('⚠️ Preencha o título do produto.'); return; }
-  if(!price || price <= 0){ showToast('⚠️ Informe um preço válido.'); return; }
+  if(!title){ showToast(WKZ_ICO.warning + '️ Preencha o título do produto.'); return; }
+  if(!price || price <= 0){ showToast(WKZ_ICO.warning + '️ Informe um preço válido.'); return; }
   products[idx].n = title;
   products[idx].op = oldPrice;
   if(oldPrice > price){
@@ -435,7 +435,7 @@ function saveEditProduct(idx){
 
   closeEditProductModal();
   refreshProductEverywhere(idx);
-  showToast('✅ Produto atualizado em todas as páginas!');
+  showToast(WKZ_ICO.check + ' Produto atualizado em todas as páginas!');
 }
 
 /* ── refreshProductEverywhere ──────────────────────────────────────────
@@ -459,7 +459,7 @@ function refreshProductEverywhere(idx){
     const pdpPrice  = document.getElementById('pdpPrice');
     const pdpOld    = document.querySelector('.pdp-price-old');
     const pdpOff    = document.querySelector('.pdp-price-off');
-    if(pdpEmoji){ pdpEmoji.setAttribute('emoji', p.e || '📦'); if(p.img){pdpEmoji.setAttribute('src',p.img);} else {pdpEmoji.removeAttribute('src');} }
+    if(pdpEmoji){ pdpEmoji.setAttribute('emoji', p.e || WKZ_ICO.package + ''); if(p.img){pdpEmoji.setAttribute('src',p.img);} else {pdpEmoji.removeAttribute('src');} }
     if(pdpTitle) pdpTitle.textContent = p.n;
     if(pdpPrice) pdpPrice.textContent = formatPrice(p.p);
     if(pdpOld)   pdpOld.textContent   = formatPrice(p.op || p.p);
@@ -547,7 +547,7 @@ var currentSeller = { store: 'Tecnologia Brasil', id: '#SPRO01' };
 // ═══════════════════════════════════════
 
 let currentAddProdStep = 1;
-let selectedProductEmoji = '📦';
+let selectedProductEmoji = WKZ_ICO.package + '';
 let addedSpecs = [];
 let addedVariations = [];
 let addedPhotoSlots = [];
@@ -580,15 +580,15 @@ function addProdGoStep(step){
       const t = document.getElementById('ap-title')?.value.trim();
       const c = document.getElementById('ap-cat')?.value;
       const d = document.getElementById('ap-desc')?.value.trim();
-      if(!t){ showToast('⚠️ Preencha o Título do Produto'); return; }
-      if(!c){ showToast('⚠️ Selecione uma Categoria'); return; }
-      if(!d){ showToast('⚠️ Preencha a Descrição Completa'); return; }
+      if(!t){ showToast(WKZ_ICO.warning + '️ Preencha o Título do Produto'); return; }
+      if(!c){ showToast(WKZ_ICO.warning + '️ Selecione uma Categoria'); return; }
+      if(!d){ showToast(WKZ_ICO.warning + '️ Preencha a Descrição Completa'); return; }
     }
     if(currentAddProdStep===3){
       const p = document.getElementById('ap-price')?.value;
       const s = document.getElementById('ap-stock')?.value;
-      if(!p||parseFloat(p)<=0){ showToast('⚠️ Informe o Preço de Venda'); return; }
-      if(!s||parseInt(s)<0){ showToast('⚠️ Informe a Quantidade em Estoque'); return; }
+      if(!p||parseFloat(p)<=0){ showToast(WKZ_ICO.warning + '️ Informe o Preço de Venda'); return; }
+      if(!s||parseInt(s)<0){ showToast(WKZ_ICO.warning + '️ Informe a Quantidade em Estoque'); return; }
     }
   }
   // Hide all
@@ -615,7 +615,7 @@ function updateProductPreview(){
   const price = parseFloat(document.getElementById('ap-price')?.value)||0;
   const oldPrice = parseFloat(document.getElementById('ap-old-price')?.value)||0;
   const cond = document.querySelector('input[name="ap-cond"]:checked')?.value||'novo';
-  const condLabels={novo:'✨ Novo',seminovo:'🔄 Seminovo',usado:'📦 Usado',recondicionado:'🔧 Recondicionado'};
+  const condLabels={novo:WKZ_ICO.sparkles + ' Novo',seminovo:WKZ_ICO.sync + ' Seminovo',usado:WKZ_ICO.package + ' Usado',recondicionado:WKZ_ICO.wrench + ' Recondicionado'};
 
   const pt = document.getElementById('prev-title'); if(pt) pt.textContent = title.slice(0,60)||(title||'Nome do produto');
   const pb = document.getElementById('prev-brand'); if(pb) pb.textContent = brand||'Minha Loja Pro';
@@ -628,7 +628,7 @@ function updateProductPreview(){
     pof.textContent = `-${Math.floor(discExact)}%`;
   } else if(pof){ pof.textContent=''; }
   const pe = document.getElementById('prev-emoji'); if(pe) pe.style.fontSize='52px', pe.textContent=selectedProductEmoji;
-  const pc = document.getElementById('prev-cond'); if(pc) pc.textContent=condLabels[cond]||'✨ Novo';
+  const pc = document.getElementById('prev-cond'); if(pc) pc.textContent=condLabels[cond]||WKZ_ICO.sparkles + ' Novo';
 
   // title char count
   const tc = document.getElementById('ap-title-count');
@@ -647,24 +647,24 @@ function insertDesc(text){
 function fillDescTemplate(){
   const title = document.getElementById('ap-title')?.value||'[Nome do produto]';
   document.getElementById('ap-desc').value =
-`✅ ${title}
+`${WKZ_ICO.check} ${title}
 
-📦 O que está incluso na caixa:
+${WKZ_ICO.package} O que está incluso na caixa:
 • Produto principal
 • Manual de instruções
 • Garantia do fabricante
 
-🔧 Especificações técnicas:
+${WKZ_ICO.wrench} Especificações técnicas:
 • [Especificação 1]: [valor]
 • [Especificação 2]: [valor]
 • [Especificação 3]: [valor]
 
-🛡️ Garantia e Suporte:
+${WKZ_ICO.shield}️ Garantia e Suporte:
 12 meses de garantia do fabricante + 90 dias extra WeKz.
 
-📞 Suporte pós-venda:
+${WKZ_ICO.phone} Suporte pós-venda:
 Respondemos em até 5 minutos no chat da plataforma.`;
-  showToast('✨ Template aplicado! Personalize as informações.');
+  showToast(WKZ_ICO.sparkles + ' Template aplicado! Personalize as informações.');
 }
 
 
@@ -770,11 +770,11 @@ function handlePhotoUpload(event){
   const files = Array.from(event.target.files);
   if(!files.length) return;
   const remaining = 8 - addedPhotoSlots.length;
-  if(remaining <= 0){ showToast('⚠️ Limite de 8 fotos atingido.'); return; }
+  if(remaining <= 0){ showToast(WKZ_ICO.warning + '️ Limite de 8 fotos atingido.'); return; }
   const toAdd = files.slice(0, remaining);
   let loaded = 0;
   toAdd.forEach(file => {
-    if(file.size > 10 * 1024 * 1024){ showToast('⚠️ ' + file.name + ' excede 10MB.'); loaded++; if(loaded===toAdd.length) renderPhotoSlots(); return; }
+    if(file.size > 10 * 1024 * 1024){ showToast(WKZ_ICO.warning + '️ ' + file.name + ' excede 10MB.'); loaded++; if(loaded===toAdd.length) renderPhotoSlots(); return; }
     const reader = new FileReader();
     reader.onload = function(e){
       addedPhotoSlots.push({ id: wkzUid('photo'), dataUrl: e.target.result, name: file.name });
@@ -799,7 +799,7 @@ function renderPhotoSlots(){
   grid.innerHTML = addedPhotoSlots.map((slot, i) => {
     const imgContent = slot.dataUrl
       ? `<img src="${slot.dataUrl}" alt="${slot.name||'foto'}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`
-      : `<span style="font-size:42px;">${slot.emoji||'📦'}</span>`;
+      : `<span style="font-size:42px;">${slot.emoji||WKZ_ICO.package + ''}</span>`;
     return `
     <div style="background:var(--card2);border:${i===0?'2px solid var(--teal)':'1px solid var(--border)'};border-radius:12px;height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative;overflow:hidden;"
          data-photo-id="${slot.id}">
@@ -857,7 +857,7 @@ function updateFinalSummary(){
   const stock = document.getElementById('ap-stock')?.value||'0';
   const cond = document.querySelector('input[name="ap-cond"]:checked')?.value||'novo';
   const freight = document.querySelector('input[name="ap-freight"]:checked')?.value||'free';
-  const freightLabels={free:'✅ Frete Grátis',table:'📊 Por CEP',fixed:'💳 Frete Fixo','free-above':'🎯 Grátis acima de valor'};
+  const freightLabels={free:WKZ_ICO.check + ' Frete Grátis',table:WKZ_ICO.barChart + ' Por CEP',fixed:WKZ_ICO.card + ' Frete Fixo','free-above':WKZ_ICO.target + ' Grátis acima de valor'};
   s.innerHTML = [
     ['Título', title.slice(0,40)+(title.length>40?'...':'')],
     ['Categoria', cat],
@@ -870,16 +870,16 @@ function updateFinalSummary(){
 }
 
 function saveDraft(){
-  showToast('💾 Rascunho salvo! Continue quando quiser.');
+  showToast(WKZ_ICO.save + ' Rascunho salvo! Continue quando quiser.');
 }
 
 function publishProduct(){
   const title = document.getElementById('ap-title')?.value.trim();
   const price = parseFloat(document.getElementById('ap-price')?.value)||0;
   const cat = document.getElementById('ap-cat')?.value;
-  if(!title){ addProdGoStep(1); showToast('⚠️ Preencha o Título do Produto'); return; }
-  if(!cat){ addProdGoStep(1); showToast('⚠️ Selecione uma Categoria'); return; }
-  if(price<=0){ addProdGoStep(3); showToast('⚠️ Informe o Preço de Venda'); return; }
+  if(!title){ addProdGoStep(1); showToast(WKZ_ICO.warning + '️ Preencha o Título do Produto'); return; }
+  if(!cat){ addProdGoStep(1); showToast(WKZ_ICO.warning + '️ Selecione uma Categoria'); return; }
+  if(price<=0){ addProdGoStep(3); showToast(WKZ_ICO.warning + '️ Informe o Preço de Venda'); return; }
 
   // Hide all steps
   for(let i=1;i<=4;i++){
@@ -947,7 +947,7 @@ function publishProduct(){
       </div>
     </div>`;
 
-  showToast('🚀 Produto publicado com sucesso!');
+  showToast(WKZ_ICO.rocket + ' Produto publicado com sucesso!');
   // [FIX v2.3.1] Invalida cache da lista de produtos e força re-render
   const mpList = document.getElementById('myProductsList');
   if(mpList) { mpList.innerHTML = ''; mpList.removeAttribute('data-inited'); }
@@ -966,7 +966,7 @@ function resetAddProduct(){
   document.getElementById('ap-specs-list').innerHTML='';
   document.getElementById('ap-variations-list').innerHTML='';
   document.getElementById('ap-margin-display').style.display='none';
-  addedSpecs=[];addedVariations=[];addedPhotoSlots=[];selectedProductEmoji='📦';
+  addedSpecs=[];addedVariations=[];addedPhotoSlots=[];selectedProductEmoji=WKZ_ICO.package + '';
   renderPhotoSlots();
   updateProductPreview();
   document.getElementById('addprod-success').style.display='none';
@@ -978,7 +978,7 @@ function resetAddProduct(){
   document.getElementById('aps1').classList.add('active');
   document.getElementById('addprod-step1').style.display='block';
   currentAddProdStep=1;
-  showToast('✅ Formulário limpo. Pronto para novo produto!');
+  showToast(WKZ_ICO.check + ' Formulário limpo. Pronto para novo produto!');
 }
 
 function filterOrders(type, el){
@@ -1001,7 +1001,7 @@ function filterOrders(type, el){
     row.style.display = show ? '' : 'none';
     if(show) visibleCount++;
   });
-  if(el) showToast('🔍 Filtrando pedidos: '+el.textContent.trim());
+  if(el) showToast(WKZ_ICO.search + ' Filtrando pedidos: '+el.textContent.trim());
   return visibleCount;
 }
 
@@ -1077,7 +1077,7 @@ function openGlobalShippingModalLegacy(){
     { flag:'🇦🇴', name:'Angola & África', desc:'Entrega prioritária AOA', days:'12–22 dias', price:'A partir de Kz 2.400', carrier:'Kz Global Express', color:'#F59E0B' },
     { flag:'🇺🇸', name:'EUA & Américas', desc:'Frete rastreado USD', days:'10–16 dias', price:'A partir de $ 7,90', carrier:'Kz Global Express', color:'#6366F1' },
     { flag:'🇯🇵', name:'Ásia & Pacífico', desc:'Envio consolidado JPY/CNY', days:'14–20 dias', price:'A partir de ¥ 1.200', carrier:'Kz Global Express', color:'#EC4899' },
-    { flag:'🌍', name:'Resto do Mundo', desc:'180+ países cobertos', days:'14–30 dias', price:'Calcule na PDP', carrier:'Kz Global Express', color:'#00B4AB' },
+    { flag:WKZ_ICO.globe + '', name:'Resto do Mundo', desc:'180+ países cobertos', days:'14–30 dias', price:'Calcule na PDP', carrier:'Kz Global Express', color:'#00B4AB' },
   ];
   const rows = regions.map(r => `
     <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;margin-bottom:8px;">
@@ -1158,14 +1158,14 @@ function openSaqueModal(){
       <input type="hidden" id="sw-conta" value="pix">
     </div>
     <div style="background:rgba(0,180,171,0.06);border:1px solid rgba(0,180,171,0.2);border-radius:10px;padding:12px;font-size:12px;margin-bottom:20px;line-height:1.7;">
-      <div style="font-weight:700;color:var(--teal);margin-bottom:4px;">📋 Resumo do saque</div>
+      <div style="font-weight:700;color:var(--teal);margin-bottom:4px;">${WKZ_ICO.clipboard} Resumo do saque</div>
       <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Valor solicitado:</span><span id="sw-resumo-val">R$ 12.480,00</span></div>
       <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Taxa de transferência:</span><span style="color:#EF4444;">R$ 0,00</span></div>
       <div style="display:flex;justify-content:space-between;font-weight:700;margin-top:4px;padding-top:4px;border-top:1px solid rgba(0,180,171,0.2);"><span>Valor líquido:</span><span style="color:#22C55E;" id="sw-resumo-liq">R$ 12.480,00</span></div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzSaqueModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="confirmarSaque()">💳 Confirmar Saque</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="confirmarSaque()">${WKZ_ICO.card} Confirmar Saque</button>
     </div>
   `, {maxWidth:'480px'});
   // Live update resumo
@@ -1183,10 +1183,10 @@ function confirmarSaque(){
   const contaVal = document.getElementById('sw-conta')?.value || 'pix';
   const contaLabels = {pix:'PIX', ted:'TED Banco do Brasil', poupanca:'Poupança Caixa'};
   const contaTxt = contaLabels[contaVal] || contaVal;
-  if(v < 50){ showToast('⚠️ Valor mínimo de saque é R$ 50,00'); return; }
-  if(v > 12480){ showToast('⚠️ Valor excede o saldo disponível'); return; }
+  if(v < 50){ showToast(WKZ_ICO.warning + '️ Valor mínimo de saque é R$ 50,00'); return; }
+  if(v > 12480){ showToast(WKZ_ICO.warning + '️ Valor excede o saldo disponível'); return; }
   document.getElementById('wkzSaqueModal').classList.remove('open');
-  showToast('✅ Saque de R$ '+v.toFixed(2).replace('.',',')+' solicitado! Processamento via '+contaTxt+'.');
+  showToast(WKZ_ICO.check + ' Saque de R$ '+v.toFixed(2).replace('.',',')+' solicitado! Processamento via '+contaTxt+'.');
 }
 
 /* ─── FINANCEIRO: Exportar Extrato ─── */
@@ -1233,9 +1233,9 @@ function openExtratoModal(){
     <div class="form-group">
       <label class="form-label">Formato</label>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="ext-fmt" value="pdf" checked> 📄 PDF</label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="ext-fmt" value="xlsx"> 📊 Excel (.xlsx)</label>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="ext-fmt" value="csv"> 📋 CSV</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="ext-fmt" value="pdf" checked> ${WKZ_ICO.file} PDF</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="ext-fmt" value="xlsx"> ${WKZ_ICO.barChart} Excel (.xlsx)</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="ext-fmt" value="csv"> ${WKZ_ICO.clipboard} CSV</label>
       </div>
     </div>
     <div class="form-group">
@@ -1249,7 +1249,7 @@ function openExtratoModal(){
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
       <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzExtratoModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="exportarExtrato()">📥 Exportar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="exportarExtrato()">${WKZ_ICO.download} Exportar</button>
     </div>
   `, {maxWidth:'480px'});
   // Wire period selection helper
@@ -1275,7 +1275,7 @@ function exportarExtrato(){
   const periodoLabels = {'mes':'Mês atual (Mai 2026)','mes-ant':'Abril 2026','trim':'Último trimestre','semestre':'Último semestre','ano':'Ano 2026','custom':'Período personalizado'};
   const periodoTxt = periodoLabels[periodoVal] || periodoVal;
   document.getElementById('wkzExtratoModal').classList.remove('open');
-  showToast('📥 Extrato ('+periodoTxt+') exportado em '+fmt.toUpperCase()+'! O download foi iniciado.');
+  showToast(WKZ_ICO.download + ' Extrato ('+periodoTxt+') exportado em '+fmt.toUpperCase()+'! O download foi iniciado.');
 }
 
 /* ─── AVALIAÇÕES: Responder ─── */
@@ -1328,7 +1328,7 @@ function openReviewReplyModal(btn, autorNome, textoAvaliacao, reviewIdx){
 
 function enviarRespostaReview(autorNome, reviewIdx){
   const txt = document.getElementById('rev-reply-text')?.value.trim();
-  if(!txt){ showToast('⚠️ Escreva sua resposta antes de publicar.'); return; }
+  if(!txt){ showToast(WKZ_ICO.warning + '️ Escreva sua resposta antes de publicar.'); return; }
   document.getElementById('wkzReviewReplyModal').classList.remove('open');
   // Persist replied state
   if(!window._repliedReviews) window._repliedReviews = new Set();
@@ -1338,7 +1338,7 @@ function enviarRespostaReview(autorNome, reviewIdx){
   if(btn){
     btn.outerHTML = `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#22C55E;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);padding:5px 12px;border-radius:6px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg> Respondido</span>`;
   }
-  showToast('✅ Resposta publicada para ' + (autorNome||'cliente') + '!');
+  showToast(WKZ_ICO.check + ' Resposta publicada para ' + (autorNome||'cliente') + '!');
 }
 
 /* ─── DISPUTAS: Responder Agora ─── */
@@ -1373,11 +1373,11 @@ function openDisputeReplyModal(pedido, produto, comprador, motivo, data){
       <textarea class="form-input" id="disp-reply-text" rows="4" placeholder="Descreva detalhadamente sua posição. Inclua rastreamento, fotos ou qualquer evidência relevante..." style="resize:vertical;font-family:inherit;"></textarea>
     </div>
     <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:16px;">
-      ⏱️ Você tem <strong style="color:#F59E0B;">até 48h</strong> para responder. Sem resposta, a WeKz decide automaticamente a favor do comprador.
+      ${WKZ_ICO.clock}️ Você tem <strong style="color:#F59E0B;">até 48h</strong> para responder. Sem resposta, a WeKz decide automaticamente a favor do comprador.
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzDisputaModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="enviarRespostaDisputa('${pedido}')">⚖️ Enviar Resposta</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="enviarRespostaDisputa('${pedido}')">${WKZ_ICO.scale}️ Enviar Resposta</button>
     </div>
   `, {maxWidth:'520px'});
 }
@@ -1385,7 +1385,7 @@ function openDisputeReplyModal(pedido, produto, comprador, motivo, data){
 function enviarRespostaDisputa(pedido){
   const txt = document.getElementById('disp-reply-text')?.value.trim();
   const pos = document.querySelector('input[name="disp-pos"]:checked')?.value;
-  if(!txt){ showToast('⚠️ Descreva sua posição antes de enviar.'); return; }
+  if(!txt){ showToast(WKZ_ICO.warning + '️ Descreva sua posição antes de enviar.'); return; }
   const posLabels = {refund:'Reembolso aceito', partial:'Reembolso parcial proposto', contest:'Contestação enviada'};
   const posLabel = posLabels[pos] || 'Resposta enviada';
   document.getElementById('wkzDisputaModal').classList.remove('open');
@@ -1418,7 +1418,7 @@ function enviarRespostaDisputa(pedido){
       card.dataset.answered = '1';
       const btn = card.querySelector('.btn-primary');
       if(btn){
-        btn.textContent = '✅ Respondido';
+        btn.textContent = WKZ_ICO.check + ' Respondido';
         btn.disabled = true;
         btn.style.background = 'rgba(34,197,94,0.15)';
         btn.style.border = '1px solid rgba(34,197,94,0.3)';
@@ -1429,7 +1429,7 @@ function enviarRespostaDisputa(pedido){
         const note = document.createElement('div');
         note.className = 'dispute-pending-note';
         note.style.cssText = 'margin-top:10px;font-size:11px;color:#F59E0B;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:8px 10px;';
-        note.textContent = '⏳ Resposta enviada — aguardando decisão da WeKz.';
+        note.textContent = WKZ_ICO.clock + ' Resposta enviada — aguardando decisão da WeKz.';
         card.appendChild(note);
       }
     }
@@ -1452,7 +1452,7 @@ function enviarRespostaDisputa(pedido){
     window.cpNotifyBuyerSellerResponded(pedido, posLabel, txt);
   }
 
-  showToast('✅ '+posLabel+' para disputa '+pedido+'!');
+  showToast(WKZ_ICO.check + ' '+posLabel+' para disputa '+pedido+'!');
 }
 
 /* ─── MARKETING: Modal unificado ─── */
@@ -1469,7 +1469,7 @@ function openMarketingModal(tipo){
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Agora não</button>
-        <button class="btn-primary" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open'); openPremiumPlansModal();">⭐ Ver Planos</button>
+        <button class="btn-primary" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open'); openPremiumPlansModal();">${WKZ_ICO.star} Ver Planos</button>
       </div>
     `, {maxWidth:'440px'});
     return;
@@ -1483,7 +1483,7 @@ function openMarketingModal(tipo){
           <label class="form-label">Código do cupom <span class="req">*</span></label>
           <div style="display:flex;gap:8px;">
             <input class="form-input" id="mk-cupom-code" type="text" placeholder="Ex: VERAO20" maxlength="20" style="text-transform:uppercase;flex:1;">
-            <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:0 14px;border-radius:10px;cursor:pointer;font-size:12px;white-space:nowrap;" onclick="gerarCodigoCupom()">🎲 Gerar</button>
+            <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:0 14px;border-radius:10px;cursor:pointer;font-size:12px;white-space:nowrap;" onclick="gerarCodigoCupom()">${WKZ_ICO.dice} Gerar</button>
           </div>
         </div>
         <div class="form-row-2col">
@@ -1526,7 +1526,7 @@ function openMarketingModal(tipo){
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
           <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="salvarMarketing('cupom')">🎁 Criar Cupom</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="salvarMarketing('cupom')">${WKZ_ICO.gift} Criar Cupom</button>
         </div>`
     },
     flash: {
@@ -1537,7 +1537,7 @@ function openMarketingModal(tipo){
           <label class="form-label">Produto <span class="req">*</span></label>
           <div style="position:relative;">
             <div id="mk-flash-prod-btn" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:border-color 0.2s;user-select:none;" onclick="_wkzDropToggle('mk-flash-prod-dd')" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor=document.getElementById('mk-flash-prod-dd').style.display==='block'?'var(--teal)':'var(--border)'">
-              <span id="mk-flash-prod-label">${products[0]?.e||'📦'} ${(products[0]?.n||'').slice(0,38)} — ${formatPrice(products[0]?.p||0)}</span>
+              <span id="mk-flash-prod-label">${products[0]?.e||WKZ_ICO.package + ''} ${(products[0]?.n||'').slice(0,38)} — ${formatPrice(products[0]?.p||0)}</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
             </div>
             <div id="mk-flash-prod-dd" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid var(--teal);border-radius:10px;z-index:100;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
@@ -1574,11 +1574,11 @@ function openMarketingModal(tipo){
           </div>
         </div>
         <div style="background:rgba(255,107,53,0.07);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:16px;">
-          ⚡ Seu produto ganhará destaque na seção Flash Sale durante o período ativo. Promoções com ≥20% de desconto têm prioridade na vitrine.
+          ${WKZ_ICO.zap} Seu produto ganhará destaque na seção Flash Sale durante o período ativo. Promoções com ≥20% de desconto têm prioridade na vitrine.
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;">
           <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#FF6B35,#FF2D7A);border:none;" onclick="salvarMarketing('flash')">⚡ Ativar Flash Sale</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#FF6B35,#FF2D7A);border:none;" onclick="salvarMarketing('flash')">${WKZ_ICO.zap} Ativar Flash Sale</button>
         </div>`
     },
     ads: {
@@ -1586,14 +1586,14 @@ function openMarketingModal(tipo){
       color: '#a78bfa',
       html: `
         <div style="background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;">
-          <div style="font-weight:700;color:#c4b5fd;margin-bottom:4px;">✨ WeKz Ads — CPC (Custo por Clique)</div>
+          <div style="font-weight:700;color:#c4b5fd;margin-bottom:4px;">${WKZ_ICO.sparkles} WeKz Ads — CPC (Custo por Clique)</div>
           <div style="color:var(--muted);font-size:12px;">Seu produto aparece no topo das buscas e nas páginas de categoria. Você paga apenas quando alguém clicar.</div>
         </div>
         <div class="form-group">
           <label class="form-label">Produto a anunciar <span class="req">*</span></label>
           <div style="position:relative;">
             <div id="mk-ads-prod-btn" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:border-color 0.2s;user-select:none;" onclick="_wkzDropToggle('mk-ads-prod-dd')" onmouseenter="this.style.borderColor='#a78bfa'" onmouseleave="this.style.borderColor=document.getElementById('mk-ads-prod-dd').style.display==='block'?'#a78bfa':'var(--border)'">
-              <span id="mk-ads-prod-label">${products[0]?.e||'📦'} ${(products[0]?.n||'').slice(0,40)}</span>
+              <span id="mk-ads-prod-label">${products[0]?.e||WKZ_ICO.package + ''} ${(products[0]?.n||'').slice(0,40)}</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
             </div>
             <div id="mk-ads-prod-dd" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid #a78bfa;border-radius:10px;z-index:100;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
@@ -1623,7 +1623,7 @@ function openMarketingModal(tipo){
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
           <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#7C3AED,#a78bfa);border:none;" onclick="salvarMarketing('ads')">📢 Ativar Anúncio</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#7C3AED,#a78bfa);border:none;" onclick="salvarMarketing('ads')">${WKZ_ICO.megaphone} Ativar Anúncio</button>
         </div>`
     },
     frete: {
@@ -1631,7 +1631,7 @@ function openMarketingModal(tipo){
       color: '#22C55E',
       html: `
         <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;">
-          <div style="font-weight:700;color:#22C55E;margin-bottom:4px;">✅ Como funciona</div>
+          <div style="font-weight:700;color:#22C55E;margin-bottom:4px;">${WKZ_ICO.check} Como funciona</div>
           <div style="color:var(--muted);font-size:12px;line-height:1.7;">A WeKz co-patrocina até <strong style="color:var(--text);">50% do custo do frete</strong> em produtos participantes. Você arca com a outra metade — e seu produto ganha o selo "Frete Grátis" nas buscas.</div>
         </div>
         <div class="form-group">
@@ -1653,7 +1653,7 @@ function openMarketingModal(tipo){
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
           <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#22C55E,#059669);border:none;" onclick="salvarMarketing('frete')">🚚 Ativar Frete Grátis</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#22C55E,#059669);border:none;" onclick="salvarMarketing('frete')">${WKZ_ICO.truck} Ativar Frete Grátis</button>
         </div>`
     }
   };
@@ -1683,7 +1683,7 @@ function salvarMarketing(tipo){
   const msgs = {
     cupom: ()=>{
       const code     = document.getElementById('mk-cupom-code')?.value.trim().toUpperCase();
-      if(!code){ showToast('⚠️ Informe o código do cupom.'); return false; }
+      if(!code){ showToast(WKZ_ICO.warning + '️ Informe o código do cupom.'); return false; }
       const val      = parseFloat(document.getElementById('mk-cupom-valor')?.value)||0;
       const tipoDesc = document.getElementById('mk-cupom-tipo')?.value || 'percent';
       const validade = document.getElementById('mk-cupom-validade')?.value || null;
@@ -1704,7 +1704,7 @@ function salvarMarketing(tipo){
         chip.onclick=()=>fillCoupon(code);
         chips.appendChild(chip);
       }
-      return `🎁 Cupom <strong>${code}</strong> (${sufixo}) criado, ativado e visível aos clientes!`;
+      return `${WKZ_ICO.gift} Cupom <strong>${code}</strong> (${sufixo}) criado, ativado e visível aos clientes!`;
     },
     flash: ()=>{
       const prodIdx  = parseInt(document.getElementById('mk-flash-prod')?.value ?? '0');
@@ -1712,7 +1712,7 @@ function salvarMarketing(tipo){
       const estoqueVal= parseInt(document.getElementById('mk-flash-estoque')?.value) || 30;
       const inicio   = document.getElementById('mk-flash-inicio')?.value;
       const duracao  = parseInt(document.getElementById('mk-flash-duracao')?.value) || 4;
-      if(!precoVal || !inicio){ showToast('⚠️ Preencha o preço e o horário de início.'); return false; }
+      if(!precoVal || !inicio){ showToast(WKZ_ICO.warning + '️ Preencha o preço e o horário de início.'); return false; }
 
       // Referência ao produto selecionado
       const prod = products[prodIdx] || {};
@@ -1722,7 +1722,7 @@ function salvarMarketing(tipo){
 
       // Monta o item no formato flashItems
       const newFlashItem = {
-        e: prod.e || '📦',
+        e: prod.e || WKZ_ICO.package + '',
         n: prod.n || 'Produto em Promoção',
         p: fmtPreco(precoVal),
         o: fmtPreco(precoOrig),
@@ -1760,17 +1760,17 @@ function salvarMarketing(tipo){
         renderFlashPage();
       }
 
-      return `⚡ Flash Sale ativada! <strong>${prod.n || 'Produto'}</strong> já aparece na vitrine com ${offPct > 0 ? offPct+'% OFF' : 'desconto especial'}! Abra (ou atualize) a página do comprador para conferir.`;
+      return `${WKZ_ICO.zap} Flash Sale ativada! <strong>${prod.n || 'Produto'}</strong> já aparece na vitrine com ${offPct > 0 ? offPct+'% OFF' : 'desconto especial'}! Abra (ou atualize) a página do comprador para conferir.`;
     },
     ads: ()=>{
       if(typeof sellerHasAdsAccess === 'function' && !sellerHasAdsAccess()){
-        showToast('⚠️ Anúncios Patrocinados exigem o plano Pro ou Enterprise.');
+        showToast(WKZ_ICO.warning + '️ Anúncios Patrocinados exigem o plano Pro ou Enterprise.');
         return false;
       }
       const cpc    = document.getElementById('mk-ads-cpc')?.value;
       const budget = document.getElementById('mk-ads-budget')?.value;
       const prodEl = document.getElementById('mk-ads-prod');
-      if(!cpc){ showToast('⚠️ Defina o lance por clique.'); return false; }
+      if(!cpc){ showToast(WKZ_ICO.warning + '️ Defina o lance por clique.'); return false; }
       // Identifica produto a patrocinar (usa 1º se não houver seletor)
       const prodIdx = prodEl ? parseInt(prodEl.value||'0') : 0;
       if(products[prodIdx] && !SPONSORED_PRODUCTS.includes(prodIdx)){
@@ -1782,7 +1782,7 @@ function salvarMarketing(tipo){
         if(typeof renderProducts==='function') renderProducts();
       }
       const pName = products[0]?.n || 'Produto';
-      return `📢 Anúncio ativado! <strong>${pName}</strong> aparece no topo com badge 📢 Patrocinado. Lance: R$${parseFloat(cpc).toFixed(2)}/clique · Orçamento: R$${budget||20}/dia.`;
+      return `${WKZ_ICO.megaphone} Anúncio ativado! <strong>${pName}</strong> aparece no topo com badge ${WKZ_ICO.megaphone} Patrocinado. Lance: R$${parseFloat(cpc).toFixed(2)}/clique · Orçamento: R$${budget||20}/dia.`;
     },
     frete: ()=>{
       // Identifica loja do vendedor logado ou fallback
@@ -1798,13 +1798,13 @@ function salvarMarketing(tipo){
         SELLER_COUPONS[freteCode]={disc:0,type:'frete',label:'Frete Grátis aplicado!',validade:null,usos:0,_used:0,seller:sellerStore};
       }
       if(typeof renderProducts==='function') renderProducts();
-      return '🚚 Frete Grátis ativado! Produtos da loja <strong>'+sellerStore+'</strong> ganham o selo 🚚 Grátis nas buscas e no carrinho. Cupom <strong>FRETE0</strong> activado.';
+      return WKZ_ICO.truck + ' Frete Grátis ativado! Produtos da loja <strong>'+sellerStore+'</strong> ganham o selo ${WKZ_ICO.truck} Grátis nas buscas e no carrinho. Cupom <strong>FRETE0</strong> activado.';
     }
   };
   const result = msgs[tipo]?.();
   if(result === false) return;
   document.getElementById('wkzMarketingModal').classList.remove('open');
-  showToast(result||'✅ Configuração salva!');
+  showToast(result||WKZ_ICO.check + ' Configuração salva!');
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -1921,9 +1921,9 @@ function openReportVendas(){
     <div style="margin-bottom:16px;">
       <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600;">Exportar como:</div>
       <div style="display:flex;gap:8px;">
-        <button onclick="this.style.borderColor='var(--teal)';this.style.background='rgba(0,180,171,0.12)';document.getElementById('rv-fmt').value='pdf'" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.2s;">📄 PDF</button>
-        <button onclick="this.style.borderColor='var(--teal)';this.style.background='rgba(0,180,171,0.12)';document.getElementById('rv-fmt').value='excel'" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.2s;">📊 Excel</button>
-        <button onclick="this.style.borderColor='var(--teal)';this.style.background='rgba(0,180,171,0.12)';document.getElementById('rv-fmt').value='csv'" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.2s;">📋 CSV</button>
+        <button onclick="this.style.borderColor='var(--teal)';this.style.background='rgba(0,180,171,0.12)';document.getElementById('rv-fmt').value='pdf'" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.2s;">${WKZ_ICO.file} PDF</button>
+        <button onclick="this.style.borderColor='var(--teal)';this.style.background='rgba(0,180,171,0.12)';document.getElementById('rv-fmt').value='excel'" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.2s;">${WKZ_ICO.barChart} Excel</button>
+        <button onclick="this.style.borderColor='var(--teal)';this.style.background='rgba(0,180,171,0.12)';document.getElementById('rv-fmt').value='csv'" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.2s;">${WKZ_ICO.clipboard} CSV</button>
       </div>
       <input type="hidden" id="rv-fmt" value="pdf">
     </div>
@@ -1954,9 +1954,9 @@ function rvSetPeriodo(idx){
 /* ── 2. RELATÓRIO DE ESTOQUE ── */
 function openReportEstoque(){
   const items = [
-    {n:'Notebook Gamer RTX 4060', sku:'NBG-RTX4060', est:8,  min:10, custo:'R$2.400', val:'R$19.200', status:'danger',  sl:'⚠ Crítico'},
+    {n:'Notebook Gamer RTX 4060', sku:'NBG-RTX4060', est:8,  min:10, custo:'R$2.400', val:'R$19.200', status:'danger',  sl:WKZ_ICO.warning + ' Crítico'},
     {n:'Headset Cyberpunk Pro',    sku:'HDP-CYBER7', est:43, min:20, custo:'R$  150', val:'R$ 6.450', status:'ok',     sl:'✓ Normal'},
-    {n:'Smartphone Ultra 5G',      sku:'SMT-5G256',  est:5,  min:15, custo:'R$1.200', val:'R$ 6.000', status:'danger',  sl:'⚠ Crítico'},
+    {n:'Smartphone Ultra 5G',      sku:'SMT-5G256',  est:5,  min:15, custo:'R$1.200', val:'R$ 6.000', status:'danger',  sl:WKZ_ICO.warning + ' Crítico'},
     {n:'Mouse Wireless Ergon.',    sku:'MSW-ERGO1',  est:120,min:30, custo:'R$   55', val:'R$ 6.600', status:'ok',     sl:'✓ Normal'},
     {n:'Monitor 4K 144Hz 27"',     sku:'MNT-4K27H',  est:4,  min:5,  custo:'R$  580', val:'R$ 2.320', status:'warn',   sl:'→ Atenção'},
     {n:'Teclado Mec. RGB TKL',     sku:'TCL-RGBTKL', est:67, min:25, custo:'R$  220', val:'R$14.740', status:'ok',     sl:'✓ Normal'},
@@ -1990,7 +1990,7 @@ function openReportEstoque(){
       <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px;">
         <div style="font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">Críticos / Sem estoque</div>
         <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#EF4444;">3 SKUs</div>
-        <div style="font-size:11px;color:#EF4444;margin-top:2px;">⚠ Reposição urgente</div>
+        <div style="font-size:11px;color:#EF4444;margin-top:2px;">${WKZ_ICO.warning} Reposição urgente</div>
       </div>
       <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px;">
         <div style="font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">Giro médio (mês)</div>
@@ -2019,7 +2019,7 @@ function openReportEstoque(){
 
     <!-- Análise de curva ABC -->
     <div style="background:rgba(0,180,171,0.04);border:1px solid rgba(0,180,171,0.15);border-radius:10px;padding:14px;margin-bottom:14px;">
-      <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--teal);margin-bottom:10px;">📊 Curva ABC — Classificação por Receita</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--teal);margin-bottom:10px;">${WKZ_ICO.barChart} Curva ABC — Classificação por Receita</div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
         <div style="display:flex;align-items:center;gap:10px;">
           <div style="width:24px;height:24px;background:#22C55E;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#000;flex-shrink:0;">A</div>
@@ -2105,7 +2105,7 @@ function openReportFinanceiro(){
     <!-- DRE completo -->
     <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;">
       <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--border);">
-        📑 Demonstrativo de Resultado (DRE) — Maio 2026
+        ${WKZ_ICO.file} Demonstrativo de Resultado (DRE) — Maio 2026
       </div>
       <div style="display:flex;flex-direction:column;gap:0;font-size:12px;">
         <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,0.05);">
@@ -2228,11 +2228,11 @@ function openReportAvaliacoes(){
     <!-- Análise de sentimento -->
     <div style="background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:14px;margin-bottom:14px;">
       <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:#A78BFA;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-        🧠 Análise de Sentimento por IA
+        ${WKZ_ICO.brain} Análise de Sentimento por IA
       </div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:12px;">
         <div>
-          <div style="color:#22C55E;font-weight:600;margin-bottom:4px;">👍 Pontos fortes (mais citados)</div>
+          <div style="color:#22C55E;font-weight:600;margin-bottom:4px;">${WKZ_ICO.thumbsUp} Pontos fortes (mais citados)</div>
           <div style="display:flex;flex-direction:column;gap:3px;color:var(--muted);">
             <span>• "Entrega rápida" — 312 menções</span>
             <span>• "Produto original" — 287 menções</span>
@@ -2241,7 +2241,7 @@ function openReportAvaliacoes(){
           </div>
         </div>
         <div>
-          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">⚠ Pontos de melhoria</div>
+          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">${WKZ_ICO.warning} Pontos de melhoria</div>
           <div style="display:flex;flex-direction:column;gap:3px;color:var(--muted);">
             <span>• "Prazo de entrega" — 38 menções</span>
             <span>• "Embalagem" — 27 menções</span>
@@ -2269,7 +2269,7 @@ function openReportAvaliacoes(){
           </div>
         </div>
         <div style="font-size:12px;color:var(--muted);padding-left:34px;line-height:1.5;">${r.txt}</div>
-        ${!r.resp?`<div style="padding-left:34px;margin-top:6px;"><button onclick="showToast('💬 Abrindo editor de resposta...')" style="font-size:10px;padding:3px 10px;border-radius:50px;border:1px solid rgba(0,180,171,0.35);background:rgba(0,180,171,0.07);color:var(--teal);cursor:pointer;">Responder</button></div>`:`<div style="padding-left:34px;margin-top:4px;font-size:10px;color:#22C55E;">✅ Respondida</div>`}
+        ${!r.resp?`<div style="padding-left:34px;margin-top:6px;"><button onclick="showToast(WKZ_ICO.chat + ' Abrindo editor de resposta...')" style="font-size:10px;padding:3px 10px;border-radius:50px;border:1px solid rgba(0,180,171,0.35);background:rgba(0,180,171,0.07);color:var(--teal);cursor:pointer;">Responder</button></div>`:`<div style="padding-left:34px;margin-top:4px;font-size:10px;color:#22C55E;">${WKZ_ICO.check} Respondida</div>`}
       </div>`).join('')}
     </div>
 
@@ -2288,9 +2288,9 @@ function exportarRelatorio(tipo, fmtInputId){
   const fmt = (fmtInputId && document.getElementById(fmtInputId)?.value) || 'pdf';
   const nomes = {vendas:'Relatorio_Vendas', estoque:'Relatorio_Estoque', financeiro:'Relatorio_Financeiro_DRE', avaliacoes:'Relatorio_Avaliacoes'};
   const exts = {pdf:'pdf', excel:'xlsx', csv:'csv'};
-  const icons = {pdf:'📄', excel:'📊', csv:'📋'};
+  const icons = {pdf:WKZ_ICO.file + '', excel:WKZ_ICO.barChart + '', csv:WKZ_ICO.clipboard + ''};
   const ext = exts[fmt] || 'pdf';
-  const icon = icons[fmt] || '📄';
+  const icon = icons[fmt] || WKZ_ICO.file + '';
   const nome = (nomes[tipo] || 'Relatorio') + '_Mai2026.' + ext;
   const btn = event.target.closest('button');
   if(btn){
@@ -2391,9 +2391,9 @@ function openOrderDetailModal(id, produto, comprador, valor, status, data, ender
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn-add-cart" style="padding:10px 16px;font-size:12px;" onclick="document.getElementById('wkzOrderDetailModal').classList.remove('open')">Fechar</button>
-      ${isDisputa ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" onclick="document.getElementById(\'wkzOrderDetailModal\').classList.remove(\'open\')">⚖️ Ver Disputa</button>' : ''}
-      ${isSent ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="showToast(\'📋 Código de rastreio copiado!\')">📦 Copiar Rastreio</button>' : ''}
-      ${isPago ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="marcarEnviado(\''+id+'\',this)">🚚 Marcar como Enviado</button>' : ''}
+      ${isDisputa ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" onclick="document.getElementById(\'wkzOrderDetailModal\').classList.remove(\'open\')">${WKZ_ICO.scale}️ Ver Disputa</button>' : ''}
+      ${isSent ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="showToast(\' + WKZ_ICO.clipboard + \' Código de rastreio copiado!\')">${WKZ_ICO.package} Copiar Rastreio</button>' : ''}
+      ${isPago ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="marcarEnviado(\''+id+'\',this)">${WKZ_ICO.truck} Marcar como Enviado</button>' : ''}
     </div>
   `, {maxWidth:'560px'});
 }
@@ -2617,7 +2617,7 @@ function closeEtiquetaModal() {
  * CSS já garante que somente #wkzEtiquetaModalOv seja renderizado.
  */
 function imprimirEtiqueta() {
-  showToast('🖨️ Enviando etiqueta para a impressora...');
+  showToast(WKZ_ICO.printer + '️ Enviando etiqueta para a impressora...');
   setTimeout(() => { window.print(); }, 320);
 }
 
@@ -2679,7 +2679,7 @@ function openDispatchModal(pedidoId) {
    ══════════════════════════════════════════════════════════════════ */
 function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
   if (!trackingCode || !trackingCode.trim()) {
-    showToast('⚠️ Informe o código de rastreio antes de confirmar.');
+    showToast(WKZ_ICO.warning + '️ Informe o código de rastreio antes de confirmar.');
     return;
   }
   var trk = trackingCode.trim().toUpperCase();
@@ -2691,7 +2691,7 @@ function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
      UI não pode ficar refém de efeitos colaterais não-críticos. */
   var modal = document.getElementById('wkzDispatchModal');
   if (modal) modal.classList.remove('open');
-  showToast('✅ Pedido ' + orderId + ' despachado! Comprador notificado. Rastreio: ' + trk);
+  showToast(WKZ_ICO.check + ' Pedido ' + orderId + ' despachado! Comprador notificado. Rastreio: ' + trk);
 
   try {
 
@@ -2739,7 +2739,7 @@ function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
   /* 4 — Notificação push ao Comprador */
   if (typeof wkzShowPush === 'function') {
     wkzShowPush(
-      '📦 Pedido Enviado!',
+      WKZ_ICO.package + ' Pedido Enviado!',
       'Seu pedido ' + orderId + ' foi despachado via ' + carrier + '. Rastreio: ' + trk,
       'success',
       8000
@@ -2755,8 +2755,8 @@ function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
 
   /* 6 — Atualiza botão na tabela para "Ver Rastreio" */
   document.querySelectorAll('button[onclick*="marcarEnviado(\'' + orderId + '\'"]').forEach(function(b) {
-    b.textContent = '📍 Rastreio';
-    b.onclick = function() { showToast('📦 Rastreio ' + orderId + ': ' + trk + ' (' + carrier + ')'); };
+    b.textContent = WKZ_ICO.mapPin + ' Rastreio';
+    b.onclick = function() { showToast(WKZ_ICO.package + ' Rastreio ' + orderId + ': ' + trk + ' (' + carrier + ')'); };
   });
 
   } catch (err) {
@@ -2792,7 +2792,7 @@ function wkzSellerConfirmOrderReceipt(orderId, btn) {
       btn.style.background = 'rgba(37,99,235,0.12)';
       btn.style.borderColor = 'rgba(37,99,235,0.4)';
       btn.style.color = '#60A5FA';
-      btn.textContent = '🚚 Marcar Enviado';
+      btn.textContent = WKZ_ICO.truck + ' Marcar Enviado';
       btn.onclick = function() { marcarEnviado(orderId, btn); };
     }
   }
@@ -2803,7 +2803,7 @@ function wkzSellerConfirmOrderReceipt(orderId, btn) {
     var td = _TRK_DATA[trkKey];
     td.status      = 'preparing';
     td.statusLabel = 'Em Preparação';
-    td.statusIcon  = '📦';
+    td.statusIcon  = WKZ_ICO.package + '';
     td.bannerGrad  = 'linear-gradient(135deg,#F59E0B 0%,#D97706 100%)';
     td.progress    = 25;
     td.activeStep  = 1;
@@ -2825,21 +2825,21 @@ function wkzSellerConfirmOrderReceipt(orderId, btn) {
   /* ── 3. Notifica o Comprador (push) ── */
   if (typeof wkzShowPush === 'function') {
     wkzShowPush(
-      '✅ Vendedor Confirmou!',
+      WKZ_ICO.check + ' Vendedor Confirmou!',
       'Seu pedido ' + orderId + ' foi confirmado pelo vendedor e está em preparação.',
       'success',
       7000
     );
   }
 
-  showToast('✅ Pedido ' + orderId + ' confirmado! Agora clique em "Marcar Enviado" ao despachar.');
+  showToast(WKZ_ICO.check + ' Pedido ' + orderId + ' confirmado! Agora clique em "Marcar Enviado" ao despachar.');
 }
 
 /* ── CONFIGURAÇÕES DO VENDEDOR — SALVAR ── */
 function salvarConfiguracoes(btn){
   const orig = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '⏳ Salvando...';
+  btn.innerHTML = WKZ_ICO.clock + ' Salvando...';
   const inputs = document.querySelectorAll('#dash-settings input, #dash-settings select, #dash-settings textarea');
   const saved = {};
   inputs.forEach(inp => { if(inp.id) saved[inp.id] = inp.value; });
@@ -2874,7 +2874,7 @@ function salvarConfiguracoes(btn){
     }
     btn.disabled = false;
     btn.innerHTML = orig;
-    showToast('✅ Configurações do vendedor salvas com sucesso!');
+    showToast(WKZ_ICO.check + ' Configurações do vendedor salvas com sucesso!');
   }, 800);
 }
 
@@ -2913,7 +2913,7 @@ function salvarNotificacoes(btn){
     try { if(typeof wkzSecureStorage!=='undefined'){wkzSecureStorage.set('wkz_notif_prefs',prefs);}else{localStorage.setItem('wkz_notif_prefs',JSON.stringify(prefs));} } catch(e){}
     btn.disabled = false;
     btn.innerHTML = orig;
-    showToast('🔔 Preferências de notificação atualizadas!');
+    showToast(WKZ_ICO.bell + ' Preferências de notificação atualizadas!');
   }, 600);
 }
 
@@ -2978,12 +2978,12 @@ function salvarProvaSocial(btn){
     // Sync the engine and update the badge immediately after saving
     if (window.kzSocialProofSync) window.kzSocialProofSync();
     if (window.kzSocialAdminStatus) window.kzSocialAdminStatus();
-    showToast(ativo ? '📣 Prova social ativada e salva!' : '⏸ Prova social desativada e salva.');
+    showToast(ativo ? WKZ_ICO.megaphone + ' Prova social ativada e salva!' : WKZ_ICO.pause + ' Prova social desativada e salva.');
   }, 700);
 }
 
 function toggleEnvioInternacional(ativo){
-  showToast(ativo ? '🌍 Envio internacional habilitado! Configure as tarifas.' : '🇧🇷 Somente envios nacionais ativados.');
+  showToast(ativo ? WKZ_ICO.globe + ' Envio internacional habilitado! Configure as tarifas.' : '🇧🇷 Somente envios nacionais ativados.');
 }
 
 /* ── filterMyDisputes ──────────────────────────────────────────────────────
@@ -3123,19 +3123,19 @@ function sellerNextStep(step){
   // ── FIX BUG-AUTH04: validação por etapa ──
   if(step === 1){
     const storeName = document.querySelector('#seller-step1 input[type="text"]')?.value.trim();
-    if(!storeName){ showToast('⚠️ Informe o nome da sua loja para continuar'); return; }
+    if(!storeName){ showToast(WKZ_ICO.warning + '️ Informe o nome da sua loja para continuar'); return; }
   }
   if(step === 2){
     const cnpjRaw = (document.getElementById('sellerCnpj') || {}).value || '';
     const cnpjDigits = cnpjRaw.replace(/[^\d]/g, '');
     if(!cnpjRaw.trim()){
-      showToast('⚠️ Informe o CNPJ / CPF / Documento Legal');
+      showToast(WKZ_ICO.warning + '️ Informe o CNPJ / CPF / Documento Legal');
       document.getElementById('sellerCnpj')?.focus();
       return;
     }
     // Valida CNPJ (14 dígitos) — CPF (11 dígitos) apenas formata
     if(cnpjDigits.length === 14 && !validateCNPJ(cnpjRaw)){
-      showToast('⚠️ CNPJ inválido — verifique os dígitos verificadores');
+      showToast(WKZ_ICO.warning + '️ CNPJ inválido — verifique os dígitos verificadores');
       document.getElementById('sellerCnpj')?.focus();
       return;
     }
@@ -3162,7 +3162,7 @@ function sellerNextStep(step){
 
   // If last step (4), show success after submit
   if(next === 4){
-    showToast('📋 Quase lá! Finalize o KYC para abrir sua loja.');
+    showToast(WKZ_ICO.clipboard + ' Quase lá! Finalize o KYC para abrir sua loja.');
   }
   document.documentElement.scrollTop = 0; window.scrollTo({top:0,behavior:'instant'});
 }
@@ -3230,12 +3230,12 @@ async function finishSellerRegister(){
       success.style.display = 'block';
       document.documentElement.scrollTop = 0; window.scrollTo({top: 0, behavior: 'instant'});
     } else {
-      showToast('🎉 Loja criada! Em análise — aprovação em até 24h.');
+      showToast(WKZ_ICO.award + ' Loja criada! Em análise — aprovação em até 24h.');
     }
 
   } catch(error){
     console.error('Falha no registro KYC:', error);
-    showToast('⚠️ Erro ao enviar os dados. Tente novamente mais tarde.');
+    showToast(WKZ_ICO.warning + '️ Erro ao enviar os dados. Tente novamente mais tarde.');
   } finally {
     // 5. Restaurar o botão em caso de erro ou finalização
     if(submitBtn){
@@ -3389,7 +3389,7 @@ function sellerGoStep(step){ sellerGoBack(step); }
     if (valid[code]) {
       msg.textContent = '✓ ' + valid[code];
       msg.style.color = '#22C55E';
-      showToast('🎟️ Cupom aplicado: ' + valid[code]);
+      showToast(WKZ_ICO.tag + '️ Cupom aplicado: ' + valid[code]);
     } else {
       msg.textContent = '✗ Cupom inválido ou expirado';
       msg.style.color = '#EF4444';
@@ -3398,7 +3398,7 @@ function sellerGoStep(step){ sellerGoBack(step); }
 
   window.confirmPremiumSubscription = function() {
     if (!_selectedPayment) {
-      showToast('⚠️ Selecione uma forma de pagamento');
+      showToast(WKZ_ICO.warning + '️ Selecione uma forma de pagamento');
       // Highlight as opções de pagamento
       var pmSection = document.getElementById('pmPix');
       if (pmSection) {
@@ -3452,7 +3452,7 @@ function sellerGoStep(step){ sellerGoBack(step); }
       }
       if (typeof refreshSellerPremiumUI === 'function') refreshSellerPremiumUI();
 
-      showToast('⭐ Plano Premium ' + planData.label + ' ativado!');
+      showToast(WKZ_ICO.star + ' Plano Premium ' + planData.label + ' ativado!');
     }, 1600);
   };
 
@@ -3683,7 +3683,7 @@ var WkzKYC = (function() {
       '<form id="kycForm" style="display:flex;flex-direction:column;gap:16px;">' +
         // RG
         '<div>' +
-          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">📄 RG ou CPF</label>' +
+          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.file} RG ou CPF</label>' +
           '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" onclick="document.getElementById(\'kycRG\').click();" id="kycRGZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de RG ou CPF</div>' +
@@ -3694,7 +3694,7 @@ var WkzKYC = (function() {
         '</div>' +
         // CNPJ
         '<div>' +
-          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">🏢 CNPJ e Inscrição Estadual</label>' +
+          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.building} CNPJ e Inscrição Estadual</label>' +
           '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" onclick="document.getElementById(\'kycCNPJ\').click();" id="kycCNPJZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de CNPJ</div>' +
@@ -3705,7 +3705,7 @@ var WkzKYC = (function() {
         '</div>' +
         // Comprovante
         '<div>' +
-          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">🏠 Comprovante de Residência/Sede</label>' +
+          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.home} Comprovante de Residência/Sede</label>' +
           '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" onclick="document.getElementById(\'kycComp\').click();" id="kycCompZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de Comprovante</div>' +
@@ -3715,7 +3715,7 @@ var WkzKYC = (function() {
           '<div id="kycCompStatus" style="font-size:11px;color:var(--muted);margin-top:6px;"></div>' +
         '</div>' +
         '<div style="background:rgba(245,158,11,0.08);border-left:4px solid #F59E0B;padding:12px;border-radius:6px;font-size:11px;color:var(--muted);line-height:1.6;">' +
-          '⚠️ <strong>Seus documentos serão verificados em até 5 dias úteis.</strong> Mantenha seus dados sempre atualizados para não perder benefícios.' +
+          WKZ_ICO.warning + '️ <strong>Seus documentos serão verificados em até 5 dias úteis.</strong> Mantenha seus dados sempre atualizados para não perder benefícios.' +
         '</div>' +
       '</form>' +
       '<div style="display:flex;gap:10px;margin-top:20px;">' +
@@ -3775,7 +3775,7 @@ window.wkzSubmitKYC = function() {
   var comp = document.getElementById('kycComp').files.length;
 
   if (!rg || !cnpj || !comp) {
-    showToast('❌ Preencha todos os documentos obrigatórios.', 'error');
+    showToast(WKZ_ICO.xCircle + ' Preencha todos os documentos obrigatórios.', 'error');
     return;
   }
 
@@ -3884,7 +3884,7 @@ window.kzNegSaveSettings = function () {
     kzNegSetSellerConfig(sellerName, { active: true, maxPct: pct });
   }
   if (typeof showToast === 'function') {
-    showToast('✅ Margem do Kz Negotiator salva: até ' + pct + '% de desconto automático para ' + sellerName + '.');
+    showToast(WKZ_ICO.check + ' Margem do Kz Negotiator salva: até ' + pct + '% de desconto automático para ' + sellerName + '.');
   }
 };
 
@@ -3910,14 +3910,14 @@ function initDashSettings() {
 function handleSellerLogoUpload(input){
   var file = input.files && input.files[0];
   if(!file) return;
-  if(!file.type.startsWith('image/')){ showToast('⚠️ Selecione um arquivo de imagem (PNG ou JPG).'); return; }
-  if(file.size > 2*1024*1024){ showToast('⚠️ Imagem muito grande — o limite é 2MB.'); return; }
+  if(!file.type.startsWith('image/')){ showToast(WKZ_ICO.warning + '️ Selecione um arquivo de imagem (PNG ou JPG).'); return; }
+  if(file.size > 2*1024*1024){ showToast(WKZ_ICO.warning + '️ Imagem muito grande — o limite é 2MB.'); return; }
   var reader = new FileReader();
   reader.onload = function(e){
     var dataUrl = e.target.result;
     applySellerLogo(dataUrl);
     try { if(typeof wkzSecureStorage!=='undefined') wkzSecureStorage.set('seller_logo', dataUrl); } catch(err){}
-    showToast('✅ Logotipo atualizado!');
+    showToast(WKZ_ICO.check + ' Logotipo atualizado!');
   };
   reader.readAsDataURL(file);
 }
@@ -4057,11 +4057,11 @@ function abrirModalDeixarDeVender(){
 function confirmarDeixarDeVender(){
   var input = document.getElementById('leaveSellerConfirmInput');
   if(!input || input.value.trim().toUpperCase() !== 'ENCERRAR'){
-    showToast('⚠️ Digite ENCERRAR para confirmar.');
+    showToast(WKZ_ICO.warning + '️ Digite ENCERRAR para confirmar.');
     return;
   }
   document.getElementById('wkzLeaveSellerModal').classList.remove('open');
-  showToast('👋 Conta de vendedor encerrada. Redirecionando...');
+  showToast(WKZ_ICO.wave + ' Conta de vendedor encerrada. Redirecionando...');
   setTimeout(function(){
     window.location.href = '../buyer/wkz-buyer.html';
   }, 1800);
@@ -4092,10 +4092,10 @@ var reportsStore = [
   {
     id: 'RPT-001',
     productName: 'Smartphone Ultra Pro 5G 256GB',
-    productEmoji: '📱',
+    productEmoji: WKZ_ICO.smartphone + '',
     storeName: (typeof currentSeller !== 'undefined' && currentSeller.store) || 'Minha Loja Pro',
     reason: 'produto_falsificado',
-    reasonLabel: '🚫 Produto falsificado',
+    reasonLabel: WKZ_ICO.slash + ' Produto falsificado',
     details: 'O comprador relata ter recebido um produto que parece ser uma réplica de baixa qualidade. O número de série não confere com o original.',
     status: 'analise',
     defesaSubmitted: false,
@@ -4108,7 +4108,7 @@ var reportsStore = [
   {
     id: 'RPT-002',
     productName: 'Fone Bluetooth ANC Pro',
-    productEmoji: '🎧',
+    productEmoji: WKZ_ICO.headset + '',
     storeName: (typeof currentSeller !== 'undefined' && currentSeller.store) || 'Minha Loja Pro',
     reason: 'diferente_anuncio',
     reasonLabel: '↩️ Produto diferente do anunciado',
@@ -4149,15 +4149,15 @@ function renderReports(filter){
   if(filter === 'closed') data = data.filter(function(r){ return r.status === 'resolvida'; });
 
   if(!data.length){
-    list.innerHTML = '<div class="denuncias-empty"><div class="big-icon">🛡️</div><p>Nenhuma denúncia encontrada.</p></div>';
+    list.innerHTML = '<div class="denuncias-empty"><div class="big-icon">${WKZ_ICO.shield}️</div><p>Nenhuma denúncia encontrada.</p></div>';
     return;
   }
 
   var statusInfo = {
-    recebida:  { label: '🟢 Recebida',          cls: 'status-recebida'  },
-    analise:   { label: '🟡 Em Análise',         cls: 'status-analise'   },
-    defesa:    { label: '🟣 Defesa do Vendedor', cls: 'status-defesa'    },
-    resolvida: { label: '🔴 Resolvida',          cls: 'status-resolvida' }
+    recebida:  { label: WKZ_ICO.dot('#22C55E') + ' Recebida',          cls: 'status-recebida'  },
+    analise:   { label: WKZ_ICO.dot('#F59E0B') + ' Em Análise',         cls: 'status-analise'   },
+    defesa:    { label: WKZ_ICO.dot('#a78bfa') + ' Defesa do Vendedor', cls: 'status-defesa'    },
+    resolvida: { label: WKZ_ICO.dot('#EF4444') + ' Resolvida',          cls: 'status-resolvida' }
   };
   var pipelineSteps = [
     { key: 'recebida',  label: 'Recebida'  },
@@ -4182,28 +4182,28 @@ function renderReports(filter){
     var actionHTML = '';
     if(r.status === 'defesa'){
       actionHTML = r.defesaSubmitted
-        ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">🛡️ Defesa enviada. Aguardando análise da equipe WeKz.</div>'
+        ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">${WKZ_ICO.shield}️ Defesa enviada. Aguardando análise da equipe WeKz.</div>'
         : '<div style="margin-top:14px;">'
-          + '<button onclick="toggleDefesaForm(\''+r.id+'\')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">🛡️ Apresentar Defesa</button>'
+          + '<button onclick="toggleDefesaForm(\''+r.id+'\')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">${WKZ_ICO.shield}️ Apresentar Defesa</button>'
           + '<div id="defesa-form-'+r.id+'" style="display:none;margin-top:10px;">'
           + '<textarea id="defesa-text-'+r.id+'" placeholder="Explique sua versão dos fatos sobre esta denúncia..." style="width:100%;min-height:90px;padding:10px;font-size:12px;font-family:inherit;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;"></textarea>'
           + '<button onclick="submitDefesa(\''+r.id+'\')" style="margin-top:8px;width:100%;padding:8px;background:var(--teal);border:none;color:#04201e;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Enviar Defesa</button>'
           + '</div></div>';
     } else if(r.status !== 'resolvida'){
-      actionHTML = '<button onclick="advanceStatus(\''+r.id+'\')" style="margin-top:14px;width:100%;padding:8px;background:rgba(0,180,171,0.08);border:1px dashed rgba(0,180,171,0.3);color:var(--teal);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" title="Simula o avanço da análise interna da equipe WeKz">⚡ [Demo] Simular avanço da análise WeKz</button>';
+      actionHTML = '<button onclick="advanceStatus(\''+r.id+'\')" style="margin-top:14px;width:100%;padding:8px;background:rgba(0,180,171,0.08);border:1px dashed rgba(0,180,171,0.3);color:var(--teal);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" title="Simula o avanço da análise interna da equipe WeKz">${WKZ_ICO.zap} [Demo] Simular avanço da análise WeKz</button>';
     }
 
     var logsHTML = r.logs.map(function(log){
       return '<div class="log-entry"><div class="log-dot" style="background:'+log.color+';box-shadow:0 0 6px '+log.color+'55;"></div>'
         + '<div class="log-content"><div class="log-text">'+escapeHtml(log.text)+'</div>'
-        + '<div class="log-time">🕐 '+formatLogTime(log.time)+'</div></div></div>';
+        + '<div class="log-time">${WKZ_ICO.clock} '+formatLogTime(log.time)+'</div></div></div>';
     }).join('');
 
     return '<div class="denuncia-item" id="dItem-'+r.id+'">'
       + '<div class="denuncia-header" onclick="toggleDenuncia(\''+r.id+'\')">'
       + '<span style="font-size:24px;flex-shrink:0;">'+r.productEmoji+'</span>'
       + '<div class="denuncia-info"><div class="denuncia-title">'+escapeHtml(r.productName)+'</div>'
-      + '<div class="denuncia-meta"><span>📋 '+r.id+'</span><span>'+r.reasonLabel+'</span><span>🕐 '+formatLogTime(r.createdAt)+'</span></div></div>'
+      + '<div class="denuncia-meta"><span>${WKZ_ICO.clipboard} '+r.id+'</span><span>'+r.reasonLabel+'</span><span>${WKZ_ICO.clock} '+formatLogTime(r.createdAt)+'</span></div></div>'
       + '<span class="denuncia-status '+si.cls+'">'+si.label+'</span>'
       + '<span class="denuncia-chevron">▼</span></div>'
       + '<div class="denuncia-logs"><div class="status-pipeline">'+pipelineHTML+'</div>'
@@ -4223,7 +4223,7 @@ function toggleDefesaForm(reportId){
 function submitDefesa(reportId){
   var ta = document.getElementById('defesa-text-' + reportId);
   var text = ta ? ta.value.trim() : '';
-  if(!text){ showToast('⚠️ Escreva sua defesa antes de enviar.'); return; }
+  if(!text){ showToast(WKZ_ICO.warning + '️ Escreva sua defesa antes de enviar.'); return; }
 
   var r = reportsStore.find(function(x){ return x.id === reportId; });
   if(!r) return;
@@ -4231,7 +4231,7 @@ function submitDefesa(reportId){
   r.logs.push({ text: 'Vendedor apresentou defesa: "' + text + '"', color: '#A78BFA', time: new Date().toISOString(), images: [] });
   r.defesaSubmitted = true;
   renderReports(window._denunciasActiveFilter || 'all');
-  showToast('✅ Defesa enviada! A equipe WeKz irá analisar e notificar ambas as partes.');
+  showToast(WKZ_ICO.check + ' Defesa enviada! A equipe WeKz irá analisar e notificar ambas as partes.');
 
   // Simula a equipe WeKz analisando a defesa e encerrando o caso
   setTimeout(function(){ advanceStatus(reportId); }, 4000);
