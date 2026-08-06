@@ -53,7 +53,7 @@ function openFormSelect(btnEl) {
 
   const options    = Array.from(selectEl.options);
   const currentVal = selectEl.value;
-  const icon       = btnEl.dataset.icon  || '📋';
+  const icon       = btnEl.dataset.icon  || _FS_ICO.clipboard;
   const title      = btnEl.dataset.title || 'Selecione';
   const panelId    = 'wkzFSPanel_' + btnEl.dataset.fsId;
 
@@ -158,22 +158,63 @@ function wkzFormSelectItem(itemEl, panelId) {
   _closeFormPanel();
 }
 
-/* Mapa de ícones por label */
+/* ════════════════════════════════════════════════════════════════════
+   [FIX-emoji-audit v1.0] Ícones SVG (substituem os emojis nativos que
+   ficavam ao lado do título de CADA select customizado do site inteiro —
+   este ficheiro é compartilhado por comprador, vendedor e admin, então
+   um único emoji trocado aqui já resolve todos os dropdowns de uma vez).
+   Mesmo estilo visual do CP_ICO em wkz-core.js (Meu Perfil): traço único,
+   sem preenchimento, 1em, para herdar o tamanho da fonte ao redor. As
+   formas em si são um dicionário próprio (não reutilizam CP_ICO porque
+   ele vive dentro de um IIFE fechado em wkz-core.js, sem acesso externo).
+   ════════════════════════════════════════════════════════════════════ */
+function _fsIco(paths) {
+  return '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true">' + paths + '</svg>';
+}
+const _FS_ICO = {
+  store:     _fsIco('<path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 004 0 2 2 0 004 0 2 2 0 004 0 2 2 0 004 0"/><path d="M5 9v10h14V9"/>'),
+  factory:   _fsIco('<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>'),
+  folder:    _fsIco('<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>'),
+  globe:     _fsIco('<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>'),
+  package:   _fsIco('<path d="M16.5 9.4L7.55 4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/>'),
+  barchart:  _fsIco('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'),
+  key:       _fsIco('<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>'),
+  bank:      _fsIco('<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 21 7 3 7"/>'),
+  sync:      _fsIco('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>'),
+  idcard:    _fsIco('<rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="10" r="2"/><line x1="14" y1="9" x2="18" y2="9"/><line x1="14" y1="13" x2="18" y2="13"/><line x1="6" y1="16" x2="18" y2="16"/>'),
+  card:      _fsIco('<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>'),
+  truck:     _fsIco('<path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 00-1.17-2.83L19 9h-5v8h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>'),
+  shield:    _fsIco('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+  money:     _fsIco('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),
+  clipboard: _fsIco('<path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>'),
+  headset:   _fsIco('<path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>'),
+  sort:      _fsIco('<polyline points="7 10 12 5 17 10"/><polyline points="7 14 12 19 17 14"/>'),
+  flag:      _fsIco('<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>'),
+  receipt:   _fsIco('<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'),
+  file:      _fsIco('<path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/>'),
+  mappin:    _fsIco('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>'),
+  warning:   _fsIco('<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+};
+
+/* Mapa de ícones por label — antes emoji, agora chaves de _FS_ICO acima.
+   [FIX-emoji-audit v1.0] Único dicionário para todo <select> do site
+   (compra, venda, admin); trocar aqui já resolve todos de uma vez. */
 const _WKZ_FS_ICONS = {
-  'Tipo de Vendedor':'🏪','Tipo de Fornecedor':'🏭','Categoria Principal':'🗂️',
-  'Categoria':'🗂️','Subcategoria':'📂','País de Operação':'🌍','País de Origem':'🌍',
-  'País de destino':'🌍','Volume mensal':'📦','Capacidade Mensal':'📊',
-  'Chave Pix':'🔑','Banco':'🏦','Ciclo de Repasse':'🔄','Tipo de documento':'🪪',
-  'Parcelas':'💳','Prazo de envio':'🚚','Garantia':'🛡️','Faturamento':'💰',
-  'Volume de Negócios':'💰','Tipo de solicitação':'📋','Suporte':'🎧',
-  'Moeda':'💲','Idioma':'🌐','Ordenar':'↕️','Motivo':'⚑','denúncia':'⚑',
-  'enquadramento':'🧾','Formato':'📄','Estado':'📍','País':'🌍','ocorrência':'⚑'
+  'Tipo de Vendedor':_FS_ICO.store,'Tipo de Fornecedor':_FS_ICO.factory,'Categoria Principal':_FS_ICO.folder,
+  'Categoria':_FS_ICO.folder,'Subcategoria':_FS_ICO.folder,'País de Operação':_FS_ICO.globe,'País de Origem':_FS_ICO.globe,
+  'País de destino':_FS_ICO.globe,'Volume mensal':_FS_ICO.package,'Capacidade Mensal':_FS_ICO.barchart,
+  'Chave Pix':_FS_ICO.key,'Banco':_FS_ICO.bank,'Ciclo de Repasse':_FS_ICO.sync,'Tipo de documento':_FS_ICO.idcard,
+  'Parcelas':_FS_ICO.card,'Prazo de envio':_FS_ICO.truck,'Transportadora':_FS_ICO.truck,'Garantia':_FS_ICO.shield,'Faturamento':_FS_ICO.money,
+  'Volume de Negócios':_FS_ICO.money,'Tipo de solicitação':_FS_ICO.clipboard,'Suporte':_FS_ICO.headset,
+  'Moeda':_FS_ICO.money,'Idioma':_FS_ICO.globe,'Ordenar':_FS_ICO.sort,'Motivo':_FS_ICO.flag,'denúncia':_FS_ICO.flag,
+  'enquadramento':_FS_ICO.receipt,'Formato':_FS_ICO.file,'Estado':_FS_ICO.mappin,'País':_FS_ICO.globe,'ocorrência':_FS_ICO.flag,
+  'página':_FS_ICO.file,'Tipo de Problema':_FS_ICO.warning,'Violação':_FS_ICO.flag
 };
 function _fsIcon(labelStr){
   for(const [k,v] of Object.entries(_WKZ_FS_ICONS)){
     if(labelStr.toLowerCase().includes(k.toLowerCase())) return v;
   }
-  return '📋';
+  return _FS_ICO.clipboard;
 }
 
 /* ─── Sincroniza o label do botão com o estado atual do <select> ───
