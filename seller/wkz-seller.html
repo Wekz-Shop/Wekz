@@ -49,7 +49,7 @@
 
     <div class="search-wrap-top">
       <div class="search-bar">
-        <select id="searchCat" class="form-select selector wkz-select wkz-select--searchbar" data-title="Categoria" data-icon="🗂️" style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);height:46px;min-width:110px;">
+        <select id="searchCat" class="form-select selector wkz-select wkz-select--searchbar" data-title="Categoria" style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);height:46px;min-width:110px;">
           <option value="">Todas</option>
           <option value="Eletrônicos">📱 Eletrôn.</option>
           <option value="Moda"><span class="wkz-icon wkz-icon-shirt"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></span> Moda</option>
@@ -261,7 +261,7 @@
       </div>
       <div class="filter-group">
         <label class="filter-label">Ordenar</label>
-        <select class="form-select wkz-select wkz-select--lg" id="fSort" data-title="Ordenar por" data-icon="↕️" onchange="window.location.href='../buyer/wkz-buyer.html'">
+        <select class="form-select wkz-select wkz-select--lg" id="fSort" data-title="Ordenar por" onchange="window.location.href='../buyer/wkz-buyer.html'">
           <option value="">Relevância</option>
           <option value="price-asc">Menor preço</option>
           <option value="price-desc">Maior preço</option>
@@ -541,7 +541,7 @@
             <button class="rev-filter" onclick="filterProductsAndRender('paused',this)"><span class="wkz-icon" style="display:inline-flex;align-items:center;margin-right:3px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></span>Pausados <span id="mpCountPaused">(0)</span></button>
             <button class="rev-filter" onclick="filterProductsAndRender('out-of-stock',this)"><span class="wkz-icon" style="display:inline-flex;align-items:center;margin-right:3px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg></span>Sem estoque <span id="mpCountOOS">(0)</span></button>
           </div>
-          <select class="form-select wkz-select wkz-select--sm" id="myProductsPerPage" data-title="Por página" data-icon="📄" style="width:auto;min-width:140px;" onchange="renderMyProducts(1)">
+          <select class="form-select wkz-select wkz-select--sm" id="myProductsPerPage" data-title="Por página" style="width:auto;min-width:140px;" onchange="renderMyProducts(1)">
             <option value="12">12 por página</option>
             <option value="24">24 por página</option>
             <option value="48">48 por página</option>

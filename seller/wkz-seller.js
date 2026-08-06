@@ -2653,7 +2653,7 @@ function openDispatchModal(pedidoId) {
     </div>
     <div style="margin-bottom:18px;">
       <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Transportadora</label>
-      <select id="wkzDispatchCarrierSelect" class="form-select wkz-select wkz-select--lg" data-title="Transportadora" data-icon="🚚">
+      <select id="wkzDispatchCarrierSelect" class="form-select wkz-select wkz-select--lg" data-title="Transportadora">
         <option value="Correios PAC">Correios PAC</option>
         <option value="Correios SEDEX">Correios SEDEX</option>
         <option value="Jadlog">Jadlog</option>
