@@ -51,7 +51,7 @@
 
     <div class="search-wrap-top">
       <div class="search-bar">
-        <select id="searchCat" class="form-select selector wkz-select wkz-select--searchbar" data-title="Categoria" data-icon="🗂️" style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);height:46px;min-width:110px;">
+        <select id="searchCat" class="form-select selector wkz-select wkz-select--searchbar" data-title="Categoria" style="border-radius:var(--radius-sm) 0 0 var(--radius-sm);height:46px;min-width:110px;">
           <option value="">Todas</option>
           <!-- [FIX v?] As opções de categoria eram uma lista fixa aqui no HTML,
                desatualizada e divergente da lista real (faltavam Bebê & Kids,
@@ -315,7 +315,7 @@
       </div>
       <div class="filter-group">
         <label class="filter-label">Ordenar</label>
-        <select class="form-select wkz-select wkz-select--lg" id="fSort" data-title="Ordenar por" data-icon="↕️" onchange="applyFilters()">
+        <select class="form-select wkz-select wkz-select--lg" id="fSort" data-title="Ordenar por" onchange="applyFilters()">
           <option value="">Relevância</option>
           <option value="price-asc">Menor preço</option>
           <option value="price-desc">Maior preço</option>
@@ -2025,7 +2025,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="ckout-field">
               <label for="cardInst">Parcelas</label>
-              <select id="cardInst" class="form-select wkz-select wkz-select--lg" data-title="Parcelas" data-icon="💳" aria-label="Número de Parcelas" onchange="this.dataset.selectedN=this.value">
+              <select id="cardInst" class="form-select wkz-select wkz-select--lg" data-title="Parcelas" aria-label="Número de Parcelas" onchange="this.dataset.selectedN=this.value">
                 <option value="1">1x de R$ 1.249,90 (sem juros)</option>
                 <option value="2">2x de R$ 624,95 (sem juros)</option>
                 <option value="3">3x de R$ 416,63 (sem juros)</option>
@@ -3261,14 +3261,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="tpl-page-sub" id="catTemplateSub">18.400+ produtos • Vendedores verificados • Frete grátis em muitos itens</div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-        <select class="form-select wkz-select wkz-select--lg" id="catSortSelect" data-title="Ordenar por" data-icon="↕️" onchange="renderCatProducts()">
+        <select class="form-select wkz-select wkz-select--lg" id="catSortSelect" data-title="Ordenar por" onchange="renderCatProducts()">
           <option value="">Mais relevantes</option>
           <option value="price-asc">Menor preço</option>
           <option value="price-desc">Maior preço</option>
           <option value="rating">Melhor avaliação</option>
           <option value="sales">Mais vendidos</option>
         </select>
-        <select class="form-select wkz-select wkz-select--lg" id="catPerPageSelect" data-title="Por página" data-icon="📄" onchange="renderCatProducts()">
+        <select class="form-select wkz-select wkz-select--lg" id="catPerPageSelect" data-title="Por página" onchange="renderCatProducts()">
           <option value="10">10 por página</option>
           <option value="20">20 por página</option>
           <option value="30">30 por página</option>
@@ -3307,12 +3307,12 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="sfg-item"><input type="radio" name="catOrigin" value="nacional" onchange="onCatOriginChange()"> <span>🇧🇷 Nacional</span></div>
           <div class="sfg-item"><input type="radio" name="catOrigin" value="internacional" onchange="onCatOriginChange()"> <span>🌍 Internacional</span></div>
           <div id="catUfWrap" style="display:none;margin-top:8px;">
-            <select class="form-select wkz-select wkz-select--sm" id="catUfSelect" data-title="Estado" data-icon="📍" style="width:100%;" onchange="renderCatProducts()">
+            <select class="form-select wkz-select wkz-select--sm" id="catUfSelect" data-title="Estado" style="width:100%;" onchange="renderCatProducts()">
               <option value="">Todos os Estados</option>
             </select>
           </div>
           <div id="catCountryWrap" style="display:none;margin-top:8px;">
-            <select class="form-select wkz-select wkz-select--sm" id="catCountrySelect" data-title="País" data-icon="🌍" style="width:100%;" onchange="renderCatProducts()">
+            <select class="form-select wkz-select wkz-select--sm" id="catCountrySelect" data-title="País" style="width:100%;" onchange="renderCatProducts()">
               <option value="">Todos os Países</option>
             </select>
           </div>
@@ -3399,10 +3399,10 @@ document.addEventListener('DOMContentLoaded', function() {
            Eletrônicos. (2) Prepara a página para volumes grandes de produtos
            por loja (visão futura) com o mesmo padrão de 10/20/30 por página. -->
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-        <select class="form-select wkz-select wkz-select--lg" id="storeSortSelect" data-title="Ordenar por" data-icon="↕️" onchange="renderStoreProducts()">
+        <select class="form-select wkz-select wkz-select--lg" id="storeSortSelect" data-title="Ordenar por" onchange="renderStoreProducts()">
           <option value="sales">Mais vendidos</option><option value="price-asc">Menor preço</option><option value="price-desc">Maior preço</option><option value="new">Mais novos</option>
         </select>
-        <select class="form-select wkz-select wkz-select--lg" id="storePerPageSelect" data-title="Por página" data-icon="📄" onchange="renderStoreProducts()">
+        <select class="form-select wkz-select wkz-select--lg" id="storePerPageSelect" data-title="Por página" onchange="renderStoreProducts()">
           <option value="10">10 por página</option>
           <option value="20">20 por página</option>
           <option value="30">30 por página</option>
@@ -3669,7 +3669,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="cp-card" id="cpMissoesCard">
       <div class="cp-card-header">
         <div class="cp-card-title">
-          <div class="cp-card-title-icon" style="background:rgba(245,158,11,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">🎯</div>
+          <div class="cp-card-title-icon" style="background:rgba(245,158,11,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
           <span data-i18n="cpMissionsTitle">Missões do Dia</span>
         </div>
         <span class="cp-card-note" id="cpMissoesTimer" style="font-size:11px;color:var(--muted);cursor:default;"><span data-i18n="cpMissionsResetLabel">Resetam em</span> <strong id="cpMissoesCountdown" style="color:var(--teal);">--:--:--</strong></span>
@@ -3708,7 +3708,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="cp-card" id="cpAvaliacoesCard">
       <div class="cp-card-header">
         <div class="cp-card-title">
-          <div class="cp-card-title-icon" style="background:rgba(251,191,36,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">⭐</div>
+          <div class="cp-card-title-icon" style="background:rgba(251,191,36,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
           <span data-i18n="cpPendingReviewsTitle">Avaliações Pendentes</span>
         </div>
         <span class="cp-card-note" style="font-size:11px;color:#F59E0B;font-weight:700;cursor:default;" data-i18n="cpPendingReviewsNote">+30 pts cada</span>
@@ -3726,7 +3726,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="cp-review-star">★</span><span class="cp-review-star">★</span>
                 <span class="cp-review-star">★</span>
               </div>
-              <div class="cp-review-pts" data-i18n="cpReviewPtsHint">🏆 Ganhe +30 pts ao avaliar!</div>
+              <div class="cp-review-pts"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 4H3v1a4 4 0 004 4"/><path d="M17 4h4v1a4 4 0 01-4 4"/></svg> <span data-i18n="cpReviewPtsHint">Ganhe +30 pts ao avaliar!</span></div>
             </div>
           </div>
         </div>
@@ -3792,7 +3792,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- [FIX-09] Saldo de Créditos WeKz (ganhos via indicação) — sempre visível
              aqui, respondendo "onde vão os créditos ganhos". -->
         <div id="cpWalletCreditsStrip" style="display:none;margin-bottom:14px;padding:12px 16px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:12px;font-size:12px;color:#c4b5fd;align-items:center;justify-content:space-between;gap:10px;">
-          <span>🎁 <strong data-i18n="cpWalletCreditsStrong">Créditos WeKz</strong> · <span data-i18n="cpWalletCreditsSuffix">ganhos com indicações</span></span>
+          <span><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg> <strong data-i18n="cpWalletCreditsStrong">Créditos WeKz</strong> · <span data-i18n="cpWalletCreditsSuffix">ganhos com indicações</span></span>
           <strong id="cpWalletCreditsValue" style="font-size:14px;">R$ 0,00</strong>
         </div>
         <div class="cp-wallet-grid" id="cpWalletGrid"><!-- JS --></div>
@@ -3866,14 +3866,14 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="cp-card cp-full-width" id="cpReferralCard">
       <div class="cp-card-header">
         <div class="cp-card-title">
-          <div class="cp-card-title-icon" style="background:rgba(124,58,237,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;">🎁</div>
+          <div class="cp-card-title-icon" style="background:rgba(124,58,237,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
           <span data-i18n="cpReferralTitle">Indicação WeKz — Ganhe Juntos</span>
         </div>
         <span class="cp-card-link" style="color:#a78bfa;" onclick="window._cpReferralHowItWorks && window._cpReferralHowItWorks()" data-i18n="cpHowItWorksLink">Como funciona</span>
       </div>
       <div class="cp-card-body">
         <div class="cp-referral-hero">
-          <div class="cp-referral-emoji">🚀</div>
+          <div class="cp-referral-emoji"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div>
           <div style="flex:1;">
             <!-- [FIX-item9] Cores fixas em branco (#fff / rgba(255,255,255,x)) ficavam
                  invisíveis no tema claro, pois .cp-referral-hero tem fundo translúcido
@@ -3913,16 +3913,17 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <!-- [FIX-09] Onde vão os créditos: explicitado + saldo real, sincronizado com a Carteira Multimoedas. -->
         <div style="margin-top:14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text);">
-          <span style="color:#a78bfa;font-weight:700;"><span data-i18n="cpReferralCreditsEarnedPre">💰 Créditos WeKz ganhos:</span> <span id="cpReferralCreditsTotal">R$ 0,00</span></span> <span data-i18n="cpReferralCreditsEarnedPost">disponíveis</span>
+          <span style="color:#a78bfa;font-weight:700;"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> <span data-i18n="cpReferralCreditsEarnedPre">Créditos WeKz ganhos:</span> <span id="cpReferralCreditsTotal">R$ 0,00</span></span> <span data-i18n="cpReferralCreditsEarnedPost">disponíveis</span>
           <div style="margin-top:2px;color:var(--muted);" data-i18n="cpReferralCreditsSyncNote" data-i18n-html>São somados automaticamente à tua <strong>Carteira Multimoedas</strong> (acima) e podem ser usados no checkout da tua próxima compra.</div>
         </div>
         <div style="margin-top:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;">
-          <span style="flex-shrink:0;color:#F59E0B;">⭐</span>
+          <span style="flex-shrink:0;color:#F59E0B;"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
           <span><strong style="color:#F59E0B;" id="cpReferralActiveCount">0 indicações ativas</strong> <span data-i18n="cpReferralActiveNotePre">· Sem limite de indicações! Cada amigo que concluir uma compra de pelo menos</span> <span id="cpReferralMinAmt3">R$100</span> <span data-i18n="cpReferralActiveNoteMid">gera</span> <span id="cpReferralRewardAmt4">R$15</span> <span data-i18n="cpReferralActiveNotePost">para você.</span></span>
         </div>
         <!-- Simulação, já que esta fase é 100% front-end (sem backend para confirmar a compra real do amigo indicado) -->
-        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;" data-i18n="cpReferralSimulateBtn">
-          🧪 Simular: um amigo indicado concluiu a 1ª compra (demo)
+        <button onclick="cpSimulateReferralConversion()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;">
+          <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M9 3h6"/><path d="M10 3v6.5L4.5 19a2 2 0 001.7 3h11.6a2 2 0 001.7-3L14 9.5V3"/><line x1="8.5" y1="14" x2="15.5" y2="14"/></svg>
+          <span data-i18n="cpReferralSimulateBtn">Simular: um amigo indicado concluiu a 1ª compra (demo)</span>
         </button>
       </div>
     </div>
@@ -5515,7 +5516,7 @@ body.kzlive-active .bottom-nav {
       </div>
 
       <div class="rm-label">Motivo da denúncia</div>
-      <select class="form-select wkz-select wkz-select--lg wkz-select--danger rm-select" id="rmReason" data-title="Motivo da denúncia" data-icon="⚑">
+      <select class="form-select wkz-select wkz-select--lg wkz-select--danger rm-select" id="rmReason" data-title="Motivo da denúncia">
         <option value="">Selecione o motivo...</option>
         <option value="produto_falsificado">🚫 Produto falsificado</option>
         <option value="anuncio_enganoso">⚠️ Anúncio enganoso</option>
@@ -5729,7 +5730,7 @@ body.kzlive-active .bottom-nav {
     <div style="display:flex;flex-direction:column;gap:12px;">
       <div>
         <label style="font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">Formato desejado</label>
-        <select id="lgpdPortFormato" class="form-select wkz-select wkz-select--lg" data-title="Formato desejado" data-icon="📄">
+        <select id="lgpdPortFormato" class="form-select wkz-select wkz-select--lg" data-title="Formato desejado">
           <option value="json">JSON (recomendado)</option>
           <option value="csv">CSV</option>
           <option value="xml">XML</option>
