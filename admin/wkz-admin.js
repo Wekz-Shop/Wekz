@@ -82,7 +82,7 @@ function filterAdminReports(filter, btn) {
 
 /* ── Dados simulados: Lojas pendentes ── */
 const ADMIN_STORES = [
-  { id:'ST001', avatar:'🛋️', name:'Casa Moderna Decor', owner:'Tatiana M.', cnpj:'12.345.678/0001-90', cat:'Casa & Decoração', date:'20/05/2025', status:'pending',  docs: true },
+  { id:'ST001', avatar:'🛋', name:'Casa Moderna Decor', owner:'Tatiana M.', cnpj:'12.345.678/0001-90', cat:'Casa & Decoração', date:'20/05/2025', status:'pending',  docs: true },
   { id:'ST002', avatar:'👗', name:'Moda Exclusiva BR',  owner:'Rodrigo F.', cnpj:'98.765.432/0001-11', cat:'Moda & Vestuário',  date:'19/05/2025', status:'pending',  docs: true },
   { id:'ST003', avatar:'💄', name:'GlowBeauty Shop',    owner:'Camila S.',  cnpj:'Pendente envio',    cat:'Beleza & Saúde',   date:'19/05/2025', status:'docs',     docs: false },
   { id:'ST004', avatar:'🎮', name:'GameZone Brasil',    owner:'Lucas P.',   cnpj:'34.512.890/0001-44', cat:'Games & Consoles',  date:'18/05/2025', status:'pending',  docs: true },
@@ -99,7 +99,7 @@ function renderAdminStores(filter = 'all') {
   if (filter !== 'all') data = data.filter(s => s.status === filter);
 
   if (data.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">✅ Nenhuma loja nesta categoria no momento.</div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhuma loja nesta categoria no momento.</div>';
     return;
   }
 
@@ -132,7 +132,7 @@ function renderAdminStores(filter = 'all') {
     if (action === 'approve')     admApproveStore(sid, store.name);
     if (action === 'reject')      admRejectStore(sid, store.name);
     if (action === 'docs')        admShowStoreDocs(sid);
-    if (action === 'requestdocs') { showToast('📨 E-mail enviado para ' + store.owner); admAuditAdd('🏪', 'Loja "' + store.name + '" — solicitação de documentos enviada', 'Admin WeKz'); }
+    if (action === 'requestdocs') { showToast(WKZ_ICO.mail + ' E-mail enviado para ' + store.owner); admAuditAdd('🏪', 'Loja "' + store.name + '" — solicitação de documentos enviada', 'Admin WeKz'); }
   };
 }
 
@@ -153,17 +153,17 @@ function admShowStoreDocs(sid) {
   ];
   const rows = docItems.map(d => `
     <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
-      <div style="width:34px;height:34px;border-radius:8px;background:${d.ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)'};display:flex;align-items:center;justify-content:center;font-size:15px;">${d.ok ? '📄' : '⏳'}</div>
+      <div style="width:34px;height:34px;border-radius:8px;background:${d.ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)'};display:flex;align-items:center;justify-content:center;font-size:15px;">${d.ok ? WKZ_ICO.file + '' : WKZ_ICO.clock + ''}</div>
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:600;">${d.label}</div>
         <div style="font-size:11px;color:${d.ok ? '#22C55E' : '#EF4444'};">${d.ok ? 'Recebido — pronto para conferência' : 'Ainda não enviado pelo lojista'}</div>
       </div>
-      ${d.ok ? `<button class="adm-btn-view" style="padding:6px 10px;font-size:11px;" onclick="showToast('🔍 Pré-visualização simulada — em produção abriria o arquivo enviado pelo lojista.')">Ver</button>` : ''}
+      ${d.ok ? `<button class="adm-btn-view" style="padding:6px 10px;font-size:11px;" onclick="showToast(WKZ_ICO.search + ' Pré-visualização simulada — em produção abriria o arquivo enviado pelo lojista.')">Ver</button>` : ''}
     </div>`).join('');
   const body = `
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">CNPJ informado: <strong style="color:${s.docs ? 'var(--teal)' : '#EF4444'}">${s.cnpj}</strong></div>
     ${rows}
-    ${!s.docs ? `<div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);font-size:12px;">⚠ Documentação incompleta — use "Solicitar Docs" no card da loja para reenviar o pedido ao lojista.</div>` : ''}`;
+    ${!s.docs ? `<div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);font-size:12px;">${WKZ_ICO.warning} Documentação incompleta — use "Solicitar Docs" no card da loja para reenviar o pedido ao lojista.</div>` : ''}`;
   openAdmInfoModal('Dossiê — ' + s.name, s.owner + ' · Solicitado em ' + s.date, body);
 }
 
@@ -230,7 +230,7 @@ function admApproveStore(id, name) {
   }
   admSyncStoreBadge();
   admAuditAdd('✅', 'Loja "' + name + '" aprovada', 'Admin WeKz');
-  showToast('✅ Loja "' + name + '" aprovada! Vendedor notificado por e-mail.');
+  showToast(WKZ_ICO.check + ' Loja "' + name + '" aprovada! Vendedor notificado por e-mail.');
   /* [v1.9.0] Actualiza mock supplier user status → desbloqueia Painel do Fornecedor */
   if (typeof window.spdSetApprovalStatus === 'function') {
     window.spdSetApprovalStatus('approved');
@@ -251,7 +251,7 @@ function admRejectStore(id, name) {
   }
   admSyncStoreBadge();
   admAuditAdd('🚫', 'Loja "' + name + '" recusada', 'Admin WeKz');
-  showToast('❌ Loja "' + name + '" recusada. Vendedor notificado.');
+  showToast(WKZ_ICO.xCircle + ' Loja "' + name + '" recusada. Vendedor notificado.');
   /* [v1.9.0] Actualiza mock supplier user status → mostra tela de rejeição */
   if (typeof window.spdSetApprovalStatus === 'function') {
     window.spdSetApprovalStatus('rejected');
@@ -288,7 +288,7 @@ const KYC_RISK_LABEL = { baixo: 'Risco Baixo', medio: 'Risco Médio', alto: 'Ris
 const ADMIN_KYC = [
   {
     id: 'KYC001', protocol: 'PROTO-KYC-20260615093244-7F3A2C',
-    avatar: '🛋️', vendorName: 'Casa Moderna Decor Ltda', ownerName: 'Tatiana Mendes',
+    avatar: '🛋', vendorName: 'Casa Moderna Decor Ltda', ownerName: 'Tatiana Mendes',
     type: 'PJ', cpfCnpj: '12.345.678/0001-90', date: '15/06/2026',
     status: 'pending', risk: 'baixo', riskScore: 24,
     docs: {
@@ -366,7 +366,7 @@ function renderAdminKyc(filter) {
   if (_admKycActiveFilter !== 'all') data = data.filter(k => k.status === _admKycActiveFilter);
 
   if (data.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">✅ Nenhuma verificação nesta categoria.</div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhuma verificação nesta categoria.</div>';
     return;
   }
 
@@ -386,7 +386,7 @@ function renderAdminKyc(filter) {
         </div>
       </div>
       <div class="adm-store-actions">
-        <button class="adm-btn-view" data-kaction="review" data-kid="${k.id}">🔍 Revisar Documentos</button>
+        <button class="adm-btn-view" data-kaction="review" data-kid="${k.id}">${WKZ_ICO.search} Revisar Documentos</button>
         ${actionable ? `<button class="adm-btn-approve" data-kaction="approve" data-kid="${k.id}">Aprovar</button><button class="adm-btn-reject" data-kaction="reject" data-kid="${k.id}">✕ Recusar</button>` : ''}
       </div>
     </div>`;
@@ -428,7 +428,7 @@ function admSyncKycBadge() {
   const kpi = document.getElementById('kpiKycNum');
   if (kpi) kpi.textContent = open;
   const kpiRisco = document.getElementById('kpiKycRisco');
-  if (kpiRisco) kpiRisco.textContent = highRisk > 0 ? `⚠ ${highRisk} de risco alto` : '';
+  if (kpiRisco) kpiRisco.textContent = highRisk > 0 ? `${WKZ_ICO.warning} ${highRisk} de risco alto` : '';
 
   const sub = document.getElementById('kycSub');
   if (sub) sub.textContent = open + ' verificaç' + (open === 1 ? 'ão aguardando análise' : 'ões aguardando análise') + (highRisk > 0 ? ` · ${highRisk} de risco alto` : '');
@@ -465,8 +465,8 @@ function openKycReview(id) {
   const actionsHtml = (k.status === 'pending' || k.status === 'under-review') ? `
       <button class="adm-btn-approve" style="flex:1;min-width:140px;padding:11px;" onclick="admApproveKyc('${k.id}');_admCloseKycModal();">✓ Aprovar Verificação</button>
       <button class="adm-btn-reject" style="flex:1;min-width:140px;padding:11px;" onclick="admRejectKyc('${k.id}');_admCloseKycModal();">✕ Recusar</button>
-      <button class="adm-btn-view" style="flex:1;min-width:140px;padding:11px;" onclick="admRequestMoreKycDocs('${k.id}')">📨 Solicitar Mais Documentos</button>`
-    : `<div style="padding:6px 0;color:${k.status === 'approved' ? '#22C55E' : '#EF4444'};font-size:13px;font-weight:600;">${k.status === 'approved' ? '✅ Verificação já aprovada.' : '❌ Verificação já recusada.'}</div>`;
+      <button class="adm-btn-view" style="flex:1;min-width:140px;padding:11px;" onclick="admRequestMoreKycDocs('${k.id}')">${WKZ_ICO.mail} Solicitar Mais Documentos</button>`
+    : `<div style="padding:6px 0;color:${k.status === 'approved' ? '#22C55E' : '#EF4444'};font-size:13px;font-weight:600;">${k.status === 'approved' ? WKZ_ICO.check + ' Verificação já aprovada.' : WKZ_ICO.xCircle + ' Verificação já recusada.'}</div>`;
 
   // C2: sanitiza campos provenientes de dados de utilizador antes de injetar no modal KYC
   const _kVendor   = (typeof wkzSanitizeHTML === 'function') ? wkzSanitizeHTML(k.vendorName, true) : escapeHtml(k.vendorName); // C2: userContent=true
@@ -478,7 +478,7 @@ function openKycReview(id) {
     <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">${_kOwner} · Protocolo <strong style="color:var(--teal)">${_kProtocol}</strong> · Enviado em ${_kDate}</div>
 
     <div class="adm-kyc-risk-box" style="background:rgba(${riskRGB},0.08);">
-      <div style="font-size:24px;">${k.risk === 'alto' ? '🚨' : (k.risk === 'medio' ? '⚠️' : '✅')}</div>
+      <div style="font-size:24px;">${k.risk === 'alto' ? WKZ_ICO.warning + '' : (k.risk === 'medio' ? WKZ_ICO.warning + '' : WKZ_ICO.check + '')}</div>
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:700;color:var(--text);">${KYC_RISK_LABEL[k.risk]} — score ${k.riskScore}/100</div>
         <div style="font-size:11px;color:var(--muted);">Calculado a partir da validação de CNPJ, idade da empresa e completude documental.</div>
@@ -486,9 +486,9 @@ function openKycReview(id) {
       <span class="adm-tag ${st.tagClass}" style="white-space:nowrap;">${st.label}</span>
     </div>
 
-    ${docCard('RG / Identidade', '🪪', k.docs.rg, [['Nome', 'nome'], ['CPF', 'cpf'], ['Validade', 'validade']])}
-    ${docCard('CNPJ', '🏢', k.docs.cnpj, [['Razão Social', 'razaoSocial'], ['CNPJ', 'cnpj'], ['Constituída em', 'constituicao'], ['Atividade', 'atividade']])}
-    ${docCard('Comprovante de Endereço', '🏠', k.docs.comprovante, [['Endereço', 'endereco'], ['Cidade/UF', 'cidade'], ['CEP', 'cep']])}
+    ${docCard('RG / Identidade', WKZ_ICO.idcard + '', k.docs.rg, [['Nome', 'nome'], ['CPF', 'cpf'], ['Validade', 'validade']])}
+    ${docCard('CNPJ', WKZ_ICO.building + '', k.docs.cnpj, [['Razão Social', 'razaoSocial'], ['CNPJ', 'cnpj'], ['Constituída em', 'constituicao'], ['Atividade', 'atividade']])}
+    ${docCard('Comprovante de Endereço', WKZ_ICO.home + '', k.docs.comprovante, [['Endereço', 'endereco'], ['Cidade/UF', 'cidade'], ['CEP', 'cep']])}
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">${actionsHtml}</div>
   `;
@@ -510,7 +510,7 @@ function admApproveKyc(id) {
   }
   admSyncKycBadge();
   admAuditAdd('✅', `KYC "${k.vendorName}" aprovado (protocolo ${k.protocol})`, 'Admin WeKz');
-  showToast('✅ KYC de "' + k.vendorName + '" aprovado! Loja liberada para vender.');
+  showToast(WKZ_ICO.check + ' KYC de "' + k.vendorName + '" aprovado! Loja liberada para vender.');
   if (typeof window.spdSetApprovalStatus === 'function') window.spdSetApprovalStatus('approved');
 }
 
@@ -529,7 +529,7 @@ function admRejectKyc(id) {
   }
   admSyncKycBadge();
   admAuditAdd('🚫', `KYC "${k.vendorName}" recusado (protocolo ${k.protocol})`, 'Admin WeKz');
-  showToast('❌ KYC de "' + k.vendorName + '" recusado. Vendedor notificado.');
+  showToast(WKZ_ICO.xCircle + ' KYC de "' + k.vendorName + '" recusado. Vendedor notificado.');
   if (typeof window.spdSetApprovalStatus === 'function') window.spdSetApprovalStatus('rejected');
 }
 
@@ -541,7 +541,7 @@ function admRequestMoreKycDocs(id) {
   renderAdminKyc(_admKycActiveFilter);
   admSyncKycBadge();
   admAuditAdd('📨', `Documentos adicionais solicitados para "${k.vendorName}" (protocolo ${k.protocol})`, 'Admin WeKz');
-  showToast('📨 Solicitação de documentos adicionais enviada para ' + k.ownerName + '.');
+  showToast(WKZ_ICO.mail + ' Solicitação de documentos adicionais enviada para ' + k.ownerName + '.');
 }
 
 /* ── Dados simulados: Produtos com denúncias ── */
@@ -563,7 +563,7 @@ function renderAdminReports(filter = 'all') {
   let data = [...ADMIN_REPORTS];
   if (filter === 'urgent')   data = data.filter(r => r.severity === 'urgent');
   if (filter === 'review')   data = data.filter(r => r.severity === 'review');
-  if (filter === 'resolved') { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">✅ Nenhum produto resolvido recente.</div>'; return; }
+  if (filter === 'resolved') { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhum produto resolvido recente.</div>'; return; }
 
   list.innerHTML = data.map(r => `
     <div class="adm-report-card" id="admReport_${r.id}" data-rid="${r.id}">
@@ -591,7 +591,7 @@ function renderAdminReports(filter = 'all') {
     const report = ADMIN_REPORTS.find(r => r.id === rid);
     if (!report) return;
     if (action === 'takedown')   admTakedown(rid, report.name);
-    if (action === 'investigate') showToast('🔍 Abrindo investigação: ' + report.name);
+    if (action === 'investigate') showToast(WKZ_ICO.search + ' Abrindo investigação: ' + report.name);
     if (action === 'notify')      admNotifyStore(rid, report.name, report.store);
   };
 }
@@ -618,18 +618,18 @@ function admTakedown(id, name) {
   }
   admSyncReportBadge();
   admAuditAdd('🚫', 'Produto "' + name + '" removido por violação de política', 'Admin WeKz');
-  showToast('🚫 Produto "' + name + '" removido da plataforma. Loja notificada e penalizada.');
+  showToast(WKZ_ICO.slash + ' Produto "' + name + '" removido da plataforma. Loja notificada e penalizada.');
 }
 
 function admNotifyStore(id, name, store) {
   const report = ADMIN_REPORTS.find(r => r.id === id);
   if (report) report.notified = true;
   admAuditAdd('🏪', 'Loja "' + store + '" notificada sobre produto "' + name + '"', 'Admin WeKz');
-  showToast('📨 Loja "' + store + '" notificada para defesa do produto "' + name + '".');
+  showToast(WKZ_ICO.mail + ' Loja "' + store + '" notificada para defesa do produto "' + name + '".');
 }
 
 function admInvestigate(id, name) {
-  showToast('🔍 Abrindo investigação: ' + name);
+  showToast(WKZ_ICO.search + ' Abrindo investigação: ' + name);
 }
 
 /* ── Kz Wisdom para Admin ── */
@@ -759,14 +759,14 @@ const COMM_HISTORY = [
   { icon:'🔧', title:'Manutenção programada', msg:'Sistema ficará fora do ar das 02h às 04h no dia 25/05.', audience:'Todos', canal:'Push + Banner', date:'20/05 — 09:14', reach:'318K' },
   { icon:'🎉', title:'Semana WeKz — até 60% OFF!', msg:'Promoções exclusivas em todas as categorias. Não perca!', audience:'Compradores', canal:'Push + E-mail', date:'18/05 — 10:00', reach:'305K' },
   { icon:'✨', title:'Novo painel do vendedor v2.0', msg:'Atualizamos seu painel com relatórios e insights de IA.', audience:'Vendedores', canal:'E-mail + Push', date:'15/05 — 08:30', reach:'12,8K' },
-  { icon:'⚠️', title:'Alerta: novas regras de CNPJ', msg:'A partir de 01/06 todos os vendedores devem validar CNPJ.', audience:'Vendedores', canal:'E-mail + Banner', date:'12/05 — 14:00', reach:'12,8K' },
+  { icon:'⚠', title:'Alerta: novas regras de CNPJ', msg:'A partir de 01/06 todos os vendedores devem validar CNPJ.', audience:'Vendedores', canal:'E-mail + Banner', date:'12/05 — 14:00', reach:'12,8K' },
 ];
 
 const COMM_TEMPLATES = {
   manutencao: { title:'Manutenção programada — [DATA] às [HH]h', msg:'Nossa plataforma ficará temporariamente indisponível para manutenção. Agradecemos a compreensão!' },
-  promoçao:   { title:'🎉 [NOME DA PROMOÇÃO] — até [X]% OFF!', msg:'Aproveite ofertas exclusivas em toda a plataforma. Promoção válida até [DATA]!' },
-  novidade:   { title:'✨ Novidade: [NOME DA FEATURE]', msg:'Lançamos [descrição]. Acesse agora e descubra todas as melhorias!' },
-  alerta:     { title:'⚠️ Aviso importante para [PÚBLICO]', msg:'[DESCREVA O ALERTA DE FORMA CLARA E OBJETIVA].' },
+  promoçao:   { title:WKZ_ICO.award + ' [NOME DA PROMOÇÃO] — até [X]% OFF!', msg:'Aproveite ofertas exclusivas em toda a plataforma. Promoção válida até [DATA]!' },
+  novidade:   { title:WKZ_ICO.sparkles + ' Novidade: [NOME DA FEATURE]', msg:'Lançamos [descrição]. Acesse agora e descubra todas as melhorias!' },
+  alerta:     { title:WKZ_ICO.warning + ' Aviso importante para [PÚBLICO]', msg:'[DESCREVA O ALERTA DE FORMA CLARA E OBJETIVA].' },
 };
 
 function setAudience(aud, btn) {
@@ -781,7 +781,7 @@ function applyTemplate(key) {
   const bi = document.getElementById('commBody');
   if (ti) { ti.value = tpl.title; updatePreview(); }
   if (bi) { bi.value = tpl.msg; updateCommChars(); updatePreview(); }
-  showToast('📋 Template "' + key + '" aplicado!');
+  showToast(WKZ_ICO.clipboard + ' Template "' + key + '" aplicado!');
 }
 
 function updateCommChars() {
@@ -818,7 +818,7 @@ function sendBroadcast() {
      atinge a base inteira de usuários (até "318K" pela estimativa de
      alcance abaixo), então o limite é bem mais rígido que o de login. */
   if (typeof wkzRateLimit === 'function' && !wkzRateLimit('admin_broadcast', 3, 300000)) {
-    showToast('⚠️ Limite de comunicados atingido (3 a cada 5 min). Aguarde antes de enviar outro.');
+    showToast(WKZ_ICO.warning + ' Limite de comunicados atingido (3 a cada 5 min). Aguarde antes de enviar outro.');
     return;
   }
 
@@ -827,8 +827,8 @@ function sendBroadcast() {
   const btn = document.getElementById('commSendBtn');
   const title = ti ? ti.value.trim() : '';
   const msg   = bi ? bi.value.trim() : '';
-  if (!title) { showToast('⚠️ Preencha o título do comunicado.'); return; }
-  if (!msg)   { showToast('⚠️ Escreva a mensagem antes de enviar.'); return; }
+  if (!title) { showToast(WKZ_ICO.warning + ' Preencha o título do comunicado.'); return; }
+  if (!msg)   { showToast(WKZ_ICO.warning + ' Escreva a mensagem antes de enviar.'); return; }
 
   const audEl = document.querySelector('.adm-aud-btn.active');
   const audText = audEl ? audEl.textContent.trim() : 'Todos';
@@ -858,7 +858,7 @@ function sendBroadcast() {
      vez de um confirm() nativo, para manter a identidade visual. */
   window._wkzConfirm(
     'Isto vai enviar "' + title + '" para <strong>' + audience + '</strong> (~' + reach + ' usuários) via ' + canal + '. Esta ação não pode ser desfeita.',
-    { title: 'Enviar comunicado agora?', icon: '📣', variant: audienceKey === 'all' ? 'warning' : 'info', confirmLabel: 'Enviar', cancelLabel: 'Revisar' }
+    { title: 'Enviar comunicado agora?', icon: WKZ_ICO.megaphone, variant: audienceKey === 'all' ? 'warning' : 'info', confirmLabel: 'Enviar', cancelLabel: 'Revisar' }
   ).then(function (confirmed) {
     if (!confirmed) return;
 
@@ -886,7 +886,7 @@ function sendBroadcast() {
       updatePreview(); updateCommChars();
       renderCommHistory();
       admAuditAdd('📣', 'Comunicado "' + title + '" enviado para ' + audience + ' (' + reach + ')', 'Admin WeKz');
-      showToast('✅ Comunicado enviado para ' + audience + ' · ~' + reach + ' usuários!');
+      showToast(WKZ_ICO.check + ' Comunicado enviado para ' + audience + ' · ~' + reach + ' usuários!');
       if (btn) { btn.disabled = false; btn.innerHTML = '<svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Comunicado'; }
     }, 1200);
   });
@@ -916,7 +916,7 @@ function admGetIconSVG(key) {
     '✅': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
     '🚫': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
     '📣': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>',
-    '⚙️': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    '⚙': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
     '🔒': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
     '👤': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
     '🏪': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -924,7 +924,7 @@ function admGetIconSVG(key) {
     '🔧': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
     '🎉': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
     '✨': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85z"/></svg>',
-    '⚠️': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    '⚠': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
     '🏭': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 002 2h16a2 2 0 002-2V8l-7 5V8l-7 5V4H2v16z"/><line x1="17" y1="18" x2="17.01" y2="18" stroke-width="3"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/><line x1="7" y1="18" x2="7.01" y2="18" stroke-width="3"/></svg>',
     '⭐': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
     'cal': '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
@@ -942,7 +942,7 @@ const AUDIT_LOG = [
   { time:'14:37', icon:'✅', desc:'Loja "TechParts Direct" aprovada', actor:'Admin WeKz' },
   { time:'13:55', icon:'🚫', desc:'Produto #P4421 removido por violação de política', actor:'Admin WeKz' },
   { time:'13:12', icon:'📣', desc:'Comunicado "Manutenção programada" enviado para 318K usuários', actor:'Admin WeKz' },
-  { time:'12:40', icon:'⚙️', desc:'Taxa de comissão "Moda" alterada de 10% → 12%', actor:'Admin WeKz' },
+  { time:'12:40', icon:'⚙', desc:'Taxa de comissão "Moda" alterada de 10% → 12%', actor:'Admin WeKz' },
   { time:'11:28', icon:'🔒', desc:'IP 103.55.xx.xx bloqueado temporariamente (47 tentativas)', actor:'Sistema' },
   { time:'10:05', icon:'👤', desc:'Conta #U9032 suspensa por chargeback acima do limite', actor:'Sistema' },
   { time:'09:18', icon:'🏪', desc:'Loja "PetLife Store" — solicitação de documentos enviada', actor:'Admin WeKz' },
@@ -975,7 +975,7 @@ const KZ_RADAR_ALERTS = [
   {
     id: 'RAD001',
     level: 'critical',
-    icon: '🌐',
+    icon: WKZ_ICO.globe,
     title: 'Variação atípica de IPs de acesso detectada',
     detail: '47 logins do vendedor GadgetDiscount BR originaram-se de 12 países distintos nas últimas 3h — padrão consistente com credential stuffing ou VPN hopping.',
     timestamp: 'há 2 min',
@@ -984,7 +984,7 @@ const KZ_RADAR_ALERTS = [
   {
     id: 'RAD002',
     level: 'high',
-    icon: '💸',
+    icon: WKZ_ICO.money,
     title: 'Tentativas de saques consecutivos suspeitos',
     detail: 'BeautySecret Store realizou 4 solicitações de saque em 18 minutos, totalizando R$ 19.200 — volume 340% acima da média histórica da loja.',
     timestamp: 'há 11 min',
@@ -993,7 +993,7 @@ const KZ_RADAR_ALERTS = [
   {
     id: 'RAD003',
     level: 'medium',
-    icon: '⚖️',
+    icon: WKZ_ICO.scale,
     title: 'Comportamento suspeito no chat tripartite de disputas',
     detail: 'Comprador USER-2291 enviou mensagens idênticas em 6 disputas abertas simultaneamente — possível fraude organizada ou abuso de política de reembolso.',
     timestamp: 'há 28 min',
@@ -1026,7 +1026,7 @@ function renderKzRadar() {
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">${alert.detail}</div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-size:10px;color:var(--muted);">⏱ ${alert.timestamp}</span>
+            <span style="font-size:10px;color:var(--muted);">${WKZ_ICO.clock} ${alert.timestamp}</span>
             ${alert.actions.map((a, i) => `<button onclick="kzRadarAction('${alert.id}','${a}')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid ${i===0?'rgba(0,180,171,0.4)':'rgba(239,68,68,0.4)'};background:${i===0?'rgba(0,180,171,0.1)':'rgba(239,68,68,0.08)'};color:${i===0?'var(--teal)':'#EF4444'};transition:all 0.2s;">${a}</button>`).join('')}
           </div>
         </div>
@@ -1043,13 +1043,13 @@ function kzRadarAction(id, action) {
   if (!alert) return;
   if (action === 'Bloquear Temporariamente') {
     admAuditAdd('🔒', `Kz Radar: Bloqueio temporário acionado para alerta ${id} — ${alert.title}`, 'Kz AI · Admin');
-    showToast('🛡️ Kz AI: Bloqueio temporário acionado. Equipe de segurança notificada.');
+    showToast(WKZ_ICO.shield + ' Kz AI: Bloqueio temporário acionado. Equipe de segurança notificada.');
     // Remove from radar visually
     const card = document.querySelector('[data-radar-id="' + id + '"]');
     if (card) { card.style.opacity='0.35'; card.style.pointerEvents='none'; }
   } else {
     admAuditAdd('🔍', `Kz Radar: Investigação iniciada para alerta ${id} — ${alert.title}`, 'Kz AI · Admin');
-    showToast('🔍 Kz AI: Investigação registrada no log de auditoria.');
+    showToast(WKZ_ICO.search + ' Kz AI: Investigação registrada no log de auditoria.');
   }
 }
 
@@ -1124,7 +1124,7 @@ function resolveFraudReport(id) {
   const r = FRAUD_REPORTS.find(x => x.id === id);
   if (!r) return;
   r.status = 'resolvida';
-  admAuditAdd('🛡️', `Reporte de fraude ${id} marcado como resolvido`, 'Admin WeKz');
+  admAuditAdd('🛡', `Reporte de fraude ${id} marcado como resolvido`, 'Admin WeKz');
   renderFraudReports();
 }
 
@@ -1171,22 +1171,22 @@ function secSuspendAccount(idx) {
   }
   SUSPECT_ACCOUNTS.splice(idx, 1);
   admAuditAdd('👤', 'Conta ' + s.name + ' suspensa por atividade suspeita', 'Admin WeKz');
-  showToast('🚫 Conta ' + s.name + ' suspensa. Acesso bloqueado imediatamente.');
+  showToast(WKZ_ICO.slash + ' Conta ' + s.name + ' suspensa. Acesso bloqueado imediatamente.');
 }
 
 function secViewAccount(idx) {
   const s = SUSPECT_ACCOUNTS[idx];
   if (!s) return;
-  showToast('🔍 Abrindo detalhes: ' + s.name + ' · Score de risco: ' + s.score);
+  showToast(WKZ_ICO.search + ' Abrindo detalhes: ' + s.name + ' · Score de risco: ' + s.score);
 }
 
 function secAction(action, target) {
   const msgs = {
-    block:   '🚫 Vendedor #' + target + ' bloqueado. Análise iniciada.',
-    blockip: '🔒 IP ' + target + '.xx.xx bloqueado por 24h.',
-    view:    '🔍 Abrindo detalhes do alerta...',
+    block:   WKZ_ICO.slash + ' Vendedor #' + target + ' bloqueado. Análise iniciada.',
+    blockip: WKZ_ICO.lock + ' IP ' + target + '.xx.xx bloqueado por 24h.',
+    view:    WKZ_ICO.search + ' Abrindo detalhes do alerta...',
   };
-  showToast(msgs[action] || '✅ Ação executada.');
+  showToast(msgs[action] || WKZ_ICO.check + ' Ação executada.');
   /* Remove o card do alerta que originou a ação */
   if (action === 'block' || action === 'blockip') {
     const btn = event && event.target ? event.target.closest('.adm-sec-alert') : null;
@@ -1212,7 +1212,7 @@ function cfgToggle(feature, input) {
       'Todos os usuários serão redirecionados para a página de manutenção enquanto o modo estiver ativo.',
       {
         title: 'Ativar modo manutenção?',
-        icon: '🔧',
+        icon: WKZ_ICO.wrench,
         variant: 'warning',
         confirmLabel: 'Ativar',
         cancelLabel: 'Cancelar',
@@ -1220,17 +1220,17 @@ function cfgToggle(feature, input) {
     ).then(function(confirmed) {
       if (!confirmed) { input.checked = false; return; }
       admAuditAdd('🔧', 'Modo manutenção ATIVADO', 'Admin WeKz');
-      showToast('🔧 Modo manutenção ATIVADO. Usuários vendo página de manutenção.');
+      showToast(WKZ_ICO.wrench + ' Modo manutenção ATIVADO. Usuários vendo página de manutenção.');
     });
     return; /* sai antes do else — a lógica continua na Promise */
   } else if (feature === 'maintenance') {
     admAuditAdd('✅', 'Modo manutenção desativado — plataforma online', 'Admin WeKz');
-    showToast('✅ Modo manutenção desativado. Plataforma online.');
+    showToast(WKZ_ICO.check + ' Modo manutenção desativado. Plataforma online.');
   } else {
     const labels = { flash:'Flash Sales', boost:'WeKz Boost', newstores:'Novos cadastros', pix:'PIX', kz:'Kz IA' };
     const label = labels[feature] || feature;
-    admAuditAdd('⚙️', label + (input.checked ? ' ativado' : ' desativado'), 'Admin WeKz');
-    showToast((input.checked ? '✅ ' : '🔴 ') + label + (input.checked ? ' ativado.' : ' desativado.'));
+    admAuditAdd('⚙', label + (input.checked ? ' ativado' : ' desativado'), 'Admin WeKz');
+    showToast((input.checked ? WKZ_ICO.check + ' ' : WKZ_ICO.dot('#EF4444') + ' ') + label + (input.checked ? ' ativado.' : ' desativado.'));
   }
 }
 
@@ -1243,15 +1243,15 @@ function updateRate(cat, input) {
 }
 
 function saveRates() {
-  admAuditAdd('⚙️', 'Taxas de comissão por categoria atualizadas', 'Admin WeKz');
-  showToast('💾 Taxas de comissão salvas com sucesso!');
+  admAuditAdd('⚙', 'Taxas de comissão por categoria atualizadas', 'Admin WeKz');
+  showToast(WKZ_ICO.save + ' Taxas de comissão salvas com sucesso!');
 }
 
 /* [FIX-admin-audit v1.0] Antes, "Salvar Limites" só mostrava um toast de
    sucesso e gravava uma linha no log de auditoria — os 5 campos nem
    tinham `id`, então não havia como a função ler o que o gestor
    realmente digitou. O admin podia mudar "Máx. produtos por loja" para
-   5000, clicar em salvar, ver "✅ salvo com sucesso"... e nada era lido,
+   5000, clicar em salvar, ver WKZ_ICO.check + " salvo com sucesso"... e nada era lido,
    nada era persistido. Agora os valores são validados contra os próprios
    min/max de cada campo e gravados em localStorage — sobrevivem a reload
    desta página (o mesmo padrão de "config da plataforma" que Faturamento
@@ -1273,15 +1273,15 @@ function saveLimits() {
     const min = el.min !== '' ? parseFloat(el.min) : -Infinity;
     const max = el.max !== '' ? parseFloat(el.max) : Infinity;
     let val = parseFloat(el.value);
-    if (isNaN(val)) { showToast('⚠️ "' + f.label + '" precisa de um número válido.'); return; }
+    if (isNaN(val)) { showToast(WKZ_ICO.warning + ' "' + f.label + '" precisa de um número válido.'); return; }
     val = Math.min(max, Math.max(min, val));
     el.value = val; // reflete o clamp de volta no campo, se o admin digitou fora do intervalo
     values[f.id] = val;
     changed.push(f.label + ': ' + val);
   }
   try { localStorage.setItem(WKZ_ADMIN_LIMITS_KEY, JSON.stringify(values)); } catch (e) {}
-  admAuditAdd('⚙️', 'Limites operacionais atualizados — ' + changed.join(' · '), 'Admin WeKz');
-  showToast('💾 Limites operacionais salvos com sucesso!');
+  admAuditAdd('⚙', 'Limites operacionais atualizados — ' + changed.join(' · '), 'Admin WeKz');
+  showToast(WKZ_ICO.save + ' Limites operacionais salvos com sucesso!');
 }
 /* Restaura os limites salvos ao (re)carregar a página — sem isto, um
    reload voltava sempre para os 5 valores fixos do HTML, mesmo depois de
@@ -1298,7 +1298,7 @@ function loadSavedLimits() {
 document.addEventListener('DOMContentLoaded', function() { setTimeout(loadSavedLimits, 50); });
 
 /* ══════════════════════════════════════════════════════════════
-   📈 KZ FX GUARD — Gestão de Spread/Risco Cambial
+   ${WKZ_ICO.trendUp} KZ FX GUARD — Gestão de Spread/Risco Cambial
    Valores de spread por moeda lidos do painel admin e aplicados
    dinamicamente na função kzFormatPrice() do motor LANG_CURRENCY.
    ══════════════════════════════════════════════════════════════ */
@@ -1342,7 +1342,7 @@ function kzFxGuardSave() {
   const entries = Object.entries(window.KZ_FX_SPREADS)
     .map(([c, v]) => `${c}: +${v}%`).join(' · ');
   admAuditAdd('📈', `Kz FX Guard — Spreads cambiais actualizados: ${entries}`, 'Admin WeKz');
-  showToast('📈 Kz FX Guard: Spreads aplicados! Preços internacionais actualizados.');
+  showToast(WKZ_ICO.trendUp + ' Kz FX Guard: Spreads aplicados! Preços internacionais actualizados.');
   // Força re-render da PDP se visível
   if (typeof kzSyncFromHeader === 'function') {
     const lang = document.getElementById('langSelect')?.value || 'pt';
@@ -1352,7 +1352,7 @@ function kzFxGuardSave() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   🚢 KZ GLOBAL EXPRESS — Estimador de Logística Internacional
+   ${WKZ_ICO.ship} KZ GLOBAL EXPRESS — Estimador de Logística Internacional
    Atualizado dinamicamente quando lang/currency muda no header.
    Exibe frete estimado, destino e confirmação de isenção alfandegária.
    ══════════════════════════════════════════════════════════════ */
@@ -1360,10 +1360,10 @@ function kzFxGuardSave() {
 // Tabela de estimativas por moeda/idioma (valores na moeda local)
 window.KZ_INTL_SHIPPING = {
   EUR: { icon:'🚢', city:'Europa',        cost:'€ 8,90',   days:'12–18',  carrier:'Kz Global Express',   customs:'Sem taxas retidas pela WeKz',   flag:'🇪🇺' },
-  USD: { icon:'✈️', city:'Estados Unidos', cost:'$ 9.50',   days:'10–16',  carrier:'Kz AirFreight Pro',   customs:'Declared value protected',       flag:'🇺🇸' },
+  USD: { icon:'✈', city:'Estados Unidos', cost:'$ 9.50',   days:'10–16',  carrier:'Kz AirFreight Pro',   customs:'Declared value protected',       flag:'🇺🇸' },
   JPY: { icon:'🚢', city:'Tóquio',        cost:'¥ 1.800',  days:'14–20',  carrier:'Kz Global Express',   customs:'関税なし（WeKz保証）',              flag:'🇯🇵' },
   CNY: { icon:'🚢', city:'Xangai',        cost:'元 65',    days:'8–14',   carrier:'Kz ChinaRoute',       customs:'无需担心关税，WeKz全额承保',        flag:'🇨🇳' },
-  INR: { icon:'✈️', city:'Mumbai',        cost:'₹ 780',    days:'14–22',  carrier:'Kz AirFreight Pro',   customs:'No customs held — WeKz covers',  flag:'🇮🇳' },
+  INR: { icon:'✈', city:'Mumbai',        cost:'₹ 780',    days:'14–22',  carrier:'Kz AirFreight Pro',   customs:'No customs held — WeKz covers',  flag:'🇮🇳' },
   RUB: { icon:'🚢', city:'Moscovo',       cost:'₽ 890',    days:'18–28',  carrier:'Kz Global Express',   customs:'Без таможенных удержаний',        flag:'🇷🇺' },
   BRL: null // mercado doméstico — oculta o estimador
 };
@@ -1421,29 +1421,29 @@ function kzUpdateIntlShipping(kzLang, kzCurr) {
 /* Banco de respostas contextuais do Kz para o painel admin */
 const KZ_IA_RESPONSES = {
   faturamento: [
-    'Meus sensores financeiros estão ativos! 📊 O <strong>GMV de Maio 2025 é R$ 4.872.340</strong>, com alta de +23,4% em relação a Abril. A receita líquida WeKz está em <strong>R$ 389.787</strong> (margem 8%). Excelente performance — <em>Eletrônicos domina 72%</em> do volume.',
-    'Análise de faturamento concluída! 💰 Maio está <strong>+23,4% acima do mês anterior</strong>. Total de <strong>38.491 pedidos</strong> processados. O ticket médio é R$ 126,58 — <em>acima da meta de R$ 120</em>.',
+    'Meus sensores financeiros estão ativos! ${WKZ_ICO.barChart} O <strong>GMV de Maio 2025 é R$ 4.872.340</strong>, com alta de +23,4% em relação a Abril. A receita líquida WeKz está em <strong>R$ 389.787</strong> (margem 8%). Excelente performance — <em>Eletrônicos domina 72%</em> do volume.',
+    'Análise de faturamento concluída! ${WKZ_ICO.money} Maio está <strong>+23,4% acima do mês anterior</strong>. Total de <strong>38.491 pedidos</strong> processados. O ticket médio é R$ 126,58 — <em>acima da meta de R$ 120</em>.',
   ],
   lojas: [
-    'Escaneando lojas pendentes... 🏪 Atualmente <strong>7 lojas aguardam aprovação</strong>: 5 pendentes de revisão e 2 com documentação incompleta. Recomendo priorizar <em>GlowBeauty Shop</em> e <em>PetLife Store</em> que estão há mais de 48h sem resposta.',
-    'Radar de lojas ativo! 🔍 <strong>12.847 lojas ativas</strong> no período. Das 7 pendentes, 2 apresentam documentação incompleta — enviar e-mail automático de solicitação é a ação recomendada.',
+    'Escaneando lojas pendentes... ${WKZ_ICO.store} Atualmente <strong>7 lojas aguardam aprovação</strong>: 5 pendentes de revisão e 2 com documentação incompleta. Recomendo priorizar <em>GlowBeauty Shop</em> e <em>PetLife Store</em> que estão há mais de 48h sem resposta.',
+    'Radar de lojas ativo! ${WKZ_ICO.search} <strong>12.847 lojas ativas</strong> no período. Das 7 pendentes, 2 apresentam documentação incompleta — enviar e-mail automático de solicitação é a ação recomendada.',
   ],
   seguranca: [
-    'Auditoria de segurança iniciada! 🔒 Tenho <strong>2 alertas ativos</strong>: 1 tentativa de acesso com credenciais inválidas (IP: 192.168.x.x) e 1 padrão suspeito de pedidos repetitivos. <em>Score de risco: 7.2/10</em> — ação preventiva recomendada.',
-    'Sensores de segurança detectaram atividade incomum! ⚠️ <strong>2 contas suspeitas</strong> identificadas com padrão de fraude (múltiplos pedidos em curto período). Uptime da plataforma: <strong>98,7%</strong> nos últimos 30 dias.',
+    'Auditoria de segurança iniciada! ${WKZ_ICO.lock} Tenho <strong>2 alertas ativos</strong>: 1 tentativa de acesso com credenciais inválidas (IP: 192.168.x.x) e 1 padrão suspeito de pedidos repetitivos. <em>Score de risco: 7.2/10</em> — ação preventiva recomendada.',
+    'Sensores de segurança detectaram atividade incomum! ${WKZ_ICO.warning} <strong>2 contas suspeitas</strong> identificadas com padrão de fraude (múltiplos pedidos em curto período). Uptime da plataforma: <strong>98,7%</strong> nos últimos 30 dias.',
   ],
   analise: [
-    'Análise completa da plataforma WeKz — Maio 2025: 📈 GMV: <strong>R$ 4.87M (+23,4%)</strong> · Net Revenue: <strong>R$ 389K (+19,1%)</strong> · Pedidos: <strong>38.491 (+5,9%)</strong> · Lojas ativas: <strong>12.847</strong> · NPS médio: <strong>4.89/5.0</strong> · Uptime: <strong>98,7%</strong>. Status geral: <em>Plataforma saudável!</em>',
-    'Visão 360° do ecossistema WeKz detectada! 🌐 Destaques: <strong>Eletrônicos lidera com R$ 3,5M</strong> em GMV. Taxa de chargeback em <strong>0,8%</strong> (abaixo do limite de 1%). <em>3 produtos com denúncias urgentes</em> aguardam moderação. Recomendo ação antes das 18h.',
+    'Análise completa da plataforma WeKz — Maio 2025: ${WKZ_ICO.trendUp} GMV: <strong>R$ 4.87M (+23,4%)</strong> · Net Revenue: <strong>R$ 389K (+19,1%)</strong> · Pedidos: <strong>38.491 (+5,9%)</strong> · Lojas ativas: <strong>12.847</strong> · NPS médio: <strong>4.89/5.0</strong> · Uptime: <strong>98,7%</strong>. Status geral: <em>Plataforma saudável!</em>',
+    'Visão 360° do ecossistema WeKz detectada! ${WKZ_ICO.globe} Destaques: <strong>Eletrônicos lidera com R$ 3,5M</strong> em GMV. Taxa de chargeback em <strong>0,8%</strong> (abaixo do limite de 1%). <em>3 produtos com denúncias urgentes</em> aguardam moderação. Recomendo ação antes das 18h.',
   ],
   moderacao: [
-    'Moderação de produtos: escaneando base de dados... 🚨 <strong>3 produtos com denúncias urgentes</strong> identificados: Smartphone Xclone (8 reportes), Tênis Supreme XLR (12 reportes — uso de marca), Suplemento "Emagrece Já" (5 reportes — alegações médicas). Ação de takedown recomendada nos 3.',
-    'Radar de denúncias ativo! ⚠️ <strong>15 produtos em análise</strong> neste ciclo: 3 urgentes, 12 em revisão. <em>Tênis Supreme XLR Ultra</em> lidera com 12 reportes de uso indevido de marca registrada — prioridade máxima.',
+    'Moderação de produtos: escaneando base de dados... ${WKZ_ICO.warning} <strong>3 produtos com denúncias urgentes</strong> identificados: Smartphone Xclone (8 reportes), Tênis Supreme XLR (12 reportes — uso de marca), Suplemento "Emagrece Já" (5 reportes — alegações médicas). Ação de takedown recomendada nos 3.',
+    'Radar de denúncias ativo! ${WKZ_ICO.warning} <strong>15 produtos em análise</strong> neste ciclo: 3 urgentes, 12 em revisão. <em>Tênis Supreme XLR Ultra</em> lidera com 12 reportes de uso indevido de marca registrada — prioridade máxima.',
   ],
   default: [
     'Lince Cibernético a postos! 🐱 Pode perguntar sobre faturamento, lojas pendentes, segurança, moderação de produtos ou qualquer métrica da plataforma. Estou monitorando o ecossistema WeKz em tempo real.',
-    'Sensores ativados! Ao seu dispor, Gestor. 🎯 Tenho acesso a todos os dados do painel — faturamento, aprovações, segurança, comunicados e configurações. O que deseja analisar?',
-    'Centro de Comando WeKz operacional! 🛡️ Maio 2025 está com <strong>performance acima da meta</strong> em todos os KPIs principais. GMV +23,4%, NPS 4.89, Uptime 98,7%. Alguma área específica para investigar?',
+    'Sensores ativados! Ao seu dispor, Gestor. ${WKZ_ICO.target} Tenho acesso a todos os dados do painel — faturamento, aprovações, segurança, comunicados e configurações. O que deseja analisar?',
+    'Centro de Comando WeKz operacional! ${WKZ_ICO.shield} Maio 2025 está com <strong>performance acima da meta</strong> em todos os KPIs principais. GMV +23,4%, NPS 4.89, Uptime 98,7%. Alguma área específica para investigar?',
   ],
 };
 
@@ -1597,7 +1597,7 @@ const ADMIN_DISPUTES = [
       { who: 'buyer',  text: 'Comprei há 22 dias e nada chegou. O código de rastreio não atualiza desde o dia 3.', time: '10:21' },
       { who: 'seller', text: 'O produto foi enviado conforme prazo. Os Correios estão com atraso na minha região.', time: '10:45' },
       { who: 'buyer',  text: 'Já abri reclamação nos Correios e disseram que o objeto não consta no sistema deles.', time: '11:02' },
-      { who: 'kz',     text: '⚡ Análise automática: rastreamento inativo há 19 dias. Probabilidade de extravio: 87%. Recomendo reembolso total ao comprador.', time: '11:03' },
+      { who: 'kz',     text: WKZ_ICO.zap + ' Análise automática: rastreamento inativo há 19 dias. Probabilidade de extravio: 87%. Recomendo reembolso total ao comprador.', time: '11:03' },
     ]
   },
   {
@@ -1610,7 +1610,7 @@ const ADMIN_DISPUTES = [
     msgs: [
       { who: 'buyer',  text: 'A tela veio com uma linha horizontal morta. Tirei fotos e vídeo assim que abri a caixa.', time: '14:33' },
       { who: 'seller', text: 'Pode ser dano no transporte. Solicito que o produto seja devolvido para análise técnica.', time: '15:10' },
-      { who: 'kz',     text: '📊 Histórico desta loja: 3 disputas similares nos últimos 60 dias. Padrão identificado.', time: '15:11' },
+      { who: 'kz',     text: WKZ_ICO.barChart + ' Histórico desta loja: 3 disputas similares nos últimos 60 dias. Padrão identificado.', time: '15:11' },
     ]
   },
   {
@@ -1634,7 +1634,7 @@ const ADMIN_DISPUTES = [
     seller: { name: 'EleteQ Plus', id: '#S3371', avatar: 'E' },
     msgs: [
       { who: 'buyer',  text: 'Cancelei o pedido há 12 dias. O sistema confirmou o cancelamento mas o estorno ainda não caiu.', time: '16:05' },
-      { who: 'kz',     text: '🔍 Verificando: cancelamento confirmado em 10/05. Estorno ainda pendente no gateway. Ação admin necessária.', time: '16:06' },
+      { who: 'kz',     text: WKZ_ICO.search + ' Verificando: cancelamento confirmado em 10/05. Estorno ainda pendente no gateway. Ação admin necessária.', time: '16:06' },
     ]
   },
   {
@@ -1646,8 +1646,8 @@ const ADMIN_DISPUTES = [
     seller: { name: 'BeautySecret Store', id: '#S4410', avatar: 'B' },
     msgs: [
       { who: 'buyer',  text: 'O frasco chegou lacrado mas completamente vazio. Claramente adulterado antes do envio.', time: '08:30' },
-      { who: 'kz',     text: '🚨 Alerta de fraude grave detectado. Loja já tem denúncia ativa de produto adulterado.', time: '08:31' },
-      { who: 'admin',  text: '✅ Reembolso total de R$ 890,00 aprovado. Loja notificada e penalidade aplicada (30% do saldo retido).', time: '09:45' },
+      { who: 'kz',     text: WKZ_ICO.warning + ' Alerta de fraude grave detectado. Loja já tem denúncia ativa de produto adulterado.', time: '08:31' },
+      { who: 'admin',  text: WKZ_ICO.check + ' Reembolso total de R$ 890,00 aprovado. Loja notificada e penalidade aplicada (30% do saldo retido).', time: '09:45' },
     ]
   },
 ];
@@ -1675,7 +1675,7 @@ function renderDisputas(filter) {
   if (badge) badge.textContent = open;
 
   if (data.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--muted);">✅ Nenhuma disputa nesta categoria.</div>';
+    list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--muted);">${WKZ_ICO.check} Nenhuma disputa nesta categoria.</div>';
     return;
   }
 
@@ -1686,17 +1686,17 @@ function renderDisputas(filter) {
         <div class="adm-disputa-meta">
           <div class="adm-disputa-title">${d.title}</div>
           <div class="adm-disputa-info">
-            <span class="adm-disputa-info-chip">👤 ${d.buyer.name} ${d.buyer.id}</span>
+            <span class="adm-disputa-info-chip">${WKZ_ICO.user} ${d.buyer.name} ${d.buyer.id}</span>
             <span style="color:var(--border);">vs</span>
-            <span class="adm-disputa-info-chip">🏪 ${d.seller.name} ${d.seller.id}</span>
-            <span class="adm-disputa-info-chip">💰 ${d.valor}</span>
-            <span class="adm-disputa-info-chip">⏱ Prazo: ${d.prazo}</span>
+            <span class="adm-disputa-info-chip">${WKZ_ICO.store} ${d.seller.name} ${d.seller.id}</span>
+            <span class="adm-disputa-info-chip">${WKZ_ICO.money} ${d.valor}</span>
+            <span class="adm-disputa-info-chip">${WKZ_ICO.clock} Prazo: ${d.prazo}</span>
             <span class="adm-disputa-info-chip">${d.msgs.length} msg${d.msgs.length !== 1 ? 's' : ''}</span>
           </div>
           <div class="adm-disputa-motivo"><strong>Motivo:</strong> <span style="color:var(--muted);">${d.motivo}</span></div>
         </div>
         <div class="adm-disputa-btns">
-          <button class="adm-btn-view" onclick="event.stopPropagation();openDisputaChat('${d.id}')">💬 Chat</button>
+          <button class="adm-btn-view" onclick="event.stopPropagation();openDisputaChat('${d.id}')">${WKZ_ICO.chat} Chat</button>
           ${d.severity !== 'resolved' ? `<button class="adm-btn-refund" onclick="event.stopPropagation();admResolveDispute('${d.id}','refund_buyer')" style="font-size:11px;padding:7px 10px;">↩ Reembolsar</button>` : ''}
         </div>
       </div>
@@ -1741,10 +1741,10 @@ function openDisputaChat(id) {
   if (d.severity !== 'resolved') {
     actionsEl.innerHTML = `
       <button class="adm-btn-refund"  onclick="admResolveDispute('${d.id}','refund_buyer')">↩ Reembolsar Comprador (100%)</button>
-      <button class="adm-btn-release" onclick="admResolveDispute('${d.id}','release_seller')">✅ Liberar para Lojista</button>
-      <button class="adm-btn-partial" onclick="admResolveDispute('${d.id}','partial_split')">⚖️ Divisão Parcial (50/50)</button>`;
+      <button class="adm-btn-release" onclick="admResolveDispute('${d.id}','release_seller')">${WKZ_ICO.check} Liberar para Lojista</button>
+      <button class="adm-btn-partial" onclick="admResolveDispute('${d.id}','partial_split')">${WKZ_ICO.scale} Divisão Parcial (50/50)</button>`;
   } else {
-    actionsEl.innerHTML = `<div style="padding:4px 0;color:#22C55E;font-size:13px;font-weight:600;">✅ Disputa já resolvida.</div>`;
+    actionsEl.innerHTML = `<div style="padding:4px 0;color:#22C55E;font-size:13px;font-weight:600;">${WKZ_ICO.check} Disputa já resolvida.</div>`;
   }
 }
 
@@ -1755,7 +1755,7 @@ function renderDisputaChat(d) {
     const isAdmin = m.who === 'admin';
     const isKz    = m.who === 'kz';
     const cls     = isKz ? 'msg-kz' : `msg-${m.who}`;
-    const avMap   = { buyer: d.buyer.avatar, seller: d.seller.avatar, admin: '🛡', kz: '' };
+    const avMap   = { buyer: d.buyer.avatar, seller: d.seller.avatar, admin: WKZ_ICO.shield + '', kz: '' };
     const av      = isKz ? (typeof getKzSVG === 'function' ? getKzSVG(18) : '🐱') : avMap[m.who];
     /* FIX XSS (auditoria M5): m.text vem direto de um <textarea> (ver
        sendDisputaMsg) sem nenhuma sanitização — sem escapeHtml(), um
@@ -1766,7 +1766,7 @@ function renderDisputaChat(d) {
         <div class="adm-chat-avatar">${av}</div>
         <div>
           <div class="adm-chat-bubble">${escapeHtml(m.text)}</div>
-          <div class="adm-chat-meta">${isKz ? '🤖 Kz IA' : isAdmin ? '🛡️ Admin WeKz' : m.who === 'buyer' ? '👤 ' + d.buyer.name : '🏪 ' + d.seller.name} · ${m.time}</div>
+          <div class="adm-chat-meta">${isKz ? WKZ_ICO.bot + ' Kz IA' : isAdmin ? WKZ_ICO.shield + ' Admin WeKz' : m.who === 'buyer' ? WKZ_ICO.user + ' ' + d.buyer.name : WKZ_ICO.store + ' ' + d.seller.name} · ${m.time}</div>
         </div>
       </div>`;
   }).join('');
@@ -1778,7 +1778,7 @@ function sendDisputaMsg() {
      generoso o bastante para uma conversa real, mas barra flood/spam
      automatizado no chat de disputas. */
   if (typeof wkzRateLimit === 'function' && !wkzRateLimit('disputa_msg', 20, 60000)) {
-    showToast('⚠️ Muitas mensagens em pouco tempo. Aguarde um instante.');
+    showToast(WKZ_ICO.warning + ' Muitas mensagens em pouco tempo. Aguarde um instante.');
     return;
   }
 
@@ -1812,8 +1812,8 @@ function admResolveDispute(id, resolution) {
 
   const msgs = {
     refund_buyer:   { toast: `↩ Reembolso de ${d.valor} aprovado para ${d.buyer.name}.`, audit: `Disputa ${id} resolvida — Reembolso total ao comprador (${d.valor})` },
-    release_seller: { toast: `✅ Valor de ${d.valor} liberado para ${d.seller.name}.`, audit: `Disputa ${id} resolvida — Valor liberado ao lojista (${d.valor})` },
-    partial_split:  { toast: `⚖️ Divisão 50/50 aplicada na Disputa ${id}.`, audit: `Disputa ${id} resolvida — Divisão parcial 50/50 (${d.valor})` },
+    release_seller: { toast: `${WKZ_ICO.check} Valor de ${d.valor} liberado para ${d.seller.name}.`, audit: `Disputa ${id} resolvida — Valor liberado ao lojista (${d.valor})` },
+    partial_split:  { toast: `${WKZ_ICO.scale} Divisão 50/50 aplicada na Disputa ${id}.`, audit: `Disputa ${id} resolvida — Divisão parcial 50/50 (${d.valor})` },
   };
 
   const m = msgs[resolution];
@@ -1821,9 +1821,9 @@ function admResolveDispute(id, resolution) {
 
   d.severity = 'resolved';
   const time = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-  d.msgs.push({ who: 'admin', text: `✅ Resolução: ${m.toast}`, time });
+  d.msgs.push({ who: 'admin', text: `${WKZ_ICO.check} Resolução: ${m.toast}`, time });
 
-  admAuditAdd('⚖️', m.audit, 'Admin WeKz');
+  admAuditAdd('⚖', m.audit, 'Admin WeKz');
   showToast(m.toast);
   closeDisputaChat();
   renderDisputas(_disputasActiveFilter);
@@ -1832,9 +1832,9 @@ function admResolveDispute(id, resolution) {
   // Disputas do comprador — fecha o ciclo trilateral (comprador ↔
   // vendedor ↔ admin) para disputas abertas através do fluxo do comprador.
   const verdictMap = {
-    refund_buyer:   { sellerLabel: '✓ Favorável ao Comprador (reembolso total)', sellerColor: '#22C55E', buyerKey: 'buyer',   buyerText: `✅ Veredito a seu favor — Reembolso de ${d.valor} processado em 2 dias úteis.` },
-    release_seller: { sellerLabel: '✓ Favorável ao Vendedor',                    sellerColor: '#22C55E', buyerKey: 'seller',  buyerText: `🏪 Veredito favorável ao vendedor — Valor de ${d.valor} liberado à loja.` },
-    partial_split:  { sellerLabel: '◐ Resolução Parcial (divisão 50/50)',        sellerColor: '#F59E0B', buyerKey: 'partial', buyerText: `⚖️ Resolução parcial — Divisão de 50/50 sobre ${d.valor}.` },
+    refund_buyer:   { sellerLabel: '✓ Favorável ao Comprador (reembolso total)', sellerColor: '#22C55E', buyerKey: 'buyer',   buyerText: `${WKZ_ICO.check} Veredito a seu favor — Reembolso de ${d.valor} processado em 2 dias úteis.` },
+    release_seller: { sellerLabel: '✓ Favorável ao Vendedor',                    sellerColor: '#22C55E', buyerKey: 'seller',  buyerText: `${WKZ_ICO.store} Veredito favorável ao vendedor — Valor de ${d.valor} liberado à loja.` },
+    partial_split:  { sellerLabel: '◐ Resolução Parcial (divisão 50/50)',        sellerColor: '#F59E0B', buyerKey: 'partial', buyerText: `${WKZ_ICO.scale} Resolução parcial — Divisão de 50/50 sobre ${d.valor}.` },
   };
   const vm = verdictMap[resolution];
   if (vm) {
@@ -1942,7 +1942,7 @@ function renderSaques(filter) {
   if (badge) badge.textContent = pending.length;
 
   if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted);">✅ Nenhum saque nesta categoria.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhum saque nesta categoria.</td></tr>`;
     return;
   }
 
@@ -1969,7 +1969,7 @@ function renderSaques(filter) {
         <td><div class="adm-saque-val-main">${fmtBRL(s.saldo)}</div></td>
         <td>
           <div class="adm-saque-val-main">${fmtBRL(s.solicitado)}</div>
-          ${s.risco === 'high' ? '<div class="adm-saque-val-sub" style="color:#EF4444;">⚠️ Risco alto</div>' : s.risco === 'med' ? '<div class="adm-saque-val-sub" style="color:#F59E0B;">⚠️ Verificar</div>' : ''}
+          ${s.risco === 'high' ? '<div class="adm-saque-val-sub" style="color:#EF4444;">${WKZ_ICO.warning} Risco alto</div>' : s.risco === 'med' ? '<div class="adm-saque-val-sub" style="color:#F59E0B;">${WKZ_ICO.warning} Verificar</div>' : ''}
         </td>
         <td><span class="adm-saque-comissao">${fmtBRL(comissaoVal)} <span style="font-size:10px;font-weight:500;color:var(--muted);">(${s.comissao}%)</span></span></td>
         <td><span class="adm-saque-liquido">${fmtBRL(liquido)}</span></td>
@@ -1980,15 +1980,15 @@ function renderSaques(filter) {
               <span class="adm-antecipar-val">${fmtBRL(liquidoExpress)}</span>
               <span class="adm-antecipar-fee">−3% · desc. ${taxaValBRL}</span>
             </div>
-            <button class="adm-btn-antecipar" onclick="admAnteciparSaque('${s.id}')">⚡ Antecipar</button>
+            <button class="adm-btn-antecipar" onclick="admAnteciparSaque('${s.id}')">${WKZ_ICO.zap} Antecipar</button>
           </div>` : '<span style="color:var(--muted);font-size:12px;">—</span>'}
         </td>
         <td style="color:var(--muted);font-size:12px;">${s.data}</td>
-        <td><span class="adm-saque-status ${s.status}">${s.antecipado ? '⚡ ' : ''}${statusLabel[s.status]}</span></td>
+        <td><span class="adm-saque-status ${s.status}">${s.antecipado ? WKZ_ICO.zap + ' ' : ''}${statusLabel[s.status]}</span></td>
         <td>
           <div class="adm-saque-action-btns" onclick="event.stopPropagation()">
-            ${s.status !== 'approved' ? `<button class="adm-btn-approve" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();admApprovePayout('${s.id}')">✅ Aprovar</button>` : ''}
-            ${s.status === 'pending'  ? `<button class="adm-btn-reject"  style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();admHoldPayout('${s.id}')">🔒 Reter</button>` : ''}
+            ${s.status !== 'approved' ? `<button class="adm-btn-approve" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();admApprovePayout('${s.id}')">${WKZ_ICO.check} Aprovar</button>` : ''}
+            ${s.status === 'pending'  ? `<button class="adm-btn-reject"  style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();admHoldPayout('${s.id}')">${WKZ_ICO.lock} Reter</button>` : ''}
           </div>
         </td>
       </tr>`;
@@ -2009,7 +2009,7 @@ function admApprovePayout(id) {
   const liquido     = s.solicitado - comissaoVal;
   s.status = 'approved';
   admAuditAdd('💰', `Saque ${id} aprovado — ${s.loja}: ${fmtBRL(liquido)} líquido liberado (comissão WeKz: ${fmtBRL(comissaoVal)})`, 'Admin WeKz');
-  showToast(`✅ Saque ${id} aprovado! ${fmtBRL(liquido)} transferido para ${s.loja}.`);
+  showToast(`${WKZ_ICO.check} Saque ${id} aprovado! ${fmtBRL(liquido)} transferido para ${s.loja}.`);
   renderSaques(_saquesActiveFilter);
 }
 
@@ -2019,7 +2019,7 @@ function admHoldPayout(id) {
   if (!s || s.status !== 'pending') return;
   s.status = 'hold';
   admAuditAdd('🔒', `Saque ${id} retido para análise — ${s.loja} (${fmtBRL(s.solicitado)})`, 'Admin WeKz');
-  showToast(`🔒 Saque ${id} retido para análise. Loja notificada.`);
+  showToast(`${WKZ_ICO.lock} Saque ${id} retido para análise. Loja notificada.`);
   renderSaques(_saquesActiveFilter);
 }
 
@@ -2040,13 +2040,13 @@ function admAnteciparSaque(id) {
 
   window._wkzConfirm(
     'A loja <strong>' + s.loja + '</strong> receberá ' + fmtBRL(liquidoExpress) + ' agora (em vez de ' + fmtBRL(liquido) + ' no prazo normal). A diferença de ' + fmtBRL(taxaExpressVal) + ' (3%) fica como receita de antecipação da WeKz.',
-    { title: 'Antecipar saque ' + id + '?', icon: '⚡', variant: 'info', confirmLabel: 'Antecipar agora', cancelLabel: 'Cancelar' }
+    { title: 'Antecipar saque ' + id + '?', icon: WKZ_ICO.zap, variant: 'info', confirmLabel: 'Antecipar agora', cancelLabel: 'Cancelar' }
   ).then(function (confirmed) {
     if (!confirmed) return;
     s.status = 'approved';
     s.antecipado = true;
     admAuditAdd('⚡', `Saque ${id} ANTECIPADO — ${s.loja}: ${fmtBRL(liquidoExpress)} liberado agora (taxa expressa de ${fmtBRL(taxaExpressVal)} retida)`, 'Admin WeKz');
-    showToast(`⚡ Saque ${id} antecipado! ${fmtBRL(liquidoExpress)} transferido agora para ${s.loja}.`);
+    showToast(`${WKZ_ICO.zap} Saque ${id} antecipado! ${fmtBRL(liquidoExpress)} transferido agora para ${s.loja}.`);
     renderSaques(_saquesActiveFilter);
   });
 }
@@ -2058,7 +2058,7 @@ function openSaqueDetail(id) {
   _activeSaqueId = id;
   const comissaoVal = s.solicitado * (s.comissao / 100);
   const liquido     = s.solicitado - comissaoVal;
-  const riscoTxt    = { low: '✅ Baixo', med: '⚠️ Médio', high: '🚨 Alto' };
+  const riscoTxt    = { low: WKZ_ICO.check + ' Baixo', med: WKZ_ICO.warning + ' Médio', high: WKZ_ICO.warning + ' Alto' };
   const statusLabel = { pending: 'Pendente', hold: 'Retido', approved: 'Aprovado' };
 
   document.getElementById('saqueDetailTitle').textContent = `Saque ${s.id} — ${s.loja}`;
@@ -2118,7 +2118,7 @@ function closeSaqueDetail() {
       const open = ADMIN_DISPUTES.filter(d => d.severity !== 'resolved').length;
       const esc  = ADMIN_DISPUTES.filter(d => d.severity === 'escalated').length;
       const resolved = ADMIN_DISPUTES.filter(d => d.severity === 'resolved').length;
-      return `⚖️ <strong>Central de Disputas:</strong> há <em>${open} disputas ativas</em> (${esc} escaladas, ${resolved} resolvidas).<br><br>🚨 Atenção às escaladas: <strong>#WKZ-9105</strong> (produto não entregue — 22 dias, ${ADMIN_DISPUTES[0].buyer.name}) e <strong>#WKZ-9067</strong> (estorno de R$ 2.180 pendente há 12 dias). Recomendo ação imediata.<br><br>🔍 GadgetDiscount BR tem padrão recorrente de disputas — considero monitoramento elevado.`;
+      return `${WKZ_ICO.scale} <strong>Central de Disputas:</strong> há <em>${open} disputas ativas</em> (${esc} escaladas, ${resolved} resolvidas).<br><br>${WKZ_ICO.warning} Atenção às escaladas: <strong>#WKZ-9105</strong> (produto não entregue — 22 dias, ${ADMIN_DISPUTES[0].buyer.name}) e <strong>#WKZ-9067</strong> (estorno de R$ 2.180 pendente há 12 dias). Recomendo ação imediata.<br><br>${WKZ_ICO.search} GadgetDiscount BR tem padrão recorrente de disputas — considero monitoramento elevado.`;
     }
 
     /* ── Saques ── */
@@ -2126,14 +2126,14 @@ function closeSaqueDetail() {
       const pending    = ADMIN_PAYOUTS.filter(s => s.status === 'pending');
       const totalPend  = pending.reduce((a, s) => a + s.solicitado, 0);
       const highRisk   = ADMIN_PAYOUTS.filter(s => s.risco === 'high');
-      return `💳 <strong>Fila de Saques:</strong> ${pending.length} saques pendentes totalizando <em>${fmtBRL(totalPend)}</em>.<br><br>⚠️ ${highRisk.length} saque(s) com <strong>risco alto</strong>: ${highRisk.map(s => s.loja + ' (' + fmtBRL(s.solicitado) + ')').join(', ')}. Recomendo reter para análise antes de liberar.<br><br>✅ Saques de baixo risco (TechNova, ModaFusion, FashionKing) podem ser liberados imediatamente.`;
+      return `${WKZ_ICO.card} <strong>Fila de Saques:</strong> ${pending.length} saques pendentes totalizando <em>${fmtBRL(totalPend)}</em>.<br><br>${WKZ_ICO.warning} ${highRisk.length} saque(s) com <strong>risco alto</strong>: ${highRisk.map(s => s.loja + ' (' + fmtBRL(s.solicitado) + ')').join(', ')}. Recomendo reter para análise antes de liberar.<br><br>${WKZ_ICO.check} Saques de baixo risco (TechNova, ModaFusion, FashionKing) podem ser liberados imediatamente.`;
     }
 
     /* ── Fraude ── */
     if (/fraude|suspeito|risco|segurança|anomalia/.test(q)) {
       const highRisk = ADMIN_PAYOUTS.filter(s => s.risco === 'high').map(s => s.loja);
       const escDisp  = ADMIN_DISPUTES.filter(d => d.severity === 'escalated').map(d => d.seller.name);
-      return `🚨 <strong>Radar de Fraude — Kz Lince Cibernético:</strong><br><br>🔴 Lojas em alerta máximo: <strong>${[...new Set([...highRisk, ...escDisp])].join(', ')}</strong>.<br><br>🔍 GadgetDiscount BR: 3 disputas de defeito + saque de alto risco simultâneos — padrão consistente com fraude estruturada.<br><br>🔐 BeautySecret Store: saque com 100% do saldo + disputa de produto adulterado em aberto. Bloqueio preventivo recomendado.`;
+      return `${WKZ_ICO.warning} <strong>Radar de Fraude — Kz Lince Cibernético:</strong><br><br>${WKZ_ICO.dot('#EF4444')} Lojas em alerta máximo: <strong>${[...new Set([...highRisk, ...escDisp])].join(', ')}</strong>.<br><br>${WKZ_ICO.search} GadgetDiscount BR: 3 disputas de defeito + saque de alto risco simultâneos — padrão consistente com fraude estruturada.<br><br>${WKZ_ICO.lock} BeautySecret Store: saque com 100% do saldo + disputa de produto adulterado em aberto. Bloqueio preventivo recomendado.`;
     }
 
     return _origGetResponse ? _origGetResponse(question) : `Não encontrei dados específicos para sua pergunta. Tente perguntar sobre <em>disputas</em>, <em>saques</em>, <em>faturamento</em> ou <em>segurança</em>.`;
@@ -2174,7 +2174,7 @@ function syncOverviewKPIs(flash) {
     numEl.className = 'adm-kpi-num ' + (openDisputas === 0 ? 'adm-kpi-ok' : 'adm-kpi-danger');
   }
   if (escEl) {
-    escEl.textContent = escDisputas > 0 ? `⚠ ${escDisputas} escalada${escDisputas > 1 ? 's' : ''}` : '';
+    escEl.textContent = escDisputas > 0 ? `${WKZ_ICO.warning} ${escDisputas} escalada${escDisputas > 1 ? 's' : ''}` : '';
   }
 
   /* ── Volume retido (pending + hold) ── */
@@ -2257,7 +2257,7 @@ function admShowUptimeDetail() {
     <div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">Por serviço</div>
     ${rows}
     <div style="margin-top:16px;padding:12px;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);font-size:12px;color:var(--text);">
-      ⚠ <strong>1 incidente nos últimos 30 dias:</strong> instabilidade em notificações Push por 42min em 28/07 (fila de envio sobrecarregada). Resolvido — sem impacto em pedidos ou pagamentos.
+      ${WKZ_ICO.warning} <strong>1 incidente nos últimos 30 dias:</strong> instabilidade em notificações Push por 42min em 28/07 (fila de envio sobrecarregada). Resolvido — sem impacto em pedidos ou pagamentos.
     </div>`;
   openAdmInfoModal('Status da Plataforma', 'Disponibilidade dos últimos 30 dias, por serviço', body);
 }
@@ -2292,7 +2292,7 @@ function admShowNpsDetail() {
     <div style="margin:16px 0 6px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">Distribuição</div>
     ${distBars}
     <div style="margin-top:14px;padding:12px;border-radius:10px;background:var(--card2,rgba(255,255,255,0.03));border:1px solid var(--border);font-size:12px;color:var(--text);">
-      💬 <strong>Comentário recente (vendedor, nota 6):</strong> "Repasse do saque podia ser mais rápido — o resto funciona bem."
+      ${WKZ_ICO.chat} <strong>Comentário recente (vendedor, nota 6):</strong> "Repasse do saque podia ser mais rápido — o resto funciona bem."
     </div>`;
   openAdmInfoModal('NPS da Plataforma', 'Satisfação — mês corrente, por segmento', body);
 }
@@ -2336,7 +2336,7 @@ function handleDisputaAttach(input) {
   }
   const file = input.files[0];
   if (!file.type.startsWith('image/')) {
-    showToast('⚠️ Apenas imagens são aceitas como prova visual.');
+    showToast(WKZ_ICO.warning + ' Apenas imagens são aceitas como prova visual.');
     input.value = '';
     return;
   }
@@ -2358,7 +2358,7 @@ function handleDisputaAttach(input) {
        é entrada controlada pelo usuário. Como renderDisputaChat agora
        escapa m.text sempre, manter <em> aqui só mostraria a tag literal
        em vez de itálico — texto plano evita o conflito. */
-    d.msgs.push({ who, text: `📎 Prova visual: ${fname}`, imgSrc, time });
+    d.msgs.push({ who, text: `${WKZ_ICO.paperclip} Prova visual: ${fname}`, imgSrc, time });
 
     /* Re-renderiza chat */
     renderDisputaChat(d);
@@ -2366,12 +2366,12 @@ function handleDisputaAttach(input) {
     /* Audit log */
     const whoLabel = { admin: 'Admin WeKz', buyer: d.buyer.name, seller: d.seller.name };
     admAuditAdd(
-      '📎',
+      WKZ_ICO.paperclip + '',
       `Prova visual anexada na Disputa ${d.id} por ${whoLabel[who] || who} — arquivo: ${fname}`,
       whoLabel[who] || who
     );
 
-    showToast(`📎 Imagem "${fname}" adicionada ao histórico da Disputa ${d.id}.`);
+    showToast(`${WKZ_ICO.paperclip} Imagem "${fname}" adicionada ao histórico da Disputa ${d.id}.`);
     input.value = ''; // reset para permitir re-upload do mesmo arquivo
   };
   reader.readAsDataURL(file);
@@ -2388,7 +2388,7 @@ function handleDisputaAttach(input) {
       const isAdmin = m.who === 'admin';
       const isKz    = m.who === 'kz';
       const cls     = isKz ? 'msg-kz' : `msg-${m.who}`;
-      const avMap   = { buyer: d.buyer.avatar, seller: d.seller.avatar, admin: '🛡', kz: '' };
+      const avMap   = { buyer: d.buyer.avatar, seller: d.seller.avatar, admin: WKZ_ICO.shield + '', kz: '' };
       const av      = isKz
         ? (typeof getKzSVG === 'function' ? getKzSVG(18) : '🐱')
         : avMap[m.who];
@@ -2404,12 +2404,12 @@ function handleDisputaAttach(input) {
         </div>` : '';
 
       const authorLabel = isKz
-        ? '🤖 Kz IA'
+        ? WKZ_ICO.bot + ' Kz IA'
         : isAdmin
-          ? '🛡️ Admin WeKz'
+          ? WKZ_ICO.shield + ' Admin WeKz'
           : m.who === 'buyer'
-            ? '👤 ' + d.buyer.name
-            : '🏪 ' + d.seller.name;
+            ? WKZ_ICO.user + ' ' + d.buyer.name
+            : WKZ_ICO.store + ' ' + d.seller.name;
 
       return `
         <div class="adm-chat-msg ${cls}">
@@ -2513,7 +2513,7 @@ function wkzLoadSharedDisputesForAdmin() {
       msgs.push({ who: 'seller', text: '[' + d.sellerReply.positionLabel + '] ' + d.sellerReply.text, time: d.sellerReply.time || '—' });
     }
     if (d.status === 'resolved' && d.verdictText) {
-      msgs.push({ who: 'admin', text: '✅ Resolução: ' + d.verdictText, time: d.updatedAt ? new Date(d.updatedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '—' });
+      msgs.push({ who: 'admin', text: WKZ_ICO.check + ' Resolução: ' + d.verdictText, time: d.updatedAt ? new Date(d.updatedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '—' });
     }
     return {
       id: d.orderId, severity: d.status === 'resolved' ? 'resolved' : 'open', title: (d.reason || '') + ' — ' + (d.productName || ''),
@@ -2774,7 +2774,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
     'Produto não entregue': {
       verdict: 'refund_buyer',
       confidence: 92,
-      icon: '📦',
+      icon: WKZ_ICO.package,
       recLabel: 'Recomendação: Reembolsar Comprador',
       summary: 'O comprador relatou <strong>não recebimento do produto</strong> após prazo máximo de entrega. O lojista não apresentou código de rastreio válido ou comprovante de envio com data auditável.',
       reason: 'Sem prova de entrega verificável, os Termos WeKz determinam reembolso integral ao comprador. Clique em <em>↩ Reembolsar Comprador</em> para encerrar.',
@@ -2785,7 +2785,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
     'Produto com defeito': {
       verdict: 'refund_buyer',
       confidence: 85,
-      icon: '🔧',
+      icon: WKZ_ICO.wrench,
       recLabel: 'Recomendação: Reembolsar Comprador',
       summary: 'O comprador apresentou <strong>evidências de defeito</strong> no produto recebido. As fotos anexadas indicam discrepância com a descrição original do anúncio.',
       reason: 'Produto defeituoso configura violação da garantia legal (CDC Art. 18). Recomendo reembolso total e abertura de investigação no lojista.',
@@ -2796,7 +2796,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
     'Produto diferente do anunciado': {
       verdict: 'refund_buyer',
       confidence: 88,
-      icon: '🖼️',
+      icon: WKZ_ICO.image,
       recLabel: 'Recomendação: Reembolsar Comprador',
       summary: 'O produto recebido <strong>não corresponde ao anúncio</strong>. O comprador forneceu fotos comparativas e o lojista não contestou com documentação válida.',
       reason: 'Publicidade enganosa viola os Termos de Uso WeKz §4.2. Reembolso total ao comprador é a resolução recomendada.',
@@ -2807,18 +2807,18 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
     'Estorno não autorizado': {
       verdict: 'release_seller',
       confidence: 79,
-      icon: '💳',
+      icon: WKZ_ICO.card,
       recLabel: 'Recomendação: Liberar para o Lojista',
       summary: 'A análise do histórico indica que o <strong>lojista cumpriu a entrega</strong> no prazo, com rastreio confirmado. O estorno parece ser uma contestação indevida no cartão de crédito.',
       reason: 'Com entrega comprovada, o lojista tem direito ao recebimento. Recomendo liberar o valor e registrar alerta de possível chargeback fraudulento neste comprador.',
       btnClass: 'btn-release',
-      btnLabel: '✅ Liberar ao Lojista',
+      btnLabel: WKZ_ICO.check + ' Liberar ao Lojista',
       btnAction: 'release_seller',
     },
     'Arrependimento de compra': {
       verdict: 'refund_buyer',
       confidence: 95,
-      icon: '↩️',
+      icon: WKZ_ICO.undo,
       recLabel: 'Recomendação: Reembolsar (Prazo Legal)',
       summary: 'O comprador solicitou <strong>cancelamento dentro de 7 dias</strong> após o recebimento, exercendo o direito de arrependimento previsto no CDC.',
       reason: 'Art. 49 do CDC garante direito de arrependimento em 7 dias para compras online. Produto não utilizado — reembolso integral obrigatório.',
@@ -2831,12 +2831,12 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
   const DEFAULT_VERDICT = {
     verdict: 'partial_split',
     confidence: 71,
-    icon: '⚖️',
+    icon: WKZ_ICO.scale,
     recLabel: 'Análise Inconclusiva — Divisão Sugerida',
     summary: 'O Kz analisou as mensagens e identificou <strong>argumentos válidos em ambos os lados</strong>. Não há evidência suficiente para determinar culpa exclusiva.',
     reason: 'Sugiro divisão 50/50 como resolução equilibrada. Ambas as partes devem ser notificadas por e-mail sobre a decisão.',
     btnClass: 'btn-refund',
-    btnLabel: '⚖️ Aplicar Divisão 50/50',
+    btnLabel: WKZ_ICO.scale + ' Aplicar Divisão 50/50',
     btnAction: 'partial_split',
   };
 
@@ -2861,7 +2861,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
         <div class="kz-copilot-header">
           <div>${getKzSvgSmall(32)}</div>
           <div class="kz-copilot-header-text">
-            <div class="kz-copilot-label">✨ Kz Dispute Copilot · Análise em Progresso</div>
+            <div class="kz-copilot-label">${WKZ_ICO.sparkles} Kz Dispute Copilot · Análise em Progresso</div>
             <div class="kz-copilot-title">Lince Cibernético está analisando o caso...</div>
           </div>
           <button class="kz-copilot-close" onclick="closeKzCopilot()">✕</button>
@@ -2886,7 +2886,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
         <div class="kz-copilot-header">
           <div>${getKzSvgSmall(32)}</div>
           <div class="kz-copilot-header-text">
-            <div class="kz-copilot-label">✨ Kz Dispute Copilot · Parecer Gerado</div>
+            <div class="kz-copilot-label">${WKZ_ICO.sparkles} Kz Dispute Copilot · Parecer Gerado</div>
             <div class="kz-copilot-title">Análise: Disputa ${d.id} — ${d.motivo}</div>
           </div>
           <button class="kz-copilot-close" onclick="closeKzCopilot()">✕</button>
