@@ -135,7 +135,7 @@ function renderProducts(list=products){
   // Also derive category from emoji
   const emojiCatMap = {
     '📱':'eletronicos','💻':'eletronicos','🎧':'eletronicos','⌚':'eletronicos',
-    '📷':'eletronicos','🖥️':'eletronicos','⌨️':'eletronicos',
+    '📷':'eletronicos','🖥':'eletronicos','⌨':'eletronicos',
     '👟':'esportes','⚽':'esportes',
     '🧴':'beleza','💄':'beleza',
     '🎮':'games',
@@ -156,7 +156,7 @@ function renderProducts(list=products){
           ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
           ${p._sponsored?'<span class="badge badge-ad">📢 Patrocinado</span>':''}
           ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">🚚 Grátis</span>':''}
-          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">🏷️ Cupom</span>':''}
+          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">🏷 Cupom</span>':''}
         </div>
         <button class="product-wish" onclick="event.stopPropagation();event.preventDefault();wishToggle(this,${realIdx},event)">♡</button>
       </div>
@@ -277,7 +277,7 @@ function showFlashProductModal(i){
           </div>
           <button class="btn-flash-buy" style="border-radius:12px;font-size:14px;padding:14px;" onclick="event.stopPropagation();btnFeedback(this,()=>{addFlashToCart(${i});setTimeout(()=>{document.getElementById('flash-product-modal-overlay')?.remove();showPage('cart');},500)},{loadingMs:600,successMs:700})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> Comprar Agora — Oferta Relâmpago!</span></button>
         </div>
-        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">⏱️ Oferta por tempo limitado · Estoque não garantido</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">⏱ Oferta por tempo limitado · Estoque não garantido</div>
       </div>
     </div>`;
   overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
@@ -456,7 +456,7 @@ function renderCart(){
           </div>
           ${unitLabel ? `<span class="cart-item-unit-price">${unitLabel}</span>` : ''}
           <button class="cart-save-later-btn" onclick="cartMoveSaveForLater(${idx})" title="Salvar para depois">🔖</button>
-          <button class="cart-item-remove-btn" onclick="removeCartItem(${idx})" title="Remover">🗑️</button>
+          <button class="cart-item-remove-btn" onclick="removeCartItem(${idx})" title="Remover">🗑</button>
         </div>
       </div>
 
@@ -495,14 +495,14 @@ function removeCartItem(idx){
     cartItemsData.splice(idx, 1);
     updateCartUI();
   }
-  showToast('🗑️ "' + name + '" removido do carrinho');
+  showToast('🗑 "' + name + '" removido do carrinho');
 }
 
 /* ─── CLEAR CART ─── */
 function clearCart(){
   cartItemsData.length = 0;
   updateCartUI();
-  showToast('🗑️ Carrinho limpo com sucesso');
+  showToast('🗑 Carrinho limpo com sucesso');
 }
 
 /* ─── WISHLIST DUAL-TAB CONTROLLER ─── */
@@ -523,7 +523,7 @@ function switchWishTab(tab, btn){
 // mascote do Flash Sale Modal (_wkzFsmMascotImgError).
 function _wkzWishlistEmptyImgError(imgEl){
   if(!imgEl) return;
-  imgEl.outerHTML = (typeof getKzSVG === 'function') ? getKzSVG(80) : '❤️';
+  imgEl.outerHTML = (typeof getKzSVG === 'function') ? getKzSVG(80) : '❤';
 }
 
 // [KZ-ILLUS] Fallback seguro: se assets/mascot/notificacao.png não
@@ -700,7 +700,7 @@ function wishColRenderChips(){
   const allActive = wishColActiveFilter === null;
 
   let html = `<button class="wish-col-chip ${allActive?'active':''}" onclick="wishColSetFilter(null)">
-    ❤️ Todas <span class="chip-count">${allCount}</span>
+    ❤ Todas <span class="chip-count">${allCount}</span>
   </button>`;
 
   wishCollections.forEach(col => {
@@ -983,7 +983,7 @@ function toggleFollowStoreByName(storeName, btn){
   if(!isFollowed){
     if(store) followedStores.push({...store, n: storeName});
     else followedStores.push({ n: storeName, a: storeName[0] || '🏪', i: '', r: '', v: '' });
-    showToast('❤️ Seguindo ' + storeName + '!');
+    showToast('❤ Seguindo ' + storeName + '!');
   } else {
     followedStores = followedStores.filter(fs => fs.n !== storeName);
     showToast('🏪 Deixou de seguir ' + storeName);
@@ -1186,7 +1186,7 @@ const TRANSLATIONS = {
     heroTitle1: 'O marketplace que',
     heroTitle2: 'evolui com você',
     heroDesc: 'Compre de vendedores verificados do mundo todo. Venda com segurança, transparência e zero burocracia.',
-    heroBtn1: '🛍️ Explorar Produtos',
+    heroBtn1: '🛍 Explorar Produtos',
     heroBtn2: '🚀 Quero Vender',
     heroSearchPlaceholder: 'O que você está buscando hoje?',
     heroFilterBtn: 'Filtros',
@@ -1222,7 +1222,7 @@ const TRANSLATIONS = {
     units: 'unidades',
     color: 'Cor',
     storage: 'Armazenamento',
-    shipping: '✈️ Frete grátis',
+    shipping: '✈ Frete grátis',
     deliveryDays: 'Entrega em 8-15 dias úteis',
     installments: '12x de',
     noInterest: 'sem juros',
@@ -1236,7 +1236,7 @@ const TRANSLATIONS = {
     qaSectionTitle: '❓ Perguntas & Respostas',
     qaSubtitle: 'Dúvidas da comunidade sobre este produto',
     reviewsTitle: '⭐ Avaliações',
-    writeReview: '✍️ Escrever Avaliação',
+    writeReview: '✍ Escrever Avaliação',
     // Cart
     myCart: '🛒 Meu Carrinho',
     items: 'itens',
@@ -1453,7 +1453,7 @@ const TRANSLATIONS = {
     heroTitle1: 'The marketplace that',
     heroTitle2: 'evolves with you',
     heroDesc: 'Buy from verified sellers worldwide. Sell safely, transparently and with zero bureaucracy.',
-    heroBtn1: '🛍️ Explore Products',
+    heroBtn1: '🛍 Explore Products',
     heroBtn2: '🚀 Start Selling',
     heroSearchPlaceholder: 'What are you looking for today?',
     heroFilterBtn: 'Filters',
@@ -1484,7 +1484,7 @@ const TRANSLATIONS = {
     units: 'units',
     color: 'Color',
     storage: 'Storage',
-    shipping: '✈️ Free shipping',
+    shipping: '✈ Free shipping',
     deliveryDays: 'Delivery in 8-15 business days',
     installments: '12x of',
     noInterest: 'interest-free',
@@ -1497,7 +1497,7 @@ const TRANSLATIONS = {
     qaSectionTitle: '❓ Questions & Answers',
     qaSubtitle: 'Community questions about this product',
     reviewsTitle: '⭐ Reviews',
-    writeReview: '✍️ Write a Review',
+    writeReview: '✍ Write a Review',
     myCart: '🛒 My Cart',
     items: 'items',
     catElectronics: 'Electronics', catFashion: 'Fashion', catHome: 'Home & Decor',
@@ -1532,7 +1532,7 @@ const TRANSLATIONS = {
     footerSupport: 'Support',
     footerAbout: 'WeKz',
     footerRights: '© 2025 WeKz Shop. All rights reserved.',
-    footerSafe: '🛡️ Secure site · SSL 256-bit · GDPR compliant · PCI DSS',
+    footerSafe: '🛡 Secure site · SSL 256-bit · GDPR compliant · PCI DSS',
     chatTitle: '💬 Chat with Seller',
     chatOnline: '🟢 Online now',
     chatTypePlaceholder: 'Type your message...',
@@ -1708,7 +1708,7 @@ const TRANSLATIONS = {
     heroTitle1: 'El marketplace que',
     heroTitle2: 'evoluciona contigo',
     heroDesc: 'Compra de vendedores verificados de todo el mundo. Vende con seguridad y transparencia.',
-    heroBtn1: '🛍️ Explorar Productos',
+    heroBtn1: '🛍 Explorar Productos',
     heroBtn2: '🚀 Quiero Vender',
     heroSearchPlaceholder: '¿Qué estás buscando hoy?',
     heroFilterBtn: 'Filtros',
@@ -1739,7 +1739,7 @@ const TRANSLATIONS = {
     units: 'unidades',
     color: 'Color',
     storage: 'Almacenamiento',
-    shipping: '✈️ Envío gratis',
+    shipping: '✈ Envío gratis',
     deliveryDays: 'Entrega en 8-15 días hábiles',
     installments: '12 cuotas de',
     noInterest: 'sin interés',
@@ -1752,7 +1752,7 @@ const TRANSLATIONS = {
     qaSectionTitle: '❓ Preguntas & Respuestas',
     qaSubtitle: 'Preguntas de la comunidad sobre este producto',
     reviewsTitle: '⭐ Reseñas',
-    writeReview: '✍️ Escribir Reseña',
+    writeReview: '✍ Escribir Reseña',
     myCart: '🛒 Mi Carrito',
     items: 'artículos',
     catElectronics: 'Electrónicos', catFashion: 'Moda', catHome: 'Hogar y Decoración',
@@ -1787,7 +1787,7 @@ const TRANSLATIONS = {
     footerSupport: 'Soporte',
     footerAbout: 'WeKz',
     footerRights: '© 2025 WeKz Shop. Todos los derechos reservados.',
-    footerSafe: '🛡️ Sitio seguro · SSL 256-bit · GDPR · PCI DSS',
+    footerSafe: '🛡 Sitio seguro · SSL 256-bit · GDPR · PCI DSS',
     chatTitle: '💬 Chat con Vendedor',
     chatOnline: '🟢 En línea ahora',
     chatTypePlaceholder: 'Escribe tu mensaje...',
@@ -1963,7 +1963,7 @@ const TRANSLATIONS = {
     heroTitle1: '随您进化的',
     heroTitle2: '全球市场',
     heroDesc: '从全球认证卖家购买。安全、透明、零繁文缛节地销售。',
-    heroBtn1: '🛍️ 探索商品',
+    heroBtn1: '🛍 探索商品',
     heroBtn2: '🚀 开始销售',
     heroSearchPlaceholder: '您在找什么？',
     heroFilterBtn: '筛选',
@@ -1994,7 +1994,7 @@ const TRANSLATIONS = {
     units: '件',
     color: '颜色',
     storage: '存储',
-    shipping: '✈️ 免费配送',
+    shipping: '✈ 免费配送',
     deliveryDays: '预计8-15个工作日送达',
     installments: '分12期，每期',
     noInterest: '免息',
@@ -2007,7 +2007,7 @@ const TRANSLATIONS = {
     qaSectionTitle: '❓ 问答',
     qaSubtitle: '买家关于此商品的提问',
     reviewsTitle: '⭐ 评价',
-    writeReview: '✍️ 写评价',
+    writeReview: '✍ 写评价',
     myCart: '🛒 我的购物车',
     items: '件商品',
     catElectronics: '电子产品', catFashion: '时尚', catHome: '家居装饰',
@@ -2042,7 +2042,7 @@ const TRANSLATIONS = {
     footerSupport: '客服支持',
     footerAbout: 'WeKz',
     footerRights: '© 2025 WeKz Shop 版权所有',
-    footerSafe: '🛡️ 安全网站 · SSL 256位加密 · GDPR合规 · PCI DSS',
+    footerSafe: '🛡 安全网站 · SSL 256位加密 · GDPR合规 · PCI DSS',
     chatTitle: '💬 与卖家聊天',
     chatOnline: '🟢 在线',
     chatTypePlaceholder: '输入消息...',
@@ -2218,7 +2218,7 @@ const TRANSLATIONS = {
     heroTitle1: 'La marketplace qui',
     heroTitle2: 'évolue avec vous',
     heroDesc: 'Achetez auprès de vendeurs vérifiés du monde entier. Vendez en toute sécurité.',
-    heroBtn1: '🛍️ Explorer les Produits',
+    heroBtn1: '🛍 Explorer les Produits',
     heroBtn2: '🚀 Je veux Vendre',
     heroSearchPlaceholder: 'Que recherchez-vous aujourd\'hui ?',
     heroFilterBtn: 'Filtres',
@@ -2249,7 +2249,7 @@ const TRANSLATIONS = {
     units: 'unités',
     color: 'Couleur',
     storage: 'Stockage',
-    shipping: '✈️ Livraison gratuite',
+    shipping: '✈ Livraison gratuite',
     deliveryDays: 'Livraison en 8-15 jours ouvrés',
     installments: '12 fois',
     noInterest: 'sans intérêts',
@@ -2262,7 +2262,7 @@ const TRANSLATIONS = {
     qaSectionTitle: '❓ Questions & Réponses',
     qaSubtitle: 'Questions de la communauté sur ce produit',
     reviewsTitle: '⭐ Avis',
-    writeReview: '✍️ Écrire un Avis',
+    writeReview: '✍ Écrire un Avis',
     myCart: '🛒 Mon Panier',
     items: 'articles',
     catElectronics: 'Électronique', catFashion: 'Mode', catHome: 'Maison & Déco',
@@ -2297,7 +2297,7 @@ const TRANSLATIONS = {
     footerSupport: 'Assistance',
     footerAbout: 'WeKz',
     footerRights: '© 2025 WeKz Shop. Tous droits réservés.',
-    footerSafe: '🛡️ Site sécurisé · SSL 256-bit · RGPD · PCI DSS',
+    footerSafe: '🛡 Site sécurisé · SSL 256-bit · RGPD · PCI DSS',
     chatTitle: '💬 Chat avec Vendeur',
     chatOnline: '🟢 En ligne',
     chatTypePlaceholder: 'Tapez votre message...',
@@ -2473,7 +2473,7 @@ const TRANSLATIONS = {
     heroTitle1: 'Der Marktplatz, der',
     heroTitle2: 'mit Ihnen wächst',
     heroDesc: 'Kaufen Sie von verifizierten Verkäufern weltweit. Sicher, transparent, ohne Bürokratie.',
-    heroBtn1: '🛍️ Produkte entdecken',
+    heroBtn1: '🛍 Produkte entdecken',
     heroBtn2: '🚀 Verkäufer werden',
     heroSearchPlaceholder: 'Was suchen Sie heute?',
     heroFilterBtn: 'Filter',
@@ -2504,7 +2504,7 @@ const TRANSLATIONS = {
     units: 'Einheiten',
     color: 'Farbe',
     storage: 'Speicher',
-    shipping: '✈️ Kostenloser Versand',
+    shipping: '✈ Kostenloser Versand',
     deliveryDays: 'Lieferung in 8-15 Werktagen',
     installments: '12 Raten à',
     noInterest: 'zinsfrei',
@@ -2517,7 +2517,7 @@ const TRANSLATIONS = {
     qaSectionTitle: '❓ Fragen & Antworten',
     qaSubtitle: 'Community-Fragen zu diesem Produkt',
     reviewsTitle: '⭐ Bewertungen',
-    writeReview: '✍️ Bewertung schreiben',
+    writeReview: '✍ Bewertung schreiben',
     myCart: '🛒 Mein Warenkorb',
     items: 'Artikel',
     catElectronics: 'Elektronik', catFashion: 'Mode', catHome: 'Haus & Deko',
@@ -2552,7 +2552,7 @@ const TRANSLATIONS = {
     footerSupport: 'Support',
     footerAbout: 'WeKz',
     footerRights: '© 2025 WeKz Shop. Alle Rechte vorbehalten.',
-    footerSafe: '🛡️ Sichere Seite · SSL 256-bit · DSGVO · PCI DSS',
+    footerSafe: '🛡 Sichere Seite · SSL 256-bit · DSGVO · PCI DSS',
     chatTitle: '💬 Chat mit Verkäufer',
     chatOnline: '🟢 Jetzt online',
     chatTypePlaceholder: 'Ihre Nachricht...',
@@ -2728,7 +2728,7 @@ const TRANSLATIONS = {
     heroTitle1: 'あなたと共に',
     heroTitle2: '進化するマーケット',
     heroDesc: '世界中の認定セラーから安心して購入。安全・透明・手軽に出品。',
-    heroBtn1: '🛍️ 商品を探す',
+    heroBtn1: '🛍 商品を探す',
     heroBtn2: '🚀 出品する',
     heroSearchPlaceholder: '何をお探しですか？',
     heroFilterBtn: '絞り込み',
@@ -2759,7 +2759,7 @@ const TRANSLATIONS = {
     units: '点',
     color: 'カラー',
     storage: 'ストレージ',
-    shipping: '✈️ 送料無料',
+    shipping: '✈ 送料無料',
     deliveryDays: '8〜15営業日でお届け',
     installments: '12回払い、毎回',
     noInterest: '金利なし',
@@ -2772,7 +2772,7 @@ const TRANSLATIONS = {
     qaSectionTitle: '❓ Q&A',
     qaSubtitle: 'この商品に関するコミュニティの質問',
     reviewsTitle: '⭐ レビュー',
-    writeReview: '✍️ レビューを書く',
+    writeReview: '✍ レビューを書く',
     myCart: '🛒 カート',
     items: '点の商品',
     catElectronics: '家電・電子機器', catFashion: 'ファッション', catHome: 'ホーム&デコ',
@@ -2807,7 +2807,7 @@ const TRANSLATIONS = {
     footerSupport: 'サポート',
     footerAbout: 'WeKz',
     footerRights: '© 2025 WeKz Shop. All rights reserved.',
-    footerSafe: '🛡️ 安全サイト · SSL 256ビット · GDPR準拠 · PCI DSS',
+    footerSafe: '🛡 安全サイト · SSL 256ビット · GDPR準拠 · PCI DSS',
     chatTitle: '💬 セラーとチャット',
     chatOnline: '🟢 オンライン',
     chatTypePlaceholder: 'メッセージを入力...',
@@ -3542,8 +3542,8 @@ const BUNDLE_DATA = {
       why: '🤖 Kz AI: Trio mais pedido por profissionais em home office. Monitor externo + suporte de mesa aumentam a produtividade em 40%.',
       items: [
         { e:'📱', n:'Smartphone Ultra Pro 5G', p:1249.90, main:true },
-        { e:'🖥️', n:'Monitor 4K 144Hz 27"', p:1890.00, idx:5 },
-        { e:'⌨️', n:'Teclado Mecânico RGB', p:199.00, custom:true },
+        { e:'🖥', n:'Monitor 4K 144Hz 27"', p:1890.00, idx:5 },
+        { e:'⌨', n:'Teclado Mecânico RGB', p:199.00, custom:true },
       ]
     },
   ],
@@ -3555,7 +3555,7 @@ const BUNDLE_DATA = {
       why: '🤖 Kz AI: Setup completo mais vendido na categoria Gaming. Mouse + headset aumentam a experiência competitiva e são os acessórios #1 para este notebook.',
       items: [
         { e:'💻', n:'Notebook Gamer RTX 4060', p:3499.00, main:true },
-        { e:'🖥️', n:'Monitor 4K 144Hz 27"', p:1890.00, idx:5 },
+        { e:'🖥', n:'Monitor 4K 144Hz 27"', p:1890.00, idx:5 },
         { e:'🎧', n:'Headset Gamer 7.1', p:249.90, custom:true },
       ]
     },
@@ -3565,8 +3565,8 @@ const BUNDLE_DATA = {
       why: '🤖 Kz AI: Combo preferido de desenvolvedores e designers. Teclado mecânico + mouse ergonômico reduzem fadiga em sessões longas.',
       items: [
         { e:'💻', n:'Notebook Gamer RTX 4060', p:3499.00, main:true },
-        { e:'⌨️', n:'Teclado Mecânico RGB TKL', p:199.00, custom:true },
-        { e:'🖱️', n:'Mouse Ergonômico 16k DPI', p:189.90, custom:true },
+        { e:'⌨', n:'Teclado Mecânico RGB TKL', p:199.00, custom:true },
+        { e:'🖱', n:'Mouse Ergonômico 16k DPI', p:189.90, custom:true },
       ]
     },
   ],
@@ -3666,7 +3666,7 @@ function toggleBundleItem(i) {
   if (selIdx > -1) {
     // Deselect — don't allow fewer than 2 items
     if (_bundleSelected.length <= 2) {
-      showToast('⚠️ Selecione ao menos 2 itens no bundle');
+      showToast('⚠ Selecione ao menos 2 itens no bundle');
       return;
     }
     _bundleSelected.splice(selIdx, 1);
@@ -3728,7 +3728,7 @@ function bundleAddAll() {
     }
     added++;
   });
-  showToast(`🛍️ ${added} ${added === 1 ? 'item adicionado' : 'itens adicionados'} ao carrinho! Bundle ativo.`);
+  showToast(`🛍 ${added} ${added === 1 ? 'item adicionado' : 'itens adicionados'} ao carrinho! Bundle ativo.`);
   // Visual feedback on button
   var btn = document.getElementById('bundleAddBtn');
   if (btn) {
@@ -3851,7 +3851,7 @@ function toggleAskForm(){
 
 function submitQuestion(){
   const inp=document.getElementById('askSellerInput');const val=inp.value.trim();
-  if(!val)return showToast('⚠️ Digite sua pergunta');
+  if(!val)return showToast('⚠ Digite sua pergunta');
   // FIX FUNC-04: persistir no array _qaData principal e re-renderizar
   var newQ = {
     id: 'q_' + Date.now(),
@@ -3891,7 +3891,7 @@ let _revUploadFiles=[];
 function handleRevUpload(input){
   const area=document.getElementById('revUploadArea');
   Array.from(input.files).forEach(file=>{
-    if(_revUploadFiles.length>=6)return showToast('⚠️ Máximo 6 arquivos');
+    if(_revUploadFiles.length>=6)return showToast('⚠ Máximo 6 arquivos');
     const isVideo=file.type.startsWith('video');
     const id='rup_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
     const item=document.createElement('div');
@@ -3926,13 +3926,13 @@ function pickStar(n){
 }
 
 function submitReview(){
-  if(!selectedStar)return showToast('⚠️ Selecione uma nota de 1 a 5 ★');
+  if(!selectedStar)return showToast('⚠ Selecione uma nota de 1 a 5 ★');
   const titleEl = document.querySelector('#writeReviewForm input[type="text"]');
   const textEl  = document.querySelector('#writeReviewForm textarea');
   const title   = titleEl ? titleEl.value.trim() : '';
   const text    = textEl  ? textEl.value.trim()  : '';
-  if(!title) return showToast('⚠️ Adicione um título à sua avaliação');
-  if(!text)  return showToast('⚠️ Escreva um comentário sobre o produto');
+  if(!title) return showToast('⚠ Adicione um título à sua avaliação');
+  if(!text)  return showToast('⚠ Escreva um comentário sobre o produto');
 
   const hasMedia=_revUploadFiles.length>0;
   const mediaMsg=hasMedia?` com ${_revUploadFiles.length} ${_revUploadFiles.length===1?'foto':'fotos'}`:' (sem fotos)';
@@ -4099,8 +4099,8 @@ function submitNegoOffer(){
   const p=products[currentPdpIndex];
   const base=p?p.p:0;
   const v=parseFloat(document.getElementById('negoOfferInput').value);
-  if(!v||v<=0)return showToast('⚠️ Digite um valor para sua proposta');
-  if(base&&v>=base)return showToast('⚠️ Sua proposta deve ser menor que o preço atual');
+  if(!v||v<=0)return showToast('⚠ Digite um valor para sua proposta');
+  if(base&&v>=base)return showToast('⚠ Sua proposta deve ser menor que o preço atual');
   showToast('📨 Proposta enviada! O vendedor responderá em até 24h.');
   document.getElementById('negoOfferInput').value='';
   const sellerName=p?p.s:'Vendedor';
@@ -4193,7 +4193,7 @@ function initInteractionPanel(productIndex){
         trustStrip.style.borderColor='rgba(124,58,237,0.2)';
       } else {
         trustStrip.innerHTML =
-          '<span class="svs-icon">🛡️</span>' +
+          '<span class="svs-icon">🛡</span>' +
           '<span class="svs-text">Vendedor <strong style="color:var(--text);">verificado WeKz</strong> · 4.7★ · satisfação acima da média</span>' +
           '<span class="svs-badge" style="color:var(--teal);">⭐ Tornar-se Loja Oficial</span>';
         trustStrip.style.cursor='pointer';
@@ -4273,7 +4273,7 @@ function showPage(id){
       window.scrollTo({top:0,behavior:'instant'});
       return;
     }
-    showToast && showToast('⚠️ Página não encontrada');
+    showToast && showToast('⚠ Página não encontrada');
     const fallback = document.getElementById('page-home');
     if(fallback) fallback.classList.add('active');
     return;
@@ -4315,7 +4315,7 @@ const _spCatMap = {
 };
 const _spEmojiCat = {
   '📱':'Eletrônicos','💻':'Eletrônicos','🎧':'Eletrônicos','⌚':'Eletrônicos',
-  '📷':'Eletrônicos','🖥️':'Eletrônicos','⌨️':'Eletrônicos',
+  '📷':'Eletrônicos','🖥':'Eletrônicos','⌨':'Eletrônicos',
   '👟':'Esportes','⚽':'Esportes',
   '🧴':'Beleza','💄':'Beleza',
   '🎮':'Games',
@@ -4409,7 +4409,7 @@ function wkzSearch(query) {
   var catMap = _spCatMap;
   var emojiCatMap = {
     '📱':'eletronicos','💻':'eletronicos','🎧':'eletronicos','⌚':'eletronicos',
-    '📷':'eletronicos','🖥️':'eletronicos','⌨️':'eletronicos',
+    '📷':'eletronicos','🖥':'eletronicos','⌨':'eletronicos',
     '👟':'esportes','⚽':'esportes','🧴':'beleza','💄':'beleza',
     '🎮':'games','🪑':'casa','🏠':'casa',
     '📚':'livros','👗':'moda','🐾':'pet','👶':'bebe','🚗':'automotivo'
@@ -4426,7 +4426,7 @@ function wkzSearch(query) {
           (p.badge==='hot'  ? '<span class="badge badge-hot">HOT</span>'   : '') +
           (p._sponsored ? '<span class="badge badge-ad">📢 Patrocinado</span>' : '') +
           ((p._frete||FRETE_GRATIS_SELLERS.includes(p.s)) ? '<span class="badge badge-frete">🚚 Grátis</span>' : '') +
-          (Object.values(SELLER_COUPONS).some(function(c){return c.seller===p.s;}) ? '<span class="badge badge-coupon">🏷️ Cupom</span>' : '') +
+          (Object.values(SELLER_COUPONS).some(function(c){return c.seller===p.s;}) ? '<span class="badge badge-coupon">🏷 Cupom</span>' : '') +
         '</div>' +
         '<button class="product-wish" onclick="event.stopPropagation();wishToggle(this,' + realIdx + ',event)">♡</button>' +
       '</div>' +
@@ -4528,7 +4528,7 @@ function pdpShareProduct(i) {
   var p = products[i];
   if (!p) return;
   var url = 'https://wekzshop.com/?p=' + i;
-  var text = '🛍️ Olha isto na WeKz Shop: ' + p.n + ' — ' + (typeof formatPrice === 'function' ? formatPrice(p.p) : ('R$ ' + p.p));
+  var text = '🛍 Olha isto na WeKz Shop: ' + p.n + ' — ' + (typeof formatPrice === 'function' ? formatPrice(p.p) : ('R$ ' + p.p));
   function done() {
     if (typeof window.cpCompleteMission === 'function') window.cpCompleteMission('share');
   }
@@ -4939,7 +4939,7 @@ function syncCartSelection() {
 /* ─── BUY SELECTED ─── */
 function cartBuySelected() {
   const sel = cartItemsData.filter(c => c._selected !== false);
-  if(sel.length === 0) return showToast('⚠️ Selecione ao menos um produto');
+  if(sel.length === 0) return showToast('⚠ Selecione ao menos um produto');
   openCheckout(false);
 }
 
@@ -4950,14 +4950,14 @@ function cartRemoveSelected() {
     if(cartItemsData[i]._selected !== false) cartItemsData.splice(i, 1);
   }
   const removed = beforeLen - cartItemsData.length;
-  if(removed > 0) showToast('🗑️ ' + removed + ' produto(s) removido(s)');
+  if(removed > 0) showToast('🗑 ' + removed + ' produto(s) removido(s)');
   updateCartUI();
 }
 
 /* ─── SAVE FOR LATER ─── */
 function cartSaveSelected() {
   const sel = cartItemsData.filter(c => c._selected !== false);
-  if(sel.length === 0) return showToast('⚠️ Selecione ao menos um produto');
+  if(sel.length === 0) return showToast('⚠ Selecione ao menos um produto');
   sel.forEach(item => savedForLaterData.push({...item}));
   for(let i = cartItemsData.length - 1; i >= 0; i--){
     if(cartItemsData[i]._selected !== false) cartItemsData.splice(i, 1);
@@ -5289,7 +5289,7 @@ function ckoutNext(from) {
   if (from === 1) {
     if (_ckoutMode === 'pickup') {
       if (!_selectedPickup) {
-        showToast('⚠️ Selecione um ponto de retirada para continuar');
+        showToast('⚠ Selecione um ponto de retirada para continuar');
         return;
       }
     } else {
@@ -5297,16 +5297,16 @@ function ckoutNext(from) {
       var rua  = (document.getElementById('ckoutRua')  || {}).value || '';
       var num  = (document.getElementById('ckoutNum')  || {}).value || '';
       var cep  = (document.getElementById('ckoutCep')  || {}).value || '';
-      if (!nome.trim()) { showToast('⚠️ Informe o nome completo'); return; }
-      if (!cep.trim() || cep.replace(/\D/g,'').length < 8) { showToast('⚠️ Informe um CEP válido'); return; }
-      if (!rua.trim()) { showToast('⚠️ Informe o logradouro'); return; }
-      if (!num.trim()) { showToast('⚠️ Informe o número do endereço'); return; }
+      if (!nome.trim()) { showToast('⚠ Informe o nome completo'); return; }
+      if (!cep.trim() || cep.replace(/\D/g,'').length < 8) { showToast('⚠ Informe um CEP válido'); return; }
+      if (!rua.trim()) { showToast('⚠ Informe o logradouro'); return; }
+      if (!num.trim()) { showToast('⚠ Informe o número do endereço'); return; }
     }
   }
   // Etapa 2 — método de pagamento
   if (from === 2) {
     if (!_ckoutPay) {
-      showToast('⚠️ Selecione um método de pagamento');
+      showToast('⚠ Selecione um método de pagamento');
       return;
     }
     if (_ckoutPay === 'card') {
@@ -5314,13 +5314,13 @@ function ckoutNext(from) {
       var cardExp = (document.getElementById('cardExp') || {}).value || '';
       var cardCvv = (document.getElementById('cardCvv') || {}).value || '';
       var digits  = cardNum.replace(/\s/g, '');
-      if (digits.length < 16) { showToast('⚠️ Número do cartão inválido'); return; }
+      if (digits.length < 16) { showToast('⚠ Número do cartão inválido'); return; }
       // FIX SEC-03: validação Luhn — detecta números estruturalmente inválidos
-      if (!luhnCheck(digits)) { showToast('⚠️ Número do cartão inválido — verifique os dígitos'); return; }
-      if (!cardExp.trim() || cardExp.length < 5) { showToast('⚠️ Data de validade inválida'); return; }
+      if (!luhnCheck(digits)) { showToast('⚠ Número do cartão inválido — verifique os dígitos'); return; }
+      if (!cardExp.trim() || cardExp.length < 5) { showToast('⚠ Data de validade inválida'); return; }
       // FIX SEC-05: usar isCardExpired() centralizada
-      if (isCardExpired(cardExp)) { showToast('⚠️ Cartão expirado — verifique a data de validade'); return; }
-      if (!cardCvv.trim() || cardCvv.length < 3) { showToast('⚠️ CVV inválido'); return; }
+      if (isCardExpired(cardExp)) { showToast('⚠ Cartão expirado — verifique a data de validade'); return; }
+      if (!cardCvv.trim() || cardCvv.length < 3) { showToast('⚠ CVV inválido'); return; }
     }
   }
   // Etapa 3 — confirmação final
@@ -5689,7 +5689,7 @@ async function ckoutFetchCep(cep) {
   try {
     var r = await fetch('https://viacep.com.br/ws/'+raw+'/json/');
     var d = await r.json();
-    if(d.erro) { showToast('⚠️ CEP não encontrado'); return; }
+    if(d.erro) { showToast('⚠ CEP não encontrado'); return; }
     var setVal = (id, val) => {
       var el = document.getElementById(id);
       if(el){ el.value = val; el.classList.add('ckout-success'); setTimeout(()=>el.classList.remove('ckout-success'),1200); }
@@ -5725,7 +5725,7 @@ async function ckoutFetchCep(cep) {
     };
     _ckoutAddr = 3;
   } catch(e) {
-    showToast('⚠️ Erro ao buscar CEP. Verifique sua conexão.');
+    showToast('⚠ Erro ao buscar CEP. Verifique sua conexão.');
   } finally {
     if(spin) spin.style.display = 'none';
   }
@@ -5750,7 +5750,7 @@ function cardExpMask(inp) {
 
 function cartCheckout() {
   const sel = cartItemsData.filter(c => c._selected !== false);
-  if(sel.length === 0) return showToast('⚠️ Selecione ao menos um produto para comprar');
+  if(sel.length === 0) return showToast('⚠ Selecione ao menos um produto para comprar');
   openCheckout(false);
 }
 
@@ -6122,7 +6122,7 @@ function cartBuyExpressNow(idx) {
     } else {
       if (_kzcList.length >= MAX_ITEMS) {
         if (typeof showToast === 'function')
-          showToast('⚠️ Máximo de ' + MAX_ITEMS + ' produtos na comparação. Remova um antes de adicionar outro.');
+          showToast('⚠ Máximo de ' + MAX_ITEMS + ' produtos na comparação. Remova um antes de adicionar outro.');
         return;
       }
       _kzcList.push(idx);
@@ -6148,7 +6148,7 @@ function cartBuyExpressNow(idx) {
   window.kzcOpenDrawer = function() {
     if (_kzcList.length < 2) {
       if (typeof showToast === 'function')
-        showToast('ℹ️ Adicione pelo menos 2 produtos para comparar.');
+        showToast('ℹ Adicione pelo menos 2 produtos para comparar.');
       return;
     }
     _kzcRenderDrawer();
@@ -6953,7 +6953,7 @@ function changeQty(d){
   if(v<1)v=1;
   if(v>maxQty){
     v=maxQty;
-    if(maxStock>0 && maxStock<10) showToast('⚠️ Só ' + maxStock + ' unidades em estoque!');
+    if(maxStock>0 && maxStock<10) showToast('⚠ Só ' + maxStock + ' unidades em estoque!');
   }
   el.textContent=v;
 }
@@ -7233,18 +7233,18 @@ function updateCartUI(){
 
     if(couponMinFail){
       const diff = (ac.minimo - (ac.type==='frete' ? subtotal : subtotalNormal));
-      discText = `⚠️ Cupom <strong>${ac.code}</strong> requer mínimo de ${fmt(ac.minimo)}. Faltam ${fmt(diff)}.`;
+      discText = `⚠ Cupom <strong>${ac.code}</strong> requer mínimo de ${fmt(ac.minimo)}. Faltam ${fmt(diff)}.`;
       bannerColor='rgba(245,158,11,0.08)'; bannerBorder='rgba(245,158,11,0.3)'; textColor='#F59E0B';
     } else if(couponBlocked){
       // [v2.9.30] Mensagem cobre os 3 motivos possíveis de bloqueio: Flash Sale,
       // Live Shopping ou produto regular que já tem desconto anunciado.
-      discText = `ℹ️ Cupom <strong>${ac.code}</strong> não se aplica a produtos que já têm desconto anunciado (Flash Sale, Live Shopping ou promoção do produto). Adicione um produto sem desconto para usar este cupom.`;
+      discText = `ℹ Cupom <strong>${ac.code}</strong> não se aplica a produtos que já têm desconto anunciado (Flash Sale, Live Shopping ou promoção do produto). Adicione um produto sem desconto para usar este cupom.`;
       bannerColor='rgba(148,163,184,0.08)'; bannerBorder='rgba(148,163,184,0.2)'; textColor='var(--muted)';
     } else if(ac.type==='%'){
-      discText = `🏷️ Cupom <strong>${ac.code}</strong>: −${fmt(couponDiscount)} (${ac.disc}% OFF em itens regulares)`;
+      discText = `🏷 Cupom <strong>${ac.code}</strong>: −${fmt(couponDiscount)} (${ac.disc}% OFF em itens regulares)`;
       if(promoItems_sel.length > 0) discText += ` <span style="font-size:10px;opacity:0.7">· itens com desconto já anunciado mantêm o preço de oferta</span>`;
     } else if(ac.type==='fixed'){
-      discText = `🏷️ Cupom <strong>${ac.code}</strong>: −${fmt(couponDiscount)} em itens regulares`;
+      discText = `🏷 Cupom <strong>${ac.code}</strong>: −${fmt(couponDiscount)} em itens regulares`;
     } else if(ac.type==='frete'){
       discText = '🚚 <strong>Frete Grátis</strong> aplicado a todos os itens!';
       if(cfsbBadge){ cfsbBadge.style.display='inline-flex'; }
@@ -7294,7 +7294,7 @@ function wishToggle(btn, productIndex, evt){
     if(product && productId && !wishlistItems.find(w => (w.n + '_' + w.p) === productId)){
       wishlistItems.push({...product, _wkzIdx: idx});
     }
-    showToast('❤️ Adicionado aos favoritos!');
+    showToast('❤ Adicionado aos favoritos!');
   } else {
     /* Remove do array de favoritos */
     btn.textContent = '♡';
@@ -7328,7 +7328,7 @@ function doLogin() {
      por minuto. Mitigação básica de UX contra tentativas grosseiras
      repetidas; não substitui rate limiting real do servidor. */
   if (typeof wkzRateLimit === 'function' && !wkzRateLimit('login', 5, 60000)) {
-    showToast('⚠️ Muitas tentativas de login. Aguarde um minuto e tente novamente.');
+    showToast('⚠ Muitas tentativas de login. Aguarde um minuto e tente novamente.');
     return;
   }
 
@@ -7337,17 +7337,17 @@ function doLogin() {
   email = email.trim();
 
   if (!email) {
-    showToast('⚠️ Informe o seu e-mail ou telefone');
+    showToast('⚠ Informe o seu e-mail ou telefone');
     document.getElementById('loginEmail').focus();
     return;
   }
   if (email.indexOf('@') > -1 && !validateEmail(email)) {
-    showToast('⚠️ E-mail inválido — verifique o formato');
+    showToast('⚠ E-mail inválido — verifique o formato');
     document.getElementById('loginEmail').focus();
     return;
   }
   if (!pw) {
-    showToast('⚠️ Informe a sua senha');
+    showToast('⚠ Informe a sua senha');
     document.getElementById('loginPassword').focus();
     return;
   }
@@ -7422,8 +7422,8 @@ function _stockConfig(level, stock, productName) {
     },
     low: {
       label: `Estoque baixo — ${stock} unidades`,
-      icon: '⚠️', accentColor: '#FF6B35',
-      toastTitle: `⚠️ Estoque baixo — ${stock} unidades`,
+      icon: '⚠', accentColor: '#FF6B35',
+      toastTitle: `⚠ Estoque baixo — ${stock} unidades`,
       toastSub: `"${productName}" está com poucas unidades. Garanta o seu antes que acabe.`,
       copy: `<strong>${stock} unidades disponíveis.</strong> Produto com alta saída — garanta o seu antes que esgote.`,
       showBar: true, showToast: true,
@@ -7569,7 +7569,7 @@ function _startSocialTicker(productIdx, level, stock, viewers, sold) {
     msgs.push({ text: sold + ' unidades vendidas nas últimas 2 horas', color: '#FF6B35' });
     if (level === 'critical') {
       msgs.push({ text: '🔥 Múltiplos compradores adicionaram ao carrinho agora', color: '#EF4444' });
-      msgs.push({ text: '⚠️ Com ' + stock + ' unidades restantes, pode esgotar a qualquer momento', color: '#EF4444' });
+      msgs.push({ text: '⚠ Com ' + stock + ' unidades restantes, pode esgotar a qualquer momento', color: '#EF4444' });
     }
     if (level === 'low' || level === 'critical') {
       msgs.push({ text: '🛒 Última compra há ' + (2 + (productIdx % 8)) + ' minutos', color: '#FF6B35' });
@@ -8579,7 +8579,7 @@ const QA_DATA = {
       id:'q2', user:'Comprador', date:'25/05/2025', votes:7, userVote:0,
       text:'O produto é original? Tem nota fiscal?',
       answer:{ by:'WeKz Shop', isSeller:true, date:'25/05/2025',
-        text:'Sim! Todos os vendedores da WeKz são verificados e obrigados a emitir nota fiscal. O produto é original com garantia do fabricante. Verificação feita pelo nosso time de qualidade. 🛡️', helpful:5 },
+        text:'Sim! Todos os vendedores da WeKz são verificados e obrigados a emitir nota fiscal. O produto é original com garantia do fabricante. Verificação feita pelo nosso time de qualidade. 🛡', helpful:5 },
       helpfulCount:5,
     },
   ],
@@ -8771,8 +8771,8 @@ function qaMarkHelpful(id, btn) {
 function qaSubmitQuestion() {
   var inp = document.getElementById('qaAskInput');
   var text = (inp ? inp.value : '').trim();
-  if (!text) return showToast('⚠️ Digite sua pergunta antes de enviar');
-  if (text.length < 10) return showToast('⚠️ Pergunta muito curta — adicione mais detalhes');
+  if (!text) return showToast('⚠ Digite sua pergunta antes de enviar');
+  if (text.length < 10) return showToast('⚠ Pergunta muito curta — adicione mais detalhes');
   // Prepend to _qaData
   var newQ = {
     id: 'q_' + Date.now(),
@@ -8815,8 +8815,8 @@ function qaToggleAnswerBox(id) {
 function qaSubmitAnswer(id) {
   var inp = document.getElementById('qaAnswerInput_' + id);
   var text = (inp ? inp.value : '').trim();
-  if (!text) return showToast('⚠️ Digite uma resposta antes de enviar');
-  if (text.length < 5) return showToast('⚠️ Resposta muito curta — adicione mais detalhes');
+  if (!text) return showToast('⚠ Digite uma resposta antes de enviar');
+  if (text.length < 5) return showToast('⚠ Resposta muito curta — adicione mais detalhes');
   var q = _qaData.find(function(x){ return x.id === id; });
   if (!q) return;
   q.answer = {
@@ -8837,7 +8837,7 @@ function qaSubmitAnswer(id) {
 
 // Cupons estendidos com metadata para a gaveta
 const COUPON_CATALOG = [
-  { code:'WEKZ10',  emoji:'🏷️',  disc:'10% OFF',  desc:'10% de desconto em toda a loja',            type:'%',     val:10, minimo:0,    expiry:'31/12/2026', limitUses:0    },
+  { code:'WEKZ10',  emoji:'🏷',  disc:'10% OFF',  desc:'10% de desconto em toda a loja',            type:'%',     val:10, minimo:0,    expiry:'31/12/2026', limitUses:0    },
   { code:'WEKZ20',  emoji:'⚡',  disc:'20% OFF',  desc:'20% de desconto exclusivo WeKz',             type:'%',     val:20, minimo:150,  expiry:'31/07/2026', limitUses:500  },
   { code:'FRETE0',  emoji:'🚚',  disc:'Frete Grátis', desc:'Entrega grátis para qualquer endereço', type:'frete', val:0,  minimo:0,    expiry:'31/12/2026', limitUses:0    },
   { code:'NOVO15',  emoji:'🎉',  disc:'15% OFF',  desc:'Desconto de boas-vindas — 1ª compra',        type:'%',     val:15, minimo:0,    expiry:'31/08/2026', limitUses:1    },
@@ -8892,7 +8892,7 @@ function renderCouponDrawer() {
         '<div class="coupon-card-desc">' + c.desc + '</div>' +
         '<div class="coupon-card-meta">' +
           (c.expiry ? '<span class="coupon-card-expiry">Válido até ' + c.expiry + '</span>' : '') +
-          (c.minimo ? '<span class="coupon-card-min">⚠️ Mín. R$ ' + c.minimo.toFixed(2).replace('.',',') + '</span>' : '') +
+          (c.minimo ? '<span class="coupon-card-min">⚠ Mín. R$ ' + c.minimo.toFixed(2).replace('.',',') + '</span>' : '') +
           (needMore ? '<span style="font-size:10px;color:#F59E0B;">Faltam R$ ' + missing.toFixed(2).replace('.',',') + '</span>' : '') +
           (isActive ? '<span style="font-size:10px;font-weight:700;color:#4ade80;">✅ Aplicado</span>' : '') +
         '</div>' +
@@ -8907,7 +8907,7 @@ function renderCouponDrawer() {
   }
 
   inner.innerHTML =
-    '<div class="coupon-section-label">🏷️ Desconto em produtos</div>' +
+    '<div class="coupon-section-label">🏷 Desconto em produtos</div>' +
     pct.map(buildCard).join('') +
     '<div class="coupon-section-label" style="margin-top:8px;">🚚 Frete grátis</div>' +
     frete.map(buildCard).join('');
@@ -8964,12 +8964,12 @@ function applyCartCouponV2(code) {
   var inp = document.getElementById('cartCouponField');
   var ac  = document.getElementById('couponAC');
   if (!code) code = inp ? inp.value.trim().toUpperCase() : '';
-  if (!code) { showCouponFeedback('⚠️ Digite um código de cupom', 'err'); return; }
+  if (!code) { showCouponFeedback('⚠ Digite um código de cupom', 'err'); return; }
   if (ac) ac.classList.remove('open');
 
   // Already active
   if (window._activeCoupon && window._activeCoupon.code === code) {
-    showCouponFeedback('ℹ️ Cupom ' + code + ' já está aplicado', 'ok'); return;
+    showCouponFeedback('ℹ Cupom ' + code + ' já está aplicado', 'ok'); return;
   }
 
   // Already used this session
@@ -9010,7 +9010,7 @@ function applyCartCouponV2(code) {
   var sub = _getCartSubtotal();
   if (coupon.minimo > 0 && sub < coupon.minimo) {
     var missing = (coupon.minimo - sub).toFixed(2).replace('.',',');
-    showCouponFeedback('⚠️ Adicione mais R$ ' + missing + ' para usar este cupom', 'err');
+    showCouponFeedback('⚠ Adicione mais R$ ' + missing + ' para usar este cupom', 'err');
     renderCouponMinProgress(sub, coupon.minimo, code);
     return;
   }
@@ -9047,7 +9047,7 @@ function renderCouponActiveBanner() {
 
   el.style.display = 'block';
   el.innerHTML = '<div class="coupon-active-banner">' +
-    '<div class="coupon-active-icon">🏷️</div>' +
+    '<div class="coupon-active-icon">🏷</div>' +
     '<div class="coupon-active-body">' +
       '<div class="coupon-active-code">' + ac.code + ' — ' + discText + '</div>' +
       '<div class="coupon-active-desc">' + desc + '</div>' +
@@ -9070,7 +9070,7 @@ function removeCouponV2() {
   var el = document.getElementById('couponActiveBanner');
   if (el) el.style.display = 'none';
   hideCouponMinProgress();
-  showToast('🗑️ Cupom removido');
+  showToast('🗑 Cupom removido');
   if (typeof updateCartUI === 'function') updateCartUI();
 }
 
@@ -9083,7 +9083,7 @@ function renderCouponMinProgress(current, minimo, code) {
   var missing = (minimo - current).toFixed(2).replace('.',',');
   el.style.display = 'block';
   el.innerHTML = '<div class="coupon-min-progress">' +
-    '<div class="coupon-min-label">⚠️ Para usar ' + code + ': adicione R$ ' + missing + ' ao carrinho</div>' +
+    '<div class="coupon-min-label">⚠ Para usar ' + code + ': adicione R$ ' + missing + ' ao carrinho</div>' +
     '<div class="coupon-min-bar"><div class="coupon-min-fill" style="width:' + pct + '%;"></div></div>' +
     '<div class="coupon-min-sub">' + pct + '% do mínimo atingido (R$ ' + current.toFixed(2).replace('.',',') + ' de R$ ' + minimo.toFixed(2).replace('.',',') + ')</div>' +
   '</div>';
@@ -9247,7 +9247,7 @@ function renderPickupPoints() {
   // FIX BUG-N01: banner de demonstração enquanto IS_DEMO_PICKUP estiver ativo
   var demoBanner = IS_DEMO_PICKUP
     ? '<div style="display:flex;align-items:center;gap:8px;padding:7px 11px;margin-bottom:8px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:8px;font-size:11px;color:#EAB308;">' +
-        '<span>⚙️</span>' +
+        '<span>⚙</span>' +
         '<span><strong>Pontos demonstrativos</strong> — Endereços de exemplo em São Paulo/SP. Após integração, serão exibidos pontos reais próximos ao seu CEP.</span>' +
       '</div>'
     : '';
@@ -9361,7 +9361,7 @@ const RETURN_REASONS = [
   { id:'defeito',   label:'🔧 Produto com defeito ou avariado' },
   { id:'diferente', label:'📦 Produto diferente do anunciado' },
   { id:'arrependimento', label:'↩️ Não gostei / desisti da compra' },
-  { id:'outro',     label:'✏️ Outro motivo' },
+  { id:'outro',     label:'✏ Outro motivo' },
 ];
 
 var _retOrder = null;
@@ -9727,15 +9727,15 @@ function toggleCepIntl(){
 
 const intlShippingData={
   US:{name:'Estados Unidos 🇺🇸',options:[{l:'📦 Econômico',d:'20-35 dias úteis',p:'Grátis'},
-    {l:'✈️ Aéreo Padrão',d:'10-15 dias úteis',p:'R$ 49,90'},{l:'⚡ Express DHL',d:'5-7 dias úteis',p:'R$ 189,90'}]},
+    {l:'✈ Aéreo Padrão',d:'10-15 dias úteis',p:'R$ 49,90'},{l:'⚡ Express DHL',d:'5-7 dias úteis',p:'R$ 189,90'}]},
   AR:{name:'Argentina 🇦🇷',options:[{l:'📦 Econômico',d:'15-25 dias úteis',p:'R$ 12,90'},
-    {l:'✈️ Aéreo',d:'8-12 dias úteis',p:'R$ 59,90'}]},
+    {l:'✈ Aéreo',d:'8-12 dias úteis',p:'R$ 59,90'}]},
   PT:{name:'Portugal 🇵🇹',options:[{l:'📦 Econômico',d:'18-30 dias úteis',p:'R$ 15,90'},
-    {l:'✈️ Aéreo',d:'7-10 dias úteis',p:'R$ 79,90'}]},
+    {l:'✈ Aéreo',d:'7-10 dias úteis',p:'R$ 79,90'}]},
   DE:{name:'Alemanha 🇩🇪',options:[{l:'📦 Econômico',d:'20-35 dias úteis',p:'R$ 19,90'},
     {l:'⚡ DHL Express',d:'5-8 dias úteis',p:'R$ 210,00'}]},
   JP:{name:'Japão 🇯🇵',options:[{l:'📦 Econômico',d:'25-40 dias úteis',p:'R$ 22,90'},
-    {l:'✈️ EMS',d:'8-12 dias úteis',p:'R$ 99,90'}]},
+    {l:'✈ EMS',d:'8-12 dias úteis',p:'R$ 99,90'}]},
   OTHER:{name:'Outros países 🌍',options:[{l:'📦 Internacional',d:'25-45 dias úteis',p:'Consulte'}]},
 };
 
@@ -9756,7 +9756,7 @@ function calcIntlShipping(){
           <div style="font-size:13px;font-weight:800;color:${o.p==='Grátis'?'#22C55E':'var(--teal)'};">${o.p}</div>
         </div>`).join('')}
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:10px;">⚠️ Possível incidência de taxas alfandegárias conforme legislação local.</div>`;
+    <div style="font-size:11px;color:var(--muted);margin-top:10px;">⚠ Possível incidência de taxas alfandegárias conforme legislação local.</div>`;
   res.style.display='block';
 }
 
@@ -9772,7 +9772,7 @@ function checkPasswordStrength(val){
   if(/[0-9]/.test(val))score++;
   if(/[^A-Za-z0-9]/.test(val))score++;
   const cls=['','weak','medium','medium','strong'];
-  const lbl=['Digite uma senha segura','⚠️ Fraca — use 8+ caracteres','🟡 Média — adicione números','🟠 Boa — adicione símbolos','✅ Forte — excelente!'];
+  const lbl=['Digite uma senha segura','⚠ Fraca — use 8+ caracteres','🟡 Média — adicione números','🟠 Boa — adicione símbolos','✅ Forte — excelente!'];
   for(let i=0;i<score;i++)bars[i].classList.add(cls[score]);
   label.textContent=lbl[score];
   label.style.color=score>=4?'#22C55E':score>=3?'#F59E0B':score>=2?'#F59E0B':'#EF4444';
@@ -9791,11 +9791,11 @@ const searchSuggestions = [
   {i:'⌚',t:'Smartwatch Ultra 2 GPS NFC',   c:'Eletrônicos', p:799,  op:1499, r:4.9, sales:'22.1k', pidx:3},
   {i:'🎧',t:'Fone Bluetooth ANC Pro 40h',  c:'Eletrônicos', p:289,  op:599,  r:4.7, sales:'31k',   pidx:2},
   {i:'📷',t:'Câmera Mirrorless 4K 24-70mm',c:'Câmeras',     p:4299, op:6999, r:4.8, sales:'4.7k',  pidx:4},
-  {i:'🕹️',t:'Console Next-Gen 1TB',        c:'Games',       p:2499, op:3999, r:4.9, sales:'11.8k', pidx:8},
+  {i:'🕹',t:'Console Next-Gen 1TB',        c:'Games',       p:2499, op:3999, r:4.9, sales:'11.8k', pidx:8},
   {i:'👗',t:'Vestido Midi Floral Verão',    c:'Moda',        p:129,  op:259,  r:4.5, sales:'18k',   pidx:null},
-  {i:'🛋️',t:'Sofá Retrátil 3 Lugares',    c:'Casa',        p:1299, op:2199, r:4.6, sales:'5.4k',  pidx:null},
+  {i:'🛋',t:'Sofá Retrátil 3 Lugares',    c:'Casa',        p:1299, op:2199, r:4.6, sales:'5.4k',  pidx:null},
   {i:'💄',t:'Kit Perfume Importado 100ml', c:'Beleza',      p:349,  op:599,  r:4.8, sales:'9.8k',  pidx:null},
-  {i:'🖥️',t:'Monitor 4K 144Hz 27" IPS',   c:'Eletrônicos', p:1890, op:2999, r:4.7, sales:'8.3k',  pidx:5},
+  {i:'🖥',t:'Monitor 4K 144Hz 27" IPS',   c:'Eletrônicos', p:1890, op:2999, r:4.7, sales:'8.3k',  pidx:5},
   {i:'🪑',t:'Cadeira Gamer Ergonômica PU', c:'Casa',        p:699,  op:1399, r:4.5, sales:'18k',   pidx:9},
   {i:'🧴',t:'Kit Skincare Vitamina C 5un', c:'Beleza',      p:189,  op:380,  r:4.8, sales:'42k',   pidx:7},
   {i:'👟',t:'Tênis Running Pro Boost MAX', c:'Esportes',    p:349,  op:699,  r:4.6, sales:'55k',   pidx:6},
@@ -10075,7 +10075,7 @@ function calcCep(){
   const optionsEl=document.getElementById('cepOptions');
 
   if(raw.length<5){
-    resultEl.innerHTML='<div class="cep-error">⚠️ Digite um CEP válido (ex: 01310-100)</div>';
+    resultEl.innerHTML='<div class="cep-error">⚠ Digite um CEP válido (ex: 01310-100)</div>';
     resultEl.style.display='block';
     optionsEl.style.display='none';
     return;
@@ -10256,7 +10256,7 @@ const DB = {
     // casar string por aproximação (frágil: mudar o `name` de exibição no
     // futuro não pode silenciosamente quebrar o filtro de produtos).
     {id:'techstore',name:'TechStore Brasil',sellerKey:'TechStore',avatar:'T',category:'<span class="wkz-icon wkz-icon-phone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span> Eletrônicos',rating:4.9,sales:'18.4k',followers:'12.8k',products:247,since:'2021',banner:'📱',desc:'Especialistas em eletrônicos premium. Vendedor oficial das principais marcas.',tags:['Apple','Samsung','Xiaomi'],policies:[{i:'↩️',t:'30 dias devolução'},{i:'✅',t:'Produto original'},{i:'🚚',t:'Envio em 24h'},{i:'💬',t:'Resp. imediata'}]},
-    {id:'gameworld',name:'GameWorld',sellerKey:'GameWorld',avatar:'G',category:'<span class="wkz-icon wkz-icon-gamepad"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg></span> Games',rating:4.9,sales:'11.8k',followers:'8.2k',products:183,since:'2020',banner:'🎮',desc:'Tudo para gamers: consoles, jogos, headsets e muito mais com garantia.',tags:['PlayStation','Xbox','Nintendo'],policies:[{i:'🎮',t:'Lacrado garantido'},{i:'✅',t:'Serial válido'},{i:'🚚',t:'Envio expresso'},{i:'🛡️',t:'Anti-fraude ativo'}]},
+    {id:'gameworld',name:'GameWorld',sellerKey:'GameWorld',avatar:'G',category:'<span class="wkz-icon wkz-icon-gamepad"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg></span> Games',rating:4.9,sales:'11.8k',followers:'8.2k',products:183,since:'2020',banner:'🎮',desc:'Tudo para gamers: consoles, jogos, headsets e muito mais com garantia.',tags:['PlayStation','Xbox','Nintendo'],policies:[{i:'🎮',t:'Lacrado garantido'},{i:'✅',t:'Serial válido'},{i:'🚚',t:'Envio expresso'},{i:'🛡',t:'Anti-fraude ativo'}]},
     {id:'sportfit',name:'SportFit',sellerKey:'SportFit',avatar:'S',category:'<span class="wkz-icon wkz-icon-dribbble"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg></span> Esportes',rating:4.6,sales:'55k',followers:'31k',products:892,since:'2019',banner:'⚽',desc:'A maior loja de artigos esportivos do WeKz. Marcas nacionais e importadas.',tags:['Nike','Adidas','Puma'],policies:[{i:'📏',t:'Troca de tamanho'},{i:'✅',t:'Original certif.'},{i:'🚚',t:'Frete grátis'},{i:'⭐',t:'+50k avaliações'}]},
     {id:'glowbeauty',name:'GlowBeauty',sellerKey:'GlowBeauty',avatar:'B',category:'<span class="wkz-icon wkz-icon-sparkles"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85L5 14z"/><path d="M17 1l.85 2 2 .85-2 .85L17 7l-.85-2-2-.85 2-.85L17 1z"/></svg></span> Beleza',rating:4.8,sales:'42k',followers:'28k',products:634,since:'2021',banner:'💄',desc:'Cosméticos, skincare e perfumes importados com autenticidade certificada.',tags:['Lancôme','Dior','L\'Oréal'],policies:[{i:'💄',t:'Produto autêntico'},{i:'✅',t:'Nota fiscal'},{i:'🚚',t:'Embalagem premium'},{i:'🌱',t:'Cruelty-free'}]},
   ],
@@ -10279,7 +10279,7 @@ const DB = {
     {i:'💳',t:'Pagamentos',c:'24 artigos'},
     {i:'🏪',t:'Vendedores',c:'41 artigos'},
     {i:'🔒',t:'Segurança',c:'15 artigos'},
-    {i:'⚖️',t:'Disputas',c:'22 artigos'},
+    {i:'⚖',t:'Disputas',c:'22 artigos'},
   ],
 
   trackingOrders: {
@@ -10618,7 +10618,7 @@ function renderCatProducts(page){
           ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
           ${p._sponsored?'<span class="badge badge-ad">📢 Patrocinado</span>':''}
           ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">🚚 Grátis</span>':''}
-          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">🏷️ Cupom</span>':''}
+          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">🏷 Cupom</span>':''}
         </div>
         <button class="product-wish" onclick="event.stopPropagation();event.preventDefault();wishToggle(this,${realIdx},event)">♡</button>
       </div>
@@ -11037,7 +11037,7 @@ const _TRK_DATA = {
   },
   'WKZ-8412': {
     orderNum: 'WKZ-8412', status: 'transit', statusLabel: 'Em Trânsito',
-    statusIcon: '✈️', bannerGrad: 'linear-gradient(135deg,var(--teal) 0%,#0891b2 100%)',
+    statusIcon: '✈', bannerGrad: 'linear-gradient(135deg,var(--teal) 0%,#0891b2 100%)',
     product: { name: 'Smartwatch Series 9 Ultra', emoji: '⌚', qty: 1, price: 'R$ 749,00' },
     carrier: { name: 'DHL Express Internacional', code: 'DHL1234567890', logo: '🟥' },
     etaDate: (() => { var d=new Date(); d.setDate(d.getDate()+4); return d; })(),
@@ -11165,7 +11165,7 @@ function loadTracking(code) {
   // BUG-05 FIX: prefixo de aviso demo antes do conteúdo real (só para pedidos demo, não para compras reais)
   var _demoNotice = data.isNewOrder ? '' : `<div style="display:flex;align-items:center;gap:8px;background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:8px 12px;margin-bottom:14px;font-size:11px;color:#FCD34D;">
     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <span>⚙️ <strong>Dados fictícios</strong> — este pedido é de demonstração. Rastreamento real disponível após integração com transportadoras.</span>
+    <span>⚙ <strong>Dados fictícios</strong> — este pedido é de demonstração. Rastreamento real disponível após integração com transportadoras.</span>
   </div>`;
 
   // Build horizontal stepper
@@ -11211,7 +11211,7 @@ function loadTracking(code) {
   var mapHtml = (data.status === 'out_delivery' || data.status === 'transit')
     ? `<div class="trk-map">
         <div class="trk-map-grid"></div>
-        <div class="trk-map-label">🗺️ Rota de entrega — ${data.carrier.name}</div>
+        <div class="trk-map-label">🗺 Rota de entrega — ${data.carrier.name}</div>
         <div class="trk-map-route"></div>
         <div class="trk-map-origin"></div>
         <div class="trk-map-dest">🏠</div>
@@ -11405,7 +11405,7 @@ function loadTracking(code) {
             +'<div style="color:var(--muted);font-size:11px;">'+c.desc+'</div>'
             +'<div class="trk-escrow-bar-wrap"><div class="trk-escrow-bar-fill" style="width:'+c.barPct+'%;background:'+c.barColor+';"></div></div>'
             +'<div class="trk-escrow-steps">'+stepsHtml+'</div>'
-            +'<div class="trk-escrow-note">🛡️ '+c.note+'</div>'
+            +'<div class="trk-escrow-note">🛡 '+c.note+'</div>'
             +ctaHtml
             +'</div>';
         })()}
@@ -11672,7 +11672,7 @@ function checkNick(input){
   const status = document.getElementById('nickStatus');
   if(!status) return;
   if(!val){ status.textContent=''; return; }
-  if(val.length < 3){ status.textContent='⚠️'; status.style.color='#EF4444'; return; }
+  if(val.length < 3){ status.textContent='⚠'; status.style.color='#EF4444'; return; }
   if(takenNicks.includes(val)){ status.textContent='✗'; status.style.color='#EF4444'; return; }
   status.textContent='✓'; status.style.color='#22C55E';
 }
@@ -11707,17 +11707,17 @@ function regQuickFinish(){
   const email = document.getElementById('r1email')?.value.trim();
   const pw    = document.getElementById('regPassword')?.value;
   const pw2   = document.getElementById('r1pw2')?.value;
-  if(!nome || !email || !pw){ showToast('⚠️ Preencha nome, e-mail e senha para continuar'); return; }
-  if(!validateEmail(email)){ showToast('⚠️ E-mail inválido — verifique o formato'); document.getElementById('r1email')?.focus(); return; }
-  if(pw.length < 8){ showToast('⚠️ Senha mínima: 8 caracteres'); document.getElementById('regPassword')?.focus(); return; }
-  if(pw2 !== undefined && pw !== pw2){ showToast('⚠️ Senhas não coincidem — verifique a confirmação'); document.getElementById('r1pw2')?.focus(); return; }
+  if(!nome || !email || !pw){ showToast('⚠ Preencha nome, e-mail e senha para continuar'); return; }
+  if(!validateEmail(email)){ showToast('⚠ E-mail inválido — verifique o formato'); document.getElementById('r1email')?.focus(); return; }
+  if(pw.length < 8){ showToast('⚠ Senha mínima: 8 caracteres'); document.getElementById('regPassword')?.focus(); return; }
+  if(pw2 !== undefined && pw !== pw2){ showToast('⚠ Senhas não coincidem — verifique a confirmação'); document.getElementById('r1pw2')?.focus(); return; }
 
   const terms = document.getElementById('termsCheckQuick');
   const dataTransfer = document.getElementById('dataTransferCheckQuick');
   const age = document.getElementById('ageCheckQuick');
-  if(terms && !terms.checked){ showToast('⚠️ Aceite os Termos de Uso e Políticas de Intermediação para continuar'); return; }
-  if(dataTransfer && !dataTransfer.checked){ showToast('⚠️ Autorize o processamento e a transferência internacional de dados para continuar'); return; }
-  if(age && !age.checked){ showToast('⚠️ Confirme que você tem 18 anos ou mais'); return; }
+  if(terms && !terms.checked){ showToast('⚠ Aceite os Termos de Uso e Políticas de Intermediação para continuar'); return; }
+  if(dataTransfer && !dataTransfer.checked){ showToast('⚠ Autorize o processamento e a transferência internacional de dados para continuar'); return; }
+  if(age && !age.checked){ showToast('⚠ Confirme que você tem 18 anos ou mais'); return; }
 
   _regProfileIncomplete = true;
 
@@ -11747,24 +11747,24 @@ function regGoStep(step){
       const pw    = document.getElementById('regPassword')?.value;
       const pw2   = document.getElementById('r1pw2')?.value;
       if(!nome || !email || !pw){
-        showToast('⚠️ Preencha todos os campos obrigatórios (*)');
+        showToast('⚠ Preencha todos os campos obrigatórios (*)');
         return;
       }
       // FIX BUG-AUTH02: validar formato do e-mail
       if(!validateEmail(email)){
-        showToast('⚠️ E-mail inválido — verifique o formato');
+        showToast('⚠ E-mail inválido — verifique o formato');
         document.getElementById('r1email')?.focus();
         return;
       }
       // FIX BUG-AUTH03: senha mínima de 8 caracteres
       if(pw.length < 8){
-        showToast('⚠️ Senha mínima: 8 caracteres');
+        showToast('⚠ Senha mínima: 8 caracteres');
         document.getElementById('regPassword')?.focus();
         return;
       }
       // FIX BUG-AUTH03: confirmação de senha obrigatória
       if(pw2 !== undefined && pw !== pw2){
-        showToast('⚠️ Senhas não coincidem — verifique a confirmação');
+        showToast('⚠ Senhas não coincidem — verifique a confirmação');
         document.getElementById('r1pw2')?.focus();
         return;
       }
@@ -11772,12 +11772,12 @@ function regGoStep(step){
     if(currentRegStep === 2){
       // CRO-01: telefone tornou-se opcional no fluxo completo — pode ser preenchido depois em "Editar Perfil"
       const phone = document.getElementById('phoneNumberInput')?.value.trim();
-      if(!phone){ showToast('ℹ️ Telefone não informado — você pode adicionar depois em "Editar Perfil"'); }
+      if(!phone){ showToast('ℹ Telefone não informado — você pode adicionar depois em "Editar Perfil"'); }
     }
     if(currentRegStep === 3){
       // CRO-01: endereço tornou-se opcional no fluxo completo — pode ser preenchido no checkout ou depois
       const cep = document.getElementById('r3cep')?.value.trim();
-      if(!cep){ showToast('ℹ️ Endereço não informado — você pode adicionar no checkout ou depois'); }
+      if(!cep){ showToast('ℹ Endereço não informado — você pode adicionar no checkout ou depois'); }
     }
   }
 
@@ -11808,9 +11808,9 @@ function finishRegister(){
   const terms = document.getElementById('termsCheck');
   const dataTransfer = document.getElementById('dataTransferCheck');
   const age = document.getElementById('ageCheck');
-  if(terms && !terms.checked){ showToast('⚠️ Aceite os Termos de Uso e Políticas de Intermediação para continuar'); return; }
-  if(dataTransfer && !dataTransfer.checked){ showToast('⚠️ Autorize o processamento e a transferência internacional de dados para continuar'); return; }
-  if(age && !age.checked){ showToast('⚠️ Confirme que você tem 18 anos ou mais'); return; }
+  if(terms && !terms.checked){ showToast('⚠ Aceite os Termos de Uso e Políticas de Intermediação para continuar'); return; }
+  if(dataTransfer && !dataTransfer.checked){ showToast('⚠ Autorize o processamento e a transferência internacional de dados para continuar'); return; }
+  if(age && !age.checked){ showToast('⚠ Confirme que você tem 18 anos ou mais'); return; }
   _regProfileIncomplete = false;
   // Hide all steps, show success
   for(let i = 1; i <= 4; i++){
@@ -11864,7 +11864,7 @@ async function regFillCep(){
   const cepEl = document.getElementById('r3cep');
   if(!cepEl) return;
   const cep = cepEl.value.replace(/\D/g,'');
-  if(cep.length !== 8){ showToast('⚠️ Digite um CEP válido com 8 dígitos.'); return; }
+  if(cep.length !== 8){ showToast('⚠ Digite um CEP válido com 8 dígitos.'); return; }
   showToast('🔍 Buscando CEP...');
   try {
     const res  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
@@ -11877,7 +11877,7 @@ async function regFillCep(){
     set('r3uf',     data.uf);
     showToast('✅ Endereço preenchido!');
   } catch(e){
-    showToast('⚠️ Não foi possível buscar o CEP. Verifique sua conexão.');
+    showToast('⚠ Não foi possível buscar o CEP. Verifique sua conexão.');
   }
 }
 
@@ -12010,7 +12010,7 @@ function handleEvidenceUpload(event) {
 
   files.forEach(file => {
     if (file.size > 5 * 1024 * 1024) {
-      showToast('⚠️ ' + file.name + ' é muito grande (máx 5MB)');
+      showToast('⚠ ' + file.name + ' é muito grande (máx 5MB)');
       return;
     }
     const reader = new FileReader();
@@ -12043,8 +12043,8 @@ async function confirmReport() {
   const reason  = document.getElementById('rmReason').value.trim();
   const details = document.getElementById('rmDetails').value.trim();
 
-  if (!reason)        { showToast('⚠️ Selecione o motivo da denúncia', 'error'); return; }
-  if (details.length < 10) { showToast('⚠️ Descreva melhor o problema (mínimo 10 caracteres)', 'error'); return; }
+  if (!reason)        { showToast('⚠ Selecione o motivo da denúncia', 'error'); return; }
+  if (details.length < 10) { showToast('⚠ Descreva melhor o problema (mínimo 10 caracteres)', 'error'); return; }
 
   const btn = document.getElementById('rmSubmitBtn');
   btn.disabled = true;
@@ -12053,12 +12053,12 @@ async function confirmReport() {
 
   const reasonLabels = {
     produto_falsificado: '🚫 Produto falsificado',
-    anuncio_enganoso: '⚠️ Anúncio enganoso',
+    anuncio_enganoso: '⚠ Anúncio enganoso',
     preco_abusivo: '💸 Preço abusivo',
     produto_proibido: '🔞 Produto proibido',
     nao_entregue: '📦 Produto não entregue',
     diferente_anuncio: '↩️ Produto diferente',
-    violacao_propriedade: '©️ Violação IP',
+    violacao_propriedade: '© Violação IP',
     vendedor_fraudulento: '👤 Vendedor fraudulento',
     outro: '❓ Outro'
   };
@@ -12174,7 +12174,7 @@ function renderReports(filter = 'all') {
   if (filter === 'closed') data = data.filter(r => r.status === 'resolvida');
 
   if (!data.length) {
-    list.innerHTML = `<div class="denuncias-empty"><div class="big-icon">🛡️</div><p>Nenhuma denúncia encontrada.</p></div>`;
+    list.innerHTML = `<div class="denuncias-empty"><div class="big-icon">🛡</div><p>Nenhuma denúncia encontrada.</p></div>`;
     return;
   }
 
@@ -12210,9 +12210,9 @@ function renderReports(filter = 'all') {
     let actionHTML = '';
     if (r.status === 'defesa') {
       actionHTML = r.defesaSubmitted
-        ? `<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">🛡️ Defesa enviada. Aguardando análise da equipe WeKz.</div>`
+        ? `<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">🛡 Defesa enviada. Aguardando análise da equipe WeKz.</div>`
         : `<div style="margin-top:14px;">
-            <button onclick="toggleDefesaForm('${r.id}')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">🛡️ Apresentar Defesa</button>
+            <button onclick="toggleDefesaForm('${r.id}')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">🛡 Apresentar Defesa</button>
             <div id="defesa-form-${r.id}" style="display:none;margin-top:10px;">
               <textarea id="defesa-text-${r.id}" placeholder="Explique sua versão dos fatos sobre esta denúncia..." style="width:100%;min-height:90px;padding:10px;font-size:12px;font-family:inherit;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;"></textarea>
               <button onclick="submitDefesa('${r.id}')" style="margin-top:8px;width:100%;padding:8px;background:var(--teal);border:none;color:#04201e;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Enviar Defesa</button>
@@ -12280,7 +12280,7 @@ function toggleDefesaForm(reportId) {
 function submitDefesa(reportId) {
   const ta = document.getElementById('defesa-text-' + reportId);
   const text = ta ? ta.value.trim() : '';
-  if (!text) { showToast('⚠️ Escreva sua defesa antes de enviar.', 'error'); return; }
+  if (!text) { showToast('⚠ Escreva sua defesa antes de enviar.', 'error'); return; }
 
   const r = reportsStore.find(x => x.id === reportId);
   if (!r) return;
@@ -12399,7 +12399,7 @@ function enhancedToast(message, type='error'){
   }
 
   toast.className = 'toast ' + (type === 'success' ? 'toast-success' : 'toast-error');
-  toast.innerHTML = '<span class="toast-icon">'+(type === 'success' ? '✅' : '⚠️')+'</span><span>'+message+'</span>';
+  toast.innerHTML = '<span class="toast-icon">'+(type === 'success' ? '✅' : '⚠')+'</span><span>'+message+'</span>';
 
   toast.style.display = 'flex';
 
@@ -12750,7 +12750,7 @@ function applyWekzCoupon(){
   if(!inp || !fb) return;
 
   const code  = inp.value.trim().toUpperCase();
-  if(!code){ showFeedback('⚠️ Digite um código de cupom.','err'); return; }
+  if(!code){ showFeedback('⚠ Digite um código de cupom.','err'); return; }
 
   /* Loading state */
   if(btn) btn.textContent = '...';
@@ -12759,7 +12759,7 @@ function applyWekzCoupon(){
 
     // Já aplicado?
     if(window._activeCoupon && window._activeCoupon.code === code){
-      showFeedback('ℹ️ Cupom '+code+' já está activo no carrinho.','ok'); return;
+      showFeedback('ℹ Cupom '+code+' já está activo no carrinho.','ok'); return;
     }
     // Já usado nesta sessão?
     window._usedCoupons = window._usedCoupons || {};
@@ -12785,7 +12785,7 @@ function applyWekzCoupon(){
       window._activeCoupon = { code, ...coupon };
       showFeedback('✅ ' + coupon.label, 'ok');
       inp.value = '';
-      if(typeof showToast === 'function') showToast('🏷️ Cupom ' + code + ' aplicado!');
+      if(typeof showToast === 'function') showToast('🏷 Cupom ' + code + ' aplicado!');
       if(typeof updateCartUI === 'function') updateCartUI();
     } else {
       showFeedback('❌ Cupom inválido ou expirado. Tente: WEKZ10, FRETE0', 'err');
@@ -12804,11 +12804,11 @@ function applyCartCoupon(){
   const inp = document.getElementById('cartCouponField');
   if(!inp) return;
   const code = inp.value.trim().toUpperCase();
-  if(!code){ showToast('⚠️ Digite um código de cupom.'); return; }
+  if(!code){ showToast('⚠ Digite um código de cupom.'); return; }
 
   // Impede reaplicar o mesmo cupom
   if(window._activeCoupon && window._activeCoupon.code === code){
-    showToast('ℹ️ Cupom '+code+' já está aplicado.'); return;
+    showToast('ℹ Cupom '+code+' já está aplicado.'); return;
   }
 
   // Verifica se cupom já foi usado nesta sessão
@@ -12848,7 +12848,7 @@ function applyCartCoupon(){
 
   if(coupon.minimo > 0 && applicableSub < coupon.minimo){
     const fmtV = v=>'R$ '+v.toFixed(2).replace('.',',');
-    showToast('⚠️ Mínimo de '+fmtV(coupon.minimo)+' para este cupom. Você tem '+fmtV(applicableSub)+'.'); return;
+    showToast('⚠ Mínimo de '+fmtV(coupon.minimo)+' para este cupom. Você tem '+fmtV(applicableSub)+'.'); return;
   }
 
   // Registra uso
@@ -12861,10 +12861,10 @@ function applyCartCoupon(){
 
   const fmtV = v=>'R$ '+v.toFixed(2).replace('.',',');
   let msg = '';
-  if(coupon.type==='%')       msg = '🏷️ Cupom '+code+' — '+coupon.disc+'% OFF aplicado!';
-  else if(coupon.type==='fixed') msg = '🏷️ Cupom '+code+' — −'+fmtV(coupon.disc)+' aplicado!';
+  if(coupon.type==='%')       msg = '🏷 Cupom '+code+' — '+coupon.disc+'% OFF aplicado!';
+  else if(coupon.type==='fixed') msg = '🏷 Cupom '+code+' — −'+fmtV(coupon.disc)+' aplicado!';
   else if(coupon.type==='frete') msg = '🚚 Frete Grátis activado pelo cupom '+code+'!';
-  showToast(msg || '🏷️ Cupom '+code+' aplicado!');
+  showToast(msg || '🏷 Cupom '+code+' aplicado!');
 
   if(typeof updateCartUI==='function') updateCartUI();
 }
@@ -12875,7 +12875,7 @@ function removeCoupon(){
     if(window._usedCoupons) delete window._usedCoupons[window._activeCoupon.code];
   }
   window._activeCoupon = null;
-  showToast('🗑️ Cupom removido.');
+  showToast('🗑 Cupom removido.');
   if(typeof updateCartUI==='function') updateCartUI();
 }
 
@@ -13479,7 +13479,7 @@ function kzNegSendOffer() {
   if (_kzNeg.resolved) return;
   var input = document.getElementById('kzNegOfferInput');
   var offer = parseFloat(input && input.value);
-  if (!offer || offer <= 0) { if (typeof showToast === 'function') showToast('⚠️ Digite um valor válido.'); return; }
+  if (!offer || offer <= 0) { if (typeof showToast === 'function') showToast('⚠ Digite um valor válido.'); return; }
 
   kzNegAddMsg('buyer', formatPrice(offer));
   input.value = '';
@@ -13641,7 +13641,7 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     { t:'u', n:'Fernanda C.', c:'#A855F7', m:'a câmera 4K é boa pro negócio mesmo?' },
     { t:'u', n:'Diego O.',   c:'#3B82F6', m:'já comprei 3 vezes aqui, recomendo 100%' },
     { t:'p', n:'🔔 AVISO',   c:'#EF4444', m:'🛒 Produto em destaque: só mais 8 minutos nesse preço!' },
-    { t:'u', n:'Beatriz H.', c:'#EC4899', m:'obrigada pela live!! ❤️❤️' },
+    { t:'u', n:'Beatriz H.', c:'#EC4899', m:'obrigada pela live!! ❤❤' },
     { t:'u', n:'Victor S.',  c:'#14B8A6', m:'esse carregador 65W vale muito mesmo' },
     { t:'u', n:'Nana R.',    c:'#F59E0B', m:'comprando pra meu pai de presente 🎁' },
     { t:'u', n:'Kaio P.',    c:'#6366F1', m:'melhor live de tech do WeKz! 🏆🏆🏆' },

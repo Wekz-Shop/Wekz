@@ -389,7 +389,7 @@
 
     <!-- ── CUPOM ── -->
     <div class="wkz-boost-coupon-block">
-      <div class="wkz-boost-section-label">🏷️ Inserir Cupom</div>
+      <div class="wkz-boost-section-label">🏷 Inserir Cupom</div>
       <div class="wkz-coupon-row">
         <div class="wkz-coupon-input-wrap">
           <span class="wkz-coupon-prefix">%</span>
@@ -412,7 +412,7 @@
       </div>
       <!-- Cupons de vendedores (inseridos dinamicamente) -->
       <div id="wkzSellerCouponsBlock" style="margin-top:10px;display:none;">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;">🏷️ Cupons dos Vendedores</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;">🏷 Cupons dos Vendedores</div>
         <div class="wkz-coupon-chips" id="wkzSellerCouponChips"></div>
       </div>
       <div style="display:none"><!-- placeholder close --></div
@@ -495,7 +495,7 @@ window.MapsTo = function(sectionId) {
     }
   }
   if (!document.getElementById('page-' + sectionId)) {
-    if (typeof showToast === 'function') showToast('⚠️ Página não encontrada');
+    if (typeof showToast === 'function') showToast('⚠ Página não encontrada');
     console.warn('[WeKz][MapsTo] Página inexistente solicitada:', sectionId);
     sectionId = 'home';
   }
@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', function() {
           Kz Live Shopping — Demonstração
           <span style="font-size:10px;font-weight:600;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);padding:2px 8px;border-radius:50px;color:#EF4444;">NOVO</span>
         </div>
-        <div class="kzlive-home-banner-sub">TechStore BR · Mega Promoção de Eletrônicos · <span style="color:var(--muted);">⚙️ Modo demonstração</span></div>
+        <div class="kzlive-home-banner-sub">TechStore BR · Mega Promoção de Eletrônicos · <span style="color:var(--muted);">⚙ Modo demonstração</span></div>
       </div>
     </div>
     <button class="kzlive-home-banner-cta" onclick="event.stopPropagation();MapsTo('live')">▶ Entrar na Live →</button>
@@ -1001,7 +1001,7 @@ document.addEventListener('DOMContentLoaded', function() {
              pela atenção do comprador no momento mais decisivo da compra. -->
         <!-- ══ STOCK WIDGET ══ -->
         <div id="pdpStockWidget"></div>
-        <div class="pdp-shipping">✈️ Frete grátis · <span>Entrega em 8-15 dias úteis</span> · Rastreamento incluso</div>
+        <div class="pdp-shipping">✈ Frete grátis · <span>Entrega em 8-15 dias úteis</span> · Rastreamento incluso</div>
         <!-- ── 🚢 KZ GLOBAL EXPRESS — Logística Internacional Estimativa ── -->
         <div id="kzIntlShipping" role="status" aria-live="polite">
           <span class="kz-ship-icon">🚢</span>
@@ -1041,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span style="font-size:12px;color:var(--muted);" id="pdpQtyMax">Estoque: carregando...</span>
       </div>
 
-      <!-- ⚖️ DISCLAIMER JURÍDICO: INTERMEDIADORA (Marco Civil Art. 18) -->
+      <!-- ⚖ DISCLAIMER JURÍDICO: INTERMEDIADORA (Marco Civil Art. 18) -->
       <div style="background:rgba(0,180,171,0.08);border:1px solid rgba(0,180,171,0.25);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.6;color:var(--muted);">
         <div style="display:flex;align-items:flex-start;gap:8px;">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -1158,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </button>
 
       <div class="pdp-protection">
-        <p>🛡️ Proteção WeKz Buyer — Reembolso garantido em até 30 dias</p>
+        <p>🛡 Proteção WeKz Buyer — Reembolso garantido em até 30 dias</p>
         <p>✅ Vendedor verificado com 4.9 estrelas (12k+ vendas)</p>
         <p>🔒 Pagamento processado com criptografia AES-256</p>
         <p>📦 Devolução gratuita dentro de 15 dias</p>
@@ -1215,10 +1215,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <button type="button" class="rev-filter" onclick="filterReviews('video',this)">▶ Com vídeo</button>
             <button type="button" class="rev-filter" onclick="filterReviews('verified',this)">✅ Verificadas</button>
           </div>
-          <button type="button" onclick="toggleReviewForm()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:16px;">✍️ Escrever avaliação</button>
+          <button type="button" onclick="toggleReviewForm()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:16px;">✍ Escrever avaliação</button>
 
           <div id="writeReviewForm" style="display:none;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:700;margin-bottom:14px;">✍️ Sua avaliação</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:14px;">✍ Sua avaliação</div>
             <div style="margin-bottom:12px;">
               <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Sua nota:</div>
               <div class="star-picker" id="starPicker">
@@ -1336,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <!-- Seller Trust Strip -->
         <div class="seller-verified-strip">
-          <span class="svs-icon">🛡️</span>
+          <span class="svs-icon">🛡</span>
           <span class="svs-text">Vendedor <strong style="color:var(--text);">verificado WeKz</strong> · 4.9★ · 18.4k vendas · 98% satisfação</span>
           <span class="svs-badge">✅ Confiável</span>
         </div>
@@ -1345,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="chat-tabs" id="sellerTabsNav">
           <button class="chat-tab-btn active" onclick="switchSellerTab('chat',this)">💬 Chat</button>
           <button class="chat-tab-btn" onclick="switchSellerTab('nego',this)">💰 Negociar</button>
-          <button class="chat-tab-btn" onclick="switchSellerTab('info',this)">ℹ️ Info</button>
+          <button class="chat-tab-btn" onclick="switchSellerTab('info',this)">ℹ Info</button>
         </div>
 
         <!-- ── TAB: CHAT ── -->
@@ -1382,7 +1382,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="margin-bottom:10px;">
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px;">Perguntas frequentes:</div>
             <div class="sq-grid" id="quickQGrid">
-              <button class="sq-item" onclick="sendQuickQNew(this,'🛡️ Produto tem garantia?')">🛡️ Tem garantia?</button>
+              <button class="sq-item" onclick="sendQuickQNew(this,'🛡 Produto tem garantia?')">🛡 Tem garantia?</button>
               <button class="sq-item" onclick="sendQuickQNew(this,'📦 Faz entrega para minha cidade?')">📦 Prazo de entrega?</button>
               <button class="sq-item" onclick="sendQuickQNew(this,'↩️ Aceita troca ou devolução?')">↩️ Aceita devolução?</button>
               <button class="sq-item" onclick="sendQuickQNew(this,'✅ Produto é original e novo?')">✅ É original?</button>
@@ -1401,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="chat-input-actions">
               <button class="chat-action-btn" title="Emoji" onclick="toggleEmojiPicker()">😊</button>
               <button class="chat-action-btn" title="Imagem" onclick="showToast('📸 Envie uma foto do produto para ajudar a esclarecer sua dúvida!')">📎</button>
-              <button class="chat-action-btn" title="Voz" onclick="showToast('🎙️ Mensagem de voz em breve!')">🎙️</button>
+              <button class="chat-action-btn" title="Voz" onclick="showToast('🎙 Mensagem de voz em breve!')">🎙</button>
               <span style="margin-left:auto;font-size:10px;color:var(--muted);">Shift+Enter = nova linha</span>
             </div>
             <!-- Emoji Picker -->
@@ -1476,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
 
           <div style="background:rgba(0,180,171,0.05);border:1px solid rgba(0,180,171,0.15);border-radius:10px;padding:12px;font-size:11px;color:var(--muted);line-height:1.6;">
-            🛡️ <strong style="color:var(--text);">Proteção WeKz:</strong> Se o vendedor aceitar sua proposta, a transação será protegida pela plataforma com garantia de devolução de 30 dias.
+            🛡 <strong style="color:var(--text);">Proteção WeKz:</strong> Se o vendedor aceitar sua proposta, a transação será protegida pela plataforma com garantia de devolução de 30 dias.
           </div>
         </div>
 
@@ -1525,12 +1525,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <span style="background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.25);color:var(--teal);padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">✅ Verificado WeKz</span>
             <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#F59E0B;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">⭐ Top Vendedor</span>
             <span style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22C55E;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">⚡ Envio Rápido</span>
-            <span style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#A78BFA;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">🛡️ Anti-Fraude</span>
+            <span style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#A78BFA;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">🛡 Anti-Fraude</span>
           </div>
 
           <div style="display:flex;gap:8px;">
             <button onclick="openStore('techstore')" style="flex:1;padding:10px;background:var(--grad1);border:none;color:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);"><span class="wkz-icon wkz-icon-store"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><rect x="9" y="13" width="6" height="9"/></svg></span> Ver Loja Completa</button>
-            <button onclick="showToast('❤️ Seguindo TechStore Brasil!')" style="flex:1;padding:10px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor=''">+ Seguir</button>
+            <button onclick="showToast('❤ Seguindo TechStore Brasil!')" style="flex:1;padding:10px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor=''">+ Seguir</button>
           </div>
           <button onclick="openReportModal(currentPdpIndex,'vendor')" style="width:100%;margin-top:8px;padding:8px;background:none;border:1px solid rgba(239,68,68,0.25);color:rgba(239,68,68,0.7);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='#EF4444';this.style.color='#EF4444'" onmouseout="this.style.borderColor='rgba(239,68,68,0.25)';this.style.color='rgba(239,68,68,0.7)'">⚑ Reportar Vendedor</button>
         </div>
@@ -1561,7 +1561,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- ══ BUNDLES INTELIGENTES — Kz AI ══ -->
     <div class="bundle-section" id="bundleSection">
       <div class="bundle-header">
-        <div class="bundle-header-title">🛍️ Frequentemente Comprado Junto</div>
+        <div class="bundle-header-title">🛍 Frequentemente Comprado Junto</div>
         <div class="bundle-ai-badge">
           <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85L5 14z"/></svg>
           Kz AI Sugestão
@@ -1709,7 +1709,7 @@ document.addEventListener('DOMContentLoaded', function() {
               🔖 Salvar p/ Depois
             </button>
             <button class="cart-select-action-btn cart-remove-selected" onclick="cartRemoveSelected()" id="cartRemoveSelectedBtn">
-              🗑️ Remover
+              🗑 Remover
             </button>
           </div>
         </div>
@@ -1956,7 +1956,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="ckout-protection-banner">
-          🛡️ <strong>Seu dinheiro só vai ao vendedor depois que você confirmar o recebimento.</strong> Toda entrega é monitorada pela IA do WeKz e protegida por 30 dias.
+          🛡 <strong>Seu dinheiro só vai ao vendedor depois que você confirmar o recebimento.</strong> Toda entrega é monitorada pela IA do WeKz e protegida por 30 dias.
         </div>
         <button class="ckout-btn-next" onclick="ckoutNext(1)">
           Continuar para Pagamento
@@ -2042,7 +2042,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="font-size:32px;margin-bottom:10px;">📄</div>
             <div style="font-size:14px;font-weight:700;margin-bottom:6px;">Boleto Bancário</div>
             <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">O boleto será gerado após a confirmação. Vence em <strong style="color:var(--text);">3 dias úteis</strong>.</div>
-            <div style="font-size:11px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:10px;color:#ffa07a;">⚠️ Após o vencimento, o pedido é cancelado automaticamente.</div>
+            <div style="font-size:11px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:10px;color:#ffa07a;">⚠ Após o vencimento, o pedido é cancelado automaticamente.</div>
           </div>
         </div>
 
@@ -2118,10 +2118,10 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="ckout-protection-banner" style="margin-top:14px;">
-          🛡️ <strong>Confirmar Pedido com Proteção Total 🔒</strong> — Seu pagamento só é liberado ao vendedor após você confirmar o recebimento. IA monitora a entrega. Disputa resolvida em até 3 dias úteis.
+          🛡 <strong>Confirmar Pedido com Proteção Total 🔒</strong> — Seu pagamento só é liberado ao vendedor após você confirmar o recebimento. IA monitora a entrega. Disputa resolvida em até 3 dias úteis.
         </div>
 
-        <!-- ⚖️ DISCLAIMER JURÍDICO CHECKOUT (CDC Art. 49 + Decreto 7.962/13) -->
+        <!-- ⚖ DISCLAIMER JURÍDICO CHECKOUT (CDC Art. 49 + Decreto 7.962/13) -->
         <div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:8px;padding:12px 14px;margin:14px 0;font-size:11.5px;line-height:1.6;color:var(--muted);">
           <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -2173,7 +2173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
           <div class="ckout-next-step">
-            <div class="ckout-ns-ico">🛡️</div>
+            <div class="ckout-ns-ico">🛡</div>
             <div>
               <div style="font-size:13px;font-weight:700;">Proteção ativa por 30 dias</div>
               <div style="font-size:11px;color:var(--muted);">Seu dinheiro só é liberado ao vendedor após você confirmar o recebimento</div>
@@ -2190,7 +2190,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <code style="background:rgba(0,180,171,0.12);padding:4px 8px;border-radius:4px;font-family:monospace;font-size:11px;color:var(--teal);display:block;margin-top:3px;word-break:break-all;" id="ckoutConfNfe">Carregando...</code>
             </div>
             <div style="margin-bottom:6px;font-size:11px;color:var(--muted);">
-              ℹ️ Esta é uma simulação educacional. A NF-e real será gerada pelo vendedor conforme legislação fiscal.
+              ℹ Esta é uma simulação educacional. A NF-e real será gerada pelo vendedor conforme legislação fiscal.
             </div>
           </div>
           <details style="margin-top:8px;font-size:11px;">
@@ -2270,7 +2270,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;border-top:1px solid var(--border);padding-top:10px;"><span class="wkz-icon wkz-icon-scale"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>A WeKz atua como <strong style="color:var(--text);">intermediária de pagamento</strong> entre você e o Vendedor Parceiro. Tributos aduaneiros, quando aplicáveis a envios internacionais, são de responsabilidade do comprador conforme a legislação vigente (Remessa Conforme / VAT).</div>
         <div class="ckout-trust">
           <div class="ckout-trust-item">🔒 <span>Pagamento criptografado AES-256</span></div>
-          <div class="ckout-trust-item">🛡️ <span>Proteção WeKz Buyer inclusa</span></div>
+          <div class="ckout-trust-item">🛡 <span>Proteção WeKz Buyer inclusa</span></div>
           <div class="ckout-trust-item">↩️ <span>Devolução grátis em 30 dias</span></div>
           <div class="ckout-trust-item">✅ <span>Vendedor verificado WeKz</span></div>
         </div>
@@ -3443,7 +3443,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- BUG-05 FIX: Banner de modo demonstração -->
     <div id="trkDemoBanner" style="display:flex;align-items:center;gap:10px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#FCD34D;">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span><strong style="color:#FDE68A;">⚙️ Modo Demonstração</strong> — Os dados de rastreamento exibidos são fictícios. A integração com transportadoras reais (Correios, DHL, FedEx) será activada após o lançamento.</span>
+      <span><strong style="color:#FDE68A;">⚙ Modo Demonstração</strong> — Os dados de rastreamento exibidos são fictícios. A integração com transportadoras reais (Correios, DHL, FedEx) será activada após o lançamento.</span>
     </div>
 
     <!-- Search -->
@@ -3716,8 +3716,8 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cp-card-body">
         <div id="cpAvaliacoesList">
           <!-- PRODUTO 1 -->
-          <div class="cp-review-item" onclick="cpOpenReviewModal(this,'#WKZ-8990','Teclado Mecânico RGB TKL','⌨️')" style="cursor:pointer;" title="Clique para avaliar">
-            <div class="cp-review-img">⌨️</div>
+          <div class="cp-review-item" onclick="cpOpenReviewModal(this,'#WKZ-8990','Teclado Mecânico RGB TKL','⌨')" style="cursor:pointer;" title="Clique para avaliar">
+            <div class="cp-review-img">⌨</div>
             <div class="cp-review-body">
               <div class="cp-review-name">Teclado Mecânico RGB TKL</div>
               <div class="cp-review-meta">#WKZ-8990 · Entregue em 18 Mai 2026</div>
@@ -4056,7 +4056,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
         <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:14px;padding:18px;">
-          <div style="font-size:22px;margin-bottom:8px;">🛡️</div>
+          <div style="font-size:22px;margin-bottom:8px;">🛡</div>
           <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Custódia de Pagamento</div>
           <div style="font-size:13px;color:var(--muted);">Seu dinheiro só é liberado ao vendedor após você confirmar o recebimento em bom estado.</div>
         </div>
@@ -4066,7 +4066,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="font-size:13px;color:var(--muted);">Kz Copilot analisa o caso e exibe a probabilidade de resolução a seu favor antes de abrir a disputa.</div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid #22C55E;border-radius:14px;padding:18px;">
-          <div style="font-size:22px;margin-bottom:8px;">✈️</div>
+          <div style="font-size:22px;margin-bottom:8px;">✈</div>
           <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Rastreio em Tempo Real</div>
           <div style="font-size:13px;color:var(--muted);">Linha do tempo visual com ETA dinâmico e notificações push em cada etapa da entrega.</div>
         </div>
@@ -4104,7 +4104,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Explore produtos de vendedores verificados em todo o mundo e receba com proteção total.</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button onclick="MapsTo('home')" style="padding:12px 24px;background:linear-gradient(135deg,var(--purple),var(--teal));border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-          🛍️ Explorar Produtos
+          🛍 Explorar Produtos
         </button>
         <button onclick="MapsTo('tracking')" style="padding:12px 24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
           📦 Rastrear Pedido
@@ -4964,7 +4964,7 @@ body.kzlive-active .bottom-nav {
             <div class="kzlive-ph-logo" style="margin-top:-4px;">WeKz Shop</div>
             <div class="kzlive-ph-preview-text" id="kzlivePlaceholderTitle">TechStore BR — Mega Promoção de Eletrônicos</div>
             <!-- FIX BUG-N02: subtítulo neutro — sem prometer stream ao vivo -->
-            <div class="kzlive-ph-subtitle">⚙️ Modo demonstração · Conteúdo de exemplo</div>
+            <div class="kzlive-ph-subtitle">⚙ Modo demonstração · Conteúdo de exemplo</div>
           </div>
           <button class="kzlive-ph-play-btn" onclick="kzliveStartPlayer()" title="Ver demonstração">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="#fff" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>
@@ -5091,7 +5091,7 @@ body.kzlive-active .bottom-nav {
           <div class="social-link" title="X / Twitter" onclick="showToast('🐦 Twitter/X WeKz em breve!')">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M4 20L20 4"/></svg>
           </div>
-          <div class="social-link" title="YouTube" onclick="showToast('▶️ YouTube WeKz em breve!')">
+          <div class="social-link" title="YouTube" onclick="showToast('▶ YouTube WeKz em breve!')">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.4 19.54C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 001.94-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02" fill="currentColor" stroke="none"/></svg>
           </div>
           <div class="social-link" title="WhatsApp" onclick="showToast('💬 WhatsApp WeKz em breve!')">
@@ -5225,7 +5225,7 @@ body.kzlive-active .bottom-nav {
         <span style="font-size:24px;">📄</span><span>Boleto</span><span style="font-size:11px;color:var(--muted);">Vence em 3 dias</span>
       </button>
     </div>
-    <div style="font-size:12px;color:var(--muted);text-align:center;">🛡️ Transação protegida pela WeKz Buyer Protection</div>
+    <div style="font-size:12px;color:var(--muted);text-align:center;">🛡 Transação protegida pela WeKz Buyer Protection</div>
   </div>
 </div>
 
@@ -5246,7 +5246,7 @@ body.kzlive-active .bottom-nav {
       <button class="btn-submit" style="flex:1;" onclick="completeOAuth()">Continuar</button>
     </div>
     <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.4;">
-      🛡️ Temos acesso apenas às informações necessárias para criar sua conta.<br>
+      🛡 Temos acesso apenas às informações necessárias para criar sua conta.<br>
       Você pode revogar o acesso a qualquer momento.
     </div>
   </div>
@@ -5519,12 +5519,12 @@ body.kzlive-active .bottom-nav {
       <select class="form-select wkz-select wkz-select--lg wkz-select--danger rm-select" id="rmReason" data-title="Motivo da denúncia">
         <option value="">Selecione o motivo...</option>
         <option value="produto_falsificado">🚫 Produto falsificado</option>
-        <option value="anuncio_enganoso">⚠️ Anúncio enganoso</option>
+        <option value="anuncio_enganoso">⚠ Anúncio enganoso</option>
         <option value="preco_abusivo">💸 Preço abusivo</option>
         <option value="produto_proibido">🔞 Produto proibido</option>
         <option value="nao_entregue">📦 Produto não entregue</option>
         <option value="diferente_anuncio">↩️ Produto diferente do anunciado</option>
-        <option value="violacao_propriedade">©️ Violação de propriedade intelectual</option>
+        <option value="violacao_propriedade">© Violação de propriedade intelectual</option>
         <option value="vendedor_fraudulento">👤 Vendedor fraudulento</option>
         <option value="outro">❓ Outro</option>
       </select>
@@ -5604,7 +5604,7 @@ body.kzlive-active .bottom-nav {
       </table>
     </div>
     <div style="font-size:10px;color:var(--muted);margin-top:12px;padding:8px 10px;background:rgba(124,58,237,0.06);border-radius:6px;border-left:3px solid rgba(124,58,237,0.3);">
-      ℹ️ Dados mostrados são simulação (mock). Em produção, este relatório reflete os dados reais armazenados em conformidade com a LGPD e a Portaria ANPD nº 11/2024.
+      ℹ Dados mostrados são simulação (mock). Em produção, este relatório reflete os dados reais armazenados em conformidade com a LGPD e a Portaria ANPD nº 11/2024.
     </div>
     <!-- Ações -->
     <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
