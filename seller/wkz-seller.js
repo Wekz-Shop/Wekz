@@ -85,7 +85,7 @@ function initDashOverview(forceRefresh){
         <div style="font-size:12px;color:var(--muted);margin-top:2px;">${formatPrice(p.p)} · <span style="color:${statusColor};font-weight:600;">${statusLabel}</span></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil}️ Editar</button>
+        <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil} Editar</button>
       </div>
     </div>`;
   }).join('');
@@ -102,12 +102,12 @@ if(!window._productStatusMap) window._productStatusMap = {};
 // ══════════════════════════════════════════════════════
 const AFFILIATE_REFERRALS = [
   { name:'Loja PixelWorks', type:WKZ_ICO.store + ' Vendedor', status:'active',  sales:8, points:1240 },
-  { name:'Ana Beatriz',     type:WKZ_ICO.bag + '️ Comprador', status:'active',  sales:3, points:340  },
+  { name:'Ana Beatriz',     type:WKZ_ICO.bag + ' Comprador', status:'active',  sales:3, points:340  },
   { name:'TechNova Store',  type:WKZ_ICO.store + ' Vendedor', status:'active',  sales:6, points:870  },
-  { name:'Rui Pereira',     type:WKZ_ICO.bag + '️ Comprador', status:'pending', sales:0, points:0    },
+  { name:'Rui Pereira',     type:WKZ_ICO.bag + ' Comprador', status:'pending', sales:0, points:0    },
   { name:'Loja Boa Vista',  type:WKZ_ICO.store + ' Vendedor', status:'pending', sales:0, points:0    },
-  { name:'Joana Mendes',    type:WKZ_ICO.bag + '️ Comprador', status:'active',  sales:2, points:0    },
-  { name:'Marco Aurélio',   type:WKZ_ICO.bag + '️ Comprador', status:'pending', sales:0, points:0    },
+  { name:'Joana Mendes',    type:WKZ_ICO.bag + ' Comprador', status:'active',  sales:2, points:0    },
+  { name:'Marco Aurélio',   type:WKZ_ICO.bag + ' Comprador', status:'pending', sales:0, points:0    },
 ];
 
 function initAffiliates(forceRefresh) {
@@ -241,7 +241,7 @@ function renderMyProducts(page){
       : isOOS
       ? `<span style="position:absolute;top:8px;left:8px;background:rgba(239,68,68,0.9);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;">${WKZ_ICO.xCircle} SEM ESTOQUE</span>`
       : '';
-    const pauseLabel = isPaused ? '▶️' : WKZ_ICO.pause + '';
+    const pauseLabel = isPaused ? '▶' : WKZ_ICO.pause + '';
     const pauseTitle = isPaused ? 'Reativar produto' : 'Pausar produto';
     const pauseBg = isPaused ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)';
     const pauseBorder = isPaused ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
@@ -257,7 +257,7 @@ function renderMyProducts(page){
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span></div>
         <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales}</div></div>
         <div style="display:flex;gap:6px;margin-top:8px;">
-          <button class="btn-cart" style="flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:12px;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil}️ Editar</button>
+          <button class="btn-cart" style="flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:12px;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil} Editar</button>
           <button class="btn-cart" title="${pauseTitle}" style="flex:0;padding:10px 12px;background:${pauseBg};border:1px solid ${pauseBorder};color:${pauseColor};font-size:14px;" onclick="togglePauseProduct(${i})">${pauseLabel}</button>
         </div>
       </div>
@@ -305,14 +305,14 @@ function togglePauseProduct(idx){
   const current = window._productStatusMap[idx] || 'active';
   const next = (current === 'paused') ? 'active' : 'paused';
   window._productStatusMap[idx] = next;
-  const msg = (next === 'paused') ? WKZ_ICO.pause + '️ Produto pausado com sucesso!' : '▶️ Produto reativado com sucesso!';
+  const msg = (next === 'paused') ? WKZ_ICO.pause + ' Produto pausado com sucesso!' : '▶ Produto reativado com sucesso!';
   showToast(msg);
   refreshProductEverywhere(idx);
 }
 
 function openEditProductModal(idx){
   const p = products[idx];
-  if(!p){ showToast(WKZ_ICO.warning + '️ Produto não encontrado.'); return; }
+  if(!p){ showToast(WKZ_ICO.warning + ' Produto não encontrado.'); return; }
   // Build or reuse modal
   let modal = document.getElementById('editProductOverlay');
   if(!modal){
@@ -326,7 +326,7 @@ function openEditProductModal(idx){
   modal.innerHTML = `
   <div class="modal" style="max-width:520px;width:94%;max-height:90vh;overflow-y:auto;padding:28px;">
     <button class="modal-close" onclick="closeEditProductModal()" style="top:14px;right:14px;">✕</button>
-    <div class="modal-title" style="font-size:18px;margin-bottom:4px;">${WKZ_ICO.pencil}️ Editar Produto</div>
+    <div class="modal-title" style="font-size:18px;margin-bottom:4px;">${WKZ_ICO.pencil} Editar Produto</div>
     <div class="modal-sub" style="margin-bottom:20px;">Altere os dados e clique em Salvar</div>
     <div class="form-group">
       <label class="form-label">Título do Produto <span class="req">*</span></label>
@@ -347,7 +347,7 @@ function openEditProductModal(idx){
           <input type="radio" name="ep-status" value="active" ${(window._productStatusMap[idx]||'active')==='active'?'checked':''}> ${WKZ_ICO.check} Ativo
         </label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-          <input type="radio" name="ep-status" value="paused" ${(window._productStatusMap[idx])==='paused'?'checked':''}> ${WKZ_ICO.pause}️ Pausado
+          <input type="radio" name="ep-status" value="paused" ${(window._productStatusMap[idx])==='paused'?'checked':''}> ${WKZ_ICO.pause} Pausado
         </label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
           <input type="radio" name="ep-status" value="out-of-stock" ${(window._productStatusMap[idx])==='out-of-stock'?'checked':''}> ${WKZ_ICO.xCircle} Sem Estoque
@@ -386,7 +386,7 @@ function _epField(id, label, value, type){
   const val = (value === undefined || value === null) ? '' : value;
   const borderStyle = isEmpty ? 'border-color:#F59E0B;' : '';
   const tooltip = isEmpty ? 'title="Este campo está vazio — não foi preenchido na publicação do produto"' : '';
-  const warnIcon = isEmpty ? ' <span style="color:#F59E0B;font-size:11px;" title="Campo vazio">${WKZ_ICO.warning}️ vazio na publicação</span>' : '';
+  const warnIcon = isEmpty ? ' <span style="color:#F59E0B;font-size:11px;" title="Campo vazio">${WKZ_ICO.warning} vazio na publicação</span>' : '';
   if(type === 'textarea'){
     return `<div class="form-group">
       <label class="form-label">${label}${warnIcon}</label>
@@ -404,8 +404,8 @@ function saveEditProduct(idx){
   const price = parseFloat(document.getElementById('ep-price')?.value);
   const oldPrice = parseFloat(document.getElementById('ep-oldprice')?.value)||0;
   const status = document.querySelector('input[name="ep-status"]:checked')?.value || 'active';
-  if(!title){ showToast(WKZ_ICO.warning + '️ Preencha o título do produto.'); return; }
-  if(!price || price <= 0){ showToast(WKZ_ICO.warning + '️ Informe um preço válido.'); return; }
+  if(!title){ showToast(WKZ_ICO.warning + ' Preencha o título do produto.'); return; }
+  if(!price || price <= 0){ showToast(WKZ_ICO.warning + ' Informe um preço válido.'); return; }
   products[idx].n = title;
   products[idx].op = oldPrice;
   if(oldPrice > price){
@@ -559,7 +559,7 @@ function initAddProductPage(){
   // Populate emoji picker
   const ep = document.getElementById('emojiPicker2');
   if(ep){
-    const emojis = ['📱','💻','⌚','🎧','📷','🕹️','🖥️','⌨️','🖱️','📺','👟','👗','👜','💄','🏠','🛋️','🍳','📚','⚽','🚗','🐾','👶','💊','🎵','🎮','🔧','💡','🌿'];
+    const emojis = ['📱','💻','⌚','🎧','📷','🕹','🖥','⌨','🖱','📺','👟','👗','👜','💄','🏠','🛋','🍳','📚','⚽','🚗','🐾','👶','💊','🎵','🎮','🔧','💡','🌿'];
     ep.innerHTML = emojis.map(e=>`<span style="font-size:26px;cursor:pointer;padding:4px;border-radius:8px;transition:var(--transition);" onclick="selectProdEmoji('${e}',this)" onmouseover="this.style.background='rgba(0,180,171,0.15)'" onmouseout="this.style.background=''">${e}</span>`).join('');
   }
   renderPhotoSlots();
@@ -580,15 +580,15 @@ function addProdGoStep(step){
       const t = document.getElementById('ap-title')?.value.trim();
       const c = document.getElementById('ap-cat')?.value;
       const d = document.getElementById('ap-desc')?.value.trim();
-      if(!t){ showToast(WKZ_ICO.warning + '️ Preencha o Título do Produto'); return; }
-      if(!c){ showToast(WKZ_ICO.warning + '️ Selecione uma Categoria'); return; }
-      if(!d){ showToast(WKZ_ICO.warning + '️ Preencha a Descrição Completa'); return; }
+      if(!t){ showToast(WKZ_ICO.warning + ' Preencha o Título do Produto'); return; }
+      if(!c){ showToast(WKZ_ICO.warning + ' Selecione uma Categoria'); return; }
+      if(!d){ showToast(WKZ_ICO.warning + ' Preencha a Descrição Completa'); return; }
     }
     if(currentAddProdStep===3){
       const p = document.getElementById('ap-price')?.value;
       const s = document.getElementById('ap-stock')?.value;
-      if(!p||parseFloat(p)<=0){ showToast(WKZ_ICO.warning + '️ Informe o Preço de Venda'); return; }
-      if(!s||parseInt(s)<0){ showToast(WKZ_ICO.warning + '️ Informe a Quantidade em Estoque'); return; }
+      if(!p||parseFloat(p)<=0){ showToast(WKZ_ICO.warning + ' Informe o Preço de Venda'); return; }
+      if(!s||parseInt(s)<0){ showToast(WKZ_ICO.warning + ' Informe a Quantidade em Estoque'); return; }
     }
   }
   // Hide all
@@ -659,7 +659,7 @@ ${WKZ_ICO.wrench} Especificações técnicas:
 • [Especificação 2]: [valor]
 • [Especificação 3]: [valor]
 
-${WKZ_ICO.shield}️ Garantia e Suporte:
+${WKZ_ICO.shield} Garantia e Suporte:
 12 meses de garantia do fabricante + 90 dias extra WeKz.
 
 ${WKZ_ICO.phone} Suporte pós-venda:
@@ -770,11 +770,11 @@ function handlePhotoUpload(event){
   const files = Array.from(event.target.files);
   if(!files.length) return;
   const remaining = 8 - addedPhotoSlots.length;
-  if(remaining <= 0){ showToast(WKZ_ICO.warning + '️ Limite de 8 fotos atingido.'); return; }
+  if(remaining <= 0){ showToast(WKZ_ICO.warning + ' Limite de 8 fotos atingido.'); return; }
   const toAdd = files.slice(0, remaining);
   let loaded = 0;
   toAdd.forEach(file => {
-    if(file.size > 10 * 1024 * 1024){ showToast(WKZ_ICO.warning + '️ ' + file.name + ' excede 10MB.'); loaded++; if(loaded===toAdd.length) renderPhotoSlots(); return; }
+    if(file.size > 10 * 1024 * 1024){ showToast(WKZ_ICO.warning + ' ' + file.name + ' excede 10MB.'); loaded++; if(loaded===toAdd.length) renderPhotoSlots(); return; }
     const reader = new FileReader();
     reader.onload = function(e){
       addedPhotoSlots.push({ id: wkzUid('photo'), dataUrl: e.target.result, name: file.name });
@@ -877,9 +877,9 @@ function publishProduct(){
   const title = document.getElementById('ap-title')?.value.trim();
   const price = parseFloat(document.getElementById('ap-price')?.value)||0;
   const cat = document.getElementById('ap-cat')?.value;
-  if(!title){ addProdGoStep(1); showToast(WKZ_ICO.warning + '️ Preencha o Título do Produto'); return; }
-  if(!cat){ addProdGoStep(1); showToast(WKZ_ICO.warning + '️ Selecione uma Categoria'); return; }
-  if(price<=0){ addProdGoStep(3); showToast(WKZ_ICO.warning + '️ Informe o Preço de Venda'); return; }
+  if(!title){ addProdGoStep(1); showToast(WKZ_ICO.warning + ' Preencha o Título do Produto'); return; }
+  if(!cat){ addProdGoStep(1); showToast(WKZ_ICO.warning + ' Selecione uma Categoria'); return; }
+  if(price<=0){ addProdGoStep(3); showToast(WKZ_ICO.warning + ' Informe o Preço de Venda'); return; }
 
   // Hide all steps
   for(let i=1;i<=4;i++){
@@ -1183,8 +1183,8 @@ function confirmarSaque(){
   const contaVal = document.getElementById('sw-conta')?.value || 'pix';
   const contaLabels = {pix:'PIX', ted:'TED Banco do Brasil', poupanca:'Poupança Caixa'};
   const contaTxt = contaLabels[contaVal] || contaVal;
-  if(v < 50){ showToast(WKZ_ICO.warning + '️ Valor mínimo de saque é R$ 50,00'); return; }
-  if(v > 12480){ showToast(WKZ_ICO.warning + '️ Valor excede o saldo disponível'); return; }
+  if(v < 50){ showToast(WKZ_ICO.warning + ' Valor mínimo de saque é R$ 50,00'); return; }
+  if(v > 12480){ showToast(WKZ_ICO.warning + ' Valor excede o saldo disponível'); return; }
   document.getElementById('wkzSaqueModal').classList.remove('open');
   showToast(WKZ_ICO.check + ' Saque de R$ '+v.toFixed(2).replace('.',',')+' solicitado! Processamento via '+contaTxt+'.');
 }
@@ -1328,7 +1328,7 @@ function openReviewReplyModal(btn, autorNome, textoAvaliacao, reviewIdx){
 
 function enviarRespostaReview(autorNome, reviewIdx){
   const txt = document.getElementById('rev-reply-text')?.value.trim();
-  if(!txt){ showToast(WKZ_ICO.warning + '️ Escreva sua resposta antes de publicar.'); return; }
+  if(!txt){ showToast(WKZ_ICO.warning + ' Escreva sua resposta antes de publicar.'); return; }
   document.getElementById('wkzReviewReplyModal').classList.remove('open');
   // Persist replied state
   if(!window._repliedReviews) window._repliedReviews = new Set();
@@ -1373,11 +1373,11 @@ function openDisputeReplyModal(pedido, produto, comprador, motivo, data){
       <textarea class="form-input" id="disp-reply-text" rows="4" placeholder="Descreva detalhadamente sua posição. Inclua rastreamento, fotos ou qualquer evidência relevante..." style="resize:vertical;font-family:inherit;"></textarea>
     </div>
     <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:16px;">
-      ${WKZ_ICO.clock}️ Você tem <strong style="color:#F59E0B;">até 48h</strong> para responder. Sem resposta, a WeKz decide automaticamente a favor do comprador.
+      ${WKZ_ICO.clock} Você tem <strong style="color:#F59E0B;">até 48h</strong> para responder. Sem resposta, a WeKz decide automaticamente a favor do comprador.
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzDisputaModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="enviarRespostaDisputa('${pedido}')">${WKZ_ICO.scale}️ Enviar Resposta</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="enviarRespostaDisputa('${pedido}')">${WKZ_ICO.scale} Enviar Resposta</button>
     </div>
   `, {maxWidth:'520px'});
 }
@@ -1385,7 +1385,7 @@ function openDisputeReplyModal(pedido, produto, comprador, motivo, data){
 function enviarRespostaDisputa(pedido){
   const txt = document.getElementById('disp-reply-text')?.value.trim();
   const pos = document.querySelector('input[name="disp-pos"]:checked')?.value;
-  if(!txt){ showToast(WKZ_ICO.warning + '️ Descreva sua posição antes de enviar.'); return; }
+  if(!txt){ showToast(WKZ_ICO.warning + ' Descreva sua posição antes de enviar.'); return; }
   const posLabels = {refund:'Reembolso aceito', partial:'Reembolso parcial proposto', contest:'Contestação enviada'};
   const posLabel = posLabels[pos] || 'Resposta enviada';
   document.getElementById('wkzDisputaModal').classList.remove('open');
@@ -1683,7 +1683,7 @@ function salvarMarketing(tipo){
   const msgs = {
     cupom: ()=>{
       const code     = document.getElementById('mk-cupom-code')?.value.trim().toUpperCase();
-      if(!code){ showToast(WKZ_ICO.warning + '️ Informe o código do cupom.'); return false; }
+      if(!code){ showToast(WKZ_ICO.warning + ' Informe o código do cupom.'); return false; }
       const val      = parseFloat(document.getElementById('mk-cupom-valor')?.value)||0;
       const tipoDesc = document.getElementById('mk-cupom-tipo')?.value || 'percent';
       const validade = document.getElementById('mk-cupom-validade')?.value || null;
@@ -1712,7 +1712,7 @@ function salvarMarketing(tipo){
       const estoqueVal= parseInt(document.getElementById('mk-flash-estoque')?.value) || 30;
       const inicio   = document.getElementById('mk-flash-inicio')?.value;
       const duracao  = parseInt(document.getElementById('mk-flash-duracao')?.value) || 4;
-      if(!precoVal || !inicio){ showToast(WKZ_ICO.warning + '️ Preencha o preço e o horário de início.'); return false; }
+      if(!precoVal || !inicio){ showToast(WKZ_ICO.warning + ' Preencha o preço e o horário de início.'); return false; }
 
       // Referência ao produto selecionado
       const prod = products[prodIdx] || {};
@@ -1764,13 +1764,13 @@ function salvarMarketing(tipo){
     },
     ads: ()=>{
       if(typeof sellerHasAdsAccess === 'function' && !sellerHasAdsAccess()){
-        showToast(WKZ_ICO.warning + '️ Anúncios Patrocinados exigem o plano Pro ou Enterprise.');
+        showToast(WKZ_ICO.warning + ' Anúncios Patrocinados exigem o plano Pro ou Enterprise.');
         return false;
       }
       const cpc    = document.getElementById('mk-ads-cpc')?.value;
       const budget = document.getElementById('mk-ads-budget')?.value;
       const prodEl = document.getElementById('mk-ads-prod');
-      if(!cpc){ showToast(WKZ_ICO.warning + '️ Defina o lance por clique.'); return false; }
+      if(!cpc){ showToast(WKZ_ICO.warning + ' Defina o lance por clique.'); return false; }
       // Identifica produto a patrocinar (usa 1º se não houver seletor)
       const prodIdx = prodEl ? parseInt(prodEl.value||'0') : 0;
       if(products[prodIdx] && !SPONSORED_PRODUCTS.includes(prodIdx)){
@@ -2391,7 +2391,7 @@ function openOrderDetailModal(id, produto, comprador, valor, status, data, ender
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn-add-cart" style="padding:10px 16px;font-size:12px;" onclick="document.getElementById('wkzOrderDetailModal').classList.remove('open')">Fechar</button>
-      ${isDisputa ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" onclick="document.getElementById(\'wkzOrderDetailModal\').classList.remove(\'open\')">${WKZ_ICO.scale}️ Ver Disputa</button>' : ''}
+      ${isDisputa ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" onclick="document.getElementById(\'wkzOrderDetailModal\').classList.remove(\'open\')">${WKZ_ICO.scale} Ver Disputa</button>' : ''}
       ${isSent ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="showToast(\' + WKZ_ICO.clipboard + \' Código de rastreio copiado!\')">${WKZ_ICO.package} Copiar Rastreio</button>' : ''}
       ${isPago ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="marcarEnviado(\''+id+'\',this)">${WKZ_ICO.truck} Marcar como Enviado</button>' : ''}
     </div>
@@ -2617,7 +2617,7 @@ function closeEtiquetaModal() {
  * CSS já garante que somente #wkzEtiquetaModalOv seja renderizado.
  */
 function imprimirEtiqueta() {
-  showToast(WKZ_ICO.printer + '️ Enviando etiqueta para a impressora...');
+  showToast(WKZ_ICO.printer + ' Enviando etiqueta para a impressora...');
   setTimeout(() => { window.print(); }, 320);
 }
 
@@ -2679,7 +2679,7 @@ function openDispatchModal(pedidoId) {
    ══════════════════════════════════════════════════════════════════ */
 function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
   if (!trackingCode || !trackingCode.trim()) {
-    showToast(WKZ_ICO.warning + '️ Informe o código de rastreio antes de confirmar.');
+    showToast(WKZ_ICO.warning + ' Informe o código de rastreio antes de confirmar.');
     return;
   }
   var trk = trackingCode.trim().toUpperCase();
@@ -3123,19 +3123,19 @@ function sellerNextStep(step){
   // ── FIX BUG-AUTH04: validação por etapa ──
   if(step === 1){
     const storeName = document.querySelector('#seller-step1 input[type="text"]')?.value.trim();
-    if(!storeName){ showToast(WKZ_ICO.warning + '️ Informe o nome da sua loja para continuar'); return; }
+    if(!storeName){ showToast(WKZ_ICO.warning + ' Informe o nome da sua loja para continuar'); return; }
   }
   if(step === 2){
     const cnpjRaw = (document.getElementById('sellerCnpj') || {}).value || '';
     const cnpjDigits = cnpjRaw.replace(/[^\d]/g, '');
     if(!cnpjRaw.trim()){
-      showToast(WKZ_ICO.warning + '️ Informe o CNPJ / CPF / Documento Legal');
+      showToast(WKZ_ICO.warning + ' Informe o CNPJ / CPF / Documento Legal');
       document.getElementById('sellerCnpj')?.focus();
       return;
     }
     // Valida CNPJ (14 dígitos) — CPF (11 dígitos) apenas formata
     if(cnpjDigits.length === 14 && !validateCNPJ(cnpjRaw)){
-      showToast(WKZ_ICO.warning + '️ CNPJ inválido — verifique os dígitos verificadores');
+      showToast(WKZ_ICO.warning + ' CNPJ inválido — verifique os dígitos verificadores');
       document.getElementById('sellerCnpj')?.focus();
       return;
     }
@@ -3235,7 +3235,7 @@ async function finishSellerRegister(){
 
   } catch(error){
     console.error('Falha no registro KYC:', error);
-    showToast(WKZ_ICO.warning + '️ Erro ao enviar os dados. Tente novamente mais tarde.');
+    showToast(WKZ_ICO.warning + ' Erro ao enviar os dados. Tente novamente mais tarde.');
   } finally {
     // 5. Restaurar o botão em caso de erro ou finalização
     if(submitBtn){
@@ -3389,7 +3389,7 @@ function sellerGoStep(step){ sellerGoBack(step); }
     if (valid[code]) {
       msg.textContent = '✓ ' + valid[code];
       msg.style.color = '#22C55E';
-      showToast(WKZ_ICO.tag + '️ Cupom aplicado: ' + valid[code]);
+      showToast(WKZ_ICO.tag + ' Cupom aplicado: ' + valid[code]);
     } else {
       msg.textContent = '✗ Cupom inválido ou expirado';
       msg.style.color = '#EF4444';
@@ -3398,7 +3398,7 @@ function sellerGoStep(step){ sellerGoBack(step); }
 
   window.confirmPremiumSubscription = function() {
     if (!_selectedPayment) {
-      showToast(WKZ_ICO.warning + '️ Selecione uma forma de pagamento');
+      showToast(WKZ_ICO.warning + ' Selecione uma forma de pagamento');
       // Highlight as opções de pagamento
       var pmSection = document.getElementById('pmPix');
       if (pmSection) {
@@ -3715,7 +3715,7 @@ var WkzKYC = (function() {
           '<div id="kycCompStatus" style="font-size:11px;color:var(--muted);margin-top:6px;"></div>' +
         '</div>' +
         '<div style="background:rgba(245,158,11,0.08);border-left:4px solid #F59E0B;padding:12px;border-radius:6px;font-size:11px;color:var(--muted);line-height:1.6;">' +
-          WKZ_ICO.warning + '️ <strong>Seus documentos serão verificados em até 5 dias úteis.</strong> Mantenha seus dados sempre atualizados para não perder benefícios.' +
+          WKZ_ICO.warning + ' <strong>Seus documentos serão verificados em até 5 dias úteis.</strong> Mantenha seus dados sempre atualizados para não perder benefícios.' +
         '</div>' +
       '</form>' +
       '<div style="display:flex;gap:10px;margin-top:20px;">' +
@@ -3910,8 +3910,8 @@ function initDashSettings() {
 function handleSellerLogoUpload(input){
   var file = input.files && input.files[0];
   if(!file) return;
-  if(!file.type.startsWith('image/')){ showToast(WKZ_ICO.warning + '️ Selecione um arquivo de imagem (PNG ou JPG).'); return; }
-  if(file.size > 2*1024*1024){ showToast(WKZ_ICO.warning + '️ Imagem muito grande — o limite é 2MB.'); return; }
+  if(!file.type.startsWith('image/')){ showToast(WKZ_ICO.warning + ' Selecione um arquivo de imagem (PNG ou JPG).'); return; }
+  if(file.size > 2*1024*1024){ showToast(WKZ_ICO.warning + ' Imagem muito grande — o limite é 2MB.'); return; }
   var reader = new FileReader();
   reader.onload = function(e){
     var dataUrl = e.target.result;
@@ -4057,7 +4057,7 @@ function abrirModalDeixarDeVender(){
 function confirmarDeixarDeVender(){
   var input = document.getElementById('leaveSellerConfirmInput');
   if(!input || input.value.trim().toUpperCase() !== 'ENCERRAR'){
-    showToast(WKZ_ICO.warning + '️ Digite ENCERRAR para confirmar.');
+    showToast(WKZ_ICO.warning + ' Digite ENCERRAR para confirmar.');
     return;
   }
   document.getElementById('wkzLeaveSellerModal').classList.remove('open');
@@ -4149,7 +4149,7 @@ function renderReports(filter){
   if(filter === 'closed') data = data.filter(function(r){ return r.status === 'resolvida'; });
 
   if(!data.length){
-    list.innerHTML = '<div class="denuncias-empty"><div class="big-icon">${WKZ_ICO.shield}️</div><p>Nenhuma denúncia encontrada.</p></div>';
+    list.innerHTML = '<div class="denuncias-empty"><div class="big-icon">${WKZ_ICO.shield}</div><p>Nenhuma denúncia encontrada.</p></div>';
     return;
   }
 
@@ -4182,9 +4182,9 @@ function renderReports(filter){
     var actionHTML = '';
     if(r.status === 'defesa'){
       actionHTML = r.defesaSubmitted
-        ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">${WKZ_ICO.shield}️ Defesa enviada. Aguardando análise da equipe WeKz.</div>'
+        ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">${WKZ_ICO.shield} Defesa enviada. Aguardando análise da equipe WeKz.</div>'
         : '<div style="margin-top:14px;">'
-          + '<button onclick="toggleDefesaForm(\''+r.id+'\')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">${WKZ_ICO.shield}️ Apresentar Defesa</button>'
+          + '<button onclick="toggleDefesaForm(\''+r.id+'\')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">${WKZ_ICO.shield} Apresentar Defesa</button>'
           + '<div id="defesa-form-'+r.id+'" style="display:none;margin-top:10px;">'
           + '<textarea id="defesa-text-'+r.id+'" placeholder="Explique sua versão dos fatos sobre esta denúncia..." style="width:100%;min-height:90px;padding:10px;font-size:12px;font-family:inherit;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;"></textarea>'
           + '<button onclick="submitDefesa(\''+r.id+'\')" style="margin-top:8px;width:100%;padding:8px;background:var(--teal);border:none;color:#04201e;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Enviar Defesa</button>'
@@ -4223,7 +4223,7 @@ function toggleDefesaForm(reportId){
 function submitDefesa(reportId){
   var ta = document.getElementById('defesa-text-' + reportId);
   var text = ta ? ta.value.trim() : '';
-  if(!text){ showToast(WKZ_ICO.warning + '️ Escreva sua defesa antes de enviar.'); return; }
+  if(!text){ showToast(WKZ_ICO.warning + ' Escreva sua defesa antes de enviar.'); return; }
 
   var r = reportsStore.find(function(x){ return x.id === reportId; });
   if(!r) return;
