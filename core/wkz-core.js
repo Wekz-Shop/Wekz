@@ -86,6 +86,14 @@ window.WKZ_ICO = {
   wave:       _wkzIco('<path d="M8 13V6a2 2 0 114 0v5"/><path d="M12 12V4a2 2 0 114 0v7"/><path d="M16 12V6a2 2 0 114 0v8a7 7 0 01-7 7h-1a7 7 0 01-6-3.4L2.9 13.5a2 2 0 013-2.5L8 13"/>'),
   slash:      _wkzIco('<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>'),
   pause:      _wkzIco('<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'),
+  lock:       _wkzIco('<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>'),
+  user:       _wkzIco('<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
+  mail:       _wkzIco('<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/>'),
+  ship:       _wkzIco('<path d="M2 20a3 3 0 003 1.5A3 3 0 008 20a3 3 0 003 1.5A3 3 0 0014 20a3 3 0 003 1.5 3 3 0 003-1.5"/><path d="M3 12l1.5-4.5A2 2 0 016.4 6h11.2a2 2 0 011.9 1.5L21 12"/><path d="M4 12h16l-1.2 5H5.2z"/><line x1="12" y1="2" x2="12" y2="6"/>'),
+  paperclip:  _wkzIco('<path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>'),
+  idcard:     _wkzIco('<rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="10" r="2"/><line x1="14" y1="9" x2="18" y2="9"/><line x1="14" y1="13" x2="18" y2="13"/><line x1="6" y1="16" x2="18" y2="16"/>'),
+  image:      _wkzIco('<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'),
+  undo:       _wkzIco('<polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/>'),
   dot:        function(color){ return _wkzIco('<circle cx="12" cy="12" r="8" fill="' + color + '" stroke="none"/>'); }
 };
 
@@ -1377,16 +1385,16 @@ const products = [
   {e:'🎧',n:'Fone Bluetooth ANC Pro — 40h bateria',p:289,op:599,off:52,s:'SoundWorld',r:4.7,sales:'31k',badge:'sale',                 stock:0,  stockMax:200, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:false,fast:false,attrs:{marca:'Sony',armazenamento:'N/A'}},
   {e:'⌚',n:'Smartwatch Ultra 2 — GPS + NFC',p:799,op:1499,off:47,s:'GadgetHub',r:4.9,sales:'22.1k',badge:'new',                     stock:47, stockMax:100, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:true,fast:true,attrs:{marca:'Samsung',armazenamento:'N/A'}},
   {e:'📷',n:'Câmera Mirrorless 4K — Lente 24-70mm',p:4299,op:6999,off:39,s:'PhotoPro',r:4.8,sales:'4.7k',badge:'',                   stock:8,  stockMax:60,  cat:'eletronicos',origin:'internacional',country:'Japão',cond:'recondicionado',frete:false,fast:false,attrs:{marca:'Sony',armazenamento:'128GB'}},
-  {e:'🖥️',n:'Monitor 4K 144Hz 27" — HDR IPS',p:1890,op:2999,off:37,s:'DisplayZone',r:4.7,sales:'8.3k',badge:'sale',                 stock:23, stockMax:90,  cat:'eletronicos',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{marca:'LG',armazenamento:'N/A'}},
+  {e:'🖥',n:'Monitor 4K 144Hz 27" — HDR IPS',p:1890,op:2999,off:37,s:'DisplayZone',r:4.7,sales:'8.3k',badge:'sale',                 stock:23, stockMax:90,  cat:'eletronicos',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{marca:'LG',armazenamento:'N/A'}},
   /* ── Esportes (2) ── */
   {e:'👟',n:'Tênis Running Pro Boost — Amortecimento MAX',p:349,op:699,off:50,s:'SportFit',r:4.6,sales:'55k',badge:'hot',             stock:84, stockMax:300, cat:'esportes',origin:'nacional',uf:'RS',cond:'novo',frete:true,fast:true,attrs:{modalidade:'Corrida'}},
-  {e:'🏋️',n:'Kit Musculação Completo — Halteres + Barras',p:479,op:899,off:47,s:'SportFit',r:4.7,sales:'12k',badge:'new',            stock:31, stockMax:150, cat:'esportes',origin:'nacional',uf:'RS',cond:'novo',frete:false,fast:false,attrs:{modalidade:'Musculação'}},
+  {e:'🏋',n:'Kit Musculação Completo — Halteres + Barras',p:479,op:899,off:47,s:'SportFit',r:4.7,sales:'12k',badge:'new',            stock:31, stockMax:150, cat:'esportes',origin:'nacional',uf:'RS',cond:'novo',frete:false,fast:false,attrs:{modalidade:'Musculação'}},
   /* ── Beleza (2) ── */
   {e:'🧴',n:'Kit Skincare Vitamina C — 5 produtos',p:189,op:380,off:50,s:'GlowBeauty',r:4.8,sales:'42k',badge:'new',                 stock:4,  stockMax:150, cat:'beleza',origin:'nacional',uf:'SP',cond:'novo',frete:true,fast:false,attrs:{tipo:'Skincare'}},
   {e:'💄',n:'Paleta de Sombras 48 cores — Matte + Shimmer',p:129,op:249,off:48,s:'GlowBeauty',r:4.6,sales:'28k',badge:'hot',        stock:67, stockMax:200, cat:'beleza',origin:'internacional',country:'Coreia do Sul',cond:'novo',frete:true,fast:true,attrs:{tipo:'Maquiagem'}},
   /* ── Games (2) ── */
   {e:'🎮',n:'Console Next-Gen 1TB — 2 Controles',p:2499,op:3999,off:38,s:'GameWorld',r:4.9,sales:'11.8k',badge:'sale',              stock:1,  stockMax:50,  cat:'games',origin:'internacional',country:'Japão',cond:'usado',frete:false,fast:false,attrs:{plataforma:'PlayStation'}},
-  {e:'🕹️',n:'Controle Pro Sem Fio — Hall Effect + Turbo',p:299,op:499,off:40,s:'GameWorld',r:4.7,sales:'19k',badge:'sale',           stock:45, stockMax:180, cat:'games',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{plataforma:'Universal'}},
+  {e:'🕹',n:'Controle Pro Sem Fio — Hall Effect + Turbo',p:299,op:499,off:40,s:'GameWorld',r:4.7,sales:'19k',badge:'sale',           stock:45, stockMax:180, cat:'games',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{plataforma:'Universal'}},
   /* ── Casa & Deco (2) ── */
   {e:'🪑',n:'Cadeira Gamer Ergonômica — Couro PU',p:699,op:1399,off:50,s:'FurniStyle',r:4.5,sales:'18k',badge:'',                   stock:62, stockMax:120, cat:'casa',origin:'nacional',uf:'SC',cond:'novo',frete:true,fast:false,attrs:{ambiente:'Escritório'}},
   {e:'🏮',n:'Luminária LED Smart 16M Cores — WiFi + App',p:149,op:299,off:50,s:'FurniStyle',r:4.6,sales:'33k',badge:'new',           stock:88, stockMax:250, cat:'casa',origin:'internacional',country:'China',cond:'novo',frete:false,fast:false,attrs:{ambiente:'Quarto'}},
@@ -1410,7 +1418,7 @@ const products = [
   {e:'🩺',n:'Monitor de Pressão Arterial Digital de Braço',p:189,op:349,off:46,s:'VidaSaude',r:4.7,sales:'15k',badge:'sale',         stock:47, stockMax:200, cat:'saude',origin:'internacional',country:'Alemanha',cond:'novo',frete:false,fast:false,attrs:{categoria:'Equipamentos'}},
   /* ── Ferramentas (2) ── */
   {e:'🔨',n:'Furadeira de Impacto 750W — Maleta + Kit 40 Bits',p:299,op:599,off:50,s:'FerraTech',r:4.6,sales:'9.1k',badge:'sale',   stock:27, stockMax:120, cat:'ferramentas',origin:'nacional',uf:'SC',cond:'novo',frete:true,fast:false,attrs:{tipo:'Elétrica'}},
-  {e:'⚙️',n:'Chave de Torque Digital 10-150Nm — LCD + Alarme',p:249,op:479,off:48,s:'FerraTech',r:4.5,sales:'4.2k',badge:'new',     stock:18, stockMax:100, cat:'ferramentas',origin:'internacional',country:'Alemanha',cond:'novo',frete:false,fast:false,attrs:{tipo:'Medição'}},
+  {e:'⚙',n:'Chave de Torque Digital 10-150Nm — LCD + Alarme',p:249,op:479,off:48,s:'FerraTech',r:4.5,sales:'4.2k',badge:'new',     stock:18, stockMax:100, cat:'ferramentas',origin:'internacional',country:'Alemanha',cond:'novo',frete:false,fast:false,attrs:{tipo:'Medição'}},
   /* [FIX-item4] Produto referenciado pelo pedido mock #WKZ-8990 (Avaliações
      Pendentes / Rastreador / Disputas do Meu Perfil) — antes não existia no
      catálogo navegável, então a avaliação feita no perfil nunca conseguia
@@ -1418,7 +1426,7 @@ const products = [
      um toast, nada visível na página do produto). Agora com o nome exato
      igual ao usado nos pedidos mock, o fluxo perfil → PDP → avaliação
      publicada funciona de ponta a ponta. */
-  {e:'⌨️',n:'Teclado Mecânico RGB TKL',p:199,op:399,off:50,s:'SoundWorld',r:4.8,sales:'21k',badge:'hot',           stock:36, stockMax:150, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{marca:'Logitech',armazenamento:'N/A'}},
+  {e:'⌨',n:'Teclado Mecânico RGB TKL',p:199,op:399,off:50,s:'SoundWorld',r:4.8,sales:'21k',badge:'hot',           stock:36, stockMax:150, cat:'eletronicos',origin:'internacional',country:'China',cond:'novo',frete:true,fast:false,attrs:{marca:'Logitech',armazenamento:'N/A'}},
   /* [FIX-item1/3/4] Produto referenciado pelo pedido/disputa mock #WKZ-9042
      (Rastreador de Encomendas / Central de Disputas do Meu Perfil) — antes
      não existia no catálogo navegável (nome "fantasma"), então a PDP nunca
@@ -1667,7 +1675,7 @@ function wkzRenderSellerDisputeCard(d) {
 
   if (typeof showToast === 'function') {
     if (isNew && status === 'open') showToast('🔔 Nova disputa recebida no painel do vendedor: ' + d.orderId);
-    else if (!isNew && status === 'resolved') showToast('⚖️ A disputa ' + d.orderId + ' foi resolvida pela equipa WeKz.');
+    else if (!isNew && status === 'resolved') showToast('⚖ A disputa ' + d.orderId + ' foi resolvida pela equipa WeKz.');
   }
 }
 window.wkzRenderSellerDisputeCard = wkzRenderSellerDisputeCard;
@@ -1924,10 +1932,10 @@ const flashItems = [
   {e:'💻',n:'Tablet 10" 128GB',p:'R$ 799',o:'R$ 1.599',off:50,s:'TechStore Brasil',rating:4.7,reviews:431,stock:5,
    desc:'Tablet com tela IPS 10.1" Full HD, processador 8 núcleos, 4GB RAM, 128GB interno (expansível até 1TB), câmera 13MP e bateria 7000mAh com 18W de carregamento.',
    specs:['Tela IPS 10.1" FHD 1920×1200','8 núcleos + 4GB RAM','128GB + slot microSD 1TB','Câmera 13MP + frontal 5MP','Bateria 7000mAh 18W','Android 13 · WiFi 6']},
-  {e:'🖥️',n:'Monitor 24" FHD',p:'R$ 699',o:'R$ 1.299',off:46,s:'GadgetHub',rating:4.9,reviews:328,stock:3,
+  {e:'🖥',n:'Monitor 24" FHD',p:'R$ 699',o:'R$ 1.299',off:46,s:'GadgetHub',rating:4.9,reviews:328,stock:3,
    desc:'Monitor 24 polegadas Full HD IPS, taxa de atualização 165Hz, tempo de resposta 1ms, painel IPS 99% sRGB, ajuste de altura e compatível com VESA 100×100.',
    specs:['Painel IPS 24" 1920×1080','165Hz · 1ms tempo resposta','99% sRGB · HDR10','HDMI 2.1 + DisplayPort 1.4','Ajuste altura, giro e inclinação','Compatível VESA 100×100']},
-  {e:'⌨️',n:'Teclado Mecânico',p:'R$ 199',o:'R$ 399',off:50,s:'SoundWorld',rating:4.8,reviews:762,stock:19,
+  {e:'⌨',n:'Teclado Mecânico',p:'R$ 199',o:'R$ 399',off:50,s:'SoundWorld',rating:4.8,reviews:762,stock:19,
    desc:'Teclado mecânico TKL (87 teclas) com switches brown (tátil, silencioso), retroiluminação RGB por tecla, cabo removível USB-C e base de alumínio escovado.',
    specs:['Switches Brown tátil silencioso','Retroiluminação RGB por tecla','Layout TKL 87 teclas compacto','Cabo removível USB-C 1.8m','Base alumínio anti-derrapante','Compatível Win/Mac/Linux']},
 ];
@@ -1952,7 +1960,7 @@ let wishColActiveFilter = null; // null = todas, string = id da coleção ativa
 let wishColAssignTarget = null; // índice do item sendo atribuído (wi)
 let wishColAssignSelected = null; // id coleção selecionada no modal
 
-const WISH_COL_EMOJIS = ['📁','🎁','🛍️','🏠','👗','💻','🎮','🌟','🎄','💍','🧸','🏋️','📚','🎨','✈️','🍕'];
+const WISH_COL_EMOJIS = ['📁','🎁','🛍','🏠','👗','💻','🎮','🌟','🎄','💍','🧸','🏋','📚','🎨','✈','🍕'];
 const WISH_COL_DEFAULT_EMOJI = '📁';
 let wishColNewSelectedEmoji = WISH_COL_DEFAULT_EMOJI;
 
@@ -2028,7 +2036,7 @@ window.MapsTo = function(sectionId) {
     }
   }
   if (!document.getElementById('page-' + sectionId)) {
-    if (typeof showToast === 'function') showToast('⚠️ Página não encontrada');
+    if (typeof showToast === 'function') showToast('⚠ Página não encontrada');
     console.warn('[WeKz][MapsTo] Página inexistente solicitada:', sectionId);
     /* FIX [tela-em-branco] — 'home' só existe no módulo Buyer (page-home).
        Nos módulos Seller/Admin/Legal esse fallback também falha, e como o
@@ -2531,7 +2539,7 @@ function wkzNotifMeta(type) {
   const map = {
     info:    { icon: '📢', color: '#06B6D4', bgClass: 'push-info',    barClass: 'bar-info',    badgeTxt: 'Aviso'     },
     promo:   { icon: '🎉', color: '#7C3AED', bgClass: 'push-promo',   barClass: 'bar-promo',   badgeTxt: 'Promoção'  },
-    warning: { icon: '⚠️', color: '#F59E0B', bgClass: 'push-warning', barClass: 'bar-warning', badgeTxt: 'Atenção'   },
+    warning: { icon: '⚠', color: '#F59E0B', bgClass: 'push-warning', barClass: 'bar-warning', badgeTxt: 'Atenção'   },
     alert:   { icon: '🚨', color: '#EF4444', bgClass: 'push-alert',   barClass: 'bar-alert',   badgeTxt: 'Urgente'   },
   };
   return map[type] || map.info;
@@ -3276,7 +3284,7 @@ function lgpdEnviarCorrecao() {
     showToast('⚠ Descreva o que precisa ser corrigido.');
     return;
   }
-  admAuditAdd && admAuditAdd('✏️', 'Titular solicitou correção de dados (LGPD Art.18 III): ' + obs.slice(0,60), 'LGPD');
+  admAuditAdd && admAuditAdd('✏', 'Titular solicitou correção de dados (LGPD Art.18 III): ' + obs.slice(0,60), 'LGPD');
   lgpdClose('lgpdModalCorrigir');
   showToast('✅ Solicitação enviada! Prazo de resposta: 15 dias úteis.');
 }
@@ -3321,7 +3329,7 @@ function lgpdExcluirFinal() {
     showToast('⚠ Digite exatamente "EXCLUIR CONTA" para confirmar.');
     return;
   }
-  admAuditAdd && admAuditAdd('🗑️', 'Titular solicitou exclusão de conta (LGPD Art.18 VI) — pendente verificação', 'LGPD');
+  admAuditAdd && admAuditAdd('🗑', 'Titular solicitou exclusão de conta (LGPD Art.18 VI) — pendente verificação', 'LGPD');
   lgpdClose('lgpdModalExcluir');
   showToast('✅ Solicitação registrada. Você receberá confirmação em até 15 dias úteis.');
 }
@@ -3593,8 +3601,8 @@ var WkzDisputeTickets = (function() {
     var problemLabels = {
       'nao-recebido': '📦 Não Recebido',
       'nao-conforme': '🔍 Não Conforme',
-      'defeito': '⚙️ Defeito/Danificado',
-      'falsificado': '⚠️ Falsificado/Violado'
+      'defeito': '⚙ Defeito/Danificado',
+      'falsificado': '⚠ Falsificado/Violado'
     };
 
     var html = '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--card2);">' +
@@ -3649,8 +3657,8 @@ var WkzDisputeTickets = (function() {
             '<option value="">Selecione...</option>' +
             '<option value="nao-recebido">📦 Não Recebi o Produto</option>' +
             '<option value="nao-conforme">🔍 Produto Não Conforme (diferente do anunciado)</option>' +
-            '<option value="defeito">⚙️ Produto com Defeito/Danificado</option>' +
-            '<option value="falsificado">⚠️ Suspeita de Falsificação</option>' +
+            '<option value="defeito">⚙ Produto com Defeito/Danificado</option>' +
+            '<option value="falsificado">⚠ Suspeita de Falsificação</option>' +
           '</select>' +
         '</div>' +
         '<div>' +
@@ -3895,7 +3903,7 @@ var WkzArrependimento = (function() {
         '</div>' +
       '</div>' +
       '<div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.25);border-radius:8px;padding:12px;margin-bottom:14px;font-size:11px;line-height:1.6;color:var(--muted);">' +
-        '⚠️ <strong>Importante:</strong> Ao exercer este direito, você receberá instruções de devolução logística. ' +
+        '⚠ <strong>Importante:</strong> Ao exercer este direito, você receberá instruções de devolução logística. ' +
         'O reembolso será processado em até 2 dias úteis após recebermos a confirmação de devolução. Este protocolo será armazenado por 5 anos para fins legais.' +
       '</div>' +
       '<div style="display:flex;gap:10px;">' +
@@ -3979,7 +3987,7 @@ var WkzNoticeAndTakeDown = (function() {
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">*URL Exata do Anúncio Infringente</label>' +
           '<input type="url" id="denunciaUrl" class="wkz-input" placeholder="Ex: https://wekzshop.com/product/12345/item-falsificado" style="width:100%;padding:10px;font-size:13px;" required>' +
-          '<div style="font-size:11px;color:var(--muted);margin-top:4px;">⚠️ Denúncias genéricas (apenas URL da loja) serão rejeitadas. Você deve indicar o anúncio específico.</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;">⚠ Denúncias genéricas (apenas URL da loja) serão rejeitadas. Você deve indicar o anúncio específico.</div>' +
         '</div>' +
         // Campo 2: Nome do requerente
         '<div>' +
@@ -4138,7 +4146,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
 📱 MULTIPOINT: Conecte-se a 2 dispositivos simultaneamente. Troca automática ao atender chamadas.
 
-🛡️ GARANTIA: 12 meses de garantia oficial Sony Brasil. Nota fiscal inclusa.
+🛡 GARANTIA: 12 meses de garantia oficial Sony Brasil. Nota fiscal inclusa.
 
 📦 CONTEÚDO DA CAIXA: Fone WH-1000XM5 + Cabo USB-C + Cabo P2 + Case rígido + Manual em PT-BR`,
       tags: 'fone de ouvido, bluetooth, sony, cancelamento de ruído, wireless, headphone, hi-res, home office',
@@ -4155,13 +4163,13 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
 ⚡ DESEMPENHO MÁXIMO: Snapdragon 8 Gen 3 + 12GB RAM. Roda qualquer jogo, app de produtividade e multitarefa sem engasgar.
 
-🖊️ S PEN INTEGRADA: Caneta inteligente para notas, desenhos e atalhos de teclado. Sem necessidade de compra adicional.
+🖊 S PEN INTEGRADA: Caneta inteligente para notas, desenhos e atalhos de teclado. Sem necessidade de compra adicional.
 
 🔋 BATERIA 5000mAh: Carga rápida 45W + carregamento sem fio 15W. Dura o dia todo com uso intenso.
 
 💎 TELA DYNAMIC AMOLED 2X 6,8": 120Hz adaptativos, brilho máximo de 2600 nits — visível até sob sol forte.
 
-🛡️ Galaxy AI embutido: tradução em tempo real, resumo de chamadas e Circle to Search.`,
+🛡 Galaxy AI embutido: tradução em tempo real, resumo de chamadas e Circle to Search.`,
       tags: 'smartphone, samsung, galaxy, s24 ultra, 5g, câmera, android, snapdragon, celular',
       category: 'eletronicos',
       brand: 'Samsung',
@@ -4176,7 +4184,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
 ⚡ FOAM REACT: Espuma React de alta resposta devolve energia ao caminhar, com 13% mais leveza que o foam padrão.
 
-🌬️ CABEDAL MESH: Malha respirável de alta engenharia mantém os pés frescos e confortáveis por horas.
+🌬 CABEDAL MESH: Malha respirável de alta engenharia mantém os pés frescos e confortáveis por horas.
 
 📐 SISTEMA LACING: Cadarços planos duplos para ajuste personalizado e look clean premium.
 
@@ -4197,13 +4205,13 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
 🧠 16GB DDR5 + SSD 512GB NVMe: Abertura de apps instantânea. 3x mais rápido que HDD convencional. Expansível até 32GB.
 
-🖥️ TELA FULL HD 15.6": Resolução 1920×1080, anti-reflexo, 250 nits. Ideal para trabalho em ambientes internos e externos.
+🖥 TELA FULL HD 15.6": Resolução 1920×1080, anti-reflexo, 250 nits. Ideal para trabalho em ambientes internos e externos.
 
 🔋 BATERIA 54Wh: Até 8 horas de uso real. Carregador compacto 65W USB-C incluso.
 
 🎮 INTEL IRIS XE: Gráficos integrados para edição de fotos, vídeos leves e games casuais sem placa adicional.
 
-🛡️ GARANTIA DELL: 12 meses com suporte técnico nacional. Windows 11 Home original incluso.`,
+🛡 GARANTIA DELL: 12 meses com suporte técnico nacional. Windows 11 Home original incluso.`,
       tags: 'notebook, laptop, dell, intel i7, 16gb, ssd, windows 11, computador portátil',
       category: 'eletronicos',
       brand: 'Dell',
@@ -4221,7 +4229,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 • Coração: Pimenta-sichuan, lavanda e baunilha selvagem
 • Fundo: Ambroxan, âmbar e cedro da Virgínia
 
-⏱️ DURAÇÃO: 10 a 14 horas de fixação na pele. Sillage médio-alto, notável sem ser invasivo.
+⏱ DURAÇÃO: 10 a 14 horas de fixação na pele. Sillage médio-alto, notável sem ser invasivo.
 
 📦 CONTEÚDO: Frasco EDP 100ml com embalagem original Dior + certificado de autenticidade.
 
@@ -4310,7 +4318,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       // ── SOCIAL PROOF NOTIFICATIONS ──────────────────────
       const KZ_SOCIAL_NAMES = ['Mariana','Carlos','Ana','Pedro','Fernanda','Lucas','Sofia','Rafael','Beatriz','Diego','Camila','Thiago','Isabela','Bruno','Juliana','André'];
       const KZ_SOCIAL_CITIES = ['Porto','Lisboa','São Paulo','Rio de Janeiro','Curitiba','Belo Horizonte','Recife','Salvador','Fortaleza','Manaus','Brasília','Florianópolis'];
-      const KZ_SOCIAL_PRODUCTS = ['Headset Cyberpunk Pro 🎧','Smartphone Ultra 5G 📱','Notebook Gamer RTX 💻','Smartwatch Kz Pro ⌚','Câmera 4K Mirrorless 📷','Console Next-Gen 🎮','Fone ANC Premium 🎵','Cadeira Gamer Elite 🪑','Monitor 144Hz 2K 🖥️','Teclado Mecânico RGB ⌨️','Mouse Gamer 16000DPI 🖱️','Perfume Exclusivo 🌿'];
+      const KZ_SOCIAL_PRODUCTS = ['Headset Cyberpunk Pro 🎧','Smartphone Ultra 5G 📱','Notebook Gamer RTX 💻','Smartwatch Kz Pro ⌚','Câmera 4K Mirrorless 📷','Console Next-Gen 🎮','Fone ANC Premium 🎵','Cadeira Gamer Elite 🪑','Monitor 144Hz 2K 🖥','Teclado Mecânico RGB ⌨','Mouse Gamer 16000DPI 🖱','Perfume Exclusivo 🌿'];
       let _socialProofInterval = null;
 
       // ── Social Proof: monotonically increasing UID prevents stale-closure conflicts ──
@@ -4784,7 +4792,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
         const proposed = parseFloat(cleaned);
         if (isNaN(proposed) || proposed <= 0) {
-          kzNegAddMsg('kz', '⚠️ Por favor, insere um valor numérico válido! Ex: <strong>950</strong> ou <strong>R$ 950</strong>');
+          kzNegAddMsg('kz', '⚠ Por favor, insere um valor numérico válido! Ex: <strong>950</strong> ou <strong>R$ 950</strong>');
           input.value = '';
           return;
         }
@@ -4869,7 +4877,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
 🚀 ENTREGA RÁPIDA: Parceria com as maiores transportadoras do Brasil. Rastreamento em tempo real pelo app WeKz.
 
-🛡️ GARANTIA COMPLETA: 90 dias de garantia contra defeitos de fabricação + 7 dias de devolução sem burocracia (CDC).
+🛡 GARANTIA COMPLETA: 90 dias de garantia contra defeitos de fabricação + 7 dias de devolução sem burocracia (CDC).
 
 💬 SUPORTE 24/7: Nossa equipe está disponível por chat, e-mail e telefone para qualquer dúvida.
 
@@ -7359,7 +7367,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     { id:'review', emoji:'⭐', get title(){return t('cpMission2Title');}, get sub(){return t('cpMission2Sub');}, pts:30,  done:false },
     { id:'browse', emoji:'🔍', get title(){return t('cpMission3Title');}, get sub(){return t('cpMission3Sub');}, pts:10,  done:false },
     { id:'share',  emoji:'📤', get title(){return t('cpMission4Title');}, get sub(){return t('cpMission4Sub');}, pts:20,  done:false },
-    { id:'coupon', emoji:'🎟️', get title(){return t('cpMission5Title');}, get sub(){return t('cpMission5Sub');}, pts:25,  done:false },
+    { id:'coupon', emoji:'🎟', get title(){return t('cpMission5Title');}, get sub(){return t('cpMission5Sub');}, pts:25,  done:false },
   ];
   var _cpBrowseCount = 0; // produtos distintos vistos nesta sessão (missão 'browse')
   var _cpBrowseSeen  = {};
@@ -7423,11 +7431,11 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
      exato onde a ação acontece, e mostra uma mensagem que motiva/celebra
      a conclusão — em vez de tópicos estáticos sem nenhuma ação associada. */
   var CP_MISSION_MSGS = {
-    buy:    '🛍️ Vamos encontrar algo incrível pra comprar — cada compra te deixa mais perto do próximo nível!',
+    buy:    '🛍 Vamos encontrar algo incrível pra comprar — cada compra te deixa mais perto do próximo nível!',
     review: '⭐ Avalie um produto que já recebeu e espalhe felicidade — a sua opinião ajuda toda a comunidade!',
     browse: '🔍 Vamos descobrir produtos recomendados pra você — a felicidade está a um clique!',
     share:  '📤 Partilhe um produto com um amigo — a alegria multiplica-se quando é partilhada!',
-    coupon: '🎟️ Use um cupom no seu próximo checkout e sinta a satisfação de poupar!'
+    coupon: '🎟 Use um cupom no seu próximo checkout e sinta a satisfação de poupar!'
   };
   window.cpMissionGoTo = function(id) {
     var m = CP_MISSOES.find(function(x){ return x.id === id; });
@@ -7609,7 +7617,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     var preview = document.getElementById('cpRevFilePreview');
     if (!preview) return;
     Array.from(input.files || []).forEach(function(file) {
-      if (_cpRevFiles.length >= 6) { showToast && showToast('⚠️ Máximo 6 arquivos'); return; }
+      if (_cpRevFiles.length >= 6) { showToast && showToast('⚠ Máximo 6 arquivos'); return; }
       _cpRevFiles.push(file);
       var isVideo = file.type.indexOf('video') === 0;
       var chip = document.createElement('div');
@@ -7675,7 +7683,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     var title = (document.getElementById('cpRevTitle') || {}).value || '';
     var text  = (document.getElementById('cpRevText')  || {}).value || '';
     title = title.trim(); text = text.trim();
-    if (!text) { showToast && showToast('⚠️ Escreve um comentário sobre o produto!'); return; }
+    if (!text) { showToast && showToast('⚠ Escreve um comentário sobre o produto!'); return; }
     if (!title) title = '★'.repeat(_cpRevRating) + ' ' + productName;
 
     var idx = _cpFindProductIndexByName(productName);
@@ -7767,7 +7775,7 @@ window.cpCopyReferralCode = function() {
 
 window.cpShareReferral = function(channel) {
   var code = (document.getElementById('cpReferralCode') || {}).textContent || 'KZWEKZ8340';
-  var msg = '🛍️ Compre na WeKz Shop e ganhe -10% OFF na 1ª compra! Use meu código: ' + code + ' → wekzshop.com';
+  var msg = '🛍 Compre na WeKz Shop e ganhe -10% OFF na 1ª compra! Use meu código: ' + code + ' → wekzshop.com';
   if (channel === 'whatsapp') {
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   } else {
@@ -7894,7 +7902,7 @@ window.cpSimulateReferralConversion = function() {
     const lince    = document.getElementById('kzMagicLince');
 
     if (!prompt) {
-      if (statusEl) { statusEl.classList.remove('hidden'); statusTx.textContent = '⚠️ Cole um link ou descreva o produto primeiro.'; }
+      if (statusEl) { statusEl.classList.remove('hidden'); statusTx.textContent = '⚠ Cole um link ou descreva o produto primeiro.'; }
       setTimeout(() => statusEl && statusEl.classList.add('hidden'), 3000);
       return;
     }
@@ -7914,8 +7922,8 @@ window.cpSimulateReferralConversion = function() {
     const steps = [
       { delay: 300,  msg: '🔍 Identificando categoria e marca...' },
       { delay: 800,  msg: '📝 Gerando título otimizado para SEO...' },
-      { delay: 1400, msg: '✍️ Redigindo descrição persuasiva...' },
-      { delay: 2000, msg: '🏷️ Sugerindo tags de alta conversão...' },
+      { delay: 1400, msg: '✍ Redigindo descrição persuasiva...' },
+      { delay: 2000, msg: '🏷 Sugerindo tags de alta conversão...' },
       { delay: 2600, msg: '✅ Preenchimento concluído pelo Kz!' },
     ];
 
@@ -8214,9 +8222,9 @@ function toggleFaq(i){
 
   /* ── Mapa de defaults por variante ── */
   var VARIANT_DEFAULTS = {
-    danger:  { icon: '🚪', title: 'Confirmar ação' },
-    warning: { icon: '⚠️', title: 'Atenção' },
-    info:    { icon: 'ℹ️', title: 'Confirmar' },
+    danger:  { icon: WKZ_ICO.logOut, title: 'Confirmar ação' },
+    warning: { icon: WKZ_ICO.warning, title: 'Atenção' },
+    info:    { icon: WKZ_ICO.check, title: 'Confirmar' },
   };
 
   /* ── Fecha com animação e resolve a Promise ── */
@@ -8358,7 +8366,7 @@ window.trackOrder = function() {
   if (!result) return;
 
   if (!code) {
-    if (typeof showToast === 'function') showToast('⚠️ Insira o número do pedido ou código de rastreamento.');
+    if (typeof showToast === 'function') showToast('⚠ Insira o número do pedido ou código de rastreamento.');
     return;
   }
 
@@ -8400,7 +8408,7 @@ window.trackOrder = function() {
     <!-- FIX JUR-02: banner de modo demonstração — dados fictícios, CDC art. 37 -->
     <div style="display:flex;align-items:center;gap:8px;background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#FCD34D;">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span>⚙️ <strong>Dados de demonstração</strong> — rastreamento fictício para fins de teste. Integração com transportadoras reais disponível após o lançamento.</span>
+      <span>⚙ <strong>Dados de demonstração</strong> — rastreamento fictício para fins de teste. Integração com transportadoras reais disponível após o lançamento.</span>
     </div>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad1);"></div>

@@ -208,7 +208,7 @@ const _WKZ_FS_ICONS = {
   'Volume de Negócios':_FS_ICO.money,'Tipo de solicitação':_FS_ICO.clipboard,'Suporte':_FS_ICO.headset,
   'Moeda':_FS_ICO.money,'Idioma':_FS_ICO.globe,'Ordenar':_FS_ICO.sort,'Motivo':_FS_ICO.flag,'denúncia':_FS_ICO.flag,
   'enquadramento':_FS_ICO.receipt,'Formato':_FS_ICO.file,'Estado':_FS_ICO.mappin,'País':_FS_ICO.globe,'ocorrência':_FS_ICO.flag,
-  'página':_FS_ICO.file,'Tipo de Problema':_FS_ICO.warning,'Violação':_FS_ICO.flag
+  'página':_FS_ICO.file,'Tipo de Problema':_FS_ICO.warning,'Violação':_FS_ICO.flag,'Enviar como':_FS_ICO.shield
 };
 function _fsIcon(labelStr){
   for(const [k,v] of Object.entries(_WKZ_FS_ICONS)){
