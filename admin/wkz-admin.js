@@ -428,7 +428,7 @@ function admSyncKycBadge() {
   const kpi = document.getElementById('kpiKycNum');
   if (kpi) kpi.textContent = open;
   const kpiRisco = document.getElementById('kpiKycRisco');
-  if (kpiRisco) kpiRisco.textContent = highRisk > 0 ? `${WKZ_ICO.warning} ${highRisk} de risco alto` : '';
+  if (kpiRisco) kpiRisco.innerHTML = highRisk > 0 ? `${WKZ_ICO.warning} ${highRisk} de risco alto` : '';
 
   const sub = document.getElementById('kycSub');
   if (sub) sub.textContent = open + ' verificaç' + (open === 1 ? 'ão aguardando análise' : 'ões aguardando análise') + (highRisk > 0 ? ` · ${highRisk} de risco alto` : '');
@@ -2174,7 +2174,10 @@ function syncOverviewKPIs(flash) {
     numEl.className = 'adm-kpi-num ' + (openDisputas === 0 ? 'adm-kpi-ok' : 'adm-kpi-danger');
   }
   if (escEl) {
-    escEl.textContent = escDisputas > 0 ? `${WKZ_ICO.warning} ${escDisputas} escalada${escDisputas > 1 ? 's' : ''}` : '';
+    /* [FIX-emoji-leak] Era .textContent — não renderiza HTML/SVG, então o
+       ícone aparecia como texto cru ("<svg viewBox=..."). Corrigido para
+       .innerHTML, seguro aqui pois só concatena um número e um SVG fixo. */
+    escEl.innerHTML = escDisputas > 0 ? `${WKZ_ICO.warning} ${escDisputas} escalada${escDisputas > 1 ? 's' : ''}` : '';
   }
 
   /* ── Volume retido (pending + hold) ── */
