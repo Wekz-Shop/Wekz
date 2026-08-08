@@ -572,7 +572,7 @@ function renderWishlist(){
           <div class="kz-cart-mascot">${kzSvg}</div>
           <div class="kz-cart-empty-title" style="margin-bottom:10px;">Nenhum Favorito Ainda</div>
           <div class="kz-cart-empty-msg">Os meus sensores ainda não detetaram produtos nos teus favoritos... <em>Que tal explorar a Home?</em></div>
-          <button class="kz-cart-explore-btn" onclick="MapsTo('home')">&#x1F6CD;&#xFE0F; Explorar Produtos</button>
+          <button class="kz-cart-explore-btn" onclick="MapsTo('home')">${WKZ_ICO.bag} Explorar Produtos</button>
         </div>
       </div>`;
     return;
@@ -606,9 +606,9 @@ function renderWishlist(){
           ${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}
           ${p.badge==='new'?'<span class="badge badge-new">NOVO</span>':''}
           ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
-          ${p._sponsored?'<span class="badge badge-ad">&#x1F4E2; Patrocinado</span>':''}
-          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">&#x1F69A; Gr\u00e1tis</span>':''}
-          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">&#x1F3F7;&#xFE0F; Cupom</span>':''}
+          ${p._sponsored?'<span class="badge badge-ad">'+WKZ_ICO.megaphone+' Patrocinado</span>':''}
+          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">'+WKZ_ICO.truck+' Gr\u00e1tis</span>':''}
+          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">'+WKZ_ICO.tag+' Cupom</span>':''}
         </div>
         <button class="product-wish wkz-wish-btn" data-wi="${wi}" style="color:#FF2D7A;" aria-label="Remover dos favoritos">&#x2665;</button>
       </div>
@@ -618,7 +618,7 @@ function renderWishlist(){
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span><span class="price-old">${formatPrice(p.op)}</span><span class="price-off">-${p.off}%</span></div>
         <div class="product-meta"><div class="product-stars"><span class="stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span> ${p.r}</div><div class="product-sales">${p.sales} vendidos</div></div>
         ${colBadge}
-        <button class="btn-add wkz-wish-add" data-pidx="${realIdx}"><span class="btn-spinner"></span><span class="btn-check">&#x2713;</span><span class="btn-label">&#x1F6D2; Adicionar ao carrinho</span></button>
+        <button class="btn-add wkz-wish-add" data-pidx="${realIdx}"><span class="btn-spinner"></span><span class="btn-check">&#x2713;</span><span class="btn-label">${WKZ_ICO.cart} Adicionar ao carrinho</span></button>
         <button class="btn-buy wkz-wish-buy" data-pidx="${realIdx}"><span class="btn-spinner"></span><span class="btn-check">&#x2713;</span><span class="btn-label">&#x26A1; Comprar Agora</span></button>
       </div>
     </div>`;
@@ -798,7 +798,7 @@ function wishColRenderAssignList(){
         <div class="col-name">${col.name}</div>
         <div class="col-meta">${cnt} produto${cnt!==1?'s':''}</div>
       </div>
-      <button class="wish-col-delete-btn" onclick="event.stopPropagation();wishColDeleteCollection('${col.id}')" title="Excluir cole\u00E7\u00E3o">&#x1F5D1;&#xFE0F;</button>
+      <button class="wish-col-delete-btn" onclick="event.stopPropagation();wishColDeleteCollection('${col.id}')" title="Excluir coleção">${WKZ_ICO.trash}</button>
       <div class="col-check">${isSelected?'\u2713':''}</div>
     </div>`;
   }).join('');
@@ -5945,7 +5945,7 @@ function cartBuyExpressNow(idx) {
     /* [FIX-item5] Micro-Histórico não registava a criação de alertas de preço. */
     if (typeof window.cpPushHistoryItem === 'function') {
       window.cpPushHistoryItem({
-        emoji: '🔔',
+        emoji: WKZ_ICO.bell,
         text: 'Alerta de preço criado para ' + (p ? p.n : 'produto') + ' — avisar em ' + _fmtPrice(threshold),
         time: 'Agora',
         action: function() {
@@ -5982,7 +5982,7 @@ function cartBuyExpressNow(idx) {
     /* [FIX-item5] Micro-Histórico não registava a remoção de alertas de preço. */
     if (typeof window.cpPushHistoryItem === 'function' && removedAlert) {
       window.cpPushHistoryItem({
-        emoji: '🔕',
+        emoji: WKZ_ICO.bellOff,
         text: 'Alerta de preço removido — ' + (removedAlert.name || 'produto'),
         time: 'Agora',
         action: function() {
@@ -7988,11 +7988,11 @@ const WKZ_REWARDS = {
   redeemRate:  0.05,   // R$ 0,05 por ponto resgatado
   maxRedeemPct:0.20,   // máx 20% do total pode vir de pontos
   levels: [
-    { name:'Bronze',     emoji:'🥉', icon:'award',   min:0,     max:499,      color:'#CD7F32', bg:'rgba(205,127,50,0.15)',  perks:'1pt/R$1 · Frete grátis acima R$150',              img:'../shared/assets/levels/card-bronze.png' },
-    { name:'Silver',     emoji:'🥈', icon:'award',   min:500,   max:1999,     color:'#94A3B8', bg:'rgba(148,163,184,0.15)', perks:'1.2pt/R$1 · Frete grátis · 5% extra',             img:'../shared/assets/levels/card-silver.png' },
-    { name:'Gold',       emoji:'🥇', icon:'award',   min:2000,  max:4999,     color:'#F59E0B', bg:'rgba(245,158,11,0.12)',  perks:'1.5pt/R$1 · Frete grátis · 10% extra',            img:'../shared/assets/levels/card-gold.png' },
-    { name:'Cyber',      emoji:'⚡', icon:'cyclone', min:5000,  max:9999,     color:'#00B4AB', bg:'rgba(0,180,171,0.12)',   perks:'2pt/R$1 · Frete express · 15% extra',             img:'../shared/assets/levels/card-cyber.png' },
-    { name:'Neon Cyber', emoji:'💎', icon:'zap',     min:10000, max:Infinity, color:'#A78BFA', bg:'rgba(167,139,250,0.15)', perks:'3pt/R$1 · Frete express · 20% extra + acesso VIP', img:'../shared/assets/levels/card-neon-cyber.png' },
+    { name:'Bronze',     emoji:WKZ_ICO.award, icon:'award',   min:0,     max:499,      color:'#CD7F32', bg:'rgba(205,127,50,0.15)',  perks:'1pt/R$1 · Frete grátis acima R$150',              img:'../shared/assets/levels/card-bronze.png' },
+    { name:'Silver',     emoji:WKZ_ICO.award, icon:'award',   min:500,   max:1999,     color:'#94A3B8', bg:'rgba(148,163,184,0.15)', perks:'1.2pt/R$1 · Frete grátis · 5% extra',             img:'../shared/assets/levels/card-silver.png' },
+    { name:'Gold',       emoji:WKZ_ICO.award, icon:'award',   min:2000,  max:4999,     color:'#F59E0B', bg:'rgba(245,158,11,0.12)',  perks:'1.5pt/R$1 · Frete grátis · 10% extra',            img:'../shared/assets/levels/card-gold.png' },
+    { name:'Cyber',      emoji:WKZ_ICO.cyclone, icon:'cyclone', min:5000,  max:9999,     color:'#00B4AB', bg:'rgba(0,180,171,0.12)',   perks:'2pt/R$1 · Frete express · 15% extra',             img:'../shared/assets/levels/card-cyber.png' },
+    { name:'Neon Cyber', emoji:WKZ_ICO.zap, icon:'zap',     min:10000, max:Infinity, color:'#A78BFA', bg:'rgba(167,139,250,0.15)', perks:'3pt/R$1 · Frete express · 20% extra + acesso VIP', img:'../shared/assets/levels/card-neon-cyber.png' },
   ],
   /* [v3.0] Categoria em destaque com taxa de pontos reforçada — alimenta o
      CTA do Guia de Níveis Kz. Pode futuramente vir do backend/admin. */
@@ -8837,14 +8837,14 @@ function qaSubmitAnswer(id) {
 
 // Cupons estendidos com metadata para a gaveta
 const COUPON_CATALOG = [
-  { code:'WEKZ10',  emoji:'🏷',  disc:'10% OFF',  desc:'10% de desconto em toda a loja',            type:'%',     val:10, minimo:0,    expiry:'31/12/2026', limitUses:0    },
-  { code:'WEKZ20',  emoji:'⚡',  disc:'20% OFF',  desc:'20% de desconto exclusivo WeKz',             type:'%',     val:20, minimo:150,  expiry:'31/07/2026', limitUses:500  },
-  { code:'FRETE0',  emoji:'🚚',  disc:'Frete Grátis', desc:'Entrega grátis para qualquer endereço', type:'frete', val:0,  minimo:0,    expiry:'31/12/2026', limitUses:0    },
-  { code:'NOVO15',  emoji:'🎉',  disc:'15% OFF',  desc:'Desconto de boas-vindas — 1ª compra',        type:'%',     val:15, minimo:0,    expiry:'31/08/2026', limitUses:1    },
-  { code:'FLASH50', emoji:'🔥',  disc:'50% OFF',  desc:'Oferta relâmpago — estoque limitado',        type:'%',     val:50, minimo:200,  expiry:'30/06/2026', limitUses:100  },
-  { code:'BOOST20', emoji:'🚀',  disc:'20% OFF',  desc:'WeKz Boost ativado — 20% em tudo',           type:'%',     val:20, minimo:100,  expiry:'31/12/2026', limitUses:0    },
-  { code:'CYBER30', emoji:'🌀',  disc:'30% OFF',  desc:'Cupom Cyber — nível Gold ou acima',          type:'%',     val:30, minimo:300,  expiry:'15/07/2026', limitUses:200  },
-  { code:'FRETENEW',emoji:'📦',  disc:'Frete Grátis', desc:'Frete grátis para novos endereços',     type:'frete', val:0,  minimo:80,   expiry:'31/12/2026', limitUses:0    },
+  { code:'WEKZ10',  emoji:WKZ_ICO.tag,  disc:'10% OFF',  desc:'10% de desconto em toda a loja',            type:'%',     val:10, minimo:0,    expiry:'31/12/2026', limitUses:0    },
+  { code:'WEKZ20',  emoji:WKZ_ICO.zap,  disc:'20% OFF',  desc:'20% de desconto exclusivo WeKz',             type:'%',     val:20, minimo:150,  expiry:'31/07/2026', limitUses:500  },
+  { code:'FRETE0',  emoji:WKZ_ICO.truck,  disc:'Frete Grátis', desc:'Entrega grátis para qualquer endereço', type:'frete', val:0,  minimo:0,    expiry:'31/12/2026', limitUses:0    },
+  { code:'NOVO15',  emoji:WKZ_ICO.award,  disc:'15% OFF',  desc:'Desconto de boas-vindas — 1ª compra',        type:'%',     val:15, minimo:0,    expiry:'31/08/2026', limitUses:1    },
+  { code:'FLASH50', emoji:WKZ_ICO.flame,  disc:'50% OFF',  desc:'Oferta relâmpago — estoque limitado',        type:'%',     val:50, minimo:200,  expiry:'30/06/2026', limitUses:100  },
+  { code:'BOOST20', emoji:WKZ_ICO.rocket,  disc:'20% OFF',  desc:'WeKz Boost ativado — 20% em tudo',           type:'%',     val:20, minimo:100,  expiry:'31/12/2026', limitUses:0    },
+  { code:'CYBER30', emoji:WKZ_ICO.cyclone,  disc:'30% OFF',  desc:'Cupom Cyber — nível Gold ou acima',          type:'%',     val:30, minimo:300,  expiry:'15/07/2026', limitUses:200  },
+  { code:'FRETENEW',emoji:WKZ_ICO.package,  disc:'Frete Grátis', desc:'Frete grátis para novos endereços',     type:'frete', val:0,  minimo:80,   expiry:'31/12/2026', limitUses:0    },
 ];
 
 // State
