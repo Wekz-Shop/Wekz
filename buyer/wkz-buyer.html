@@ -3645,27 +3645,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="cp-history-list" id="cpHistoryList"><!-- JS --></div>
       </div>
     </div>
-
-    <!-- ╔══════════════════════════════════════════╗
-         ║  CARD 1b: GUIA DE NÍVEIS KZ (full)       ║
-         ║  [v3.0] Transformado de modal em secção  ║
-         ║  fixa do perfil + CTA p/ categoria com    ║
-         ║  maior taxa de pontos do momento.         ║
-         ╚══════════════════════════════════════════╝ -->
-    <div class="cp-card cp-full-width" id="cpLevelGuideCard">
-      <div class="cp-card-header">
-        <div class="cp-card-title">
-          <div class="cp-card-title-icon amber"><span class="wkz-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 4H3v1a4 4 0 004 4"/><path d="M17 4h4v1a4 4 0 01-4 4"/></svg></span></div>
-          <span data-i18n="cpLevelGuideTitle">Guia de Níveis Kz</span>
-        </div>
-      </div>
-      <div class="cp-card-body" id="cpLevelGuideBody"><!-- JS: renderLevelGuideSection() --></div>
-    </div>
-
-    <!-- ╔══════════════════════════════════════════╗
-         ║  CARD 1c: MISSÕES DO DIA (v2.9.12)      ║
-         ║  Gamificação diária — inspir. Shopee     ║
-         ╚══════════════════════════════════════════╝ -->
     <div class="cp-card" id="cpMissoesCard">
       <div class="cp-card-header">
         <div class="cp-card-title">
@@ -3685,10 +3664,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
-
-    <!-- ╔══════════════════════════════════════╗
-         ║  CARD 2: RASTREADOR DE ENCOMENDAS   ║
-         ╚══════════════════════════════════════╝ -->
     <div class="cp-card">
       <div class="cp-card-header">
         <div class="cp-card-title">
@@ -3701,10 +3676,27 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="cp-order-list" id="cpOrderList"><!-- JS --></div>
       </div>
     </div>
-
-    <!-- ╔══════════════════════════════════════════╗
-         ║  CARD 2b: AVALIAÇÕES PENDENTES (v2.9.12)║
-         ╚══════════════════════════════════════════╝ -->
+    <div class="cp-card" id="cpPurchaseHistoryCard">
+      <div class="cp-card-header">
+        <div class="cp-card-title">
+          <div class="cp-card-title-icon" style="background:rgba(0,180,171,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div>
+          <span data-i18n="cpPurchaseHistoryTitle">Histórico de Compras</span>
+        </div>
+        <span class="cp-card-note" style="font-size:11px;cursor:default;" data-i18n="cpPurchaseHistoryNote">Todos os produtos já comprados</span>
+      </div>
+      <div class="cp-card-body">
+        <div id="cpPurchaseHistoryList"><!-- JS --></div>
+      </div>
+    </div>
+    <div class="cp-card cp-full-width" id="cpLevelGuideCard">
+      <div class="cp-card-header">
+        <div class="cp-card-title">
+          <div class="cp-card-title-icon amber"><span class="wkz-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 4H3v1a4 4 0 004 4"/><path d="M17 4h4v1a4 4 0 01-4 4"/></svg></span></div>
+          <span data-i18n="cpLevelGuideTitle">Guia de Níveis Kz</span>
+        </div>
+      </div>
+      <div class="cp-card-body" id="cpLevelGuideBody"><!-- JS: renderLevelGuideSection() --></div>
+    </div>
     <div class="cp-card" id="cpAvaliacoesCard">
       <div class="cp-card-header">
         <div class="cp-card-title">
@@ -3736,30 +3728,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
-
-    <!-- ╔══════════════════════════════════════════╗
-         ║  CARD 2c: HISTÓRICO DE COMPRAS (novo)   ║
-         ║  [FIX-06] Consulta rápida do que já foi ║
-         ║  comprado, com atalho para reforçar a   ║
-         ║  compra ou rever a página do produto.   ║
-         ╚══════════════════════════════════════════╝ -->
-    <div class="cp-card cp-full-width" id="cpPurchaseHistoryCard">
-      <div class="cp-card-header">
-        <div class="cp-card-title">
-          <div class="cp-card-title-icon" style="background:rgba(0,180,171,0.15);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div>
-          <span data-i18n="cpPurchaseHistoryTitle">Histórico de Compras</span>
-        </div>
-        <span class="cp-card-note" style="font-size:11px;cursor:default;" data-i18n="cpPurchaseHistoryNote">Todos os produtos já comprados</span>
-      </div>
-      <div class="cp-card-body">
-        <div id="cpPurchaseHistoryList"><!-- JS --></div>
-      </div>
-    </div>
-
-    <!-- ╔══════════════════════════════════════════╗
-         ║  CARD 3: CENTRAL DE DISPUTAS (full)     ║
-         ╚══════════════════════════════════════════╝ -->
-    <div class="cp-card cp-full-width">
+    <div class="cp-card">
       <div class="cp-card-header">
         <div class="cp-card-title">
           <div class="cp-card-title-icon purple"><span class="wkz-icon wkz-icon-scale"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span></div>
@@ -3771,10 +3740,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="cpDisputeContainer"><!-- JS --></div>
       </div>
     </div>
-
-    <!-- ╔══════════════════════════════════════════════════╗
-         ║  CARD 4: CARTEIRA MULTIMOEDAS & CUPONS (full)  ║
-         ╚══════════════════════════════════════════════════╝ -->
     <div class="cp-card cp-full-width">
       <div class="cp-card-header">
         <div class="cp-card-title">
@@ -3800,13 +3765,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="cp-coupon-list" id="cpCouponList"><!-- JS --></div>
       </div>
     </div>
-
-
-
-
-    <!-- ╔══════════════════════════════════════════════════════════╗
-         ║  CARD 4b: ALERTAS DE PREÇO ATIVOS — KZ PRICE ALERT    ║
-         ╚══════════════════════════════════════════════════════════╝ -->
     <div class="cp-card cp-full-width" id="cpPriceAlertsCard">
       <div class="cp-card-header">
         <div class="cp-card-title">
@@ -3819,10 +3777,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="cpPriceAlertsList"><!-- Preenchido por JS --></div>
       </div>
     </div>
-
-    <!-- ╔══════════════════════════════════════════╗
-         ║  CARD 5: ACESSOS RÁPIDOS (full)         ║
-         ╚══════════════════════════════════════════╝ -->
     <div class="cp-card cp-full-width">
       <div class="cp-card-header">
         <div class="cp-card-title">
@@ -3858,11 +3812,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
-
-    <!-- ╔══════════════════════════════════════════╗
-         ║  CARD 6: INDICAÇÃO WEKZ (v2.9.12)       ║
-         ║  Crescimento viral — inspir. Shein/Shopee║
-         ╚══════════════════════════════════════════╝ -->
     <div class="cp-card cp-full-width" id="cpReferralCard">
       <div class="cp-card-header">
         <div class="cp-card-title">
