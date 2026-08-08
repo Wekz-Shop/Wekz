@@ -459,7 +459,7 @@ function refreshProductEverywhere(idx){
     const pdpPrice  = document.getElementById('pdpPrice');
     const pdpOld    = document.querySelector('.pdp-price-old');
     const pdpOff    = document.querySelector('.pdp-price-off');
-    if(pdpEmoji){ pdpEmoji.setAttribute('emoji', p.e || WKZ_ICO.package + ''); if(p.img){pdpEmoji.setAttribute('src',p.img);} else {pdpEmoji.removeAttribute('src');} }
+    if(pdpEmoji){ pdpEmoji.setAttribute('emoji', p.e || '📦'); if(p.img){pdpEmoji.setAttribute('src',p.img);} else {pdpEmoji.removeAttribute('src');} }
     if(pdpTitle) pdpTitle.textContent = p.n;
     if(pdpPrice) pdpPrice.textContent = formatPrice(p.p);
     if(pdpOld)   pdpOld.textContent   = formatPrice(p.op || p.p);
@@ -628,7 +628,7 @@ function updateProductPreview(){
     pof.textContent = `-${Math.floor(discExact)}%`;
   } else if(pof){ pof.textContent=''; }
   const pe = document.getElementById('prev-emoji'); if(pe) pe.style.fontSize='52px', pe.textContent=selectedProductEmoji;
-  const pc = document.getElementById('prev-cond'); if(pc) pc.textContent=condLabels[cond]||WKZ_ICO.sparkles + ' Novo';
+  const pc = document.getElementById('prev-cond'); if(pc) pc.innerHTML=condLabels[cond]||WKZ_ICO.sparkles + ' Novo';
 
   // title char count
   const tc = document.getElementById('ap-title-count');
@@ -1418,7 +1418,7 @@ function enviarRespostaDisputa(pedido){
       card.dataset.answered = '1';
       const btn = card.querySelector('.btn-primary');
       if(btn){
-        btn.textContent = WKZ_ICO.check + ' Respondido';
+        btn.innerHTML = WKZ_ICO.check + ' Respondido';
         btn.disabled = true;
         btn.style.background = 'rgba(34,197,94,0.15)';
         btn.style.border = '1px solid rgba(34,197,94,0.3)';
@@ -1429,7 +1429,7 @@ function enviarRespostaDisputa(pedido){
         const note = document.createElement('div');
         note.className = 'dispute-pending-note';
         note.style.cssText = 'margin-top:10px;font-size:11px;color:#F59E0B;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:8px 10px;';
-        note.textContent = WKZ_ICO.clock + ' Resposta enviada — aguardando decisão da WeKz.';
+        note.innerHTML = WKZ_ICO.clock + ' Resposta enviada — aguardando decisão da WeKz.';
         card.appendChild(note);
       }
     }
@@ -2755,7 +2755,7 @@ function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
 
   /* 6 — Atualiza botão na tabela para "Ver Rastreio" */
   document.querySelectorAll('button[onclick*="marcarEnviado(\'' + orderId + '\'"]').forEach(function(b) {
-    b.textContent = WKZ_ICO.mapPin + ' Rastreio';
+    b.innerHTML = WKZ_ICO.mapPin + ' Rastreio';
     b.onclick = function() { showToast(WKZ_ICO.package + ' Rastreio ' + orderId + ': ' + trk + ' (' + carrier + ')'); };
   });
 
@@ -2792,7 +2792,7 @@ function wkzSellerConfirmOrderReceipt(orderId, btn) {
       btn.style.background = 'rgba(37,99,235,0.12)';
       btn.style.borderColor = 'rgba(37,99,235,0.4)';
       btn.style.color = '#60A5FA';
-      btn.textContent = WKZ_ICO.truck + ' Marcar Enviado';
+      btn.innerHTML = WKZ_ICO.truck + ' Marcar Enviado';
       btn.onclick = function() { marcarEnviado(orderId, btn); };
     }
   }
