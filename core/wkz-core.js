@@ -94,6 +94,19 @@ window.WKZ_ICO = {
   idcard:     _wkzIco('<rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><circle cx="8" cy="10" r="2"/><line x1="14" y1="9" x2="18" y2="9"/><line x1="14" y1="13" x2="18" y2="13"/><line x1="6" y1="16" x2="18" y2="16"/>'),
   image:      _wkzIco('<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'),
   undo:       _wkzIco('<polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/>'),
+  bellOff:    _wkzIco('<path d="M13.73 21a2 2 0 01-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0118 8"/><path d="M6.26 6.26A5.86 5.86 0 006 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 00-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/>'),
+  shirt:      _wkzIco('<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 001 .84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.14a1 1 0 001-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>'),
+  gamepad:    _wkzIco('<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="4"/>'),
+  activity:   _wkzIco('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'),
+  baby:       _wkzIco('<circle cx="12" cy="9" r="6"/><path d="M8 9a4 4 0 018 0"/><path d="M5 21c0-4 3.13-6 7-6s7 2 7 6"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>'),
+  paw:        _wkzIco('<circle cx="6.5" cy="9.5" r="2"/><circle cx="17.5" cy="9.5" r="2"/><circle cx="9" cy="5" r="1.8"/><circle cx="15" cy="5" r="1.8"/><path d="M12 12c-3 0-6.5 2.2-6.5 5.5A2.5 2.5 0 008 20c1.3 0 1.8-.7 4-.7s2.7.7 4 .7a2.5 2.5 0 002.5-2.5C18.5 14.2 15 12 12 12z"/>'),
+  book:       _wkzIco('<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>'),
+  cross:      _wkzIco('<path d="M12 2v8m0 0v8m0-8h8m-8 0H4" stroke-width="2.4"/>'),
+  toolbox:    _wkzIco('<path d="M2 7h20v13a2 2 0 01-2 2H4a2 2 0 01-2-2V7z"/><path d="M6 7V5a2 2 0 012-2h8a2 2 0 012 2v2"/><line x1="2" y1="13" x2="22" y2="13"/><line x1="10" y1="13" x2="10" y2="15"/><line x1="14" y1="13" x2="14" y2="15"/>'),
+  droplet:    _wkzIco('<path d="M12 2s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>'),
+  flame:      _wkzIco('<path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/>'),
+  cyclone:    _wkzIco('<path d="M12 3a9 9 0 019 9"/><path d="M12 3a5 5 0 015 5"/><path d="M3 12a9 9 0 009 9"/><path d="M3 12a5 5 0 005 5"/><circle cx="12" cy="12" r="1"/>'),
+  trash:      _wkzIco('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>'),
   dot:        function(color){ return _wkzIco('<circle cx="12" cy="12" r="8" fill="' + color + '" stroke="none"/>'); }
 };
 
@@ -7363,11 +7376,11 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
    síncrono), como pedido. */
 (function() {
   var CP_MISSOES = [
-    { id:'buy',    emoji:'🛒', get title(){return t('cpMission1Title');}, get sub(){return t('cpMission1Sub');}, pts:50,  done:false },
-    { id:'review', emoji:'⭐', get title(){return t('cpMission2Title');}, get sub(){return t('cpMission2Sub');}, pts:30,  done:false },
-    { id:'browse', emoji:'🔍', get title(){return t('cpMission3Title');}, get sub(){return t('cpMission3Sub');}, pts:10,  done:false },
-    { id:'share',  emoji:'📤', get title(){return t('cpMission4Title');}, get sub(){return t('cpMission4Sub');}, pts:20,  done:false },
-    { id:'coupon', emoji:'🎟', get title(){return t('cpMission5Title');}, get sub(){return t('cpMission5Sub');}, pts:25,  done:false },
+    { id:'buy',    emoji:WKZ_ICO.cart, get title(){return t('cpMission1Title');}, get sub(){return t('cpMission1Sub');}, pts:50,  done:false },
+    { id:'review', emoji:WKZ_ICO.star, get title(){return t('cpMission2Title');}, get sub(){return t('cpMission2Sub');}, pts:30,  done:false },
+    { id:'browse', emoji:WKZ_ICO.search, get title(){return t('cpMission3Title');}, get sub(){return t('cpMission3Sub');}, pts:10,  done:false },
+    { id:'share',  emoji:WKZ_ICO.upload, get title(){return t('cpMission4Title');}, get sub(){return t('cpMission4Sub');}, pts:20,  done:false },
+    { id:'coupon', emoji:WKZ_ICO.tag, get title(){return t('cpMission5Title');}, get sub(){return t('cpMission5Sub');}, pts:25,  done:false },
   ];
   var _cpBrowseCount = 0; // produtos distintos vistos nesta sessão (missão 'browse')
   var _cpBrowseSeen  = {};
@@ -7854,7 +7867,7 @@ window.cpSimulateReferralConversion = function() {
   cpRenderReferralStats();
   if (typeof window.cpPushHistoryItem === 'function') {
     window.cpPushHistoryItem({
-      emoji: '🎁',
+      emoji: WKZ_ICO.gift,
       // FIX [meu-perfil-moeda]: usa _cpFmtBRL (agora convertido pela moeda
       // ativa) em vez de 'R$15' fixo.
       text: 'Indicação concluiu a 1ª compra — +' + _cpFmtBRL(CP_REFERRAL_REWARD_BRL) + ' em Créditos WeKz',
