@@ -793,6 +793,7 @@ body{background:var(--darker);color:var(--text);font-family:'DM Sans',sans-serif
   font-size: 15px;
   display: flex; align-items: center; justify-content: center;
   transition: var(--transition);
+  z-index: 20; /* [FIX-modal-close-zindex] mesma correção do .modal-close geral — ver comentário acima */
 }
 .wish-col-modal .modal-close:hover { background: var(--card2); color: var(--text); }
 /* Name input */
@@ -5036,7 +5037,19 @@ footer{background:var(--card);border-top:1px solid var(--border);padding:48px 32
 }
 .modal-overlay.open{display:flex;}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:32px;width:90%;max-width:500px;position:relative;animation:fadeIn 0.3s ease;}
-.modal-close{position:absolute;top:16px;right:16px;background:var(--card2);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;}
+/* [FIX-modal-close-zindex] z-index:20 adicionado — sem isto, o botão ✕ ficava
+   inacessível a cliques sempre que um elemento irmão dentro do mesmo .modal
+   tivesse uma animação CSS ativa com `transform` (ex.: kzPopIn, usada na
+   transição de passo do modal de assinatura do Vendedor). Motivo: `transform`
+   força um elemento position:static a se comportar como position:relative
+   para fins de empilhamento (spec CSS Transforms) — com animation-fill-mode:
+   both, esse comportamento persiste mesmo depois da animação terminar. Como
+   esse elemento vem DEPOIS do .modal-close no HTML, ele passava a empilhar
+   ACIMA do botão (mesmo "bucket" de z-index:auto, ordem do DOM decide), sem
+   nenhuma mudança visual — o ✕ continuava aparecendo normalmente, mas os
+   cliques eram capturados pelo elemento invisível por cima. Reproduzido em
+   telas com múltiplos passos (ex.: escolha de plano → confirmação). */
+.modal-close{position:absolute;top:16px;right:16px;background:var(--card2);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;z-index:20;}
 .modal-title{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;}
 .modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
 
