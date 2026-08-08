@@ -499,7 +499,7 @@
       <div id="dash-orders" class="dash-panel" style="display:none;">
         <h1 style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;margin-bottom:20px;"><span class="wkz-icon wkz-icon-package"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 9.4l-9-5.19"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Pedidos Recebidos</h1>
         <div style="display:flex;gap:10px;margin-bottom:14px;">
-          <input id="ordersSearch" class="form-input wkz-input" type="text" placeholder="<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar por nº do pedido ou nome do comprador..." style="flex:1;" oninput="filterOrders(window._ordersActiveStatus||'all', document.querySelector('#dash-orders .rev-filter.active'))">
+          <input id="ordersSearch" class="form-input wkz-input" type="text" placeholder="Buscar por nº do pedido ou nome do comprador..." style="flex:1;" oninput="filterOrders(window._ordersActiveStatus||'all', document.querySelector('#dash-orders .rev-filter.active'))">
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
           <button class="rev-filter active" onclick="filterOrders('all',this)">Todos (14)</button>
@@ -1351,7 +1351,7 @@
             <div class="kz-social-proof-toast" style="position:relative;pointer-events:all;animation:none;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad1);border-radius:14px 14px 0 0;"></div><div class="kz-sp-avatar">S</div><div class="kz-sp-body"><div class="kz-sp-text"><strong>Sofia</strong> de Lisboa acabou de adquirir <strong>Notebook Gamer RTX <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></strong></div><div class="kz-sp-time">Há 3 min · Compra verificada <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="kz-sp-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57l1.65-7.43H6"/></svg></div></div>
           </div>
           <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn-primary" onclick="kzSocialProofShow();document.getElementById('kzSpStatViews').textContent=(parseInt(document.getElementById('kzSpStatViews').textContent)||0)+1;showToast('<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg> Preview: notificação exibida no marketplace!')">
+            <button class="btn-primary" onclick="kzSocialProofShow();document.getElementById('kzSpStatViews').textContent=(parseInt(document.getElementById('kzSpStatViews').textContent)||0)+1;showToast(WKZ_ICO.megaphone + ' Preview: notificação exibida no marketplace!')">
               <span style="display:inline-flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Pré-visualizar no Marketplace</span>
             </button>
             <button class="btn-add-cart" style="padding:10px 20px;font-size:13px;" onclick="salvarProvaSocial(this)">
@@ -1644,7 +1644,7 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Frente do documento</label>
-              <div class="upload-box" onclick="showToast('<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> Selecione o arquivo...')">
+              <div class="upload-box" onclick="showToast(WKZ_ICO.file + ' Selecione o arquivo...')">
                 <span class="wkz-icon" style="display:flex;justify-content:center;margin-bottom:8px;color:var(--teal);"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span>
                 <div style="font-size:12px;font-weight:600;">Clique para enviar</div>
                 <div style="font-size:11px;color:var(--muted);">JPG, PNG ou PDF · Máx 10MB</div>
@@ -1652,7 +1652,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Verso do documento</label>
-              <div class="upload-box" onclick="showToast('<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> Selecione o arquivo...')">
+              <div class="upload-box" onclick="showToast(WKZ_ICO.file + ' Selecione o arquivo...')">
                 <span class="wkz-icon" style="display:flex;justify-content:center;margin-bottom:8px;color:var(--teal);"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span>
                 <div style="font-size:12px;font-weight:600;">Clique para enviar</div>
                 <div style="font-size:11px;color:var(--muted);">JPG, PNG ou PDF · Máx 10MB</div>
@@ -1661,7 +1661,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Selfie com documento (Prova de vida)</label>
-            <div class="upload-box" onclick="showToast('<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;display:inline-block;flex-shrink:0;" aria-hidden="true"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> Abrir câmera...')">
+            <div class="upload-box" onclick="showToast(WKZ_ICO.camera + ' Abrir câmera...')">
               <span class="wkz-icon" style="display:flex;justify-content:center;margin-bottom:8px;color:var(--teal);"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M8.5 20c0-2.21 1.567-3.5 3.5-3.5s3.5 1.29 3.5 3.5"/></svg></span>
               <div style="font-size:12px;font-weight:600;">Tirar selfie segurando o documento</div>
               <div style="font-size:11px;color:var(--muted);">Documento deve estar visível e legível</div>
