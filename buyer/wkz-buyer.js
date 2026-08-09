@@ -123,9 +123,62 @@ function showShimmerSkeletons(containerId, count){
   el.innerHTML = skel;
 }
 
-function renderProducts(list=products){
+/* [FIX-home-pagination] Estado da paginação da seção "Em Destaque" (Home).
+   Guarda a última lista usada (pode vir de um filtro rápido do hero, de uma
+   busca limpa, etc. — nem sempre é `products` na íntegra) para que os
+   cliques de paginação consigam re-fatiar a MESMA lista, e não resetem
+   sempre para o catálogo inteiro. Mesmo padrão já usado em catCurrentPage/
+   catCurrentList na página de Categoria. */
+let featCurrentList = null;
+let featCurrentPage = 1;
+
+function renderProducts(list, page){
   const g=document.getElementById('productsGrid');
   if(!g)return;
+
+  // Se a função foi chamada SEM argumento de lista (ex.: onchange dos
+  // seletores "Ordenar por"/"Por página"), reaproveita a última lista
+  // usada — senão os filtros do hero/busca seriam perdidos ao reordenar.
+  const listWasGiven = arguments.length >= 1 && list !== undefined;
+  if(!listWasGiven) list = featCurrentList || products;
+
+  // Ordenação (dropdown "Ordenar por" da seção Em Destaque) — aplicada por
+  // cima do que quer que a lista já contenha, sem mutar o array do chamador.
+  const sortSel = document.getElementById('featSortSelect');
+  const sort = sortSel ? sortSel.value : '';
+  list = [...list];
+  if(sort==='price-asc') list.sort((a,b)=>a.p-b.p);
+  else if(sort==='price-desc') list.sort((a,b)=>b.p-a.p);
+  else if(sort==='rating') list.sort((a,b)=>b.r-a.r);
+  else if(sort==='sales') list.sort((a,b)=>parseFloat(b.sales)-parseFloat(a.sales));
+
+  featCurrentList = list;
+
+  // Paginação: só ativa se os controles existirem na página atual (Home).
+  // Chamar renderProducts(lista) sem page sempre volta para a página 1;
+  // só um clique nos botões de paginação (renderProducts(undefined, n))
+  // preserva/avança a página — mesmo padrão da página de Categoria.
+  const perPageSel = document.getElementById('featPerPageSelect');
+  const pag = document.getElementById('featPagination');
+  const rb = document.getElementById('featResultBar');
+  let pageList = list;
+  if(perPageSel){
+    featCurrentPage = (typeof page === 'number' && page > 0) ? page : 1;
+    const perPage = parseInt(perPageSel.value, 10) || 10;
+    const totalItems = list.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+    if(featCurrentPage > totalPages) featCurrentPage = totalPages;
+    const startIdx = (featCurrentPage - 1) * perPage;
+    pageList = list.slice(startIdx, startIdx + perPage);
+    const rangeStart = totalItems ? startIdx + 1 : 0;
+    const rangeEnd = Math.min(startIdx + perPage, totalItems);
+    const sortLabel = sortSel?.options[sortSel.selectedIndex]?.textContent || 'Relevância';
+    if(rb) rb.innerHTML = totalItems ? `<div class="search-result-bar"><span class="srb-count"><strong>${totalItems}</strong> produto${totalItems!==1?'s':''} <span style="color:var(--muted);font-weight:400;">(mostrando ${rangeStart}–${rangeEnd})</span></span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sortLabel}</span></div>` : '';
+    if(pag) pag.innerHTML = totalPages > 1 ? buildFeatPaginationHTML(featCurrentPage, totalPages) : '';
+    // Rola para o topo da grade ao trocar de página (não no carregamento inicial)
+    if(typeof page === 'number') g.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
   // Map product names to canonical categories
   const catMap = {
     'TechStore':'eletronicos','NoteShop':'eletronicos','SoundWorld':'eletronicos',
@@ -142,7 +195,7 @@ function renderProducts(list=products){
     '🪑':'casa','🏠':'casa',
     '📚':'livros','👗':'moda','🐾':'pet','👶':'bebe','🚗':'automotivo'
   };
-  g.innerHTML=list.map((p,i)=>{
+  g.innerHTML=pageList.map((p,i)=>{
     const cat = p.cat || catMap[p.s] || emojiCatMap[p.e] || 'outros'; /* v2.9.21: p.cat field takes priority */
     const nameLower = p.n.toLowerCase();
     // Real index in global products array for openProduct
@@ -177,6 +230,36 @@ function renderProducts(list=products){
       </div>
     </div>`;
   }).join('');
+}
+
+// Monta os botões de paginação (Anterior / números / Próxima) da seção "Em
+// Destaque" na Home — mesmo padrão visual/lógico de buildCatPaginationHTML
+// (página de Categoria), só que aponta para renderProducts() e #featPagination.
+function buildFeatPaginationHTML(current, total){
+  if(total <= 1) return '';
+  const pageBtn = (label, targetPage, opts) => {
+    opts = opts || {};
+    const isActive = targetPage === current && !opts.isNav;
+    const isDisabled = !!opts.disabled;
+    return `<button ${isDisabled?'disabled':''} style="padding:8px 14px;border-radius:8px;border:1px solid ${isActive?'var(--teal)':'var(--border)'};background:${isActive?'rgba(0,180,171,0.1)':'var(--card)'};color:${isActive?'var(--teal)':'var(--muted)'};cursor:${isDisabled?'default':'pointer'};font-size:13px;opacity:${isDisabled?'0.4':'1'};transition:var(--transition);" ${isDisabled?'':`onclick="renderProducts(undefined,${targetPage})"`}>${label}</button>`;
+  };
+  const ellipsis = '<span style="padding:0 4px;color:var(--muted);">…</span>';
+
+  let nums = [];
+  if(total <= 7){
+    for(let n=1; n<=total; n++) nums.push(n);
+  } else {
+    nums.push(1);
+    if(current > 3) nums.push('...');
+    for(let n=Math.max(2,current-1); n<=Math.min(total-1,current+1); n++) nums.push(n);
+    if(current < total-2) nums.push('...');
+    nums.push(total);
+  }
+
+  let html = pageBtn('‹ Anterior', current-1, {isNav:true, disabled: current===1});
+  html += nums.map(n => n==='...' ? ellipsis : pageBtn(String(n), n)).join('');
+  html += pageBtn('Próxima ›', current+1, {isNav:true, disabled: current===total});
+  return html;
 }
 
 /* renderStores está definido abaixo usando DB.stores — evitar duplicado */

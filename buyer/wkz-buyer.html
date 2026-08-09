@@ -798,9 +798,24 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="section-inner">
       <div class="section-header">
         <h2 class="section-title"><span class="wkz-icon wkz-icon-flame"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-7 7A7 7 0 015 14c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 3.5z"/></svg></span> Em <span>Destaque</span></h2>
-        <span class="see-all">Ver todos →</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select class="form-select wkz-select wkz-select--sm" id="featSortSelect" data-title="Ordenar por" onchange="renderProducts()">
+            <option value="">Mais relevantes</option>
+            <option value="price-asc">Menor preço</option>
+            <option value="price-desc">Maior preço</option>
+            <option value="rating">Melhor avaliação</option>
+            <option value="sales">Mais vendidos</option>
+          </select>
+          <select class="form-select wkz-select wkz-select--sm" id="featPerPageSelect" data-title="Por página" onchange="renderProducts()">
+            <option value="10">10 por página</option>
+            <option value="20">20 por página</option>
+            <option value="30">30 por página</option>
+          </select>
+        </div>
       </div>
+      <div id="featResultBar" style="margin-bottom:12px;"></div>
       <div class="products-grid" id="productsGrid"></div>
+      <div id="featPagination" style="display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:24px;"></div>
     </div>
   </div>
 
