@@ -9778,6 +9778,38 @@ h2.section-title .wkz-icon svg {
 
 /* ── Main Grid ── */
 .cp-main { max-width: 900px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+/* [FIX-cp-quicknav] Barra de atalhos fixa da página "Meu Perfil" — rola
+   horizontalmente em telas estreitas (mobile), fica visível ao rolar a
+   página (sticky) para permitir pular direto a qualquer seção. */
+.cp-quicknav {
+  position: sticky; top: 70px; z-index: 50;
+  display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  max-width: 900px; margin: 0 auto 20px; padding: 10px 16px;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  scrollbar-width: none;
+}
+.cp-quicknav::-webkit-scrollbar { display: none; }
+.cp-quicknav-item {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--bg2, transparent); color: var(--muted);
+  font-family: 'DM Sans',sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: var(--transition); white-space: nowrap;
+}
+.cp-quicknav-item:hover { border-color: var(--teal); color: var(--teal); background: rgba(0,180,171,0.08); }
+.cp-quicknav-item .wkz-icon { display: inline-flex; }
+/* Destaque temporário no card-alvo ao chegar via clique na barra de atalhos */
+.cp-quicknav-highlight { animation: cpQuickNavPulse 1.2s ease; }
+@keyframes cpQuickNavPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0,180,171,0.5); }
+  40%  { box-shadow: 0 0 0 6px rgba(0,180,171,0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(0,180,171,0); }
+}
+@media (max-width: 720px) {
+  .cp-quicknav { top: 58px; margin-left: 16px; margin-right: 16px; max-width: none; }
+}
 .cp-full-width { grid-column: 1 / -1; }
 @media (max-width: 768px) {
   .cp-main { grid-template-columns: 1fr; padding: 0 12px; gap: 12px; }
