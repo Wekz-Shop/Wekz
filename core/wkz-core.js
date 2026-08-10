@@ -7227,6 +7227,35 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     }, 400);
   };
 
+  /* [FIX-meus-pedidos] "Meus Pedidos" no menu do perfil (cabeçalho) levava
+     para a página separada de rastreio (MapsTo('tracking') → page-logistica-
+     -global) em vez de ficar dentro de "Meu Perfil", onde já existe o card
+     "Rastreador de Encomendas" com a mesma informação — obrigava o
+     comprador a navegar para uma página totalmente à parte, quebrando o
+     contexto (voltar exigia clicar em "Meus Pedidos" de novo, dentro
+     daquela outra página). Agora abre "Meu Perfil" e rola direto até o
+     card, mesmo padrão já usado em cpHdrDdGoDisputes() acima. */
+  window.cpHdrDdGoTracking = function() {
+    window.cpCloseHeaderDropdown();
+    if (typeof MapsTo === 'function') MapsTo('client-profile');
+    setTimeout(function() {
+      var el = document.getElementById('cpTrackerCard');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 400);
+  };
+
+  /* [FIX-cp-quicknav] Rola até uma seção de "Meu Perfil" a partir da barra
+     de atalhos fixa no topo da página. Um pequeno destaque visual (mesma
+     classe usada por _cpScrollAndFlash noutros pontos deste ficheiro)
+     ajuda a confirmar que chegou no lugar certo. */
+  window.cpQuickNavGo = function(cardId) {
+    var el = document.getElementById(cardId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.classList.add('cp-quicknav-highlight');
+    setTimeout(function () { el.classList.remove('cp-quicknav-highlight'); }, 1200);
+  };
+
   window.cpHdrDdCoupons = function() {
     window.cpCloseHeaderDropdown();
     if (typeof MapsTo === 'function') MapsTo('client-profile');
