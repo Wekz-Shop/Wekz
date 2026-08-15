@@ -11197,6 +11197,309 @@ function _trkFmtCountdown(targetDate) {
   return { d, h, m, s };
 }
 
+// ══════════════════════════════════════════════════════
+//  TRACKING ACTIONS — [FIX-ACOES-01]
+//  Antes, todo o card "Ações" (Confirmar Recebimento, Contactar
+//  Vendedor, Ativar Notificações, Reportar Problema, Avaliar Produto)
+//  e os CTAs de custódia (Confirmar Recebimento Agora / Liberar
+//  Pagamento) só disparavam showToast(...) — nenhuma rota de ação era
+//  executada de verdade: o status do pedido não avançava, a custódia
+//  não liberava, nada ficava salvo. Este bloco implementa o efeito
+//  real de cada botão (estado local + persistência + re-render).
+// ══════════════════════════════════════════════════════
+
+var _TRK_CHATS   = {};  // { code: [{from:'me'|'seller', text, time}] }
+var _TRK_REPORTS = {};  // { code: {reason, desc, protocol, date} }
+
+function _trkNormCode(raw) {
+  return String(raw || '').replace('#', '').trim().toUpperCase();
+}
+
+/* ── Confirmar Recebimento — fonte única de verdade, usada pelo
+   Rastreador (sidebar + CTA de custódia) E por "Meus Pedidos"
+   (cpMarkOrderDelivered, em wkz-core.js) para o dataset CP_ORDERS. ── */
+function wkzMarkOrderDelivered(rawCode) {
+  var code = _trkNormCode(rawCode);
+  if (!code) return false;
+  var didSomething = false;
+
+  if (typeof _TRK_DATA !== 'undefined' && _TRK_DATA[code] && _TRK_DATA[code].status !== 'delivered') {
+    var d = _TRK_DATA[code];
+    var todayLabel = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+    d.status       = 'delivered';
+    d.statusLabel  = 'Entregue com Sucesso!';
+    d.statusIcon   = '✅';
+    d.bannerGrad   = 'linear-gradient(135deg,#22C55E 0%,#16A34A 100%)';
+    d.progress     = 100;
+    d.etaDate      = null;
+    d.etaLabel     = 'Entregue em ' + todayLabel;
+    d.escrowReleased = true;
+    if (Array.isArray(d.steps) && d.steps.length) {
+      d.steps[d.steps.length - 1].date = 'Agora';
+      d.activeStep = d.steps.length;
+    }
+    if (Array.isArray(d.events)) {
+      d.events.forEach(function(ev) { ev.active = false; });
+      d.events.unshift({
+        title: 'Recebimento confirmado pelo comprador',
+        desc: 'Você confirmou o recebimento do pedido. Pagamento liberado ao vendedor.',
+        time: 'Agora',
+        location: (d.address || 'WeKz Shop').split('—')[0].trim(),
+        done: true, active: true
+      });
+    }
+    didSomething = true;
+  }
+
+  if (typeof window.cpMarkOrderDelivered === 'function') {
+    if (window.cpMarkOrderDelivered('#' + code)) didSomething = true;
+    if (window.cpMarkOrderDelivered(code)) didSomething = true;
+  }
+
+  if (!didSomething) return false;
+
+  var inp = document.getElementById('trkInput');
+  if (inp && _trkNormCode(inp.value) === code) loadTracking(code);
+
+  if (typeof wkzShowPush === 'function') {
+    wkzShowPush('✅ Recebimento confirmado!', 'Pagamento liberado ao vendedor. Que tal avaliar sua compra?', 'success', 6000);
+  }
+  if (typeof showToast === 'function') {
+    showToast('✅ Recebimento confirmado! Pagamento liberado ao vendedor.');
+  }
+  if (window.WkzBus) WkzBus.emit('buyer:order:delivered', { orderId: '#' + code });
+  return true;
+}
+window.wkzMarkOrderDelivered = wkzMarkOrderDelivered;
+
+/* ── Liberar Pagamento ao Vendedor — CTA de custódia no status "delivered" ── */
+function trkReleasePayment(code) {
+  code = _trkNormCode(code);
+  var d = typeof _TRK_DATA !== 'undefined' ? _TRK_DATA[code] : null;
+  if (!d) return;
+  d.escrowReleased = true;
+  showToast('✅ Pagamento liberado ao vendedor! Obrigado por comprar na WeKz.');
+  if (typeof wkzShowPush === 'function') {
+    wkzShowPush('💸 Pagamento liberado', 'O vendedor já pode sacar o valor deste pedido.', 'success', 5000);
+  }
+  loadTracking(code);
+}
+window.trkReleasePayment = trkReleasePayment;
+
+/* ── Ativar/Desativar Notificações de Atualização — toggle real,
+   persistido em localStorage (sobrevive a reload). ── */
+function trkToggleNotify(code) {
+  code = _trkNormCode(code);
+  var key = 'wkz_trk_notify_' + code;
+  var on = localStorage.getItem(key) === '1';
+  on = !on;
+  try { localStorage.setItem(key, on ? '1' : '0'); } catch(e) {}
+  showToast(on ? '🔔 Notificações ativadas para o pedido ' + code : '🔕 Notificações desativadas.');
+  var btn = document.getElementById('trkNotifyBtn');
+  if (btn) btn.outerHTML = _trkNotifyBtnHtml(code);
+}
+window.trkToggleNotify = trkToggleNotify;
+function _trkNotifyBtnHtml(code) {
+  var on = false;
+  try { on = localStorage.getItem('wkz_trk_notify_' + code) === '1'; } catch(e) {}
+  return '<button class="trk-action-btn' + (on ? ' active-notify' : '') + '" id="trkNotifyBtn" onclick="trkToggleNotify(\'' + code + '\')">'
+    + _trkIco(on ? 'check' : 'zap', 14) + ' ' + (on ? 'Notificações Ativadas' : 'Ativar Notificações de Atualização')
+    + '</button>';
+}
+
+/* ── Contactar Vendedor — mini-chat funcional (reaproveita getChatReply,
+   já usado no chat do PDP), com histórico mantido durante a sessão. ── */
+function trkOpenSellerChat(code, sellerName) {
+  code = _trkNormCode(code);
+  if (!_TRK_CHATS[code]) {
+    _TRK_CHATS[code] = [
+      { from:'seller', text:'Olá! 👋 Sou da equipe ' + sellerName + '. Em que posso ajudar com o pedido ' + code + '?', time:'Agora' }
+    ];
+  }
+  _trkOpenModal({
+    icon: '💬', title: 'Contactar Vendedor', subtitle: sellerName + ' · Pedido ' + code,
+    bodyHtml: '<div class="chat-messages" id="trkChatMsgs" style="max-height:220px;">' + _trkChatBubbles(code) + '</div>'
+      + '<div class="chat-input-row" style="margin-bottom:0;">'
+        + '<input type="text" class="chat-input" id="trkChatInput" placeholder="Escreva sua mensagem..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();trkSendChatMsg(\'' + code + '\')}">'
+      + '</div>',
+    footerHtml: '<button class="wkz-ret-btn secondary" onclick="trkCloseModal()">Fechar</button>'
+      + '<button class="wkz-ret-btn primary" onclick="trkSendChatMsg(\'' + code + '\')">Enviar</button>'
+  });
+  setTimeout(function(){ var m=document.getElementById('trkChatMsgs'); if(m) m.scrollTop = m.scrollHeight; }, 30);
+}
+window.trkOpenSellerChat = trkOpenSellerChat;
+
+function _trkChatBubbles(code) {
+  return (_TRK_CHATS[code] || []).map(function(m) {
+    return '<div class="chat-msg-wrap ' + (m.from === 'me' ? 'me' : 'seller') + '">'
+      + '<div class="chat-bubble ' + (m.from === 'me' ? 'me' : 'seller') + '">' + m.text + '</div>'
+      + '<div class="chat-time">' + m.time + '</div>'
+    + '</div>';
+  }).join('');
+}
+
+function trkSendChatMsg(code) {
+  code = _trkNormCode(code);
+  var inp = document.getElementById('trkChatInput');
+  if (!inp) return;
+  var text = inp.value.trim();
+  if (!text) return;
+  _TRK_CHATS[code].push({ from:'me', text: text, time:'Agora' });
+  inp.value = '';
+  var reply = (typeof getChatReply === 'function') ? getChatReply(text) : 'Obrigado pela mensagem! Já vamos verificar e responder. 🙌';
+  var msgsEl = document.getElementById('trkChatMsgs');
+  if (msgsEl) msgsEl.innerHTML = _trkChatBubbles(code);
+  setTimeout(function() {
+    _TRK_CHATS[code].push({ from:'seller', text: reply, time:'Agora' });
+    var el = document.getElementById('trkChatMsgs');
+    if (el) { el.innerHTML = _trkChatBubbles(code); el.scrollTop = el.scrollHeight; }
+  }, 900);
+  if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+window.trkSendChatMsg = trkSendChatMsg;
+
+/* ── Reportar Problema na Entrega — modal com motivo + descrição,
+   gera protocolo real e fica salvo (persistente na sessão). ── */
+var TRK_REPORT_REASONS = [
+  { id:'atraso',    label:'Atraso na entrega' },
+  { id:'danificado',label:'Produto chegou danificado' },
+  { id:'errado',    label:'Produto diferente do anunciado' },
+  { id:'nao_chegou',label:'Não recebi o pedido' },
+  { id:'outro',     label:'Outro motivo' },
+];
+var _trkReportReasonSel = null;
+
+function trkOpenReportModal(code) {
+  code = _trkNormCode(code);
+  _trkReportReasonSel = null;
+  _trkOpenModal({
+    icon: '⚑', title: 'Reportar Problema na Entrega', subtitle: 'Pedido ' + code,
+    bodyHtml: '<div class="wkz-ret-step-label" style="margin-top:0;">Qual o problema?</div>'
+      + '<div class="wkz-ret-reasons" id="trkReportReasons">'
+        + TRK_REPORT_REASONS.map(function(r) {
+            return '<label class="wkz-ret-reason" id="trkReportR_' + r.id + '" onclick="_trkSelectReportReason(\'' + r.id + '\')">'
+              + '<input type="radio" name="trkReportReason">'
+              + '<span>' + r.label + '</span>'
+            + '</label>';
+          }).join('')
+      + '</div>'
+      + '<div class="wkz-ret-step-label">Descreva o ocorrido</div>'
+      + '<textarea class="wkz-input" id="trkReportDesc" rows="3" placeholder="Conte com detalhes o que aconteceu..."></textarea>',
+    footerHtml: '<button class="wkz-ret-btn secondary" onclick="trkCloseModal()">Cancelar</button>'
+      + '<button class="wkz-ret-btn primary" onclick="trkSubmitReport(\'' + code + '\')">Enviar Denúncia</button>'
+  });
+}
+window.trkOpenReportModal = trkOpenReportModal;
+
+function _trkSelectReportReason(id) {
+  _trkReportReasonSel = id;
+  TRK_REPORT_REASONS.forEach(function(r) {
+    var el = document.getElementById('trkReportR_' + r.id);
+    if (!el) return;
+    el.classList.toggle('sel', r.id === id);
+    var inp = el.querySelector('input');
+    if (inp) inp.checked = (r.id === id);
+  });
+}
+window._trkSelectReportReason = _trkSelectReportReason;
+
+function trkSubmitReport(code) {
+  code = _trkNormCode(code);
+  if (!_trkReportReasonSel) { showToast('⚠ Selecione o motivo do problema'); return; }
+  var desc = (document.getElementById('trkReportDesc') || {}).value || '';
+  var reasonObj = TRK_REPORT_REASONS.find(function(r){ return r.id === _trkReportReasonSel; });
+  var protocol = 'PR-' + Math.floor(100000 + Math.random() * 899999);
+  _TRK_REPORTS[code] = { reasonId: _trkReportReasonSel, reasonLabel: reasonObj.label, desc: desc, protocol: protocol, date: new Date().toLocaleDateString('pt-BR') };
+
+  var d = typeof _TRK_DATA !== 'undefined' ? _TRK_DATA[code] : null;
+  if (d && Array.isArray(d.events)) {
+    d.events.forEach(function(ev) { ev.active = false; });
+    d.events.unshift({
+      title: 'Problema reportado pelo comprador',
+      desc: reasonObj.label + (desc ? ' — ' + desc : '') + ' · Protocolo ' + protocol,
+      time: 'Agora', location: 'WeKz Shop', done: true, active: true
+    });
+  }
+
+  trkCloseModal();
+  showToast('⚑ Denúncia registrada · Protocolo ' + protocol);
+  if (typeof wkzShowPush === 'function') {
+    wkzShowPush('⚑ Problema reportado', 'Protocolo ' + protocol + ' — nossa equipe vai analisar em até 48h.', 'warning', 6000);
+  }
+  loadTracking(code);
+}
+window.trkSubmitReport = trkSubmitReport;
+
+/* ── Avaliar Produto — modal com estrelas + comentário, salva a nota
+   junto ao pedido (fica visível ao reabrir o rastreamento). ── */
+var _trkReviewStars = 0;
+
+function trkOpenReviewModal(code, productName) {
+  code = _trkNormCode(code);
+  _trkReviewStars = 0;
+  _trkOpenModal({
+    icon: '⭐', title: 'Avaliar Produto', subtitle: productName || ('Pedido ' + code),
+    bodyHtml: '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Sua nota:</div>'
+      + '<div class="star-picker" id="trkStarPicker" style="margin-bottom:14px;">'
+        + [1,2,3,4,5].map(function(n){ return '<span class="star-pick" onclick="_trkPickStar(' + n + ')">☆</span>'; }).join('')
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Comentário:</div>'
+      + '<textarea class="wkz-input" id="trkReviewText" rows="3" placeholder="Conte como foi sua experiência com o produto..."></textarea>',
+    footerHtml: '<button class="wkz-ret-btn secondary" onclick="trkCloseModal()">Cancelar</button>'
+      + '<button class="wkz-ret-btn primary" onclick="trkSubmitReview(\'' + code + '\')">Enviar Avaliação</button>'
+  });
+}
+window.trkOpenReviewModal = trkOpenReviewModal;
+
+function _trkPickStar(n) {
+  _trkReviewStars = n;
+  document.querySelectorAll('#trkStarPicker .star-pick').forEach(function(s, i) {
+    s.textContent = i < n ? '★' : '☆';
+    s.style.transform = i < n ? 'scale(1.2)' : 'scale(1)';
+  });
+}
+window._trkPickStar = _trkPickStar;
+
+function trkSubmitReview(code) {
+  code = _trkNormCode(code);
+  if (!_trkReviewStars) { showToast('⚠ Selecione uma nota de 1 a 5 ★'); return; }
+  var text = (document.getElementById('trkReviewText') || {}).value || '';
+  var d = typeof _TRK_DATA !== 'undefined' ? _TRK_DATA[code] : null;
+  if (d) d.userReview = { stars: _trkReviewStars, text: text, date: new Date().toLocaleDateString('pt-BR') };
+
+  if (typeof REVIEWS_DATA !== 'undefined') {
+    REVIEWS_DATA.unshift({
+      id: Date.now(), user:'Você', avatar:'V', rating: _trkReviewStars,
+      title: (d && d.product && d.product.name) || 'Minha avaliação',
+      text: text || '(sem comentário)', date: new Date().toLocaleDateString('pt-BR'),
+      verified: true, photos: [], helpful: 0, country:'🇧🇷', tags: []
+    });
+  }
+
+  trkCloseModal();
+  showToast('⭐ Avaliação enviada! Obrigado por comprar na WeKz.');
+  loadTracking(code);
+}
+window.trkSubmitReview = trkSubmitReview;
+
+/* ── Modal genérico reaproveitado pelas 3 ações acima (mesma casca
+   visual de openReturnModal — wkzReturnModalOv/.wkz-ret-*). ── */
+function _trkOpenModal(cfg) {
+  var ov = document.getElementById('wkzTrkModalOv');
+  if (!ov) return;
+  document.getElementById('wkzTrkModalIcon').textContent = cfg.icon || '💬';
+  document.getElementById('wkzTrkModalTitle').textContent = cfg.title || '';
+  document.getElementById('wkzTrkModalSubtitle').textContent = cfg.subtitle || '';
+  document.getElementById('wkzTrkModalBody').innerHTML = cfg.bodyHtml || '';
+  document.getElementById('wkzTrkModalFooter').innerHTML = cfg.footerHtml || '';
+  ov.classList.add('open');
+}
+function trkCloseModal() {
+  var ov = document.getElementById('wkzTrkModalOv');
+  if (ov) ov.classList.remove('open');
+}
+window.trkCloseModal = trkCloseModal;
+
 function loadTracking(code) {
   if(!code) code = (document.getElementById('trkInput')||{}).value || '';
   code = code.trim().toUpperCase();
@@ -11339,12 +11642,45 @@ function loadTracking(code) {
     }
   }
 
-  // Action buttons
-  var confirmBtn = data.status === 'out_delivery' || data.status === 'delivered'
-    ? `<button class="trk-action-btn primary" onclick="showToast('✅ Recebimento confirmado! Avalie o produto.')">
+  // Action buttons — [FIX-ACOES-01] cada botão agora executa a ação real
+  var _trkCodeEsc   = wkzJsEsc(data.orderNum.replace('#',''));
+  var _trkSellerEsc = wkzJsEsc(data.seller.name);
+  var _trkProdEsc   = wkzJsEsc(data.product.name);
+
+  var confirmBtn = '';
+  if (data.status === 'out_delivery') {
+    confirmBtn = `<button class="trk-action-btn primary" onclick="wkzMarkOrderDelivered('${_trkCodeEsc}')">
         ${_trkIco('check',15)} Confirmar Recebimento
-       </button>`
-    : '';
+       </button>`;
+  } else if (data.status === 'delivered' && !data.escrowReleased) {
+    confirmBtn = `<button class="trk-action-btn primary" onclick="trkReleasePayment('${_trkCodeEsc}')">
+        ${_trkIco('check',15)} Confirmar Recebimento
+       </button>`;
+  } else if (data.status === 'delivered' && data.escrowReleased) {
+    confirmBtn = `<div class="trk-action-btn" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.3);color:#4ade80;cursor:default;justify-content:center;">
+        ${_trkIco('check',15)} Recebimento Confirmado
+       </div>`;
+  }
+
+  var reportOrReviewBtn;
+  if (data.status !== 'delivered') {
+    var rep = _TRK_REPORTS[_trkCodeEsc];
+    reportOrReviewBtn = rep
+      ? `<div class="trk-action-btn" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.3);color:#F59E0B;cursor:default;">
+          ${_trkIco('map',14)} Problema Reportado — Protocolo ${rep.protocol}
+         </div>`
+      : `<button class="trk-action-btn danger" onclick="trkOpenReportModal('${_trkCodeEsc}')">
+          ${_trkIco('map',14)} Reportar Problema na Entrega
+         </button>`;
+  } else {
+    reportOrReviewBtn = data.userReview
+      ? `<div class="trk-action-btn" style="background:rgba(234,179,8,0.08);border-color:rgba(234,179,8,0.3);color:#FCD34D;cursor:default;">
+          ${'★'.repeat(data.userReview.stars)}${'☆'.repeat(5-data.userReview.stars)} Avaliação Enviada
+         </div>`
+      : `<button class="trk-action-btn" onclick="trkOpenReviewModal('${_trkCodeEsc}','${_trkProdEsc}')">
+          ⭐ Avaliar Produto
+         </button>`;
+  }
 
   var html = `
     ${urgencyBanner}
@@ -11411,20 +11747,11 @@ function loadTracking(code) {
           <div class="trk-sb-title">Ações</div>
           <div class="trk-actions">
             ${confirmBtn}
-            <button class="trk-action-btn" onclick="showToast('💬 Abrindo chat com vendedor...')">
+            <button class="trk-action-btn" onclick="trkOpenSellerChat('${_trkCodeEsc}','${_trkSellerEsc}')">
               ${_trkIco('check',14)} Contactar Vendedor (${data.seller.name} ⭐${data.seller.rating})
             </button>
-            <button class="trk-action-btn" onclick="showToast('📧 Notificação ativada!')">
-              ${_trkIco('zap',14)} Ativar Notificações de Atualização
-            </button>
-            ${data.status !== 'delivered'
-              ? `<button class="trk-action-btn danger" onclick="showToast('⚑ Problema reportado à WeKz')">
-                  ${_trkIco('map',14)} Reportar Problema na Entrega
-                 </button>`
-              : `<button class="trk-action-btn" onclick="showPage('product');showToast('📝 Abrindo formulário de avaliação')">
-                  ⭐ Avaliar Produto
-                 </button>`
-            }
+            ${_trkNotifyBtnHtml(_trkCodeEsc)}
+            ${reportOrReviewBtn}
           </div>
         </div>
 
@@ -11475,12 +11802,28 @@ function loadTracking(code) {
             }
           };
           var c = _cfg[data.status] || _cfg['confirmed'];
+          // [FIX-ACOES-01] estado final real após liberação confirmada pelo comprador
+          if (data.status === 'delivered' && data.escrowReleased) {
+            c = {
+              bg:'rgba(34,197,94,0.08)',border:'rgba(34,197,94,0.28)',
+              barColor:'#22C55E',barPct:100,
+              icon:'✅',title:'Pagamento Liberado ao Vendedor',
+              desc:'Tudo certo! O valor deste pedido já foi <strong style="color:#4ade80;">transferido ao vendedor</strong> (descontada a comissão WeKz).',
+              steps:['Pago','Enviado','Entregue','Avaliação','✔ Liberado'],
+              stepActive:5,
+              note:'Obrigado por comprar na WeKz Shop. Aproveite para avaliar sua compra ao lado.',
+              cta:'', ctaStyle:''
+            };
+          }
           var stepsHtml = c.steps.map(function(s,i){
             var col = i < c.stepActive ? 'color:#4ade80;' : (i===c.stepActive ? 'color:var(--teal);font-weight:700;' : '');
             return '<span style="'+col+'">'+s+'</span>';
           }).join('');
+          var _escrowAction = data.status === 'out_delivery'
+            ? "wkzMarkOrderDelivered('" + _trkCodeEsc + "')"
+            : "trkReleasePayment('" + _trkCodeEsc + "')";
           var ctaHtml = c.cta
-            ? '<button class="trk-escrow-cta" style="'+c.ctaStyle+'" onclick="showToast(\'✅ Confirmação registrada! Pagamento será liberado ao vendedor.\')">'+c.cta+'</button>'
+            ? '<button class="trk-escrow-cta" style="'+c.ctaStyle+'" onclick="'+_escrowAction+'">'+c.cta+'</button>'
             : '';
           return '<div class="trk-escrow" style="background:'+c.bg+';border:1px solid '+c.border+';">'
             +'<div class="trk-escrow-header"><div class="trk-escrow-icon">'+c.icon+'</div>'

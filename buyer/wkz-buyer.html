@@ -5263,6 +5263,23 @@ body.kzlive-active .bottom-nav {
 
   </div>
 </div>
+<!-- [FIX-ACOES-01] Modal genérico reaproveitado pelas ações reais do
+     Rastreador de Pedido: Contactar Vendedor (chat), Reportar Problema
+     e Avaliar Produto. Mesma casca visual do wkzReturnModalOv. -->
+<div id="wkzTrkModalOv" onclick="if(event.target===this)trkCloseModal()">
+  <div class="wkz-ret-shell" style="max-width:420px;">
+    <div class="wkz-ret-header">
+      <div class="wkz-ret-header-icon" id="wkzTrkModalIcon">💬</div>
+      <div>
+        <div class="wkz-ret-title" id="wkzTrkModalTitle">Título</div>
+        <div class="wkz-ret-subtitle" id="wkzTrkModalSubtitle">Subtítulo</div>
+      </div>
+      <button class="wkz-ret-close" onclick="trkCloseModal()">✕</button>
+    </div>
+    <div class="wkz-ret-body" id="wkzTrkModalBody"></div>
+    <div class="wkz-ret-footer" id="wkzTrkModalFooter"></div>
+  </div>
+</div>
 <div id="revLightbox" onclick="if(event.target===this)closeLightbox()">
   <div class="lb-inner">
     <div class="lb-close" onclick="closeLightbox()">✕</div>
