@@ -11593,6 +11593,16 @@ body.kzlive-active .bottom-nav {
   padding: 20px; overflow-y: auto;
 }
 #wkzReturnModalOv.open { display: flex; }
+/* [FIX-ACOES-01] mesma casca do modal de devolução, reaproveitada pelas
+   ações reais do Rastreador de Pedido (chat / denúncia / avaliação). */
+#wkzTrkModalOv {
+  position: fixed; inset: 0; background: rgba(8,14,26,0.88);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  z-index: 2850; display: none; align-items: center; justify-content: center;
+  padding: 20px; overflow-y: auto;
+}
+#wkzTrkModalOv.open { display: flex; }
+.trk-action-btn.active-notify { border-color: rgba(0,180,171,0.4); color: var(--teal); background: rgba(0,180,171,0.06); }
 .wkz-ret-shell {
   background: var(--card); border: 1px solid rgba(124,58,237,0.25);
   border-radius: 16px; max-width: 480px; width: 100%; max-height: 88vh;
