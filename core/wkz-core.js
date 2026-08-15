@@ -5169,6 +5169,38 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     return map[status] || status;
   }
 
+  /* ══════════════════════════════════════════════════════════════════
+     cpMarkOrderDelivered — [FIX-ACOES-01] API real de confirmação de
+     recebimento para o dataset "Meus Pedidos" (CP_ORDERS).
+     Antes, o botão "Confirmar Recebimento" desta lista chamava
+     wkzBuyerConfirmReceived() — função que só existe em wkz-admin.js,
+     nunca carregado em wkz-buyer.html. Resultado: ReferenceError
+     silencioso, botão sem nenhum efeito. Esta função substitui-a com
+     uma implementação local ao módulo Buyer, sem dependência cross-file,
+     e é a única fonte de verdade usada tanto aqui quanto pela página
+     Rastrear Pedido (ver wkzMarkOrderDelivered em wkz-buyer.js). */
+  window.cpMarkOrderDelivered = function(id) {
+    var o = CP_ORDERS.find(function(x){ return x.id === id; });
+    if (!o || o.status === 'delivered') return false;
+    var steps = _cpOrderSteps();
+    var today = new Date();
+    var mAbbr = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    o.status = 'delivered';
+    o.progress = 100;
+    o.activeStep = steps.length;
+    o.eta = 'Entregue ' + today.getDate() + ' ' + mAbbr[today.getMonth()] + ' ' + today.getFullYear();
+    if (Array.isArray(o.events)) {
+      o.events.forEach(function(e){ e.active = false; });
+      o.events.unshift({
+        title: 'Recebimento confirmado pelo comprador',
+        desc: 'Você confirmou o recebimento. Pagamento liberado ao vendedor.',
+        time: 'Agora', location: o.address || 'WeKz Shop', done: true, active: true
+      });
+    }
+    renderOrders();
+    return true;
+  };
+
   var CP_DISPUTES = [
     { id:'#WKZ-8801', reason:'Produto chegou com ecrã danificado', date:'19 Mai 2026',
       verdict:'buyer', verdictAmtEUR:89.50,
@@ -5380,7 +5412,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
           + '<span class="cp-order-eta-value">' + o.eta + '</span>'
           + '<button onclick="cpTrackOrder(\'' + o.id + '\')" style="margin-left:auto;padding:3px 10px;background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.3);border-radius:6px;color:var(--teal);font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(0,180,171,0.2)\'" onmouseout="this.style.background=\'rgba(0,180,171,0.1)\'">' + CP_ICO.search + ' ' + t('cpOrderTrackBtn') + '</button>'
           + (o.status === 'delivered' ? '<button onclick="openReturnModal(\'' + o.id + '\',\'' + o.name.replace(/'/g,"\\\\'") + '\')" style="padding:3px 10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:6px;color:#a78bfa;font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(124,58,237,0.2)\'" onmouseout="this.style.background=\'rgba(124,58,237,0.1)\'">' + CP_ICO.undo + ' ' + t('cpOrderReturnBtn') + '</button>' : '')
-          + (o.status === 'shipping' ? '<button onclick="wkzBuyerConfirmReceived(\'' + o.id + '\')" style="padding:3px 10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(34,197,94,0.2)\'" onmouseout="this.style.background=\'rgba(34,197,94,0.1)\'">' + '\u2713 ' + t('cpOrderConfirmBtn') + '</button>' : '')
+          + (o.status === 'shipping' ? '<button onclick="if(typeof wkzMarkOrderDelivered===\'function\')wkzMarkOrderDelivered(\'' + o.id + '\')" style="padding:3px 10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;color:#22C55E;font-size:10px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background=\'rgba(34,197,94,0.2)\'" onmouseout="this.style.background=\'rgba(34,197,94,0.1)\'">' + '\u2713 ' + t('cpOrderConfirmBtn') + '</button>' : '')
         + '</div>'
         + '</div>';
     }).join('');
