@@ -14028,26 +14028,60 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
 (function() {
   'use strict';
 
-  /* ─── Live products data ─── */
+  /* ─── Live products data ───
+     [FIX-KZLIVE-01] Adicionados: desc/specs/rating/reviews/store — antes só
+     existiam em flashItems (usado por showFlashProductModal). Agora os
+     produtos da live têm ficha completa própria, exibida no quick-view
+     ao clicar no card (ver kzliveOpenProduct/_showKzliveProductModal). */
   var _LIVE_PRODUCTS = [
     { id:0, name:'Fone TWS AirPods Pro Clone Alta Fidelidade', emoji:'🎧',
       price:'R$ 189,90', orig:'R$ 379,90', disc:'-50%', priceVal:189.90,
-      countdown:600, stock:15, stockPct:22, active:true },
+      countdown:600, stock:15, stockPct:22, active:true, store:'TechStore Brasil',
+      rating:4.8, reviews:2140,
+      desc:'Fone de ouvido sem fio com cancelamento de ruído ativo (ANC), driver de 12mm para graves potentes, estojo de carregamento com autonomia total de 32h e resistência IPX5 ao suor.',
+      specs:['ANC — cancelamento ativo de ruído','32h de bateria total (estojo incluso)','Bluetooth 5.3 · baixa latência','Resistência IPX5 ao suor/chuva leve','Toque sensível nos controles','Microfone com redução de ruído para chamadas'] },
     { id:1, name:'Smartphone Redmi Note 14 Pro 256GB 5G', emoji:'📱',
       price:'R$ 1.299,90', orig:'R$ 1.799,90', disc:'-28%', priceVal:1299.90,
-      countdown:1200, stock:8, stockPct:10, active:false },
+      countdown:1200, stock:8, stockPct:10, active:false, store:'TechStore Brasil',
+      rating:4.9, reviews:5680,
+      desc:'Smartphone 5G com tela AMOLED 6.67" 120Hz, câmera principal de 200MP, 256GB de armazenamento, 12GB RAM e carregamento turbo de 67W. Desbloqueado, dual SIM.',
+      specs:['Tela AMOLED 6.67" 120Hz','Câmera 200MP + ultrawide + macro','256GB + 12GB RAM','Bateria 5000mAh · turbo 67W','Android 14 atualizado','Dual SIM 5G desbloqueado'] },
     { id:2, name:'Smartwatch Ultra X9 AMOLED + GPS', emoji:'⌚',
       price:'R$ 319,90', orig:'R$ 599,90', disc:'-47%', priceVal:319.90,
-      countdown:900, stock:22, stockPct:38, active:false },
+      countdown:900, stock:22, stockPct:38, active:false, store:'TechStore Brasil',
+      rating:4.7, reviews:1893,
+      desc:'Smartwatch com tela AMOLED 1.9" sempre ativa, GPS integrado, monitor cardíaco e de SpO2 contínuo, mais de 100 modos esportivos e resistência 5ATM à água.',
+      specs:['Tela AMOLED 1.9" always-on','GPS integrado de alta precisão','Monitor cardíaco + SpO2 24h','100+ modos esportivos','Bateria de até 7 dias','Resistência 5ATM (natação)'] },
     { id:3, name:'Carregador Turbo 65W Wireless MagSafe', emoji:'🔋',
       price:'R$ 89,90', orig:'R$ 159,90', disc:'-44%', priceVal:89.90,
-      countdown:450, stock:48, stockPct:62, active:false },
+      countdown:450, stock:48, stockPct:62, active:false, store:'TechStore Brasil',
+      rating:4.6, reviews:967,
+      desc:'Carregador sem fio 65W compatível com MagSafe, encaixe magnético que garante alinhamento perfeito e carregamento rápido protegido contra superaquecimento.',
+      specs:['65W carregamento turbo sem fio','Compatível MagSafe (encaixe magnético)','Proteção contra superaquecimento','Cabo USB-C reforçado incluso','Compatível iPhone/Android Qi','LED indicador de status'] },
     { id:4, name:'Mini Câmera Segurança 4K WiFi Visão Noturna', emoji:'📷',
       price:'R$ 229,90', orig:'R$ 399,90', disc:'-43%', priceVal:229.90,
-      countdown:720, stock:5, stockPct:7, active:false },
+      countdown:720, stock:5, stockPct:7, active:false, store:'TechStore Brasil',
+      rating:4.5, reviews:534,
+      desc:'Câmera de segurança 4K com WiFi, visão noturna colorida, detecção de movimento com notificação no app, áudio bidirecional e armazenamento em nuvem opcional.',
+      specs:['Resolução 4K nítida','Visão noturna colorida','Detecção de movimento + alerta app','Áudio bidirecional (fala e escuta)','Instalação sem fio, só energia','Compatível Alexa/Google Home'] },
     { id:5, name:'Fone Over-Ear Bluetooth 5.3 ANC 40h', emoji:'🎵',
       price:'R$ 349,90', orig:'R$ 599,90', disc:'-42%', priceVal:349.90,
-      countdown:1500, stock:34, stockPct:48, active:false },
+      countdown:1500, stock:34, stockPct:48, active:false, store:'TechStore Brasil',
+      rating:4.8, reviews:1102,
+      desc:'Headphone over-ear com cancelamento ativo de ruído, drivers de 40mm para graves profundos, até 40h de bateria e almofadas em memory foam para uso prolongado.',
+      specs:['ANC — cancelamento ativo de ruído','Drivers 40mm alta fidelidade','40h de bateria (ANC ligado)','Bluetooth 5.3 multiponto','Almofadas memory foam','Dobrável, vem com case rígido'] },
+    { id:6, name:'Caixa de Som Bluetooth 30W à Prova d\'Água', emoji:'🔊',
+      price:'R$ 159,90', orig:'R$ 289,90', disc:'-45%', priceVal:159.90,
+      countdown:1050, stock:27, stockPct:33, active:false, store:'TechStore Brasil',
+      rating:4.7, reviews:721,
+      desc:'Caixa de som portátil 30W com graves reforçados, certificação IPX7 à prova d\'água, 18h de autonomia e função poweer bank para carregar o celular.',
+      specs:['Potência 30W RMS','Certificação IPX7 à prova d\'água','18h de autonomia contínua','Função power bank (carrega celular)','Bluetooth 5.3 · pareamento duplo','Alça de transporte reforçada'] },
+    { id:7, name:'Webcam Full HD 1080p com Microfone', emoji:'📹',
+      price:'R$ 119,90', orig:'R$ 219,90', disc:'-45%', priceVal:119.90,
+      countdown:390, stock:41, stockPct:55, active:false, store:'TechStore Brasil',
+      rating:4.6, reviews:388,
+      desc:'Webcam Full HD 1080p com foco automático, microfone com redução de ruído embutido e clipe universal compatível com notebooks e monitores.',
+      specs:['Resolução Full HD 1080p 30fps','Foco automático','Microfone com redução de ruído','Clipe universal ajustável','Plug and play USB — sem drivers','Compatível Windows/Mac/Linux'] },
   ];
 
   /* ─── Chat messages pool ─── */
@@ -14055,15 +14089,15 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     { t:'u', n:'Ana Lima',    c:'#7C3AED', m:'que produto incrível!! 😍' },
     { t:'u', n:'Pedro Zk',   c:'#2563EB', m:'comprei o smartwatch mês passado, chegou em 3 dias!' },
     { t:'u', n:'Carol F.',   c:'#EC4899', m:'o frete grátis ainda tá ativo? 🚚' },
-    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'✅ Frete grátis para todo o Brasil por mais 30 min!' },
+    { t:'h', n:'TechStore Brasil', c:'#00B4AB', m:'✅ Frete grátis para todo o Brasil por mais 30 min!' },
     { t:'u', n:'Lucas M.',   c:'#F59E0B', m:'que desconto absurdo nesses airpods 🔥' },
     { t:'u', n:'Gi Santos',  c:'#10B981', m:'tô amando essa live! 🔥🔥🔥' },
     { t:'p', n:'🔴 DESTAQUE', c:'#EF4444', m:'⚡ ÚLTIMAS 15 UNIDADES! Preço volta em 10 minutos' },
     { t:'u', n:'Rob Alves',  c:'#8B5CF6', m:'já coloquei no carrinho, confiável essa loja?' },
-    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'✅ Verificada WeKz com garantia de 1 ano e devolução fácil!' },
+    { t:'h', n:'TechStore Brasil', c:'#00B4AB', m:'✅ Verificada WeKz com garantia de 1 ano e devolução fácil!' },
     { t:'u', n:'Mari J.',    c:'#F97316', m:'uau que preço no smartwatch 😲' },
     { t:'u', n:'Teo K.',     c:'#06B6D4', m:'pode parcelar no cartão?' },
-    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'💳 Sim! Até 12x sem juros no cartão WeKz' },
+    { t:'h', n:'TechStore Brasil', c:'#00B4AB', m:'💳 Sim! Até 12x sem juros no cartão WeKz' },
     { t:'u', n:'Fernanda C.', c:'#A855F7', m:'a câmera 4K é boa pro negócio mesmo?' },
     { t:'u', n:'Diego O.',   c:'#3B82F6', m:'já comprei 3 vezes aqui, recomendo 100%' },
     { t:'p', n:'🔔 AVISO',   c:'#EF4444', m:'🛒 Produto em destaque: só mais 8 minutos nesse preço!' },
@@ -14071,7 +14105,7 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     { t:'u', n:'Victor S.',  c:'#14B8A6', m:'esse carregador 65W vale muito mesmo' },
     { t:'u', n:'Nana R.',    c:'#F59E0B', m:'comprando pra meu pai de presente 🎁' },
     { t:'u', n:'Kaio P.',    c:'#6366F1', m:'melhor live de tech do WeKz! 🏆🏆🏆' },
-    { t:'h', n:'TechStore BR', c:'#00B4AB', m:'🎉 Próximo produto em 2 minutos! Vão adorar o preço' },
+    { t:'h', n:'TechStore Brasil', c:'#00B4AB', m:'🎉 Próximo produto em 2 minutos! Vão adorar o preço' },
     { t:'u', n:'Luisa W.',   c:'#EC4899', m:'comprei! chegou antes do prazo 👏' },
     { t:'u', n:'Mateus B.',  c:'#2563EB', m:'a qualidade do fone é surreal pelo preço' },
     { t:'p', n:'💎 FLASH',   c:'#EF4444', m:'⏱ ÚLTIMOS 3 MINUTOS nesse preço! Garante o seu!' },
@@ -14085,8 +14119,10 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
   var _viewerTimer = null;
   var _cdTimers = [];
   var _activeCdTimer = null;
-  var _isFollowing = false;
   var _viewers = 1247;
+  // [FIX-KZLIVE-05] Paginação real da grade "Produtos Nesta Live"
+  var _KZLIVE_PER_PAGE = 4;
+  var _kzlivePage = 1;
 
   /* ─── Format countdown ─── */
   function _fmtCd(secs) {
@@ -14095,15 +14131,35 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
   }
 
-  /* ─── Render products grid ─── */
-  function _renderGrid() {
+  /* ─── Render products grid (paginado) ─── */
+  // [FIX-KZLIVE-05] Antes renderizava TODOS os produtos numa grade só,
+  // sem nenhum controle de página — lista longa vira scroll infinito e
+  // dificulta achar o que se quer. Agora fatia por página (4 por vez) e
+  // desenha os controles Anterior/números/Próxima (mesmo padrão visual/
+  // lógico de buildFeatPaginationHTML, usado na Home/Categoria/Lojas).
+  function _renderGrid(page) {
     var grid = document.getElementById('kzliveGrid');
     if (!grid) return;
+    var totalItems = _LIVE_PRODUCTS.length;
+    var totalPages = Math.max(1, Math.ceil(totalItems / _KZLIVE_PER_PAGE));
+    _kzlivePage = (typeof page === 'number' && page > 0) ? page : (_kzlivePage || 1);
+    if (_kzlivePage > totalPages) _kzlivePage = totalPages;
+    var startIdx = (_kzlivePage - 1) * _KZLIVE_PER_PAGE;
+    var pageItems = _LIVE_PRODUCTS.slice(startIdx, startIdx + _KZLIVE_PER_PAGE);
+
     grid.innerHTML = '';
-    _LIVE_PRODUCTS.forEach(function(p, i) {
+    pageItems.forEach(function(p, i) {
       var card = document.createElement('div');
       card.className = 'kzlive-pcard' + (p.active ? ' kzlive-pcard-active' : '');
       card.style.animationDelay = (i * 60) + 'ms';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.title = 'Ver produto: ' + p.name;
+      // [FIX-KZLIVE-02] Clicar em qualquer área do card (fora do botão de
+      // compra) agora abre a ficha completa do produto — antes não fazia
+      // nada além do hover visual.
+      card.onclick = function() { window.kzliveOpenProduct(p.id); };
+      card.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.kzliveOpenProduct(p.id); } };
       var stockTxt = p.stock < 10
         ? '<div class="kzlive-pcard-stock-txt">🔥 Apenas ' + p.stock + ' restam!</div>'
         : '<div class="kzlive-pcard-stock-ok">' + p.stock + ' unidades disponíveis</div>';
@@ -14111,6 +14167,7 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
         '<div class="kzlive-pcard-img">' +
           (p.active ? '<div class="kzlive-pcard-now-badge"><span class="kzlive-dot" style="width:5px;height:5px;"></span> AGORA</div>' : '') +
           '<span>' + p.emoji + '</span>' +
+          '<div class="kzlive-pcard-view-hint">👁 Ver produto</div>' +
         '</div>' +
         '<div class="kzlive-pcard-body">' +
           '<div class="kzlive-pcard-name">' + p.name + '</div>' +
@@ -14127,28 +14184,82 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
             '<div class="kzlive-pcard-stock-fill" style="width:' + (100 - p.stockPct) + '%"></div>' +
           '</div>' +
           stockTxt +
-          '<button class="kzlive-pcard-cta" onclick="kzliveAddToCart(' + p.id + ')">🛒 Comprar Agora</button>' +
+          // [FIX-KZLIVE-03] botão real: feedback de loading/sucesso (via
+          // btnFeedback, mesmo padrão de .btn-flash-buy) + navega pro
+          // carrinho ao final — antes só chamava addToCart sem nenhum
+          // retorno visual claro nem "direcionamento" de compra.
+          '<button class="kzlive-pcard-cta" onclick="event.stopPropagation();btnFeedback(this,()=>window.kzliveBuyNow(' + p.id + '))">' +
+            '<span class="btn-spinner"></span><span class="btn-check">✓</span>' +
+            '<span class="btn-label">🛒 Comprar Agora</span>' +
+          '</button>' +
         '</div>';
       grid.appendChild(card);
     });
+
+    var pag = document.getElementById('kzlivePagination');
+    if (pag) pag.innerHTML = totalPages > 1 ? _buildKzlivePaginationHTML(_kzlivePage, totalPages) : '';
+
+    // Reaplica os countdowns só nos cards visíveis desta página
+    _tickVisibleCountdowns();
   }
 
+  // [FIX-KZLIVE-05] Botões Anterior/números/Próxima — réplica fiel do
+  // padrão já usado em buildFeatPaginationHTML (Home) / buildCatPaginationHTML
+  // (Categoria) / buildStorePaginationHTML (Lojas), pra manter a mesma
+  // linguagem visual em todo o site.
+  function _buildKzlivePaginationHTML(current, total) {
+    if (total <= 1) return '';
+    function pageBtn(label, targetPage, opts) {
+      opts = opts || {};
+      var isActive = targetPage === current && !opts.isNav;
+      var isDisabled = !!opts.disabled;
+      return '<button ' + (isDisabled ? 'disabled' : '') + ' style="padding:8px 14px;border-radius:8px;border:1px solid ' + (isActive ? 'var(--teal)' : 'var(--border)') + ';background:' + (isActive ? 'rgba(0,180,171,0.1)' : 'var(--card)') + ';color:' + (isActive ? 'var(--teal)' : 'var(--muted)') + ';cursor:' + (isDisabled ? 'default' : 'pointer') + ';font-size:13px;opacity:' + (isDisabled ? '0.4' : '1') + ';transition:var(--transition);" '
+        + (isDisabled ? '' : 'onclick="window.kzliveGoToPage(' + targetPage + ')"') + '>' + label + '</button>';
+    }
+    var ellipsis = '<span style="padding:0 4px;color:var(--muted);">…</span>';
+    var nums = [];
+    if (total <= 7) {
+      for (var n = 1; n <= total; n++) nums.push(n);
+    } else {
+      nums.push(1);
+      if (current > 3) nums.push('...');
+      for (var m = Math.max(2, current - 1); m <= Math.min(total - 1, current + 1); m++) nums.push(m);
+      if (current < total - 2) nums.push('...');
+      nums.push(total);
+    }
+    var html = pageBtn('‹ Anterior', current - 1, { isNav: true, disabled: current === 1 });
+    html += nums.map(function(n) { return n === '...' ? ellipsis : pageBtn(String(n), n); }).join('');
+    html += pageBtn('Próxima ›', current + 1, { isNav: true, disabled: current === total });
+    return html;
+  }
+
+  window.kzliveGoToPage = function(page) {
+    _renderGrid(page);
+    var sec = document.querySelector('.kzlive-products-sec');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   /* ─── Countdown timers ─── */
+
   function _startCountdowns() {
     _cdTimers.forEach(clearInterval);
     _cdTimers = [];
     if (_activeCdTimer) { clearInterval(_activeCdTimer); _activeCdTimer = null; }
 
+    // [FIX-KZLIVE-05] O tempo restante agora vive no PRÓPRIO produto
+    // (p._rem), não numa variável presa no closure do setInterval — assim
+    // _tickVisibleCountdowns() consegue pintar o valor certo na hora,
+    // mesmo quando o card só existe no DOM depois de trocar de página.
     _LIVE_PRODUCTS.forEach(function(p) {
-      var rem = p.countdown;
+      if (typeof p._rem !== 'number') p._rem = p.countdown;
       var timer = setInterval(function() {
-        if (rem > 0) rem--;
+        if (p._rem > 0) p._rem--;
         var el = document.getElementById('kzlivecd_' + p.id);
         if (el) {
-          el.textContent = _fmtCd(rem);
-          el.style.color = rem < 60 ? '#EF4444' : '#FF6B35';
+          el.textContent = _fmtCd(p._rem);
+          el.style.color = p._rem < 60 ? '#EF4444' : '#FF6B35';
         }
-        if (rem === 0) clearInterval(timer);
+        if (p._rem === 0) clearInterval(timer);
       }, 1000);
       _cdTimers.push(timer);
     });
@@ -14163,28 +14274,75 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     }, 1000);
   }
 
-  /* ─── Chat message injection ─── */
+  // [FIX-KZLIVE-05] Pinta o valor ATUAL de cada countdown assim que a
+  // página troca — sem isso, o card recém-criado ficaria mostrando
+  // "--:--" por até 1s até o próximo tick do setInterval already-running.
+  function _tickVisibleCountdowns() {
+    _LIVE_PRODUCTS.forEach(function(p) {
+      var el = document.getElementById('kzlivecd_' + p.id);
+      if (!el) return;
+      var rem = (typeof p._rem === 'number') ? p._rem : p.countdown;
+      el.textContent = _fmtCd(rem);
+      el.style.color = rem < 60 ? '#EF4444' : '#FF6B35';
+    });
+  }
+
+  /* ─── Chat message injection ───
+     [FIX-KZLIVE-04] Agora aceita avatar real (foto ou ícone do perfil,
+     ver _kzliveMyIdentity) via msg.avatarUrl/msg.avatarIcon, e destaca
+     visualmente as mensagens do próprio usuário (msg.t === 'me'). */
   function _injectMsg(msg) {
     var body = document.getElementById('kzliveChatBody');
     if (!body) return;
     var div = document.createElement('div');
-    div.className = 'kzlive-msg';
-    var initials = msg.n.replace(/[^A-Za-záéíóúÁÉÍÓÚãõâêîôû ]/g,'').trim().slice(0, 2).toUpperCase();
     var isPromo = (msg.t === 'p');
     var isHost  = (msg.t === 'h');
+    var isMe    = (msg.t === 'me');
+    div.className = 'kzlive-msg' + (isMe ? ' kzlive-msg-me' : '');
+    var initials = msg.n.replace(/[^A-Za-záéíóúÁÉÍÓÚãõâêîôû ]/g,'').trim().slice(0, 2).toUpperCase();
+    var avatarInner = initials;
+    var avatarStyle = 'background:' + msg.c + ';min-width:26px;';
+    if (msg.avatarUrl) {
+      avatarInner = '';
+      avatarStyle = 'min-width:26px;padding:0;background:' + msg.c + ';';
+    } else if (msg.avatarIcon) {
+      avatarInner = msg.avatarIcon;
+      avatarStyle = 'min-width:26px;background:' + msg.c + ';';
+    }
+    var safeText = (typeof escapeHtml === 'function') ? escapeHtml(msg.m) : msg.m;
     div.innerHTML =
-      '<div class="kzlive-msg-avatar" style="background:' + msg.c + ';min-width:26px;">' + initials + '</div>' +
+      '<div class="kzlive-msg-avatar" style="' + avatarStyle + '">' + avatarInner +
+        (msg.avatarUrl ? '<img src="' + msg.avatarUrl + '" alt="' + msg.n + '">' : '') +
+      '</div>' +
       '<div class="kzlive-msg-body">' +
         '<div class="kzlive-msg-name" style="color:' + msg.c + ';">' + msg.n +
           (isHost ? ' <span style="font-size:9px;background:rgba(0,180,171,0.12);border:1px solid rgba(0,180,171,0.25);color:var(--teal);border-radius:50px;padding:1px 5px;font-weight:700;">HOST</span>' : '') +
+          (isMe ? ' <span style="font-size:9px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:var(--purple);border-radius:50px;padding:1px 5px;font-weight:700;">VOCÊ</span>' : '') +
         '</div>' +
         (isPromo
-          ? '<div class="kzlive-msg-promo-inner">' + msg.m + '</div>'
-          : '<div class="kzlive-msg-text">' + msg.m + '</div>') +
+          ? '<div class="kzlive-msg-promo-inner">' + safeText + '</div>'
+          : '<div class="kzlive-msg-text">' + safeText + '</div>') +
       '</div>';
     body.appendChild(div);
     body.scrollTop = body.scrollHeight;
     while (body.children.length > 45) body.removeChild(body.firstChild);
+  }
+
+  // [FIX-KZLIVE-04] Lê o nome e a foto/ícone cadastrados em "Meu Perfil"
+  // (mesma fonte-de-verdade usada no dropdown do cabeçalho: cpUserName +
+  // window._cpAvatarState) — antes o chat sempre mandava "Você" com um
+  // círculo colorido genérico, sem nenhuma ligação com o cadastro real.
+  function _kzliveMyIdentity() {
+    var nameEl = document.getElementById('cpUserName');
+    var name = (nameEl && nameEl.textContent.trim()) || 'Você';
+    var identity = { n: name, c: '#00B4AB' };
+    var s = window._cpAvatarState;
+    if (s && s.mode === 'photo' && s.payload) {
+      identity.avatarUrl = s.payload;
+    } else if (s && s.mode === 'icon' && s.payload) {
+      identity.avatarIcon = s.payload;
+    }
+    return identity;
   }
 
   function _startChat() {
@@ -14243,32 +14401,38 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     showPage('home');
   };
 
-  window.kzliveToggleFollow = function() {
-    _isFollowing = !_isFollowing;
+  // [FIX-KZLIVE-06] Antes mantinha um estado local (_isFollowing) isolado,
+  // sem nenhuma ligação com o sistema real de "Lojas Seguidas" — seguir
+  // aqui não aparecia em nenhum outro lugar do site. Agora delega para
+  // toggleFollowStoreByName(), a mesma função unificada usada nas fichas
+  // de loja e na Home, que grava em followedStores[] de verdade.
+  function _syncKzliveFollowBtn() {
     var btn = document.getElementById('kzliveFollowBtn');
     if (!btn) return;
-    if (_isFollowing) {
-      btn.textContent = '✓ Seguindo';
-      btn.classList.add('kzlive-following');
-      if (typeof showToast === 'function') showToast('✅ Seguindo TechStore BR! Você será notificado nas próximas lives.');
-    } else {
-      btn.textContent = '+ Seguir';
-      btn.classList.remove('kzlive-following');
+    var following = (typeof followedStores !== 'undefined') && followedStores.some(function(fs) { return fs.n === 'TechStore Brasil'; });
+    btn.textContent = following ? '✓ Seguindo' : '+ Seguir';
+    btn.classList.toggle('kzlive-following', following);
+  }
+
+  window.kzliveToggleFollow = function() {
+    if (typeof toggleFollowStoreByName === 'function') {
+      toggleFollowStoreByName('TechStore Brasil');
     }
+    _syncKzliveFollowBtn();
   };
 
   // [BUG-N04 fix] Unificado: usa cartItemsData canónico em vez do array paralelo _wkzCartItems
-  window.kzliveAddToCart = function(productId) {
+  window.kzliveAddToCart = function(productId, silent) {
     var p = null;
     for (var i = 0; i < _LIVE_PRODUCTS.length; i++) {
       if (_LIVE_PRODUCTS[i].id === productId) { p = _LIVE_PRODUCTS[i]; break; }
     }
-    if (!p) return;
+    if (!p) return false;
     var itemId = 'live_' + p.id;
     var existing = cartItemsData.find(function(x){ return x.id === itemId; });
     if (existing) {
       existing.qty++;
-      if (typeof showToast === 'function') showToast('➕ +1 "' + p.name.slice(0, 32) + '" no carrinho!');
+      if (!silent && typeof showToast === 'function') showToast('➕ +1 "' + p.name.slice(0, 32) + '" no carrinho!');
     } else {
       // [v2.9.30] op = preço original (campo p.orig) — mesma lógica de addToCart/addFlashToCart.
       var liveOp = parseFloat(String(p.orig||'0').replace(/[^0-9,]/g,'').replace(',','.')) || p.priceVal;
@@ -14283,27 +14447,137 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
         qty: 1,
         _isLive: true
       });
-      if (typeof showToast === 'function') showToast('🛒 "' + p.name.slice(0, 32) + '" adicionado ao carrinho!');
+      if (!silent && typeof showToast === 'function') showToast('🛒 "' + p.name.slice(0, 32) + '" adicionado ao carrinho!');
     }
     if (typeof updateCartUI === 'function') updateCartUI();
+    return true;
   };
 
+  // [FIX-KZLIVE-03] "Comprar"/"Comprar Agora" agora DIRECIONA para a
+  // compra de verdade: adiciona ao carrinho e navega pra página do
+  // carrinho — antes só adicionava silenciosamente e o usuário continuava
+  // na live sem perceber que a ação tinha funcionado.
+  window.kzliveBuyNow = function(productId) {
+    var ok = window.kzliveAddToCart(productId, true);
+    if (!ok) return;
+    var p = null;
+    for (var i = 0; i < _LIVE_PRODUCTS.length; i++) {
+      if (_LIVE_PRODUCTS[i].id === productId) { p = _LIVE_PRODUCTS[i]; break; }
+    }
+    if (typeof showToast === 'function' && p) showToast('🛒 "' + p.name.slice(0, 32) + '" adicionado! Indo para o carrinho...');
+    setTimeout(function() { showPage('cart'); }, 550);
+  };
+
+  // [FIX-KZLIVE-02] Clicar no produto (card ou destaque) agora abre uma
+  // ficha completa — antes não existia nenhuma ação de "ver produto"
+  // fora do botão de compra.
+  window.kzliveOpenProduct = function(productId) {
+    var p = null;
+    for (var i = 0; i < _LIVE_PRODUCTS.length; i++) {
+      if (_LIVE_PRODUCTS[i].id === productId) { p = _LIVE_PRODUCTS[i]; break; }
+    }
+    if (!p) return;
+    _showKzliveProductModal(p);
+  };
+
+  function _showKzliveProductModal(p) {
+    var existing = document.getElementById('kzlive-product-modal-overlay');
+    if (existing) existing.remove();
+
+    var starsFull = Math.round(p.rating || 5);
+    var stars = '★'.repeat(starsFull) + '☆'.repeat(5 - starsFull);
+    var specsHtml = (p.specs || []).map(function(s) {
+      return '<li style="font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">' + s + '</li>';
+    }).join('');
+    var stockColor = p.stock <= 5 ? '#EF4444' : p.stock <= 15 ? '#F59E0B' : '#22C55E';
+    var stockMsg = p.stock <= 5 ? ('🔥 Apenas ' + p.stock + ' unidades!') : p.stock <= 15 ? ('⚡ ' + p.stock + ' unidades disponíveis') : '✅ Em estoque';
+    var remLabel = _fmtCd(typeof p._rem === 'number' ? p._rem : p.countdown);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'kzlive-product-modal-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML =
+      '<div style="background:var(--card);border:1px solid rgba(239,68,68,0.3);border-radius:24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 40px 80px rgba(0,0,0,0.6);position:relative;">'
+        + '<div style="background:linear-gradient(135deg,#EF4444,#FF6B35);padding:10px 20px;border-radius:24px 24px 0 0;display:flex;align-items:center;justify-content:space-between;">'
+          + '<span style="font-family:\'DM Sans\',sans-serif;font-weight:800;font-size:13px;color:#fff;letter-spacing:1px;">📺 EXCLUSIVO KZ LIVE — ' + p.disc + '</span>'
+          + '<button onclick="document.getElementById(\'kzlive-product-modal-overlay\').remove()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer;line-height:1;">✕</button>'
+        + '</div>'
+        + '<div style="padding:24px;">'
+          + '<div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">'
+            + '<div style="width:90px;height:90px;flex-shrink:0;background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(255,107,53,0.12));border:1px solid rgba(239,68,68,0.25);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:46px;">' + p.emoji + '</div>'
+            + '<div style="flex:1;">'
+              + '<h2 style="font-size:17px;font-weight:700;line-height:1.3;margin-bottom:6px;">' + p.name + '</h2>'
+              + '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">🏪 ' + (p.store || 'Kz Live') + '</div>'
+              + '<div style="color:#F59E0B;font-size:13px;">' + stars + ' <span style="color:var(--muted);font-size:11px;">' + p.rating + ' (' + (p.reviews || 0).toLocaleString('pt-BR') + ' avaliações)</span></div>'
+            + '</div>'
+          + '</div>'
+          + '<div style="background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(255,107,53,0.08));border:1px solid rgba(239,68,68,0.2);border-radius:14px;padding:16px;margin-bottom:16px;">'
+            + '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
+              + '<span style="font-family:\'DM Sans\',sans-serif;font-size:32px;font-weight:800;color:#EF4444;">' + p.price + '</span>'
+              + '<div>'
+                + '<div style="font-size:13px;color:var(--muted);text-decoration:line-through;">' + p.orig + '</div>'
+                + '<div style="background:linear-gradient(90deg,#EF4444,#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;font-size:13px;">Você economiza ' + p.disc.replace('-','') + '</div>'
+              + '</div>'
+            + '</div>'
+            + '<div style="font-size:12px;color:' + stockColor + ';font-weight:600;margin-top:8px;">' + stockMsg + '</div>'
+            + '<div style="font-size:11px;color:var(--muted);margin-top:6px;">⏱ Preço exclusivo da live expira em <strong style="color:#FF6B35;">' + remLabel + '</strong></div>'
+          + '</div>'
+          + '<div style="margin-bottom:16px;">'
+            + '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);">Descrição</div>'
+            + '<p style="font-size:13px;color:var(--muted);line-height:1.7;">' + (p.desc || 'Produto exclusivo desta live. Aproveite enquanto está ao vivo!') + '</p>'
+          + '</div>'
+          + (specsHtml ? '<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);">Especificações</div><ul style="list-style:none;padding:0;margin:0;">' + specsHtml + '</ul></div>' : '')
+          + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">'
+            + '<span style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22C55E;font-size:11px;padding:4px 10px;border-radius:20px;">🚚 Frete Grátis</span>'
+            + '<span style="background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.25);color:var(--teal);font-size:11px;padding:4px 10px;border-radius:20px;">🛡 Proteção WeKz</span>'
+            + '<span style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:var(--purple);font-size:11px;padding:4px 10px;border-radius:20px;">↩ 30 dias devolução</span>'
+          + '</div>'
+          + '<div style="display:flex;gap:10px;flex-direction:column;">'
+            + '<div style="display:flex;gap:10px;">'
+              + '<button onclick="document.getElementById(\'kzlive-product-modal-overlay\').remove()" style="flex:0.4;padding:14px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">Fechar</button>'
+              + '<button class="btn-add" style="flex:1;margin-top:0;border-radius:12px;font-size:14px;padding:14px;" onclick="event.stopPropagation();btnFeedback(this,()=>window.kzliveAddToCart(' + p.id + '))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label">🛒 Adicionar ao Carrinho</span></button>'
+            + '</div>'
+            + '<button class="btn-flash-buy" style="border-radius:12px;font-size:14px;padding:14px;background:linear-gradient(135deg,#EF4444,#FF6B35);" onclick="event.stopPropagation();btnFeedback(this,()=>{document.getElementById(\'kzlive-product-modal-overlay\')?.remove();window.kzliveBuyNow(' + p.id + ');},{loadingMs:500,successMs:500})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label">⚡ Comprar Agora — Preço da Live!</span></button>'
+          + '</div>'
+          + '<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">📺 Preço exclusivo enquanto a live estiver ao vivo · Estoque não garantido</div>'
+        + '</div>'
+      + '</div>';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+  }
+
+  // [FIX-KZLIVE-04] Usa a identidade real do perfil (nome + foto/ícone
+  // cadastrados) em vez do genérico "Você" com avatar de cor fixa.
   window.kzliveSendMsg = function() {
     var input = document.getElementById('kzliveChatInput');
     if (!input) return;
     var txt = input.value.trim();
     if (!txt) return;
-    _injectMsg({ t:'u', n:'Você', c:'#00B4AB', m: txt });
+    var me = _kzliveMyIdentity();
+    _injectMsg({ t:'me', n: me.n, c: me.c, m: txt, avatarUrl: me.avatarUrl, avatarIcon: me.avatarIcon });
     input.value = '';
     input.focus();
+    var counter = document.getElementById('kzliveChatCharCount');
+    if (counter) counter.textContent = '0/120';
+    var sendBtn = document.getElementById('kzliveChatSendBtn');
+    if (sendBtn) sendBtn.classList.remove('kzlive-send-ready');
+  };
+
+  // [FIX-KZLIVE-04b] Envio rápido de reações (👍🔥❤️😍👏) com um toque —
+  // usa a mesma identidade real do usuário.
+  window.kzliveSendReaction = function(emoji) {
+    var me = _kzliveMyIdentity();
+    _injectMsg({ t:'me', n: me.n, c: me.c, m: emoji, avatarUrl: me.avatarUrl, avatarIcon: me.avatarIcon });
   };
 
   /* ─── Init on page open ─── */
   window.initKzLive = function() {
-    _renderGrid();
+    _kzlivePage = 1;
+    _renderGrid(1);
     _startCountdowns();
     _startChat();
     _startViewers();
+    _syncKzliveFollowBtn();
     /* Reset iframe / placeholder state */
     var ifr = document.getElementById('kzliveIframe');
     var ph  = document.getElementById('kzlivePlaceholder');
@@ -14331,6 +14605,13 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
       setTimeout(window.initKzLive, 80);
     } else {
       _cleanupLive();
+      // [FIX-KZLIVE-07] Sair da live SEM clicar em "Voltar" (ex.: clicando
+      // em "Comprar Agora", que agora navega pro carrinho) deixava a
+      // classe "kzlive-active" presa no <body> — e essa classe é o gatilho
+      // documentado no wkz-kzlive-patch.css do bug "bottom-nav flutuando
+      // no meio da página". Antes só kzliveClose() limpava essa classe;
+      // agora QUALQUER navegação para fora da live limpa também.
+      document.body.classList.remove('kzlive-active');
     }
   });
 

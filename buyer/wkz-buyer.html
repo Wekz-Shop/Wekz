@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', function() {
           Kz Live Shopping — Demonstração
           <span style="font-size:10px;font-weight:600;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);padding:2px 8px;border-radius:50px;color:#EF4444;">NOVO</span>
         </div>
-        <div class="kzlive-home-banner-sub">TechStore BR · Mega Promoção de Eletrônicos · <span style="color:var(--muted);">⚙ Modo demonstração</span></div>
+        <div class="kzlive-home-banner-sub">TechStore Brasil · Mega Promoção de Eletrônicos · <span style="color:var(--muted);">⚙ Modo demonstração</span></div>
       </div>
     </div>
     <button class="kzlive-home-banner-cta" onclick="event.stopPropagation();MapsTo('live')">▶ Entrar na Live →</button>
@@ -4943,7 +4943,7 @@ body.kzlive-active .bottom-nav {
             <!-- WeKz Shop Logo SVG — placeholder da live -->
             <img src="../shared/assets/logo/logotipo-wekz-com-sombra.png" class="kzlive-ph-logo-svg" alt="WeKz Shop Logo" style="object-fit:contain;">
             <div class="kzlive-ph-logo" style="margin-top:-4px;">WeKz Shop</div>
-            <div class="kzlive-ph-preview-text" id="kzlivePlaceholderTitle">TechStore BR — Mega Promoção de Eletrônicos</div>
+            <div class="kzlive-ph-preview-text" id="kzlivePlaceholderTitle">TechStore Brasil — Mega Promoção de Eletrônicos</div>
             <!-- FIX BUG-N02: subtítulo neutro — sem prometer stream ao vivo -->
             <div class="kzlive-ph-subtitle">⚙ Modo demonstração · Conteúdo de exemplo</div>
           </div>
@@ -4968,7 +4968,7 @@ body.kzlive-active .bottom-nav {
         <div class="kzlive-host-avatar">T</div>
         <div style="flex:1;min-width:0;">
           <div class="kzlive-host-name">
-            TechStore BR
+            TechStore Brasil
             <span class="kzlive-verified-tag">✅ Verificado</span>
           </div>
           <div class="kzlive-host-meta">⭐ 4.9 · 12.430 seguidores · Live #47</div>
@@ -4978,7 +4978,7 @@ body.kzlive-active .bottom-nav {
 
       <!-- Active product highlight card -->
       <div class="kzlive-active-card" id="kzliveActiveCard">
-        <div style="flex:1;min-width:0;">
+        <div class="kzlive-active-clickzone" onclick="window.kzliveOpenProduct(0)" role="button" tabindex="0" title="Ver produto" style="flex:1;min-width:0;cursor:pointer;">
           <div class="kzlive-active-label">
             <span class="kzlive-dot" style="width:6px;height:6px;"></span>
             PRODUTO EM DESTAQUE AGORA
@@ -4994,7 +4994,10 @@ body.kzlive-active .bottom-nav {
             Oferta expira em: <span class="kzlive-cd-val" id="kzliveActiveCd">--:--</span>
           </div>
         </div>
-        <button class="kzlive-buy-now-btn" onclick="kzliveAddToCart(0)">🛒 Comprar</button>
+        <button class="kzlive-buy-now-btn" onclick="event.stopPropagation();btnFeedback(this,()=>window.kzliveBuyNow(0))">
+          <span class="btn-spinner"></span><span class="btn-check">✓</span>
+          <span class="btn-label">🛒 Comprar</span>
+        </button>
       </div>
 
     </div><!-- /video-side -->
@@ -5013,16 +5016,28 @@ body.kzlive-active .bottom-nav {
         </div>
       </div>
       <div class="kzlive-chat-body" id="kzliveChatBody"><!-- Injected by JS --></div>
+      <!-- [FIX-KZLIVE-04b] Reações rápidas — um toque envia direto pro chat com nome/foto reais do perfil -->
+      <div class="kzlive-chat-reactions">
+        <button onclick="window.kzliveSendReaction('🔥')" title="Enviar reação">🔥</button>
+        <button onclick="window.kzliveSendReaction('❤️')" title="Enviar reação">❤️</button>
+        <button onclick="window.kzliveSendReaction('👏')" title="Enviar reação">👏</button>
+        <button onclick="window.kzliveSendReaction('😍')" title="Enviar reação">😍</button>
+        <button onclick="window.kzliveSendReaction('👍')" title="Enviar reação">👍</button>
+      </div>
       <div class="kzlive-chat-foot">
-        <input
-          type="text"
-          class="kzlive-chat-input"
-          id="kzliveChatInput"
-          placeholder="Enviar mensagem..."
-          maxlength="120"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();kzliveSendMsg();}"
-        />
-        <button class="kzlive-chat-send-btn" onclick="kzliveSendMsg()" title="Enviar">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+          <input
+            type="text"
+            class="kzlive-chat-input"
+            id="kzliveChatInput"
+            placeholder="Enviar mensagem..."
+            maxlength="120"
+            oninput="document.getElementById('kzliveChatCharCount').textContent=this.value.length+'/120';document.getElementById('kzliveChatSendBtn').classList.toggle('kzlive-send-ready',this.value.trim().length>0);"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();kzliveSendMsg();}"
+          />
+          <span class="kzlive-chat-char-count" id="kzliveChatCharCount">0/120</span>
+        </div>
+        <button class="kzlive-chat-send-btn" id="kzliveChatSendBtn" onclick="kzliveSendMsg()" title="Enviar">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
         </button>
       </div>
@@ -5043,6 +5058,7 @@ body.kzlive-active .bottom-nav {
       <div class="kzlive-exclusive-badge">⚡ Exclusivo Live — Só agora!</div>
     </div>
     <div class="kzlive-grid" id="kzliveGrid"><!-- Injected by JS --></div>
+    <div class="kzlive-pagination" id="kzlivePagination"><!-- Injected by JS --></div>
   </div>
 
 </div><!-- /page-live -->
