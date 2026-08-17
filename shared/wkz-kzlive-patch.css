@@ -206,3 +206,117 @@
   border-color: rgba(239,68,68,0.3);
   color: var(--live-accent);
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   6) [FIX-KZLIVE-01..07] Correções de funcionamento — Ago/2026
+   Botões de compra sem feedback/redirecionamento real, produto sem
+   destino ao clicar, Seguir não contabilizava, chat sem identidade real
+   do usuário, e paginação inexistente na grade de produtos.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* [FIX-KZLIVE-02] Dica visual "Ver produto" ao passar o mouse/focar no
+   card — deixa claro que o card inteiro é clicável, não só o botão. */
+.kzlive-pcard-img { position: relative; overflow: hidden; }
+.kzlive-pcard-view-hint {
+  position: absolute; inset: 0;
+  background: rgba(8,14,26,0.55);
+  color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  opacity: 0; transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.kzlive-pcard:hover .kzlive-pcard-view-hint,
+.kzlive-pcard:focus-visible .kzlive-pcard-view-hint { opacity: 1; }
+.kzlive-pcard:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.kzlive-pcard-img span { transition: transform 0.25s ease; }
+.kzlive-pcard:hover .kzlive-pcard-img span { transform: scale(1.08); }
+
+/* [FIX-KZLIVE-03] Feedback real de loading→sucesso nos botões de compra
+   (mesmo padrão visual de .btn-flash-buy, reaproveitando os keyframes
+   globais btn-spin/btn-pop já usados no resto do site). */
+.kzlive-pcard-cta, .kzlive-buy-now-btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  position: relative;
+}
+.kzlive-pcard-cta .btn-spinner, .kzlive-buy-now-btn .btn-spinner {
+  width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff; border-radius: 50%;
+  animation: btn-spin 0.65s linear infinite; display: none; flex-shrink: 0;
+}
+.kzlive-pcard-cta .btn-check, .kzlive-buy-now-btn .btn-check {
+  font-size: 13px; display: none; animation: btn-pop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.kzlive-pcard-cta.btn-loading .btn-label, .kzlive-buy-now-btn.btn-loading .btn-label { display: none; }
+.kzlive-pcard-cta.btn-loading .btn-spinner, .kzlive-buy-now-btn.btn-loading .btn-spinner { display: block; }
+.kzlive-pcard-cta.btn-success .btn-label, .kzlive-buy-now-btn.btn-success .btn-label { display: none; }
+.kzlive-pcard-cta.btn-success .btn-spinner, .kzlive-buy-now-btn.btn-success .btn-spinner { display: none; }
+.kzlive-pcard-cta.btn-success .btn-check, .kzlive-buy-now-btn.btn-success .btn-check { display: block; }
+.kzlive-pcard-cta.btn-success, .kzlive-buy-now-btn.btn-success {
+  background: linear-gradient(135deg, #22C55E, #16A34A) !important;
+  box-shadow: 0 0 18px rgba(34,197,94,0.5);
+}
+.kzlive-pcard-cta:disabled, .kzlive-buy-now-btn:disabled { cursor: default; opacity: 0.92; }
+
+/* [FIX-KZLIVE-04] Avatar com foto real do perfil no chat (em vez de só
+   iniciais) — mantém o círculo de 26px, encaixando a imagem dentro. */
+.kzlive-msg-avatar { position: relative; overflow: hidden; }
+.kzlive-msg-avatar img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; border-radius: 50%;
+}
+/* Mensagens do próprio usuário — leve destaque para diferenciar no fluxo */
+.kzlive-msg-me .kzlive-msg-text {
+  background: rgba(124,58,237,0.07);
+  border: 1px solid rgba(124,58,237,0.16);
+  border-radius: 8px; padding: 6px 10px;
+}
+
+/* [FIX-KZLIVE-04b] Reações rápidas acima do campo de mensagem */
+.kzlive-chat-reactions {
+  display: flex; gap: 6px; padding: 0 10px 8px; flex-shrink: 0;
+}
+.kzlive-chat-reactions button {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--card2); border: 1px solid var(--border);
+  font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.kzlive-chat-reactions button:hover { transform: translateY(-2px) scale(1.08); background: rgba(0,180,171,0.1); }
+.kzlive-chat-reactions button:active { transform: scale(0.92); }
+
+/* Contador de caracteres + botão de enviar "pronto" */
+.kzlive-chat-char-count {
+  font-size: 10px; color: var(--muted); text-align: right; padding: 2px 4px 0 0;
+}
+.kzlive-chat-send-btn { opacity: 0.55; }
+.kzlive-chat-send-btn.kzlive-send-ready { opacity: 1; box-shadow: 0 0 12px rgba(0,180,171,0.45); }
+
+/* [FIX-KZLIVE-05] Espaçamento da paginação da grade de produtos */
+.kzlive-pagination {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  gap: 6px; margin-top: 20px;
+}
+
+/* [FIX-KZLIVE-02b] Zona clicável do card em destaque — cursor + leve
+   realce ao passar o mouse, mesma linguagem dos cards da grade. */
+.kzlive-active-clickzone:hover .kzlive-active-pname { color: var(--teal); }
+.kzlive-active-pname { transition: color 0.15s ease; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   7) [FIX-KZLIVE-08] Polimento estético geral — hierarquia mais clara
+   entre preço/desconto/estoque, cards com mais "respiro" e sombra sutil
+   para dar profundidade e guiar o olhar para o produto.
+   ══════════════════════════════════════════════════════════════════════ */
+.kzlive-pcard {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+}
+.kzlive-pcard:hover {
+  box-shadow: 0 10px 26px rgba(0,0,0,0.28);
+}
+.kzlive-pcard.kzlive-pcard-active {
+  box-shadow: 0 10px 26px rgba(239,68,68,0.16);
+}
+.kzlive-products-sec { padding-top: 28px; }
+.kzlive-products-hd { margin-bottom: 18px; }
+.kzlive-pcard-cd { font-weight: 600; }
+
