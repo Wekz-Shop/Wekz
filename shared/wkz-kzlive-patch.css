@@ -152,6 +152,16 @@
   }
 }
 
+/* [FIX-KZLIVE-09] Vão em branco enorme sob o vídeo e sob o chat, em
+   telas ≥901px — causa raiz: .kzlive-chat-side tinha height fixo em
+   calc(100vh - 55px) (sem relação com a quantidade real de mensagens)
+   enquanto .kzlive-main-wrap usava align-items:start, então a coluna do
+   vídeo (curta) não esticava para acompanhar. Corrigido na origem, em
+   wkz-styles-full.css e no <style> inline de wkz-buyer.html (que é o
+   que realmente vence a cascata nesta página): align-items:stretch no
+   wrap + altura do chat vinda do grid, não de 100vh. Nada a fazer aqui
+   — só documentando pra próxima pessoa não reintroduzir o bug. */
+
 .kzlive-player-outer {
   aspect-ratio: 16 / 9;
   width: 100%;

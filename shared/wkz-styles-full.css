@@ -10388,7 +10388,10 @@ body.kz-neg-focus-mode::before {
   max-width:1400px;
   margin:0 auto;
   border-bottom:1px solid var(--border);
-  align-items:start;
+  /* [FIX-KZLIVE-09] Era "start" — deixava um vão em branco enorme sob as
+     duas colunas (ver .kzlive-chat-side). "stretch" faz as colunas
+     terminarem juntas, na altura natural do conteúdo do vídeo. */
+  align-items:stretch;
 }
 
 /* ── Video side ── */
@@ -10620,14 +10623,15 @@ body.kz-neg-focus-mode::before {
 .kzlive-chat-side {
   display:flex;flex-direction:column;
   background:var(--card);
-  /* Desktop: sticky alongside video + scrollable */
-  height:calc(100vh - 55px);
-  max-height:calc(100vh - 55px);
-  min-height:420px;
+  /* [FIX-KZLIVE-09] Altura fixa em 100vh removida — ver explicação
+     completa no bloco .kzlive-main-wrap acima e no <style> inline de
+     wkz-buyer.html (fonte real que estava vencendo a cascata). */
+  min-height:480px;
+  max-height:calc(100vh - 90px);
   position:sticky;
   top:55px; /* height of kzlive-page-hd */
   overflow:hidden;
-  align-self:start; /* prevents grid from stretching it */
+  align-self:stretch;
 }
 .kzlive-chat-head {
   padding:13px 15px;
