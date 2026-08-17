@@ -10388,10 +10388,11 @@ body.kz-neg-focus-mode::before {
   max-width:1400px;
   margin:0 auto;
   border-bottom:1px solid var(--border);
-  /* [FIX-KZLIVE-09] Era "start" — deixava um vão em branco enorme sob as
-     duas colunas (ver .kzlive-chat-side). "stretch" faz as colunas
-     terminarem juntas, na altura natural do conteúdo do vídeo. */
-  align-items:stretch;
+  /* [FIX-KZLIVE-11] "stretch" (tentativa anterior) causava crescimento
+     contínuo: o chat recebe mensagens sem parar, e "puxava" a coluna do
+     vídeo junto. Com "start" cada coluna tem altura independente — o
+     chat agora usa altura fixa própria (ver .kzlive-chat-side). */
+  align-items:start;
 }
 
 /* ── Video side ── */
@@ -10623,15 +10624,14 @@ body.kz-neg-focus-mode::before {
 .kzlive-chat-side {
   display:flex;flex-direction:column;
   background:var(--card);
-  /* [FIX-KZLIVE-09] Altura fixa em 100vh removida — ver explicação
-     completa no bloco .kzlive-main-wrap acima e no <style> inline de
-     wkz-buyer.html (fonte real que estava vencendo a cascata). */
-  min-height:480px;
-  max-height:calc(100vh - 90px);
+  /* [FIX-KZLIVE-11] Altura FIXA (clamp), independente do vídeo e da
+     quantidade de mensagens — ver explicação completa no <style> inline
+     de wkz-buyer.html (fonte real que vence a cascata nesta página). */
+  height:clamp(420px, calc(100vh - 90px), 640px);
   position:sticky;
   top:55px; /* height of kzlive-page-hd */
   overflow:hidden;
-  align-self:stretch;
+  align-self:start;
 }
 .kzlive-chat-head {
   padding:13px 15px;
