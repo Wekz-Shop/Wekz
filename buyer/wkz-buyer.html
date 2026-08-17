@@ -4517,6 +4517,14 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .kzlive-chat-body {
   flex:1;overflow-y:auto;
+  /* [FIX-KZLIVE-10] Sem isto, um item flex nunca encolhe abaixo da
+     altura do próprio conteúdo (min-height:auto é o padrão do CSS) —
+     então o overflow-y:auto acima nunca chegava a entrar em ação: a
+     lista de mensagens simplesmente empurrava a altura de TODA a coluna
+     de chat pra cima (e, por tabela, a do vídeo ao lado, que agora
+     acompanha via align-items:stretch). Com min-height:0 a caixa pode
+     encolher de verdade e o scroll interno passa a funcionar. */
+  min-height:0;
   padding:12px 10px;
   display:flex;flex-direction:column;gap:9px;
   scroll-behavior:smooth;
