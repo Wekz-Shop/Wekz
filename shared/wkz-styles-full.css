@@ -10651,6 +10651,10 @@ body.kz-neg-focus-mode::before {
 }
 .kzlive-chat-body {
   flex:1;overflow-y:auto;
+  /* [FIX-KZLIVE-10] min-height:0 — sem isto o flex item nunca encolhe
+     abaixo do conteúdo e overflow-y:auto nunca entra em ação (ver
+     explicação completa no <style> inline de wkz-buyer.html). */
+  min-height:0;
   padding:12px 10px;
   display:flex;flex-direction:column;gap:9px;
   scroll-behavior:smooth;
