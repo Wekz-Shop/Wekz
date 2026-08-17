@@ -4247,7 +4247,12 @@ document.addEventListener('DOMContentLoaded', function() {
   max-width:1400px;
   margin:0 auto;
   border-bottom:1px solid var(--border);
-  align-items:start;
+  /* [FIX-KZLIVE-09] Era "start": a coluna do vídeo (curta) não esticava,
+     mas o grid ainda reservava a altura toda da coluna do chat ao lado
+     (quase 100vh — ver .kzlive-chat-side abaixo) — sobrava um vão em
+     branco enorme embaixo dos dois lados. Com "stretch" as duas colunas
+     terminam juntas, na altura natural do conteúdo do vídeo. */
+  align-items:stretch;
 }
 
 /* ── Video side ── */
@@ -4479,14 +4484,20 @@ document.addEventListener('DOMContentLoaded', function() {
 .kzlive-chat-side {
   display:flex;flex-direction:column;
   background:var(--card);
-  /* Desktop: sticky alongside video + scrollable */
-  height:calc(100vh - 55px);
-  max-height:calc(100vh - 55px);
-  min-height:420px;
+  /* [FIX-KZLIVE-09] Antes: height fixo em calc(100vh - 55px) — sem
+     nenhuma relação com quantas mensagens existiam. Isso deixava um vão
+     em branco enorme aqui (entre a última mensagem e a caixa de digitar)
+     E, por tabela, na coluna do vídeo ao lado (que não esticava, por
+     causa do align-items:start no .kzlive-main-wrap — já corrigido
+     acima). Agora a altura vem do próprio grid (align-items:stretch),
+     acompanhando o conteúdo real da coluna do vídeo; min/max abaixo
+     ficam só como cinto de segurança para telas muito curtas/altas. */
+  min-height:480px;
+  max-height:calc(100vh - 90px);
   position:sticky;
   top:55px; /* height of kzlive-page-hd */
   overflow:hidden;
-  align-self:start; /* prevents grid from stretching it */
+  align-self:stretch;
 }
 .kzlive-chat-head {
   padding:13px 15px;
