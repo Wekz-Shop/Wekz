@@ -51,12 +51,13 @@ class FakeElement {
   querySelectorAll() { return []; }
   set innerHTML(v) { this._html = v; this.childNodes = []; this.children = []; }
   get innerHTML() { return this._html || ''; }
-  set textContent(v) { this._text = v; this._html = v; }
+  set textContent(v) { this._text = String(v); this._html = this._text; }
   get textContent() { return this._text; }
   focus() {}
   click() {}
   scrollIntoView() {}
   insertAdjacentHTML() {}
+  getBoundingClientRect() { return { width: 0, height: 0, top: 0, left: 0, right: 0, bottom: 0 }; }
 }
 
 const fakeDocument = {
@@ -104,6 +105,9 @@ const sandbox = {
   Blob: class FakeBlob { constructor(parts, opts) { this.parts = parts; this.type = opts && opts.type; } },
   URL: { createObjectURL: () => 'blob:fake', revokeObjectURL: () => {} },
   MutationObserver: class { observe() {} disconnect() {} },
+  ResizeObserver: class { observe() {} disconnect() {} unobserve() {} },
+  innerWidth: 1000,
+  innerHeight: 900,
   showToast: () => {},
 };
 sandbox.window = sandbox;
@@ -129,9 +133,12 @@ function assert(cond, msg) { if (!cond) { console.log('❌ FALHOU: ' + msg); fai
 // já teria no DOM antes de initKzLive() rodar.
 function makeEl(id, tag) { const el = new FakeElement(tag || 'div'); el.id = id; return el; }
 ['kzliveGrid','kzlivePagination','kzliveChatBody','kzliveChatInput','kzliveChatCount',
- 'kzliveFollowBtn','kzliveActiveCd','kzlivePlaceholder','kzliveIframe','kzliveChatCharCount','kzliveChatSendBtn'
+ 'kzliveFollowBtn','kzliveActiveCd','kzlivePlaceholder','kzliveIframe','kzliveChatCharCount','kzliveChatSendBtn',
+ 'kzliveVideoSide','kzliveChatSide','kzliveStatViewers','kzliveStatDuration','kzliveStatLikes','kzliveLikeBtn','kzliveLikeIcon'
 ].forEach(id => makeEl(id));
 makeEl('cpUserName', 'span').textContent = 'Marina Souza';
+registry['kzliveStatLikes'].textContent = '0';
+registry['kzliveLikeIcon'].textContent = '🤍';
 
 console.log('\n── Teste: Seguir loja (contabiliza em followedStores) ──');
 (function () {
@@ -210,6 +217,50 @@ console.log('\n── Teste: bug de "kzlive-active" preso no <body> ao sair pela
   hooks.forEach(function (h) { h('cart'); }); // simula navegação para outra página
   var hasClass = vm.runInContext("document.body.classList.contains('kzlive-active')", sandbox);
   assert(hasClass === false, 'sair da live via navegação (ex.: Comprar Agora → carrinho) limpa a classe kzlive-active do body');
+})();
+
+console.log('\n── Teste: [FIX-KZLIVE-12] curtir a live (contador real + coração flutuante) ──');
+(function () {
+  var likeCountEl = registry['kzliveStatLikes'];
+  var likeIconEl = registry['kzliveLikeIcon'];
+  var likeBtn = registry['kzliveLikeBtn'];
+  assert(likeCountEl.textContent === '0', 'contador de curtidas começa em 0 (nunca simulado)');
+  assert(likeIconEl.textContent === '🤍', 'ícone começa como coração vazio');
+
+  // Captura o callback do setTimeout em vez de rodá-lo na hora, só pra
+  // conseguir verificar que o coração flutuante REALMENTE existe no DOM
+  // antes de ser removido (no app real isso fica visível por ~1.1s).
+  var capturedCb = null;
+  var originalSetTimeout = sandbox.setTimeout;
+  sandbox.setTimeout = function (fn) { capturedCb = fn; return 0; };
+
+  sandbox.kzliveLike();
+  assert(likeCountEl.textContent === '1', 'primeiro toque incrementa o contador pra 1 (ação real do usuário)');
+  assert(likeIconEl.textContent === '❤️', 'ícone vira coração cheio após curtir');
+  assert(likeBtn.children.some(c => c.className === 'kzlive-float-heart'), 'coração flutuante é criado no botão ao curtir');
+  if (capturedCb) capturedCb(); // simula o fim da animação (1.1s depois, no app real)
+  assert(!likeBtn.children.some(c => c.className === 'kzlive-float-heart'), 'coração flutuante é removido do DOM após a animação');
+
+  sandbox.setTimeout = originalSetTimeout;
+  sandbox.kzliveLike();
+  sandbox.kzliveLike();
+  assert(likeCountEl.textContent === '3', 'toques seguidos continuam incrementando (like múltiplo, como TikTok Live)');
+})();
+
+console.log('\n── Teste: [FIX-KZLIVE-12] tempo ao vivo (contagem real desde a abertura) ──');
+(function () {
+  var durationEl = registry['kzliveStatDuration'];
+  assert(/^\d{1,2}:\d{2}$/.test(durationEl.textContent), 'duração é formatada como mm:ss desde que a live abriu: "' + durationEl.textContent + '"');
+})();
+
+console.log('\n── Teste: [FIX-KZLIVE-12] sincronia de altura vídeo↔chat não quebra em telas mobile ──');
+(function () {
+  sandbox.window.innerWidth = 400; // simula mobile
+  var chatSideEl = registry['kzliveChatSide'];
+  chatSideEl.style.height = '999px'; // simula um valor "preso" de uma sincronia anterior
+  vm.runInContext("window.initKzLive();", sandbox);
+  assert(chatSideEl.style.height === '', 'em telas <901px, o JS limpa o height inline e deixa o CSS (layout empilhado) assumir');
+  sandbox.window.innerWidth = 1000; // restaura desktop pros próximos testes, se houver
 })();
 
 console.log('\n' + (failed ? '❌ HÁ FALHAS — ver acima' : '✅ TODOS OS TESTES FUNCIONAIS PASSARAM'));
