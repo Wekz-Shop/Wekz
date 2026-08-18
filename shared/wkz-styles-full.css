@@ -10581,6 +10581,51 @@ body.kz-neg-focus-mode::before {
   color:var(--teal);
 }
 
+/* [FIX-KZLIVE-12] Barra de estatísticas ao vivo (espectadores/tempo/curtidas) */
+.kzlive-stats-bar {
+  display:flex;align-items:center;gap:16px;
+  padding:10px 18px;
+  border-bottom:1px solid var(--border);
+  font-family:'DM Sans',sans-serif;
+}
+.kzlive-stat {
+  display:flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:700;color:var(--muted);
+}
+.kzlive-stat svg { color:var(--teal); flex-shrink:0; }
+.kzlive-like-btn {
+  display:flex;align-items:center;gap:5px;
+  margin-left:auto;
+  padding:5px 12px;
+  border-radius:20px;
+  border:1px solid rgba(239,68,68,0.28);
+  background:rgba(239,68,68,0.06);
+  color:#EF4444;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;
+  cursor:pointer;
+  transition:transform 0.12s ease, background 0.15s ease;
+  position:relative;
+  overflow:visible;
+}
+.kzlive-like-btn:hover { background:rgba(239,68,68,0.12); }
+.kzlive-like-btn:active { transform:scale(0.9); }
+.kzlive-like-btn.kzlive-liked-pulse { animation:kzlive-like-pulse 0.35s ease; }
+@keyframes kzlive-like-pulse {
+  0%{transform:scale(1);} 40%{transform:scale(1.22);} 100%{transform:scale(1);}
+}
+.kzlive-like-icon { font-size:14px; transition:transform 0.15s ease; }
+.kzlive-float-heart {
+  position:absolute; right:10px; bottom:50%;
+  font-size:16px; pointer-events:none;
+  animation:kzlive-float-up 1.1s ease-out forwards;
+  z-index:5;
+}
+@keyframes kzlive-float-up {
+  0%   { opacity:1; transform:translate(0,0) scale(0.8) rotate(0deg); }
+  30%  { opacity:1; transform:translate(-6px,-22px) scale(1.1) rotate(-8deg); }
+  100% { opacity:0; transform:translate(8px,-70px) scale(0.9) rotate(10deg); }
+}
+
 /* ── Active product card ── */
 .kzlive-active-card {
   margin:14px 18px;
