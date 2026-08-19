@@ -1803,6 +1803,60 @@ let WKZ_PROFILE_EXTRA = {
   curr: '🇧🇷 BRL — Real Brasileiro',
 };
 
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-CADASTRO-01] Fonte única de sincronização de nome/email exibidos.
+   Antes, #cpUserName/#cpUserEmail (Meu Perfil) e #cpHdrName/
+   #cpHdrAvatarInitial (dropdown do cabeçalho) eram atualizados de forma
+   independente e incompleta: finishRegister() (cadastro) não tocava em
+   NENHUM deles — por isso a conta recém-criada nunca aparecia em lugar
+   nenhum, sempre mostrando o "Alexandre Kz" fixo do HTML — e
+   cpEditProfile() só atualizava #cpUserName/#cpUserEmail, deixando o
+   dropdown do cabeçalho desatualizado após editar o perfil. Agora os
+   dois pontos de entrada (cadastro e edição) chamam esta única função,
+   e ela também persiste em localStorage para sobreviver a reloads —
+   comportamento padrão em qualquer marketplace real. */
+window.wkzSyncProfileDisplay = function(name, email) {
+  name = (name || '').trim();
+  email = (email || '').trim();
+  if (name) {
+    ['cpUserName', 'cpHdrName'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = name;
+    });
+    var initialEl = document.getElementById('cpHdrAvatarInitial');
+    if (initialEl) initialEl.textContent = name.charAt(0).toUpperCase();
+  }
+  if (email) {
+    var emailEl = document.getElementById('cpUserEmail');
+    if (emailEl) emailEl.textContent = email;
+  }
+  try {
+    var saved = JSON.parse(localStorage.getItem('wkz_registered_profile') || '{}');
+    if (name) saved.name = name;
+    if (email) saved.email = email;
+    saved.extra = WKZ_PROFILE_EXTRA;
+    localStorage.setItem('wkz_registered_profile', JSON.stringify(saved));
+  } catch (e) { /* localStorage indisponível (modo privado) — segue sem persistir */ }
+};
+
+/* [FIX-CADASTRO-01] Ao abrir o app, aplica o cadastro salvo na sessão
+   anterior (se existir) — assim a conta continua "logada" com os dados
+   reais mesmo depois de recarregar a página, como em qualquer
+   marketplace de verdade. Sem isso, cada reload voltava para o
+   "Alexandre Kz" de demonstração mesmo já tendo cadastrado uma conta. */
+(function _wkzRestoreRegisteredProfile() {
+  var saved;
+  try { saved = JSON.parse(localStorage.getItem('wkz_registered_profile') || 'null'); } catch (e) { saved = null; }
+  if (!saved) return;
+  function apply() {
+    if (saved.extra) { for (var k in saved.extra) { if (saved.extra.hasOwnProperty(k)) WKZ_PROFILE_EXTRA[k] = saved.extra[k]; } }
+    window.wkzSyncProfileDisplay(saved.name, saved.email);
+    if (typeof window.wkzSetBuyerLoggedIn === 'function') window.wkzSetBuyerLoggedIn(true);
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') apply();
+  else document.addEventListener('DOMContentLoaded', apply);
+})();
+
 /* Retorna até `limit` produtos relacionados aos interesses do usuário;
    completa com mais vendidos/avaliados caso não haja matches suficientes. */
 function wkzGetInterestSuggestions(limit) {
@@ -5940,10 +5994,6 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         var newEmail = document.getElementById('cpEditEmail') ? document.getElementById('cpEditEmail').value.trim() : '';
         if (!newName)  { showToast && showToast(CP_ICO.warning + ' Informa um nome de utilizador.'); return false; }
         if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { showToast && showToast(CP_ICO.warning + ' Informa um email válido.'); return false; }
-        var nameEl = document.getElementById('cpUserName');
-        if (nameEl) nameEl.textContent = newName;
-        var emailEl = document.getElementById('cpUserEmail');
-        if (emailEl) emailEl.textContent = newEmail;
 
         var f;
         f = document.getElementById('cpEditPhone');    if (f) WKZ_PROFILE_EXTRA.phone        = f.value.trim();
@@ -5953,6 +6003,20 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         f = document.getElementById('cpCountryLabel'); if (f) WKZ_PROFILE_EXTRA.countryLabel  = f.textContent.trim();
         f = document.getElementById('cpEditLang');     if (f) WKZ_PROFILE_EXTRA.lang           = f.value;
         f = document.getElementById('cpEditCurr');     if (f) WKZ_PROFILE_EXTRA.curr           = f.value;
+
+        // [FIX-CADASTRO-01] wkzSyncProfileDisplay atualiza #cpUserName/
+        // #cpUserEmail E o dropdown do cabeçalho (#cpHdrName/avatar) numa
+        // única chamada, além de persistir em localStorage — antes só os
+        // dois primeiros eram tocados aqui, deixando o cabeçalho parado
+        // com o nome antigo depois de qualquer edição.
+        if (typeof window.wkzSyncProfileDisplay === 'function') {
+          window.wkzSyncProfileDisplay(newName, newEmail);
+        } else {
+          var nameEl = document.getElementById('cpUserName');
+          if (nameEl) nameEl.textContent = newName;
+          var emailEl = document.getElementById('cpUserEmail');
+          if (emailEl) emailEl.textContent = newEmail;
+        }
 
         var pct = cpUpdateProfileCompletion();
         var msg = pct >= 100
