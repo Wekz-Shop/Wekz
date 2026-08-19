@@ -12147,6 +12147,19 @@ function regQuickFinish(){
 
   _regProfileIncomplete = true;
 
+  // [FIX-CADASTRO-01] Mesmo no cadastro rápido (só nome/email/senha), o
+  // que a pessoa digitou precisa aparecer em "Meu Perfil" imediatamente
+  // — antes NADA era salvo aqui também, então mesmo o cadastro rápido
+  // caía no "Alexandre Kz" fixo. Telefone/documento/endereço continuam
+  // vazios de propósito (não foram coletados nesta etapa) — por isso o
+  // CTA "Completar Perfil agora" existe, e agora ele abre o modal já
+  // com o nome/email reais pré-preenchidos, faltando só o resto.
+  if (nome) {
+    if (typeof window.wkzSyncProfileDisplay === 'function') window.wkzSyncProfileDisplay(nome, email);
+    if (typeof cpUpdateProfileCompletion === 'function') cpUpdateProfileCompletion();
+  }
+  if (typeof window.wkzSetBuyerLoggedIn === 'function') window.wkzSetBuyerLoggedIn(true);
+
   // Esconde todos os passos, mostra sucesso direto (perfil completo depois, em "Editar Perfil")
   for(let i = 1; i <= 4; i++){
     const s = document.getElementById('reg-step'+i);
@@ -12238,6 +12251,48 @@ function finishRegister(){
   if(dataTransfer && !dataTransfer.checked){ showToast('⚠ Autorize o processamento e a transferência internacional de dados para continuar'); return; }
   if(age && !age.checked){ showToast('⚠ Confirme que você tem 18 anos ou mais'); return; }
   _regProfileIncomplete = false;
+
+  // [FIX-CADASTRO-01] Antes, nada do que era digitado nos 4 passos do
+  // cadastro era lido ou salvo em lugar nenhum — "Meu Perfil" e "Editar
+  // Perfil" sempre mostravam o "Alexandre Kz" fixo do HTML, não importa
+  // o que a pessoa tivesse preenchido. Agora lê todos os campos e aplica
+  // via wkzSyncProfileDisplay() (mesma função usada por cpEditProfile),
+  // então tudo fica consistente e sobrevive a reload (localStorage).
+  (function _applyRegisteredData() {
+    var g = function(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    var nome = g('r1nome'), sobrenome = g('r1sob'), nick = g('r1nick'), email = g('r1email');
+    var fullName = (nome + ' ' + sobrenome).trim() || nick || email.split('@')[0];
+
+    var ddi = (document.getElementById('phoneDDI') || {}).textContent || '';
+    var phoneLocal = g('phoneNumberInput');
+    var phone = phoneLocal ? (ddi + ' ' + phoneLocal).trim() : '';
+
+    var countrySel = document.getElementById('regCountry');
+    var countryCode  = countrySel ? countrySel.value : '';
+    var countryLabel = (countrySel && countrySel.selectedOptions && countrySel.selectedOptions[0])
+      ? countrySel.selectedOptions[0].textContent : '';
+
+    var langSel = document.getElementById('r2lang');
+    var currSel = document.getElementById('r2curr');
+
+    if (fullName) {
+      if (phone)          WKZ_PROFILE_EXTRA.phone = phone;
+      var doc = g('r2doc'); if (doc) WKZ_PROFILE_EXTRA.doc = doc;
+      var cep = g('r3cep'); if (cep) WKZ_PROFILE_EXTRA.cep = cep;
+      if (countryCode)    WKZ_PROFILE_EXTRA.country = countryCode;
+      if (countryLabel)   WKZ_PROFILE_EXTRA.countryLabel = countryLabel;
+      if (langSel && langSel.value) WKZ_PROFILE_EXTRA.lang = langSel.value;
+      if (currSel && currSel.value) WKZ_PROFILE_EXTRA.curr = currSel.value;
+
+      if (typeof window.wkzSyncProfileDisplay === 'function') {
+        window.wkzSyncProfileDisplay(fullName, email);
+      }
+      if (typeof cpUpdateProfileCompletion === 'function') cpUpdateProfileCompletion();
+    }
+    // Cadastro concluído = usuário autenticado (mock de sessão já existente no app).
+    if (typeof window.wkzSetBuyerLoggedIn === 'function') window.wkzSetBuyerLoggedIn(true);
+  })();
+
   // Hide all steps, show success
   for(let i = 1; i <= 4; i++){
     const s = document.getElementById('reg-step'+i);
@@ -12254,6 +12309,35 @@ function finishRegister(){
   if(profileCta) profileCta.style.display = 'none';
   showToast('Conta criada com sucesso! Bem-vindo à WeKz!');
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-CADASTRO-02] Sem isto, qualquer visita futura à página de auth
+   (ex.: um botão guest que chama MapsTo('auth') depois de já ter
+   registado nesta sessão) reexibia a mesma tela "Bem-vindo à WeKz Shop!"
+   travada — porque #reg-success nunca voltava a display:none e a aba
+   "Cadastrar" nunca voltava a ser a ativa. De fora, isso parecia "cliquei
+   em Meu Perfil e voltei pro cadastro". Chamado sempre que se SAI da
+   página de auth (nav hook) e também direto pelos botões de saída da
+   tela de sucesso, como cinto de segurança. ─────────────────────────── */
+function _wkzResetAuthForm() {
+  var success = document.getElementById('reg-success');
+  if (success) success.style.display = 'none';
+  var profileCta = document.getElementById('regSuccessProfileCta');
+  if (profileCta) profileCta.style.display = '';
+  for (let i = 1; i <= 4; i++) {
+    const s = document.getElementById('reg-step' + i);
+    if (s) s.style.display = (i === 1 ? 'block' : 'none');
+    const rs = document.getElementById('rs' + i);
+    if (rs) { rs.classList.remove('done', 'active'); if (i === 1) rs.classList.add('active'); }
+  }
+  currentRegStep = 1;
+  var loginTab = document.querySelector('.auth-tab');
+  if (loginTab && typeof switchAuthTab === 'function') switchAuthTab('login', loginTab);
+}
+if (!window._wkzNavHooks) window._wkzNavHooks = [];
+window._wkzNavHooks.push(function(sectionId) {
+  if (sectionId !== 'auth') _wkzResetAuthForm();
+});
 
 // Alias usado no HTML (regGoStep é definido acima nesta mesma etapa)
 // Aliases used in HTML
@@ -14123,6 +14207,11 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
   // [FIX-KZLIVE-05] Paginação real da grade "Produtos Nesta Live"
   var _KZLIVE_PER_PAGE = 4;
   var _kzlivePage = 1;
+  // [FIX-KZLIVE-12] Barra de estatísticas ao vivo + sincronia de altura
+  var _likeCount = 0;
+  var _liveStartTs = null;
+  var _durationTimer = null;
+  var _videoResizeObserver = null;
 
   /* ─── Format countdown ─── */
   function _fmtCd(secs) {
@@ -14370,11 +14459,84 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
       var delta = Math.round((Math.random() - 0.42) * 18);
       _viewers = Math.max(850, Math.min(2100, _viewers + delta));
       var fmt = _viewers.toLocaleString('pt-BR');
-      ['kzliveViewerCount','kzliveViewerBadge','kzliveChatCount'].forEach(function(id) {
+      ['kzliveViewerCount','kzliveViewerBadge','kzliveChatCount','kzliveStatViewers'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.textContent = fmt;
       });
     }, 3500);
+  }
+
+  /* ─── [FIX-KZLIVE-12] Tempo ao vivo (contagem real, não simulada —
+     conta o tempo real desde que a live foi aberta nesta sessão) ─── */
+  function _startDurationTimer() {
+    _liveStartTs = Date.now();
+    if (_durationTimer) clearInterval(_durationTimer);
+    function _tick() {
+      var el = document.getElementById('kzliveStatDuration');
+      if (!el) return;
+      var secs = Math.floor((Date.now() - _liveStartTs) / 1000);
+      var h = Math.floor(secs / 3600);
+      var m = Math.floor((secs % 3600) / 60);
+      var s = secs % 60;
+      el.textContent = (h > 0 ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+    _tick();
+    _durationTimer = setInterval(_tick, 1000);
+  }
+
+  /* ─── [FIX-KZLIVE-12] Curtir a live — contador real (só sobe quando o
+     usuário toca), com pulso no botão + corações flutuantes (mesma
+     linguagem visual do TikTok Live). ─── */
+  window.kzliveLike = function(evt) {
+    var btn = document.getElementById('kzliveLikeBtn');
+    var icon = document.getElementById('kzliveLikeIcon');
+    var countEl = document.getElementById('kzliveStatLikes');
+    if (!btn || !countEl) return;
+    _likeCount++;
+    countEl.textContent = _likeCount >= 1000 ? (_likeCount / 1000).toFixed(1).replace('.0', '') + 'k' : _likeCount;
+    if (icon) icon.textContent = '❤️';
+    btn.classList.remove('kzlive-liked-pulse');
+    void btn.offsetWidth; /* força reflow pra reiniciar a animação em toques seguidos */
+    btn.classList.add('kzlive-liked-pulse');
+    var heart = document.createElement('span');
+    heart.className = 'kzlive-float-heart';
+    heart.textContent = '❤️';
+    heart.style.right = (8 + Math.random() * 14) + 'px';
+    btn.appendChild(heart);
+    setTimeout(function() { heart.remove(); }, 1150);
+  };
+
+  /* ─── [FIX-KZLIVE-12] Sincronia de altura vídeo↔chat ───
+     Em vez de tentar adivinhar um valor fixo em CSS (testado e
+     descartado — ver histórico em wkz-kzlive-patch.css), mede a altura
+     REAL da coluna do vídeo e aplica no chat via ResizeObserver, que
+     reage a qualquer mudança de conteúdo (nome do host quebrando linha,
+     card de destaque mudando, etc.) sem nunca deixar o chat "puxar" o
+     vídeo de volta — o chat nunca contribui para essa medição. */
+  function _syncChatHeight() {
+    var video = document.getElementById('kzliveVideoSide');
+    var chat = document.getElementById('kzliveChatSide');
+    if (!video || !chat) return;
+    if (window.innerWidth < 901) { chat.style.height = ''; return; } /* mobile: CSS cuida (layout empilhado) */
+    var h = video.getBoundingClientRect().height;
+    if (h > 0) {
+      var clamped = Math.max(420, Math.min(h, window.innerHeight - 90));
+      chat.style.height = clamped + 'px';
+    }
+  }
+
+  function _initChatHeightSync() {
+    _syncChatHeight();
+    if (_videoResizeObserver) _videoResizeObserver.disconnect();
+    var video = document.getElementById('kzliveVideoSide');
+    if (video && typeof ResizeObserver !== 'undefined') {
+      _videoResizeObserver = new ResizeObserver(function() { _syncChatHeight(); });
+      _videoResizeObserver.observe(video);
+    }
+    if (!window._kzliveResizeBound) {
+      window.addEventListener('resize', function() { _syncChatHeight(); });
+      window._kzliveResizeBound = true;
+    }
   }
 
   /* ─── Public API ─── */
@@ -14577,12 +14739,16 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     _startCountdowns();
     _startChat();
     _startViewers();
+    _startDurationTimer();
     _syncKzliveFollowBtn();
     /* Reset iframe / placeholder state */
     var ifr = document.getElementById('kzliveIframe');
     var ph  = document.getElementById('kzlivePlaceholder');
     if (ifr) { ifr.src = ''; ifr.style.display = 'none'; }
     if (ph)  { ph.style.display = 'flex'; }
+    /* [FIX-KZLIVE-12] Sincroniza a altura do chat com a altura real do
+       vídeo depois que tudo acima já renderizou (aguarda 1 frame). */
+    requestAnimationFrame(function() { _initChatHeightSync(); });
   };
 
   /* ─── Cleanup on page leave ─── */
@@ -14590,6 +14756,8 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
     if (_chatTimer)  { clearTimeout(_chatTimer); clearInterval(_chatTimer); _chatTimer = null; }
     if (_viewerTimer){ clearInterval(_viewerTimer); _viewerTimer = null; }
     if (_activeCdTimer){ clearInterval(_activeCdTimer); _activeCdTimer = null; }
+    if (_durationTimer){ clearInterval(_durationTimer); _durationTimer = null; }
+    if (_videoResizeObserver){ _videoResizeObserver.disconnect(); _videoResizeObserver = null; }
     _cdTimers.forEach(clearInterval); _cdTimers = [];
     /* Stop iframe audio/video */
     var ifr = document.getElementById('kzliveIframe');
