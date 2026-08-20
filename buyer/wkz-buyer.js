@@ -1385,6 +1385,8 @@ const TRANSLATIONS = {
     cpStatPurchasesLabel: 'Total de Compras',
     cpStatLevelLabel: 'Nível Atual ↗',
     cpHistoryTitle: 'Micro-Histórico de Interações',
+    cpHistoryWelcomeItem: 'Conta criada — bem-vindo(a) à WeKz Shop!',
+    cpHistoryTimeNow: 'Agora',
     cpLevelGuideTitle: 'Guia de Níveis Kz',
     cpMissionsTitle: 'Missões do Dia',
     cpMissionsResetLabel: 'Resetam em',
@@ -1640,6 +1642,8 @@ const TRANSLATIONS = {
     cpStatPurchasesLabel: 'Total Purchases',
     cpStatLevelLabel: 'Current Level ↗',
     cpHistoryTitle: 'Interaction Micro-History',
+    cpHistoryWelcomeItem: 'Account created — welcome to WeKz Shop!',
+    cpHistoryTimeNow: 'Just now',
     cpLevelGuideTitle: 'Kz Level Guide',
     cpMissionsTitle: 'Daily Missions',
     cpMissionsResetLabel: 'Resets in',
@@ -1895,6 +1899,8 @@ const TRANSLATIONS = {
     cpStatPurchasesLabel: 'Total de Compras',
     cpStatLevelLabel: 'Nivel Actual ↗',
     cpHistoryTitle: 'Micro-Historial de Interacciones',
+    cpHistoryWelcomeItem: 'Cuenta creada — ¡bienvenido(a) a WeKz Shop!',
+    cpHistoryTimeNow: 'Ahora',
     cpLevelGuideTitle: 'Guía de Niveles Kz',
     cpMissionsTitle: 'Misiones del Día',
     cpMissionsResetLabel: 'Se reinician en',
@@ -2150,6 +2156,8 @@ const TRANSLATIONS = {
     cpStatPurchasesLabel: '总购买次数',
     cpStatLevelLabel: '当前等级 ↗',
     cpHistoryTitle: '互动微历史',
+    cpHistoryWelcomeItem: '账户已创建 — 欢迎来到 WeKz Shop！',
+    cpHistoryTimeNow: '刚刚',
     cpLevelGuideTitle: 'Kz等级指南',
     cpMissionsTitle: '每日任务',
     cpMissionsResetLabel: '重置于',
@@ -2405,6 +2413,8 @@ const TRANSLATIONS = {
     cpStatPurchasesLabel: 'Total des Achats',
     cpStatLevelLabel: 'Niveau Actuel ↗',
     cpHistoryTitle: 'Micro-Historique des Interactions',
+    cpHistoryWelcomeItem: 'Compte créé — bienvenue chez WeKz Shop !',
+    cpHistoryTimeNow: 'À l\'instant',
     cpLevelGuideTitle: 'Guide des Niveaux Kz',
     cpMissionsTitle: 'Missions du Jour',
     cpMissionsResetLabel: 'Réinitialisation dans',
@@ -2660,6 +2670,8 @@ const TRANSLATIONS = {
     cpStatPurchasesLabel: 'Gesamtkäufe',
     cpStatLevelLabel: 'Aktuelles Level ↗',
     cpHistoryTitle: 'Mikro-Verlauf der Interaktionen',
+    cpHistoryWelcomeItem: 'Konto erstellt — willkommen bei WeKz Shop!',
+    cpHistoryTimeNow: 'Gerade eben',
     cpLevelGuideTitle: 'Kz-Level-Leitfaden',
     cpMissionsTitle: 'Tagesmissionen',
     cpMissionsResetLabel: 'Zurücksetzen in',
@@ -2915,6 +2927,8 @@ const TRANSLATIONS = {
     cpStatPurchasesLabel: '購入合計',
     cpStatLevelLabel: '現在のレベル ↗',
     cpHistoryTitle: 'やり取りの履歴',
+    cpHistoryWelcomeItem: 'アカウントが作成されました — WeKz Shopへようこそ！',
+    cpHistoryTimeNow: 'たった今',
     cpLevelGuideTitle: 'Kzレベルガイド',
     cpMissionsTitle: 'デイリーミッション',
     cpMissionsResetLabel: 'リセットまで',
@@ -12128,6 +12142,74 @@ let _regProfileIncomplete = false;
 /* CRO-01: cria a conta apenas com Nome/E-mail/Senha + consentimentos obrigatórios.
    Dados secundários (telefone, CPF, endereço, idioma, moeda, interesses, 2FA)
    ficam para a seção "Editar Perfil" no dashboard do cliente. */
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-CADASTRO-03] Ponto único de "perfil em branco" para QUALQUER
+   cadastro concluído — fluxo completo (4 passos, finishRegister) ou
+   rápido (nome+email+senha, regQuickFinish). Antes, só nome/email/
+   telefone/doc/cep eram sincronizados com os dados reais digitados
+   (FIX-CADASTRO-01) — tudo o resto do "Meu Perfil" (12 pedidos,
+   R$ 242,86 economizados, 8.340 pts, nível Cyber, "Membro desde Mar
+   2024", 4 encomendas em rastreio, 5 compras no histórico, 3 entradas
+   de micro-histórico, 2 cartões salvos) continuava vindo dos arrays
+   mock da persona de demonstração "Alexandre" — que só são inicializados
+   UMA VEZ, no carregar do script, e nunca eram limpos. Resultado: toda
+   conta nova criada no mesmo navegador aparecia com o nome trocado, mas
+   os MESMOS pedidos/pontos/histórico de outra conta qualquer.
+   Chamada ANTES de aplicar a identidade da nova conta, para que a tela
+   já nasça zerada. window.wkzResetProfileForNewAccount() e
+   window.cpResetMissoes() (wkz-core.js) são as únicas com acesso aos
+   datasets mock privados do módulo "Meu Perfil" — o resto do estado
+   (userPoints, WKZ_REFERRAL_STATE, WKZ_USER_INTERESTS, avatar) vive
+   neste arquivo/escopo global e é resetado diretamente aqui. */
+function _wkzResetForNewRegistration() {
+  if (typeof window.wkzResetProfileForNewAccount === 'function') window.wkzResetProfileForNewAccount();
+  if (typeof window.cpResetMissoes === 'function') window.cpResetMissoes();
+
+  if (typeof userPoints !== 'undefined' && userPoints) {
+    userPoints.balance = 0;
+    userPoints.lifetime = 0;
+    userPoints.redeemNow = 0;
+  }
+  if (typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE) {
+    window.WKZ_REFERRAL_STATE.activeReferrals = 0;
+    window.WKZ_REFERRAL_STATE.creditsBRL = 0;
+  }
+  if (typeof WKZ_USER_INTERESTS !== 'undefined') WKZ_USER_INTERESTS.length = 0;
+  if (window._cpAvatarState) { window._cpAvatarState.mode = 'logo'; window._cpAvatarState.payload = null; }
+
+  // [FIX-CADASTRO-03] phone/doc/cep/país são dados PESSOAIS identificáveis
+  // (telefone, CPF/CNPJ, CEP) — diferente de idioma/moeda (mantidos de
+  // propósito por UX, mesmo raciocínio já usado em cpLogout()). Sem isto,
+  // o código abaixo em _applyRegisteredData()/regQuickFinish() só
+  // SOBRESCREVE esses campos quando a pessoa de fato preenche o passo
+  // correspondente (telefone/endereço são opcionais no fluxo completo, e
+  // nem existem no cadastro rápido) — deixando o telefone/CPF/CEP da
+  // conta anterior visível na conta nova sempre que ela pulasse essa etapa.
+  if (typeof WKZ_PROFILE_EXTRA !== 'undefined') {
+    WKZ_PROFILE_EXTRA.phone = '';
+    WKZ_PROFILE_EXTRA.doc = '';
+    WKZ_PROFILE_EXTRA.cep = '';
+    WKZ_PROFILE_EXTRA.country = '';
+    WKZ_PROFILE_EXTRA.countryLabel = '';
+    WKZ_PROFILE_EXTRA._bonusAwarded = false;
+  }
+
+  if (typeof window.cpSyncLevelDisplay === 'function') window.cpSyncLevelDisplay();
+  if (typeof window.cpRefreshLevelGuide === 'function') window.cpRefreshLevelGuide();
+  if (typeof cpRenderReferralStats === 'function') cpRenderReferralStats();
+
+  // "Membro desde" — era texto fixo "Mar 2024" no HTML, igual pra
+  // qualquer conta. Agora reflete a data real de criação e é persistido
+  // via WKZ_PROFILE_EXTRA (mesmo mecanismo já usado por telefone/doc/
+  // cep — ver wkzSyncProfileDisplay em wkz-core.js), sobrevivendo a reload.
+  var mAbbr = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  var _now = new Date();
+  var memberSince = mAbbr[_now.getMonth()] + ' ' + _now.getFullYear();
+  if (typeof WKZ_PROFILE_EXTRA !== 'undefined') WKZ_PROFILE_EXTRA.memberSince = memberSince;
+  var sinceEl = document.getElementById('cpStatHeroSince');
+  if (sinceEl) sinceEl.textContent = memberSince;
+}
+
 function regQuickFinish(){
   const nome  = document.getElementById('r1nome')?.value.trim();
   const email = document.getElementById('r1email')?.value.trim();
@@ -12155,6 +12237,9 @@ function regQuickFinish(){
   // CTA "Completar Perfil agora" existe, e agora ele abre o modal já
   // com o nome/email reais pré-preenchidos, faltando só o resto.
   if (nome) {
+    // [FIX-CADASTRO-03] Perfil em branco ANTES de aplicar a identidade da
+    // conta nova — ver comentário completo em _wkzResetForNewRegistration().
+    _wkzResetForNewRegistration();
     if (typeof window.wkzSyncProfileDisplay === 'function') window.wkzSyncProfileDisplay(nome, email);
     if (typeof cpUpdateProfileCompletion === 'function') cpUpdateProfileCompletion();
   }
@@ -12276,6 +12361,13 @@ function finishRegister(){
     var currSel = document.getElementById('r2curr');
 
     if (fullName) {
+      // [FIX-CADASTRO-03] Perfil em branco ANTES de aplicar a identidade
+      // da conta nova — ver comentário completo em
+      // _wkzResetForNewRegistration(). Define WKZ_PROFILE_EXTRA.memberSince
+      // com a data real de hoje; as linhas abaixo só ACRESCENTAM os
+      // demais campos extra (telefone/doc/cep/país/idioma/moeda) por
+      // cima, sem sobrescrever o que acabou de ser zerado/definido.
+      _wkzResetForNewRegistration();
       if (phone)          WKZ_PROFILE_EXTRA.phone = phone;
       var doc = g('r2doc'); if (doc) WKZ_PROFILE_EXTRA.doc = doc;
       var cep = g('r3cep'); if (cep) WKZ_PROFILE_EXTRA.cep = cep;
