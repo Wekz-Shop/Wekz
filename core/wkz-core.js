@@ -1801,6 +1801,18 @@ let WKZ_PROFILE_EXTRA = {
   countryLabel: '🇵🇹 Portugal',
   lang: '🇧🇷 Português (Brasil)',
   curr: '🇧🇷 BRL — Real Brasileiro',
+  /* [FIX-CADASTRO-03] Preenchido dinamicamente por
+     _wkzResetForNewRegistration() (wkz-buyer.js) no momento em que um
+     cadastro é concluído — substitui o "Membro desde Mar 2024" fixo do
+     HTML pela data real de criação da conta. Vazio até o 1º cadastro
+     desta sessão/navegador (visita de demonstração mantém o valor
+     estático do HTML). */
+  memberSince: '',
+  /* [FIX-CADASTRO-03] Guarda de idempotência do bônus de +100 pts por
+     perfil 100% completo (ver cpEditProfile onConfirm) — evita creditar
+     de novo a cada "Guardar Alterações" enquanto o perfil já está
+     completo. Zerado por _wkzResetForNewRegistration() a cada conta nova. */
+  _bonusAwarded: false,
 };
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -5436,6 +5448,67 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         action: function(){ window.cpTrackOrder(order.id); }
       });
     }
+    cpSyncOrdersHeroCount();
+  };
+
+  /* [FIX-CADASTRO-03] O stat "Pedidos" do hero (#cpStatHeroOrders) estava
+     hardcoded em "12" direto no HTML e NUNCA era atualizado por nenhum
+     código — nem ao registar uma conta nova, nem sequer numa compra real
+     concluída durante a própria sessão. Fonte de verdade passa a ser
+     CP_PURCHASE_HISTORY (mesmo dataset do card "Histórico de Compras"),
+     chamada aqui e em cpRegisterNewPurchase()/initClientProfile(). */
+  function cpSyncOrdersHeroCount() {
+    var el = document.getElementById('cpStatHeroOrders');
+    if (el) el.textContent = String(CP_PURCHASE_HISTORY.length);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     [FIX-CADASTRO-03] Reset do "Meu Perfil" ao criar uma conta NOVA.
+     Antes, CP_ORDERS / CP_PURCHASE_HISTORY / CP_HISTORY / CP_DISPUTES /
+     CP_CARDS e CP_SAVED_EUR eram inicializados UMA ÚNICA VEZ, no carregar
+     do script, com os dados de demonstração da persona "Alexandre" — e
+     nunca eram limpos depois. FIX-CADASTRO-01 já corrigia nome/email/
+     telefone/doc/cep exibidos, mas tudo o resto (12 pedidos, R$ 242,86
+     economizados, 8.340 pts, nível Cyber, 4 encomendas em rastreio, 5
+     compras no histórico, 3 entradas de micro-histórico, 2 cartões
+     salvos) continuava a aparecer — idêntico — para QUALQUER conta nova
+     criada no mesmo navegador, só com o nome trocado por cima. Esta
+     função é a fonte única de "perfil em branco" e é chamada por
+     finishRegister()/regQuickFinish() (wkz-buyer.js) assim que um
+     cadastro é concluído, e por cpLogout() (abaixo) como reforço —
+     assim como qualquer marketplace real, cada conta começa do zero. */
+  window.wkzResetProfileForNewAccount = function() {
+    CP_ORDERS.length = 0;
+    CP_PURCHASE_HISTORY.length = 0;
+    CP_DISPUTES.length = 0;
+    CP_CARDS.length = 0;
+    CP_SAVED_EUR = 0;
+
+    CP_HISTORY.length = 0;
+    CP_HISTORY.push({
+      emoji: CP_ICO.check,
+      text: t('cpHistoryWelcomeItem'),
+      time: t('cpHistoryTimeNow'),
+      action: function(){}
+    });
+    _cpInsightIdx = 0;
+
+    renderOrders();
+    renderPurchaseHistory();
+    renderDisputes();
+    renderWallet();
+    renderCopilotHistory();
+    cpSyncOrdersHeroCount();
+
+    var zeroFmt = cpFmtAmt(0);
+    var heroSavedEl = document.getElementById('cpStatHeroSaved');
+    if (heroSavedEl) heroSavedEl.textContent = zeroFmt;
+    var negoStatEl = document.getElementById('cpStatNego');
+    if (negoStatEl) negoStatEl.textContent = zeroFmt;
+    var copilotSavedEl = document.getElementById('cpCopilotSaved');
+    if (copilotSavedEl) copilotSavedEl.textContent = zeroFmt;
+    var copilotMsgEl = document.getElementById('cpCopilotMsg');
+    if (copilotMsgEl) copilotMsgEl.innerHTML = cpApplyTpl(CP_INSIGHTS[0]);
   };
 
   function renderOrders() {
@@ -5579,6 +5652,19 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     renderLevelGuideSection();
     renderOrders();
     renderPurchaseHistory();
+    cpSyncOrdersHeroCount();
+
+    /* [FIX-CADASTRO-03] Reaplica "Membro desde" real (definido no
+       cadastro, ver _wkzResetForNewRegistration em wkz-buyer.js) sempre
+       que "Meu Perfil" abre — cobre o caso de reload da página, em que
+       _wkzRestoreRegisteredProfile() (mais acima neste arquivo) já
+       restaurou WKZ_PROFILE_EXTRA do localStorage antes desta página
+       alguma vez ter sido visitada nesta sessão. Sem conta registada
+       ainda (visita de demonstração), mantém o valor estático do HTML. */
+    if (typeof WKZ_PROFILE_EXTRA !== 'undefined' && WKZ_PROFILE_EXTRA.memberSince) {
+      var sinceEl = document.getElementById('cpStatHeroSince');
+      if (sinceEl) sinceEl.textContent = WKZ_PROFILE_EXTRA.memberSince;
+    }
     /* [FIX-disputas v3.0] Sincroniza CP_DISPUTES com o registo partilhado
        (kzDisputas_v1) toda vez que "Meu Perfil" é aberto — inclui tanto
        disputas que o comprador abriu nesta sessão (antes eram perdidas ao
@@ -6019,16 +6105,32 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         }
 
         var pct = cpUpdateProfileCompletion();
-        var msg = pct >= 100
+        /* [FIX-CADASTRO-03] Antes, ao atingir 100%, o bônus de +100 pts
+           era só um texto fixo "8.440" escrito por cima do DOM — o
+           número exato de "Alexandre" (8.340) + 100, sem nenhuma relação
+           com os pontos REAIS da conta (userPoints). Numa conta nova
+           (0 pts, ver _wkzResetForNewRegistration em wkz-buyer.js), isso
+           fazia o perfil "pular" magicamente para 8.440 pts do nada.
+           Agora credita de verdade em userPoints (uma única vez por
+           conta, via WKZ_PROFILE_EXTRA._bonusAwarded) e reusa
+           cpSyncLevelDisplay()/cpRefreshLevelGuide() — as mesmas funções
+           que já mantêm hero/copilot/Guia de Níveis consistentes em
+           qualquer outro lugar da app. */
+        var bonusJustAwarded = false;
+        if (pct === 100 && !WKZ_PROFILE_EXTRA._bonusAwarded) {
+          WKZ_PROFILE_EXTRA._bonusAwarded = true;
+          bonusJustAwarded = true;
+          if (typeof userPoints !== 'undefined' && userPoints) {
+            userPoints.balance  = (userPoints.balance  || 0) + 100;
+            userPoints.lifetime = (userPoints.lifetime || 0) + 100;
+          }
+          if (typeof window.cpSyncLevelDisplay === 'function') window.cpSyncLevelDisplay();
+          if (typeof window.cpRefreshLevelGuide === 'function') window.cpRefreshLevelGuide();
+        }
+        var msg = bonusJustAwarded
           ? CP_ICO.award + ' Perfil 100% completo! +100 pts bônus creditados e recomendações turbinadas.'
           : 'Perfil atualizado com sucesso' + (pct ? ' — ' + pct + '% completo' : '') + '!';
         showToast && showToast(msg);
-        if (pct === 100) {
-          var ptsEl = document.getElementById('cpStatHeroPoints');
-          if (ptsEl) ptsEl.textContent = '8.440';
-          var coPtsEl = document.getElementById('cpStatPoints');
-          if (coPtsEl) coPtsEl.textContent = '8.440 pts';
-        }
       }
     });
     /* Sincroniza a barra de completude assim que o modal abre */
@@ -6271,6 +6373,19 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         sessionStorage.clear();
         // Futuro: fetch('/api/auth/logout', {method:'POST'}) para invalidar JWT
       } catch(e) { /* ignorar erros de quota/modo privado */ }
+
+      // [FIX-CADASTRO-03] Reforço: como esta é uma SPA (a página NÃO
+      // recarrega ao sair), o estado em memória de CP_ORDERS/
+      // CP_PURCHASE_HISTORY/CP_HISTORY/CP_DISPUTES/CP_CARDS/userPoints/
+      // missões sobreviveria ao logout se não fosse limpo aqui. Sem isto,
+      // registar uma nova conta logo em seguida (sem dar reload manual)
+      // ainda herdaria os dados da sessão anterior.
+      if (typeof window.wkzResetProfileForNewAccount === 'function') window.wkzResetProfileForNewAccount();
+      if (typeof window.cpResetMissoes === 'function') window.cpResetMissoes();
+      if (typeof userPoints !== 'undefined' && userPoints) { userPoints.balance = 0; userPoints.lifetime = 0; userPoints.redeemNow = 0; }
+      if (typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE) { window.WKZ_REFERRAL_STATE.activeReferrals = 0; window.WKZ_REFERRAL_STATE.creditsBRL = 0; }
+      if (typeof WKZ_USER_INTERESTS !== 'undefined') WKZ_USER_INTERESTS.length = 0;
+      if (window._cpAvatarState) { window._cpAvatarState.mode = 'logo'; window._cpAvatarState.payload = null; }
 
       // [v2.9.13] Atualiza o estado de login do comprador (mock) — esconde
       // imediatamente os elementos buyer-only, ex.: "Meus Favoritos".
@@ -7547,6 +7662,24 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
      idioma (cpRefreshCurrencyDisplays, noutra IIFE) poder re-renderizar as
      missões quando o utilizador troca de idioma já dentro da página. */
   window.cpRefreshMissoesLanguage = renderMissoes;
+
+  /* [FIX-CADASTRO-03] Reset das Missões do Dia ao criar uma conta nova.
+     CP_MISSOES já nasce com done:false para todas (é reatribuída do zero
+     a cada carregamento do script), então isto normalmente já "parece"
+     certo num reload — mas se a pessoa regista uma SEGUNDA conta na
+     mesma aba, sem recarregar a página (ex.: sair e cadastrar de novo),
+     qualquer missão concluída pela conta anterior ficava marcada como
+     concluída também para a conta nova. Chamada junto com
+     window.wkzResetProfileForNewAccount() por finishRegister()/
+     regQuickFinish() (wkz-buyer.js). */
+  window.cpResetMissoes = function() {
+    CP_MISSOES.forEach(function(m){ m.done = false; });
+    _cpBrowseCount = 0;
+    _cpBrowseSeen = {};
+    var wrap = document.getElementById('cpMissoesCard');
+    if (wrap) delete wrap.dataset.allDoneToasted;
+    renderMissoes();
+  };
 
   /* [FIX-03] Ponto único de conclusão — chamado pelas ações reais em toda
      a app. Credita pontos de verdade (soma a userPoints, a mesma fonte
