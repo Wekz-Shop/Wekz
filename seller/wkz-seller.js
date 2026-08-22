@@ -3189,10 +3189,22 @@ function sellerGoBack(step){
 
 async function finishSellerRegister(){
   // 1. Coleta de dados do formulário
+  /* [FIX-seller-approval v1.0] step1Selects[1]/[2] (categoria/país) e os
+     demais campos de step2 (razão social, nome fantasia) nunca eram lidos
+     antes — só storeName/storeType/documentId/payMode. Precisamos deles
+     agora para publicar uma solicitação de loja completa em
+     wkzShareNewStoreRequest() (ver wkz-core.js), que é o que faz a loja
+     aparecer de verdade em "Aprovação de Lojas" no Admin. */
+  const step1Selects = document.querySelectorAll('#seller-step1 select');
+  const step2Texts    = document.querySelectorAll('#seller-step2 input[type="text"]');
   const payload = {
     storeName: document.querySelector('#seller-step1 input[type="text"]')?.value || '',
-    storeType: document.querySelector('#seller-step1 select')?.value || '',
-    documentId: document.querySelector('#seller-step2 input[type="text"]')?.value || '',
+    storeType: step1Selects[0]?.value || '',
+    category:  step1Selects[1]?.value || '',
+    country:   step1Selects[2]?.value || 'BR',
+    documentId:   step2Texts[0]?.value || '',
+    razaoSocial:  step2Texts[1]?.value || '',
+    nomeFantasia: step2Texts[2]?.value || '',
     payMode: document.querySelector('input[name="payMode"]:checked')?.value || 'pix',
   };
 
@@ -3217,7 +3229,35 @@ async function finishSellerRegister(){
     // });
     // if (!response.ok) throw new Error('Erro ao registrar vendedor');
 
-    // 4. Sucesso: esconder os passos e mostrar a tela final
+    // 4. [FIX-seller-approval v1.0] Publica a solicitação na fonte
+    // partilhada (localStorage + WkzBus) — é isto que faz a loja aparecer
+    // de verdade em "Aprovação de Lojas" no Admin, ao vivo se a aba já
+    // estiver aberta, ou na próxima vez que o Admin carregar a página.
+    // 100% front-end, sem depender de nenhuma API — mesmo mecanismo já
+    // usado para disputas/comunicados (ver WKZ_SHARED_KEYS em wkz-core.js).
+    if (typeof window.wkzShareNewStoreRequest === 'function') {
+      const CAT_EMOJI = {
+        'Eletrônicos': '📱', 'Moda & Acessórios': '👗', 'Casa & Decoração': '🛋',
+        'Beleza & Saúde': '💄', 'Games & Consoles': '🎮', 'Esportes & Fitness': '⚽',
+        'Automotivo': '🚗', 'Livros & Papelaria': '📚', 'Pet Shop': '🐾',
+        'Bebê & Infantil': '🍼', 'Outros': '🏪',
+      };
+      const now = new Date();
+      const dateStr = String(now.getDate()).padStart(2,'0') + '/' + String(now.getMonth()+1).padStart(2,'0') + '/' + now.getFullYear();
+      window.wkzShareNewStoreRequest({
+        id: 'ST-' + now.getTime().toString(36).toUpperCase(),
+        avatar: CAT_EMOJI[payload.category] || '🏪',
+        name: payload.storeName || 'Loja sem nome',
+        owner: payload.nomeFantasia || payload.razaoSocial || payload.storeName || 'Vendedor(a)',
+        cnpj: payload.documentId || 'Pendente envio',
+        cat: payload.category || 'Outros',
+        date: dateStr,
+        status: 'pending',
+        docs: true, // wizard completo (Loja→Empresa→Banco→KYC) até esta tela
+      });
+    }
+
+    // 6. Sucesso: esconder os passos e mostrar a tela final
     for(let i = 1; i <= 4; i++){
       const s = document.getElementById('seller-step'+i);
       if(s) s.style.display = 'none';
@@ -3237,7 +3277,7 @@ async function finishSellerRegister(){
     console.error('Falha no registro KYC:', error);
     showToast(WKZ_ICO.warning + ' Erro ao enviar os dados. Tente novamente mais tarde.');
   } finally {
-    // 5. Restaurar o botão em caso de erro ou finalização
+    // 7. Restaurar o botão em caso de erro ou finalização
     if(submitBtn){
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
