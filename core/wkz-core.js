@@ -1485,7 +1485,7 @@ const sellerReviews = [
    complementa isso com atualização ao vivo quando duas abas estão abertas
    ao mesmo tempo na mesma sessão.
    ═══════════════════════════════════════════════════════════════════════ */
-var WKZ_SHARED_KEYS = { seller: 'wkz_seller_profile', disputes: 'kzDisputas_v1', flash: 'kzContracts_v1', broadcasts: 'kzComunicados_v1' };
+var WKZ_SHARED_KEYS = { seller: 'wkz_seller_profile', disputes: 'kzDisputas_v1', flash: 'kzContracts_v1', broadcasts: 'kzComunicados_v1', storeRequests: 'kzLojasAprovacao_v1' };
 
 function wkzReadShared(key, fallback) {
   try {
@@ -1603,6 +1603,55 @@ function wkzShareNewFlashItem(item) {
 function wkzGetSharedFlashItems() { return wkzReadShared(WKZ_SHARED_KEYS.flash, []); }
 window.wkzShareNewFlashItem = wkzShareNewFlashItem;
 window.wkzGetSharedFlashItems = wkzGetSharedFlashItems;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   [FIX-seller-approval v1.0] Solicitações de abertura de loja — mesma
+   arquitetura de "fonte única partilhada" já usada acima para disputas
+   (kzDisputas_v1) e comunicados (kzComunicados_v1).
+   ───────────────────────────────────────────────────────────────────────
+   Problema relatado: ao concluir o cadastro de vendedor (Loja → Empresa →
+   Banco → KYC), a tela "Loja em Análise!" era só uma animação local —
+   finishSellerRegister() (wkz-seller.js) nunca escrevia os dados em
+   lugar nenhum. O Admin ("Aprovação de Lojas") sempre mostrava as MESMAS
+   7 lojas fictícias (ADMIN_STORES, hardcoded em wkz-admin.js) porque não
+   existia NENHUMA ponte entre o cadastro real e essa lista — não é uma
+   limitação de back-end, é só a ponte que faltava construir no front-end
+   (mesmo raciocínio já usado nas disputas/comunicados/flash sale acima).
+   wkzShareNewStoreRequest() é chamada por finishSellerRegister() ao
+   concluir o wizard; wkzGetSharedStoreRequests() é lida por
+   wkz-admin.js (wkzHydrateSharedStoresForAdmin) para popular ADMIN_STORES
+   junto com as 7 lojas de demonstração; wkzUpdateSharedStoreRequest() é
+   chamada por admApproveStore()/admRejectStore() para persistir a
+   decisão. WkzBus emite 'store:registered' e 'store:statusChanged' para
+   que uma aba do Admin já aberta atualize a lista ao vivo, sem reload. */
+function wkzShareNewStoreRequest(entry) {
+  var list = wkzReadShared(WKZ_SHARED_KEYS.storeRequests, []);
+  var now = new Date().toISOString();
+  entry.status = entry.status || 'pending';   // 'pending' | 'docs' | 'approved' | 'rejected'
+  entry.createdAt = now;
+  entry.updatedAt = now;
+  list.unshift(entry);
+  wkzWriteShared(WKZ_SHARED_KEYS.storeRequests, list);
+  if (window.WkzBus) WkzBus.emit('store:registered', entry);
+  return entry;
+}
+function wkzGetSharedStoreRequests() { return wkzReadShared(WKZ_SHARED_KEYS.storeRequests, []); }
+/* Usada pelo Admin ao Aprovar/Recusar — persiste a decisão de volta na
+   fonte partilhada (as 7 lojas mock ST001-ST007 não existem aqui, então
+   o "not found" é esperado e silencioso para elas). */
+function wkzUpdateSharedStoreRequest(id, patch) {
+  var list = wkzReadShared(WKZ_SHARED_KEYS.storeRequests, []);
+  var s = list.find(function(x) { return x.id === id; });
+  if (!s) return null;
+  for (var k in patch) { if (patch.hasOwnProperty(k)) s[k] = patch[k]; }
+  s.updatedAt = new Date().toISOString();
+  wkzWriteShared(WKZ_SHARED_KEYS.storeRequests, list);
+  if (window.WkzBus) WkzBus.emit('store:statusChanged', s);
+  return s;
+}
+window.wkzShareNewStoreRequest = wkzShareNewStoreRequest;
+window.wkzGetSharedStoreRequests = wkzGetSharedStoreRequests;
+window.wkzUpdateSharedStoreRequest = wkzUpdateSharedStoreRequest;
 
 /* ═══════════════════════════════════════════════════════════════════════
    [FIX-disputas v3.0] wkzRenderSellerDisputeCard — UPSERT (insere OU
