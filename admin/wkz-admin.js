@@ -52,7 +52,21 @@ function switchAdminTab(tab, el) {
   if (mainEl) mainEl.scrollTop = 0;
 
   // Atualiza fade do nav carousel (fix: chamada direta evita problema de ordering dos patches)
-  setTimeout(admNavFadeInit, 30);
+  /* [FIX-admin-nav] admNavFadeInit NUNCA foi definida em lugar nenhum do
+     projeto (confirmado por busca em todo o código — wkz-buyer.js já a
+     referencia da mesma forma, mas sempre atrás de "typeof === 'function'",
+     igual às outras 4 chamadas a initAllScrollFades()/admNavFadeInit no
+     resto do código). Aqui, sem essa blindagem, TODA chamada de
+     switchAdminTab() lançava ReferenceError sem ser capturado — o que
+     interrompia a função assim que chegava aqui, ANTES de rodar
+     renderAdminStores()/renderAdminKyc()/renderAdminReports()/
+     renderCommHistory()/renderSecurityPanel() logo abaixo, e antes do
+     patchSwitchAdminTabAll() (mais adiante no arquivo) rodar
+     initAdmKzIaPanel()/renderDisputas()/renderSaques()/syncOverviewKPIs()
+     ao trocar de aba. Mesmo padrão defensivo já usado em todo o resto do
+     projeto para esta mesma função — sem inventar comportamento visual
+     novo que não existe em nenhum CSS/HTML do projeto. */
+  setTimeout(function(){ if (typeof admNavFadeInit === 'function') admNavFadeInit(); }, 30);
 
   // Lazy render
   if (tab === 'store-approval')    renderAdminStores();
@@ -90,6 +104,40 @@ const ADMIN_STORES = [
   { id:'ST006', avatar:'🐾', name:'PetLife Store',      owner:'Fernanda K.',cnpj:'Pendente envio',    cat:'Pet Shop',          date:'17/05/2025', status:'docs',     docs: false },
   { id:'ST007', avatar:'🚗', name:'AutoPeças Online',   owner:'Marco A.',   cnpj:'11.098.765/0001-33', cat:'Automotivo',        date:'17/05/2025', status:'pending',  docs: true },
 ];
+
+/* ═══════════════════════════════════════════════════════════════════════
+   [FIX-seller-approval v1.0] Mescla as lojas REAIS cadastradas pelo
+   wizard do vendedor (kzLojasAprovacao_v1, ver wkzShareNewStoreRequest em
+   wkz-core.js) por cima das 7 lojas de demonstração acima — mesmo padrão
+   de wkzLoadSharedDisputesForAdmin() (abaixo neste arquivo) para
+   disputas. Chamada no bootstrap (DOMContentLoaded, wkz-admin.html),
+   ANTES do primeiro renderAdminStores(), e escuta 'store:registered' em
+   tempo real para o caso de a aba do Admin já estar aberta quando um
+   vendedor termina o cadastro noutra aba/dispositivo. Só entram lojas
+   com status 'pending'/'docs' — se o Admin já tiver aprovado/recusado
+   numa sessão anterior (persistido via wkzUpdateSharedStoreRequest), a
+   loja não deve reaparecer na fila. */
+function wkzHydrateSharedStoresForAdmin() {
+  if (typeof wkzGetSharedStoreRequests !== 'function' || typeof ADMIN_STORES === 'undefined') return;
+
+  wkzGetSharedStoreRequests().forEach(function (s) {
+    if (s.status !== 'pending' && s.status !== 'docs') return; // já decidida — não deve voltar pra fila
+    if (ADMIN_STORES.some(function (x) { return x.id === s.id; })) return; // já carregada nesta sessão
+    ADMIN_STORES.unshift({ id: s.id, avatar: s.avatar, name: s.name, owner: s.owner, cnpj: s.cnpj, cat: s.cat, date: s.date, status: s.status, docs: s.docs });
+  });
+
+  if (window.WkzBus) {
+    WkzBus.on('store:registered', function (s) {
+      if (ADMIN_STORES.some(function (x) { return x.id === s.id; })) return;
+      ADMIN_STORES.unshift({ id: s.id, avatar: s.avatar, name: s.name, owner: s.owner, cnpj: s.cnpj, cat: s.cat, date: s.date, status: s.status, docs: s.docs });
+      if (typeof renderAdminStores === 'function' && document.getElementById('admStoreList')) renderAdminStores(_admStoresActiveFilter);
+      if (typeof admSyncStoreBadge === 'function') admSyncStoreBadge();
+      showToast(WKZ_ICO.store + ' Nova loja cadastrada: "' + s.name + '" — aguardando revisão.');
+      admAuditAdd('🏪', 'Loja "' + s.name + '" enviou cadastro para aprovação', s.owner);
+    });
+  }
+}
+window.wkzHydrateSharedStoresForAdmin = wkzHydrateSharedStoresForAdmin;
 
 function renderAdminStores(filter = 'all') {
   _admStoresActiveFilter = filter;
@@ -231,6 +279,14 @@ function admApproveStore(id, name) {
   admSyncStoreBadge();
   admAuditAdd('✅', 'Loja "' + name + '" aprovada', 'Admin WeKz');
   showToast(WKZ_ICO.check + ' Loja "' + name + '" aprovada! Vendedor notificado por e-mail.');
+  /* [FIX-seller-approval v1.0] Persiste a decisão na fonte partilhada —
+     sem isto, um reload do Admin fazia a loja recém-aprovada "voltar"
+     pra fila (wkzHydrateSharedStoresForAdmin só filtra por status). Lojas
+     mock ST001-ST007 não existem em kzLojasAprovacao_v1 — a função
+     retorna null nesse caso, silenciosamente, sem quebrar nada. */
+  if (typeof window.wkzUpdateSharedStoreRequest === 'function') {
+    window.wkzUpdateSharedStoreRequest(id, { status: 'approved' });
+  }
   /* [v1.9.0] Actualiza mock supplier user status → desbloqueia Painel do Fornecedor */
   if (typeof window.spdSetApprovalStatus === 'function') {
     window.spdSetApprovalStatus('approved');
@@ -252,6 +308,10 @@ function admRejectStore(id, name) {
   admSyncStoreBadge();
   admAuditAdd('🚫', 'Loja "' + name + '" recusada', 'Admin WeKz');
   showToast(WKZ_ICO.xCircle + ' Loja "' + name + '" recusada. Vendedor notificado.');
+  /* [FIX-seller-approval v1.0] Ver comentário equivalente em admApproveStore(). */
+  if (typeof window.wkzUpdateSharedStoreRequest === 'function') {
+    window.wkzUpdateSharedStoreRequest(id, { status: 'rejected' });
+  }
   /* [v1.9.0] Actualiza mock supplier user status → mostra tela de rejeição */
   if (typeof window.spdSetApprovalStatus === 'function') {
     window.spdSetApprovalStatus('rejected');
@@ -2145,7 +2205,8 @@ function closeSaqueDetail() {
   const _orig = window.switchAdminTab;
   window.switchAdminTab = function(tab, el) {
     if (_orig) _orig(tab, el);
-    setTimeout(admNavFadeInit, 60);
+    /* [FIX-admin-nav] Mesma blindagem do fix acima (linha ~55). */
+    setTimeout(function(){ if (typeof admNavFadeInit === 'function') admNavFadeInit(); }, 60);
     if (tab === 'kz-ia')   setTimeout(initAdmKzIaPanel, 60);
     if (tab === 'disputas') setTimeout(() => { renderDisputas('all'); initDisputasKzMonitor(); }, 60);
     if (tab === 'saques')   setTimeout(() => renderSaques('all'), 60);

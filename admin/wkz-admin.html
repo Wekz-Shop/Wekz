@@ -1097,6 +1097,11 @@
      tudo. currentAdminUser já é um placeholder (ver wkz-admin.js, topo). */
   document.addEventListener('DOMContentLoaded', function () {
     MapsTo('admin-dashboard');
+    // [FIX-seller-approval v1.0] Carrega lojas cadastradas de verdade pelo
+    // wizard do vendedor (kzLojasAprovacao_v1) ANTES do primeiro
+    // renderAdminStores() — mesmo raciocínio do FIX-item4 logo abaixo,
+    // aplicado a "Aprovação de Lojas" em vez de "Disputas".
+    if (typeof wkzHydrateSharedStoresForAdmin === 'function') wkzHydrateSharedStoresForAdmin();
     if (typeof renderAdminStores === 'function') renderAdminStores();
     if (typeof renderAdminKyc === 'function') renderAdminKyc();
     if (typeof renderAdminReports === 'function') renderAdminReports();
