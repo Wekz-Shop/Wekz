@@ -4171,13 +4171,19 @@ img, svg, video, canvas, iframe {
   color: var(--teal);
 }
 
-/* ─── BANNER STRIP ─── */
+/* ─── BANNER STRIP / COLEÇÕES EM DESTAQUE ─── */
 .banners-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;}
 .banner-card{border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;cursor:pointer;transition:var(--transition);min-height:140px;display:flex;flex-direction:column;justify-content:flex-end;}
 .banner-card:hover{transform:scale(1.02);}
 .banner-card h3{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;position:relative;z-index:1;color:#fff;}
 .banner-card p{font-size:12px;opacity:0.85;margin-top:4px;position:relative;z-index:1;color:#fff;}
 .banner-bg{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:64px;opacity:0.2;z-index:0;}
+/* Sprint M18: badge de contagem real (prova social) + CTA + tag de curadoria
+   junto ao título da seção — ver renderFeaturedCollections() em wkz-buyer.js */
+.banners-strip-tag{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:#FF6B35;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;white-space:nowrap;}
+.banner-count{position:relative;z-index:1;align-self:flex-start;background:rgba(255,255,255,0.16);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:50px;margin-bottom:auto;}
+.banner-cta{position:relative;z-index:1;display:inline-block;margin-top:8px;font-size:11px;font-weight:700;color:#fff;opacity:0.9;}
+.banner-card:hover .banner-cta{opacity:1;text-decoration:underline;}
 
 /* ─── SELLERS/STORES ─── */
 .stores-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px;}
@@ -4191,13 +4197,68 @@ img, svg, video, canvas, iframe {
 .btn-follow{border:1px solid var(--teal);background:transparent;color:var(--teal);padding:7px 20px;border-radius:50px;cursor:pointer;font-size:12px;font-weight:600;transition:var(--transition);}
 .btn-follow:hover{background:var(--teal);color:#fff;}
 
+/* ─── LOJAS VERIFICADAS: carrossel horizontal (Sprint M18) ───
+   #storesGrid (home) vira uma linha flex com scroll nativo — arrasta no
+   mobile, setas de canto no desktop — preservando o gap de 24px original
+   do .stores-grid em grade. #storesGridFull (página "Todas as Lojas")
+   NÃO usa essa classe extra e continua em grade normal. Fade real nas
+   pontas (não CSS estático) via initStoresScrollFade(), wkz-buyer.js —
+   funciona em mobile E desktop, como pedido. */
+.stores-scroll-wrap{position:relative;display:flex;align-items:center;gap:8px;}
+.stores-scroll-track{position:relative;flex:1 1 auto;min-width:0;overflow:hidden;}
+.stores-grid.stores-scroll{
+  display:flex;flex-wrap:nowrap;overflow-x:auto;gap:24px;
+  scroll-snap-type:x proximity;scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;padding:4px 2px 10px;
+}
+.stores-grid.stores-scroll::-webkit-scrollbar{display:none;}
+.stores-grid.stores-scroll{scrollbar-width:none;-ms-overflow-style:none;}
+.stores-grid.stores-scroll > .store-card{flex:0 0 220px;width:220px;scroll-snap-align:start;}
+/* Fade nas pontas — sempre presente (mobile e desktop), opacidade
+   controlada via classes .fade-left-hidden/.fade-right-hidden pelo JS. */
+.stores-scroll-track::before,
+.stores-scroll-track::after{
+  content:'';position:absolute;top:0;bottom:10px;z-index:5;width:56px;
+  pointer-events:none;transition:opacity 0.25s ease;
+}
+.stores-scroll-track::before{left:0;background:linear-gradient(to right, var(--darker) 0%, transparent 100%);}
+.stores-scroll-track::after{right:0;background:linear-gradient(to left, var(--darker) 0%, transparent 100%);}
+.stores-scroll-track.fade-left-hidden::before{opacity:0;}
+.stores-scroll-track.fade-right-hidden::after{opacity:0;}
+@media(max-width:768px){
+  .carousel-arrow{display:none;}
+  .stores-grid.stores-scroll{gap:14px;}
+  .stores-grid.stores-scroll > .store-card{flex-basis:190px;width:190px;}
+}
+
+/* ─── SETA DE CARROSSEL genérica (reutilizável) — cor teal/marca, distinta
+   da laranja .flashhero-arrow (que é específica do Flash Sale) ─── */
+.carousel-arrow{
+  flex:0 0 auto;width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(0,180,171,0.35);background:var(--card);color:var(--teal);
+  font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;opacity:0.6;transition:var(--transition);
+}
+.carousel-arrow:hover{opacity:1;background:rgba(0,180,171,0.12);}
+
 /* ─── TRUST STRIP ─── */
 .trust-strip{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:24px 32px;}
 .trust-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
-.trust-item{display:flex;align-items:center;gap:14px;}
+/* Sprint M18: itens agora são clicáveis (levam à página de explicação
+   correspondente) — cursor + hover + foco visível pra quem navega por
+   teclado (role="link" tabindex="0" no HTML). */
+.trust-item{display:flex;align-items:center;gap:14px;cursor:pointer;border-radius:var(--radius-sm);padding:6px;margin:-6px;transition:var(--transition);}
+.trust-item:hover{background:rgba(0,180,171,0.06);}
+.trust-item:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
 .trust-icon{width:48px;height:48px;border-radius:12px;background:var(--grad1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
 .trust-title{font-size:14px;font-weight:600;margin-bottom:2px;}
 .trust-desc{font-size:12px;color:var(--muted);}
+/* Linha fina de reforço de confiança que substitui o antigo bloco
+   "Sua Proteção Garantida" (agora em wkz-legal.html#pg-seguranca) —
+   1 linha em vez de uma seção inteira duplicando "Pagamento Seguro". */
+.trust-more{max-width:1400px;margin:16px auto 0;padding-top:16px;border-top:1px solid var(--border);text-align:center;font-size:12.5px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;}
+.trust-more a{color:var(--teal);font-weight:600;cursor:pointer;}
+.trust-more a:hover{text-decoration:underline;}
 
 /* ─── PRODUCT DETAIL PAGE ─── */
 /* v2.9.19: Desktop layout tightened — gallery column is now fixed 500px to prevent
