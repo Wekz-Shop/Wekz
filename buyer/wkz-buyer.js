@@ -71,7 +71,7 @@ function renderAll(){
   // chegar a esta outra página (o comprador) sem um back-end real.
   if (typeof wkzInjectSellerStore === 'function') wkzInjectSellerStore();
   if (typeof wkzLoadSharedFlashItems === 'function') wkzLoadSharedFlashItems();
-  renderCats();renderProducts();renderStores();renderFlash();renderFlashHero();renderWishlist();
+  renderCats();renderFeaturedCollections();renderProducts();renderStores();renderFlash();renderFlashHero();renderWishlist();
   populateSearchCatOptions();renderNavCategories();
   // Cart starts empty, updateCartUI initializes badge=0 and clears display
   updateCartUI();
@@ -104,6 +104,41 @@ function renderCats(){
   setTimeout(function(){ if(typeof initAllScrollFades==="function") initAllScrollFades(); }, 60);
 }
 
+
+// ─── COLEÇÕES EM DESTAQUE (ex-banners estáticos da home) — Sprint M18 ───
+// Curadoria fixa das 3 categorias com maior apelo de conversão (visual +
+// volume de catálogo). O texto/emoji/gradiente de cada card é curatorial
+// (não faz sentido vir do array `categories`, que tem 12 entradas neutras),
+// mas nome e contagem de produtos são lidos de `categories` (wkz-core.js) —
+// a MESMA fonte usada por "Explorar Categorias" — pra nunca divergir entre
+// as duas seções nem exigir atualização manual em dois lugares.
+const FEATURED_COLLECTIONS = [
+  { name:'Eletrônicos', label:'Mega Eletrônicos', sub:'Smartphones, tablets e muito mais', emoji:'📱', grad:'linear-gradient(135deg,#0D1F3C,#1A3A6B)' },
+  { name:'Moda',        label:'Moda Global',       sub:'Tendências internacionais',        emoji:'👗', grad:'linear-gradient(135deg,#1A0D3C,#3A1A6B)' },
+  { name:'Casa & Deco',  label:'Casa & Design',     sub:'Transforme seu espaço',            emoji:'🏠', grad:'linear-gradient(135deg,#0D2A1F,#1A5A3C)' },
+];
+
+function renderFeaturedCollections(){
+  const g = document.getElementById('featuredCollectionsGrid');
+  if(!g) return;
+  g.innerHTML = FEATURED_COLLECTIONS.map(fc=>{
+    // [FIX Casa&Design] antes o card chamava filterCat('Casa'), rótulo que
+    // não existe em CAT_KEY_MAP (só 'Casa & Deco' existe) — funcionava por
+    // coincidência de chave gerada via fallback .toLowerCase(), mas o toast
+    // mostrava "Casa" em vez do nome real da categoria. fc.name agora usa o
+    // nome canônico direto.
+    const cat = (typeof categories !== 'undefined') ? categories.find(c => c.n === fc.name) : null;
+    const countBadge = cat ? `<span class="banner-count">+${cat.c} produtos</span>` : '';
+    return `
+    <div class="banner-card" style="background:${fc.grad};" onclick="filterCat('${fc.name}')">
+      ${countBadge}
+      <div class="banner-bg">${fc.emoji}</div>
+      <h3>${fc.label}</h3>
+      <p>${fc.sub}</p>
+      <span class="banner-cta">Explorar coleção →</span>
+    </div>`;
+  }).join('');
+}
 
 /* ─── Shimmer Skeleton Loader ─── */
 function showShimmerSkeletons(containerId, count){
@@ -398,6 +433,46 @@ function scrollFlashHero(dir){
   const card = g.querySelector(':scope > div');
   const step = card ? (card.getBoundingClientRect().width + 14) * 2 : 420;
   g.scrollBy({ left: dir * step, behavior: 'smooth' });
+}
+
+// Setas de canto (desktop) do carrossel "Lojas Verificadas" da Home — mesmo
+// padrão do Flash Sale Hero (scrollFlashHero). No mobile as setas ficam
+// ocultas (CSS) e o usuário arrasta com o dedo, já que #storesGrid é
+// overflow-x:auto nativo dentro de .stores-scroll-track.
+function scrollStores(dir){
+  const g = document.getElementById('storesGrid');
+  if(!g) return;
+  const card = g.querySelector(':scope > .store-card');
+  const step = card ? (card.getBoundingClientRect().width + 24) * 2 : 460;
+  g.scrollBy({ left: dir * step, behavior: 'smooth' });
+}
+
+// Fade real nas pontas do carrossel de lojas — ao contrário de
+// initAllScrollFades() (referenciada em ~6 pontos do projeto mas nunca
+// implementada, confirmado por busca em todo o código-fonte; ver comentário
+// em switchAdminTab(), wkz-admin.js), esta função realmente liga/desliga a
+// opacidade dos gradientes de acordo com a posição do scroll: esconde o fade
+// esquerdo quando já está no início, e o direito quando chega ao fim.
+let _storesScrollFadeBound = false;
+function initStoresScrollFade(){
+  const track = document.getElementById('storesScrollTrack');
+  const grid  = document.getElementById('storesGrid');
+  if(!track || !grid) return;
+
+  function update(){
+    const maxScroll = grid.scrollWidth - grid.clientWidth;
+    const atStart = grid.scrollLeft <= 4;
+    const atEnd   = grid.scrollLeft >= maxScroll - 4;
+    track.classList.toggle('fade-left-hidden',  atStart);
+    track.classList.toggle('fade-right-hidden', atEnd || maxScroll <= 0);
+  }
+
+  update();
+  if(!_storesScrollFadeBound){
+    grid.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    _storesScrollFadeBound = true;
+  }
 }
 
 function renderFlashHero(){
@@ -11068,6 +11143,10 @@ function renderStores(){
       </div>`;
     }).join('');
   });
+  // Home usa carrossel horizontal (#storesGrid dentro de #storesScrollTrack);
+  // a página "Todas as Lojas" (#storesGridFull) continua em grade normal e
+  // não tem essa track, initStoresScrollFade() só age se ela existir.
+  setTimeout(function(){ if(typeof initStoresScrollFade === 'function') initStoresScrollFade(); }, 60);
 }
 
 // ─── ORDER TRACKING TEMPLATE ───

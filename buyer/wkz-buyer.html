@@ -819,52 +819,25 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- BANNERS -->
+  <!-- COLEÇÕES EM DESTAQUE (ex-"BANNERS") — Sprint M18.
+       Antes eram 3 cards 100% estáticos: título, contagem-fantasma (nenhuma,
+       só texto fixo) e onclick fixo no HTML — o card "Casa & Design" chamava
+       filterCat('Casa'), rótulo divergente do nome canônico 'Casa & Deco'
+       usado em CAT_KEY_MAP/categories (funcionava por coincidência de chave,
+       mas o toast exibido mostrava "Casa" em vez de "Casa & Deco").
+       Agora renderFeaturedCollections() (wkz-buyer.js) injeta o conteúdo a
+       partir de FEATURED_COLLECTIONS + do MESMO array `categories`
+       (wkz-core.js) que alimenta "Explorar Categorias" logo acima — nome e
+       contagem de produtos nunca mais podem divergir entre as duas seções,
+       e o card passa a mostrar prova social real (nº de produtos) em vez de
+       ser puramente decorativo. -->
   <div class="section" style="padding-top:0;">
     <div class="section-inner">
-      <div class="banners-strip">
-        <div class="banner-card" style="background:linear-gradient(135deg,#0D1F3C,#1A3A6B);" onclick="filterCat('Eletrônicos')">
-          <div class="banner-bg">📱</div>
-          <h3>Mega Eletrônicos</h3>
-          <p>Smartphones, tablets e muito mais</p>
-        </div>
-        <div class="banner-card" style="background:linear-gradient(135deg,#1A0D3C,#3A1A6B);" onclick="filterCat('Moda')">
-          <div class="banner-bg">👗</div>
-          <h3>Moda Global</h3>
-          <p>Tendências internacionais</p>
-        </div>
-        <div class="banner-card" style="background:linear-gradient(135deg,#0D2A1F,#1A5A3C);" onclick="filterCat('Casa')">
-          <div class="banner-bg">🏠</div>
-          <h3>Casa & Design</h3>
-          <p>Transforme seu espaço</p>
-        </div>
+      <div class="section-header">
+        <h2 class="section-title">Coleções em <span>Destaque</span></h2>
+        <span class="banners-strip-tag">🔥 Mais procuradas</span>
       </div>
-    </div>
-  </div>
-
-  <!-- PROTECTION -->
-  <div style="padding:0 32px 40px;max-width:1464px;margin:0 auto;">
-    <div class="protection-section">
-      <div class="section-header" style="margin-bottom:24px;">
-        <h2 class="section-title"><span class="wkz-icon wkz-icon-shield"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg></span> Sua <span>Proteção</span> Garantida</h2>
-      </div>
-      <div class="protection-grid">
-        <div class="protection-item">
-          <div class="protection-icon"><span class="wkz-icon wkz-icon-lock"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
-          <div class="protection-title">Pagamento Seguro</div>
-          <div class="protection-desc">Tecnologia SSL 256-bit. Seus dados financeiros nunca são compartilhados com vendedores. Processamento via gateway certificado PCI DSS.</div>
-        </div>
-        <div class="protection-item">
-          <div class="protection-icon"><span class="wkz-icon wkz-icon-scale"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span></div>
-          <div class="protection-title">Proteção ao Comprador</div>
-          <div class="protection-desc">Se o produto não chegar ou não for como descrito, você recebe seu dinheiro de volta. Prazo de 30 dias para disputas abertas.</div>
-        </div>
-        <div class="protection-item">
-          <div class="protection-icon"><span class="wkz-icon wkz-icon-checkcirc"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span></div>
-          <div class="protection-title">Vendedores Verificados</div>
-          <div class="protection-desc">Todos os vendedores passam por verificação de identidade, endereço e histórico. Sistema de avaliação transparente com 5 estrelas. <a onclick="showPage('pg-garantia-autenticidade')" style="color:var(--teal);cursor:pointer;font-weight:600;">Ver Garantia de Autenticidade →</a></div>
-        </div>
-      </div>
+      <div class="banners-strip" id="featuredCollectionsGrid"><!-- injetado por renderFeaturedCollections() --></div>
     </div>
   </div>
 
@@ -875,41 +848,71 @@ document.addEventListener('DOMContentLoaded', function() {
         <h2 class="section-title"><span class="wkz-icon wkz-icon-store"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><rect x="9" y="13" width="6" height="9"/></svg></span> Lojas <span>Verificadas</span></h2>
         <span class="see-all" onclick="showPage('stores')">Ver todas →</span>
       </div>
-      <div class="stores-grid" id="storesGrid"></div>
+      <!-- Carrossel horizontal (Sprint M18): a grade fixa (auto-fill) quebrava
+           em várias linhas assim que houvesse muitas lojas — inviável quando a
+           plataforma estiver em operação real com dezenas/centenas de lojas.
+           Mesmo padrão de arrasto (mobile) + setas de canto (desktop) já usado
+           no Flash Sale Hero (.flashhero-*), mas com fade REAL nas pontas via
+           initStoresScrollFade() (wkz-buyer.js) — ao contrário de
+           initAllScrollFades(), referenciada em vários pontos do projeto mas
+           nunca implementada (fade estático, sempre visível mesmo no início/fim
+           do scroll). "Ver todas →" continua sendo o atalho pra quem prefere
+           grade completa em vez de arrastar. -->
+      <div class="stores-scroll-wrap">
+        <button type="button" class="carousel-arrow carousel-arrow-left" onclick="scrollStores(-1)" aria-label="Ver lojas anteriores">‹</button>
+        <div class="stores-scroll-track" id="storesScrollTrack">
+          <div class="stores-grid stores-scroll" id="storesGrid"></div>
+        </div>
+        <button type="button" class="carousel-arrow carousel-arrow-right" onclick="scrollStores(1)" aria-label="Ver mais lojas">›</button>
+      </div>
     </div>
   </div>
 
-  <!-- TRUST -->
+  <!-- TRUST — Sprint M18: cada item agora é clicável e leva à página com a
+       explicação completa (evita repetir, no meio da home, o mesmo discurso
+       de confiança que antes aparecia 2x — no bloco "Sua Proteção Garantida"
+       E aqui embaixo, os dois mencionando "Pagamento Seguro"). O conteúdo
+       detalhado de "Proteção ao Comprador" e "Vendedores Verificados" (antes
+       um bloco grande no meio do scroll da home) foi consolidado na página
+       dedicada Segurança & Proteção da Compra (wkz-legal.html#pg-seguranca),
+       seguindo o mesmo padrão já usado por Garantia de Autenticidade e
+       Anti-fraude: conteúdo de confiança/compliance mora no módulo legal
+       (fonte única, compartilhada por Buyer/Seller/Admin), a home só
+       referencia com um resumo curto. -->
   <div class="trust-strip">
     <div class="trust-inner">
-      <div class="trust-item">
+      <div class="trust-item" role="link" tabindex="0" aria-label="Ver informações de entrega e rastreamento" onclick="window.location.href='../legal/wkz-legal.html#pg-tracking-info'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="trust-icon"><span class="wkz-icon wkz-icon-truck"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16 16,8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span></div>
         <div>
           <div class="trust-title">Entrega Rápida</div>
           <div class="trust-desc">Frete grátis acima de R$150</div>
         </div>
       </div>
-      <div class="trust-item">
+      <div class="trust-item" role="link" tabindex="0" aria-label="Ver diretrizes de devolução" onclick="window.location.href='../legal/wkz-legal.html#pg-returns'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="trust-icon"><span class="wkz-icon wkz-icon-rotateccw"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span></div>
         <div>
           <div class="trust-title">Devolução Fácil</div>
           <div class="trust-desc">30 dias sem perguntas</div>
         </div>
       </div>
-      <div class="trust-item">
+      <div class="trust-item" role="link" tabindex="0" aria-label="Ver segurança e proteção da compra" onclick="window.location.href='../legal/wkz-legal.html#pg-seguranca'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="trust-icon"><span class="wkz-icon wkz-icon-creditcard"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="7" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="11" cy="15" r="1.5" fill="currentColor" stroke="none"/></svg></span></div>
         <div>
           <div class="trust-title">Pagamento Seguro</div>
           <div class="trust-desc">Pix, cartão, boleto</div>
         </div>
       </div>
-      <div class="trust-item">
+      <div class="trust-item" role="link" tabindex="0" aria-label="Ver central de ajuda e suporte" onclick="window.location.href='../legal/wkz-legal.html#pg-suporte'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
         <div class="trust-icon"><span class="wkz-icon wkz-icon-headphones"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></span></div>
         <div>
           <div class="trust-title">Suporte 24/7</div>
           <div class="trust-desc">Chat, e-mail e WhatsApp</div>
         </div>
       </div>
+    </div>
+    <div class="trust-more">
+      <span class="wkz-icon wkz-icon-shield" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg></span>
+      Sua compra é protegida do pedido à entrega — <a onclick="window.location.href='../legal/wkz-legal.html#pg-seguranca'">saiba como →</a>
     </div>
   </div>
 
@@ -5231,6 +5234,7 @@ body.kzlive-active .bottom-nav {
             <summary>Suporte</summary>
             <div class="footer-col-links">
               <a onclick="window.location.href='../legal/wkz-legal.html#pg-suporte'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>Central de Ajuda e FAQs da Plataforma</a>
+              <a onclick="window.location.href='../legal/wkz-legal.html#pg-seguranca'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>Segurança &amp; Proteção da Compra</a>
               <a onclick="window.location.href='../legal/wkz-legal.html#pg-disputes'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Mediação de Disputas &amp; Reembolsos</a>
               <a onclick="window.location.href='../legal/wkz-legal.html#pg-tracking-info'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Rastreamento de Envios</a>
               <a onclick="window.location.href='../legal/wkz-legal.html#pg-returns'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Diretrizes de Devolução de Lojistas</a>
