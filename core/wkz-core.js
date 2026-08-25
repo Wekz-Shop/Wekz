@@ -1187,6 +1187,43 @@ function isOfficialStore(sellerName) {
   return OFFICIAL_STORES.includes(sellerName);
 }
 
+// ══════════════════════════════════════════════════════
+//  SELO WEKZ DE AUTENTICIDADE v1 (mock p/ testes de front-end)
+//  Conceito DISTINTO do "Loja Oficial" acima: este selo representa
+//  o protocolo de KYC do vendedor + procedência do produto descrito
+//  em wkz-legal.html#pg-garantia-autenticidade (4 camadas: KYC,
+//  documentação de produto, verificação contínua por IA e histórico
+//  de conformidade). Antes desta v1 ele só existia como texto na
+//  página institucional — nenhum produto/vendedor carregava esse
+//  dado, e a aba "Info do Vendedor" + seção "Proteção WeKz" da PDP
+//  mostravam sempre o mesmo texto estático (TechStore/4.9★/18.4k),
+//  não importa o produto aberto.
+//  Escopo mínimo: 3 lojas com selo ativo (cobrindo os 3 níveis de
+//  risco da tabela institucional) + as demais sem selo, para o time
+//  poder validar visualmente os 4 pontos do "Como Verificar o Selo".
+//  FIX (proposto): substituir por flag real vinda da API de
+//  verificação (/api/sellers/:id/selo-autenticidade) após integração.
+// ══════════════════════════════════════════════════════
+const SELO_AUTENTICIDADE_SELLERS = {
+  'TechStore':  { ativo: true, nivel: 'alto',   kyc: 'aprovado' }, // Eletrônicos > R$800
+  'GlowBeauty': { ativo: true, nivel: 'alto',   kyc: 'aprovado' }, // Cosméticos importados
+  'SportFit':   { ativo: true, nivel: 'padrao', kyc: 'aprovado' }, // Demais categorias
+};
+
+function getSeloAutenticidade(sellerName) {
+  return SELO_AUTENTICIDADE_SELLERS[sellerName] || { ativo: false, nivel: null, kyc: 'pendente' };
+}
+
+function hasSeloAutenticidade(sellerName) {
+  return !!getSeloAutenticidade(sellerName).ativo;
+}
+
+if (typeof window !== 'undefined') {
+  window.SELO_AUTENTICIDADE_SELLERS = SELO_AUTENTICIDADE_SELLERS;
+  window.getSeloAutenticidade = getSeloAutenticidade;
+  window.hasSeloAutenticidade = hasSeloAutenticidade;
+}
+
 
 /* WeKz Category Icon Map */
 const WKZ_CAT_ICONS = {
