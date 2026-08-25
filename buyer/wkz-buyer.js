@@ -4758,6 +4758,64 @@ function openProduct(i){
   // Sync "Vendido por" disclaimer seller name
   const pdpSellerNameEl=document.getElementById('pdpSellerName');
   if(pdpSellerNameEl) pdpSellerNameEl.textContent=(p.s||'Vendedor')+' Oficial';
+  // ── Selo WeKz de Autenticidade (mock v1 — dados em wkz-core.js) ──
+  // Substitui os textos estáticos da aba "Info do Vendedor" e da seção
+  // "Proteção WeKz" (antes sempre mostravam TechStore/4.9★/18.4k, não
+  // importa o produto aberto) por dados reais do produto/vendedor + pelo
+  // status do selo de autenticidade daquele vendedor.
+  (function syncSeloAutenticidade(){
+    var selo = (typeof getSeloAutenticidade === 'function') ? getSeloAutenticidade(p.s) : {ativo:false,nivel:null};
+    var ratingTxt = (p.r!=null ? p.r.toFixed(1) : '4.5') + '★';
+    var salesTxt = p.sales || '—';
+    var satisfPct = Math.min(99, Math.round((p.r||4.5) * 20));
+
+    var elR=document.getElementById('sellerInfoRating'); if(elR) elR.textContent=ratingTxt;
+    var elS=document.getElementById('sellerInfoSales'); if(elS) elS.textContent=salesTxt;
+    var elSat=document.getElementById('sellerInfoSatisfaction'); if(elSat) elSat.textContent=satisfPct+'%';
+
+    var elVerifIcon=document.getElementById('sellerInfoVerifIcon');
+    var elVerifStatus=document.getElementById('sellerInfoVerifStatus');
+    if(elVerifIcon) elVerifIcon.textContent = selo.ativo ? '✅ Verificação' : '⏳ Verificação';
+    if(elVerifStatus){
+      elVerifStatus.textContent = selo.ativo ? 'Documentos confirmados' : 'Em análise — selo não ativo';
+      elVerifStatus.style.color = selo.ativo ? '#22C55E' : '#F59E0B';
+    }
+
+    var badgesEl=document.getElementById('sellerInfoBadges');
+    if(badgesEl){
+      var pills=[];
+      if(selo.ativo) pills.push('<span style="background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.25);color:var(--teal);padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">✅ Verificado WeKz</span>');
+      if((p.r||0)>=4.8) pills.push('<span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#F59E0B;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">⭐ Top Vendedor</span>');
+      if(p.fast) pills.push('<span style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22C55E;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">⚡ Envio Rápido</span>');
+      pills.push('<span style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#A78BFA;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600;">🛡 Anti-Fraude</span>');
+      badgesEl.innerHTML = pills.join('');
+    }
+
+    // "Ver Loja Completa" só abre um perfil real se existir em DB.stores
+    // (evita o bug de abrir a TechStore por engano pra qualquer vendedor).
+    var storeBtn=document.getElementById('sellerInfoStoreBtn');
+    var followBtn=document.getElementById('sellerInfoFollowBtn');
+    var storeEntry = (typeof DB!=='undefined' && DB.stores) ? DB.stores.find(function(st){return st.sellerKey===p.s;}) : null;
+    if(storeBtn){
+      if(storeEntry){
+        storeBtn.onclick=function(){ openStore(storeEntry.id); };
+      } else {
+        storeBtn.onclick=function(){ if(typeof showToast==='function') showToast('📋 Perfil completo desta loja ainda não está disponível no protótipo.'); };
+      }
+    }
+    if(followBtn) followBtn.onclick=function(){ if(typeof showToast==='function') showToast('❤ Seguindo '+(p.s||'vendedor')+'!'); };
+
+    var protLine=document.getElementById('pdpProtVerifiedLine');
+    if(protLine) protLine.textContent = selo.ativo
+      ? ('✅ Vendedor verificado com '+ratingTxt+' ('+salesTxt+' vendas)')
+      : ('ℹ️ Vendedor com '+ratingTxt+' ('+salesTxt+' vendas) — selo de autenticidade não ativo');
+
+    var seloLine=document.getElementById('pdpProtSeloLine');
+    if(seloLine) seloLine.style.opacity = selo.ativo ? '1' : '0.55';
+
+    var medal=document.getElementById('pdpAuthMedal');
+    if(medal) medal.style.display = (selo.ativo && selo.nivel==='alto') ? 'flex' : 'none';
+  })();
   // Update old price and discount badge if those elements exist
   const pdpOld=document.querySelector('.pdp-price-old');
   const pdpOff=document.querySelector('.pdp-price-off');
