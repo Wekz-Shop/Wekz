@@ -119,3 +119,48 @@ nome de `#cpUserName` (mesma fonte já sincronizada por
   (`SEC-02`), o que mitiga o caso mais óbvio, mas vale revisitar quando o
   projeto tiver múltiplas contas persistidas simultaneamente (ex.: trocar
   de conta sem logout explícito).
+
+---
+
+## Adenda — FIX-ENDERECO-01 (mesma sprint, achado após reporte de bug)
+
+**Pedido do usuário:** screenshot da página "Meu Carrinho" mostrando o
+nome "João da Silva" na barra de fidelidade (pontos/nível), divergente da
+conta logada ("Wekz", visível no dropdown do cabeçalho ao lado). Pedido
+para corrigir e auditar por bugs semelhantes.
+
+**Diagnóstico:** mesma classe de bug do FIX-CADASTRO-04 acima (nome
+escrito directamente no código, nunca lido da conta real), mas em módulos
+diferentes — o `.clb-name` da barra de fidelidade do carrinho
+(`renderCartLoyaltyBar()`) tinha `'João da Silva'` fixo, enquanto
+pontos/nível ao lado já eram corretamente dinâmicos. Auditoria encontrou
+mais 3 ocorrências do mesmo padrão, todas no fluxo de checkout:
+`_SAVED_ADDRS[1]`/`[2]` (endereços "Casa"/"Trabalho" salvos), o endereço
+de retirada gerado ao escolher um ponto de coleta (`_SAVED_ADDRS[99]`), e
+os cartões visuais estáticos "Endereços salvos" (`#addrCard1`/
+`#addrCard2`) no HTML do checkout, que nunca eram regenerados por JS.
+
+**Correção:** nova função única `window.wkzGetDisplayName()` em
+`wkz-core.js` (contraparte de leitura de `wkzSyncProfileDisplay`, que já
+existia só para gravação) — lê o nome da conta do `localStorage`
+(`wkz_registered_profile`), com fallback para o cabeçalho sincronizado e,
+por fim, para a persona de demonstração. Os 4 pontos identificados
+(barra de fidelidade do carrinho, os 2 endereços salvos, o endereço de
+retirada e os cartões estáticos do checkout) passaram a usar essa mesma
+fonte. `_cpDisplayFirstName()` (Kz Copilot, do fix acima) foi também
+simplificada para reaproveitá-la, eliminando a duplicação de lógica de
+leitura de nome. `openCheckout()` agora sincroniza os cartões visuais de
+endereço a cada abertura do checkout, cobrindo também troca de conta na
+mesma sessão sem reload.
+
+Arquivos: `core/wkz-core.js`, `buyer/wkz-buyer.js`. Diff cirúrgico
+(~57 e ~70 linhas respectivamente, sobre a versão já entregue acima).
+Sintaxe validada com `node -c` nos dois arquivos.
+
+**Fora do escopo desta correção:** `wkz-seller.js` tem uma ocorrência
+semelhante (`nome: 'João da Silva Santos'`, persona de loja) — é uma
+página/conta completamente separada (vendedor), com seu próprio sistema
+de perfil ainda não auditado; não foi tocada aqui. O placeholder
+"Ex: João da Silva Santos" no formulário de denúncia (`wkz-core.js`) é só
+texto de exemplo dentro de um campo de input, nunca exibido como dado
+real — não é um bug.
