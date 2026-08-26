@@ -5265,9 +5265,14 @@ function ckoutToggleWalletCredits(checkbox) {
   }
 }
 
+/* [FIX-ENDERECO-01] Nome do destinatário fixo em "João da Silva" nos 2
+   endereços salvos de demonstração — independente de quem tivesse
+   cadastrado. Ver window.wkzGetDisplayName em wkz-core.js (mesma fonte já
+   usada pela barra de fidelidade do carrinho). Só o nome é sincronizado
+   com a conta; ruas/CEPs continuam sendo os endereços de exemplo. */
 var _SAVED_ADDRS = {
-  1: { label:'🏠 Casa', name:'João da Silva', line1:'Rua das Flores, 42, Ap 12', line2:'São Paulo – SP · 01310-100' },
-  2: { label:'💼 Trabalho', name:'João da Silva', line1:'Av. Paulista, 1500, Sala 47', line2:'São Paulo – SP · 01311-200' }
+  1: { label:'🏠 Casa', name:(typeof window.wkzGetDisplayName === 'function' ? window.wkzGetDisplayName() : 'Alexandre Kz'), line1:'Rua das Flores, 42, Ap 12', line2:'São Paulo – SP · 01310-100' },
+  2: { label:'💼 Trabalho', name:(typeof window.wkzGetDisplayName === 'function' ? window.wkzGetDisplayName() : 'Alexandre Kz'), line1:'Av. Paulista, 1500, Sala 47', line2:'São Paulo – SP · 01311-200' }
 };
 var _PAY_META = {
   pix:    { icon:'📱', name:'Pix — aprovação em segundos', desc:'5% de desconto aplicado' },
@@ -5276,6 +5281,22 @@ var _PAY_META = {
 };
 
 function openCheckout(expressMode) {
+  /* [FIX-ENDERECO-01] Os cartões visuais "Endereços salvos" (#addrCard1/
+     #addrCard2) são HTML estático com "João da Silva" hardcoded — nunca
+     regenerados a partir de _SAVED_ADDRS (usado só no resumo/revisão do
+     checkout, já corrigido acima). Sincroniza aqui, toda vez que o
+     checkout abre, para cobrir também o caso de trocar de conta na mesma
+     sessão (SPA) sem recarregar a página. */
+  if (typeof window.wkzGetDisplayName === 'function') {
+    var _ckoutDispName = window.wkzGetDisplayName();
+    ['addrCard1', 'addrCard2'].forEach(function(cardId) {
+      var card = document.getElementById(cardId);
+      var nmEl = card ? card.querySelector('.addr-nm') : null;
+      if (nmEl) nmEl.textContent = _ckoutDispName;
+    });
+    if (_SAVED_ADDRS[1]) _SAVED_ADDRS[1].name = _ckoutDispName;
+    if (_SAVED_ADDRS[2]) _SAVED_ADDRS[2].name = _ckoutDispName;
+  }
   // Populate sidebar from cart
   _ckoutPopulateSidebar();
   _ckoutStep = 1;
@@ -8358,12 +8379,16 @@ function renderCartLoyaltyBar() {
     ? Math.round(((userPoints.balance - level.min) / (next.min - level.min)) * 100)
     : 100;
   var ptsToNext = next ? (next.min - userPoints.balance).toLocaleString('pt-BR') : null;
+  /* [FIX-ENDERECO-01] Nome fixo "João da Silva" — não refletia a conta
+     logada (pontos/nível ao lado já eram dinâmicos, só o nome era
+     hardcoded). Ver window.wkzGetDisplayName em wkz-core.js. */
+  var _clbName = (typeof window.wkzGetDisplayName === 'function') ? window.wkzGetDisplayName() : 'Alexandre Kz';
 
   el.innerHTML = `
     <div class="clb-header">
       <div class="clb-avatar" style="background:${level.bg};">${level.emoji}</div>
       <div>
-        <div class="clb-name">João da Silva</div>
+        <div class="clb-name">${_clbName}</div>
         <div style="font-size:11px;color:var(--muted);">${_wkzFmtPts(userPoints.balance)} · ${level.perks.split('·')[0].trim()}</div>
       </div>
       <div class="clb-level-badge" style="background:${level.bg};color:${level.color};border:1px solid ${level.color}33;">${level.emoji} ${level.name}</div>
@@ -9537,7 +9562,8 @@ function selectPickupPoint(id) {
   if (pt) {
     _SAVED_ADDRS[99] = {
       label: pt.type + ' — Retirada',
-      name: 'João da Silva',
+      /* [FIX-ENDERECO-01] Idem aos endereços 1/2 — nome do retirante era fixo. */
+      name: (typeof window.wkzGetDisplayName === 'function' ? window.wkzGetDisplayName() : 'Alexandre Kz'),
       line1: pt.name,
       line2: pt.addr,
     };
