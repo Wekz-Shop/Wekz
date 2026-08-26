@@ -5129,11 +5129,24 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   function cpLevelShortLabel(name) {
     return name === 'Neon Cyber' ? 'Neon' : name;
   }
+  /* [FIX-CADASTRO-04] cpBuildLevelInsight() tinha 'Alexandre' escrito
+     directamente no código — a saudação do Kz Copilot ("Olá, Alexandre!")
+     NUNCA usava o nome da conta real, nem depois do FIX-CADASTRO-01 já ter
+     corrigido #cpUserName/#cpHdrName em todo o resto da página. Lê agora o
+     primeiro nome de #cpUserName (mesma fonte já sincronizada por
+     wkzSyncProfileDisplay a cada cadastro/edição de perfil) — sem conta
+     registada ainda, mantém "Alexandre" como nome da persona de
+     demonstração, igual ao resto da página nesse cenário. */
+  function _cpDisplayFirstName() {
+    var el = document.getElementById('cpUserName');
+    var full = el ? (el.textContent || '').trim() : '';
+    return full ? full.split(' ')[0] : 'Alexandre';
+  }
   function cpBuildLevelInsight() {
     var d = cpCurrentLevelData();
     if (d.next) {
       return t('cpInsightLevelProgress')
-        .replace('{NAME}', 'Alexandre')
+        .replace('{NAME}', _cpDisplayFirstName())
         .replace('{ICON}', CP_ICO.flame)
         .replace('{LEVEL}', d.curr.name)
         .replace('{SAVED}', cpFmtAmt(CP_SAVED_EUR))
@@ -5141,7 +5154,7 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         .replace('{NEXT_LEVEL}', d.next.name);
     }
     return t('cpInsightLevelMaxed')
-      .replace('{NAME}', 'Alexandre')
+      .replace('{NAME}', _cpDisplayFirstName())
       .replace('{ICON}', CP_ICO.flame)
       .replace('{LEVEL}', d.curr.name)
       .replace('{SAVED}', cpFmtAmt(CP_SAVED_EUR));
@@ -5164,10 +5177,14 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     if (heroPtsEl) heroPtsEl.textContent = ptsFmt;
     var coPtsEl = document.getElementById('cpStatPoints');
     if (coPtsEl) coPtsEl.textContent = ptsFmt + ' pts';
+    /* [FIX-CADASTRO-04] Persiste pontos/nível — ver wkzSaveActivityState. */
+    if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
   };
   window.cpPushHistoryItem = function(item) {
     CP_HISTORY.unshift(item);
     renderCopilotHistory();
+    /* [FIX-CADASTRO-04] Persiste o micro-histórico — ver wkzSaveActivityState. */
+    if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
   };
   function cpApplyTpl(str) {
     if (!str) return str;
@@ -5535,6 +5552,9 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       });
     }
     cpSyncOrdersHeroCount();
+    /* [FIX-CADASTRO-04] Persiste CP_PURCHASE_HISTORY — não coberta pelos
+       hooks de renderOrders()/cpPushHistoryItem() acima. */
+    if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
   };
 
   /* [FIX-CADASTRO-03] O stat "Pedidos" do hero (#cpStatHeroOrders) estava
@@ -5597,6 +5617,115 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     if (copilotMsgEl) copilotMsgEl.innerHTML = cpApplyTpl(CP_INSIGHTS[0]);
   };
 
+  /* ══════════════════════════════════════════════════════════════════════
+     [FIX-CADASTRO-04] Persistência real do "Meu Perfil" (pedidos, disputas,
+     carteira, histórico, pontos, indicações) — a peça que faltava no
+     FIX-CADASTRO-03.
+
+     PROBLEMA: wkzResetProfileForNewAccount() (acima) e o reset de
+     userPoints/WKZ_REFERRAL_STATE/WKZ_USER_INTERESTS em cpLogout()/
+     _wkzResetForNewRegistration() só existiam EM MEMÓRIA. Isso resolvia o
+     caso "trocar de conta sem recarregar a página" (SPA), mas nenhum
+     desses dados nunca era escrito no localStorage — diferente de
+     nome/e-mail/telefone/CPF/CEP/"membro desde", que já são persistidos
+     via wkz_registered_profile (ver wkzSyncProfileDisplay acima). CP_ORDERS,
+     CP_PURCHASE_HISTORY, CP_DISPUTES, CP_CARDS, CP_SAVED_EUR, CP_HISTORY,
+     userPoints, WKZ_REFERRAL_STATE e WKZ_USER_INTERESTS são inicializados
+     A PARTIR DO ZERO, com os valores fixos da persona de demonstração
+     "Alexandre", toda vez que o script carrega — ou seja, em QUALQUER
+     recarregamento de página (F5, nova aba, reabrir o site depois). Como a
+     identidade (nome) É persistida mas a atividade NÃO, o resultado
+     observado era: nome/e-mail corretos da conta nova, mas pedidos/
+     disputas/cartões/pontos idênticos aos de "Alexandre" — não porque
+     pertencessem à conta anterior, e sim porque TODA conta, a cada reload,
+     recaía nos mesmos dados fixos do demo.
+
+     SOLUÇÃO: mesmo padrão já usado para identidade — uma chave própria no
+     localStorage (WKZ_ACTIVITY_KEY), escrita sempre que qualquer uma
+     dessas listas é renderizada (ou seja, depois de qualquer criação de
+     pedido/disputa/cartão — todos os pontos de mutação já chamam
+     renderOrders()/renderDisputes()/renderWallet()/renderCopilotHistory()
+     logo em seguida, então o hook é colocado ali, sem precisar caçar cada
+     mutação isoladamente) e lida de volta em qualquer carregamento de
+     página. Cadastro novo e logout continuam gravando o estado
+     explicitamente zerado (para que um F5 imediato após criar conta/sair
+     já mostre tudo zerado, mesmo antes de qualquer render acontecer). ═══ */
+  var WKZ_ACTIVITY_KEY = 'wkz_account_activity';
+
+  window.wkzSaveActivityState = function() {
+    try {
+      var snapshot = {
+        orders: CP_ORDERS,
+        purchaseHistory: CP_PURCHASE_HISTORY,
+        disputes: CP_DISPUTES,
+        cards: CP_CARDS,
+        savedEUR: CP_SAVED_EUR,
+        // action é uma closure (não serializável) — guarda só o que é exibido;
+        // reconstruída com uma ação vazia ao restaurar (ver wkzRestoreActivityState).
+        history: CP_HISTORY.map(function(h) { return { emoji: h.emoji, text: h.text, time: h.time }; }),
+        points: (typeof userPoints !== 'undefined' && userPoints)
+          ? { balance: userPoints.balance, lifetime: userPoints.lifetime, redeemNow: userPoints.redeemNow } : null,
+        referral: (typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE)
+          ? { activeReferrals: window.WKZ_REFERRAL_STATE.activeReferrals, creditsBRL: window.WKZ_REFERRAL_STATE.creditsBRL } : null,
+        interests: (typeof WKZ_USER_INTERESTS !== 'undefined') ? WKZ_USER_INTERESTS.slice() : []
+      };
+      localStorage.setItem(WKZ_ACTIVITY_KEY, JSON.stringify(snapshot));
+    } catch (e) { /* localStorage indisponível (modo privado) — segue sem persistir */ }
+  };
+
+  /* Chamada por cpLogout() e no fim de _wkzResetForNewRegistration()
+     (wkz-buyer.js) — remove o snapshot para que a próxima conta (ou a
+     tela de login/cadastro, antes de qualquer conta existir) não herde
+     nada da sessão anterior nem do "Alexandre" original. */
+  window.wkzClearActivityState = function() {
+    try { localStorage.removeItem(WKZ_ACTIVITY_KEY); } catch (e) { /* ignore */ }
+  };
+
+  /* Chamada uma vez ao carregar a página (ver hook no fim deste arquivo).
+     Se existir um snapshot salvo (conta já registada nesta sessão/
+     navegador), substitui os dados fixos de demonstração pelos dados
+     reais da conta antes de qualquer render acontecer. Sem snapshot
+     (primeira visita, nunca cadastrou), mantém os dados de demo como
+     estavam — comportamento inalterado para quem só está a navegar. */
+  window.wkzRestoreActivityState = function() {
+    var saved;
+    try { saved = JSON.parse(localStorage.getItem(WKZ_ACTIVITY_KEY) || 'null'); } catch (e) { saved = null; }
+    if (!saved) return;
+
+    if (Array.isArray(saved.orders))         { CP_ORDERS.length = 0; Array.prototype.push.apply(CP_ORDERS, saved.orders); }
+    if (Array.isArray(saved.purchaseHistory)){ CP_PURCHASE_HISTORY.length = 0; Array.prototype.push.apply(CP_PURCHASE_HISTORY, saved.purchaseHistory); }
+    if (Array.isArray(saved.disputes))       { CP_DISPUTES.length = 0; Array.prototype.push.apply(CP_DISPUTES, saved.disputes); }
+    if (Array.isArray(saved.cards))          { CP_CARDS.length = 0; Array.prototype.push.apply(CP_CARDS, saved.cards); }
+    if (typeof saved.savedEUR === 'number')  CP_SAVED_EUR = saved.savedEUR;
+    if (Array.isArray(saved.history)) {
+      CP_HISTORY.length = 0;
+      saved.history.forEach(function(h) { CP_HISTORY.push({ emoji: h.emoji, text: h.text, time: h.time, action: function(){} }); });
+    }
+    if (saved.points && typeof userPoints !== 'undefined' && userPoints) {
+      userPoints.balance = saved.points.balance || 0;
+      userPoints.lifetime = saved.points.lifetime || 0;
+      userPoints.redeemNow = saved.points.redeemNow || 0;
+    }
+    if (saved.referral && typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE) {
+      window.WKZ_REFERRAL_STATE.activeReferrals = saved.referral.activeReferrals || 0;
+      window.WKZ_REFERRAL_STATE.creditsBRL = saved.referral.creditsBRL || 0;
+    }
+    if (Array.isArray(saved.interests) && typeof WKZ_USER_INTERESTS !== 'undefined') {
+      WKZ_USER_INTERESTS.length = 0;
+      Array.prototype.push.apply(WKZ_USER_INTERESTS, saved.interests);
+    }
+
+    renderOrders();
+    renderPurchaseHistory();
+    renderDisputes();
+    renderWallet();
+    renderCopilotHistory();
+    cpSyncOrdersHeroCount();
+    if (typeof window.cpSyncLevelDisplay === 'function') window.cpSyncLevelDisplay();
+    if (typeof window.cpRefreshLevelGuide === 'function') window.cpRefreshLevelGuide();
+    if (typeof cpRenderReferralStats === 'function') cpRenderReferralStats();
+  };
+
   function renderOrders() {
     var el = document.getElementById('cpOrderList');
     if (!el) return;
@@ -5636,6 +5765,11 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         bar.style.width = (w || '0') + '%';
       });
     }, 120);
+    /* [FIX-CADASTRO-04] Persiste após qualquer render (cobre toda mutação
+       de CP_ORDERS, já que todo ponto que altera o array chama esta
+       função logo em seguida — ver comentário completo em
+       window.wkzSaveActivityState). */
+    if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
   }
 
   /* ── Render: Disputes ── */
@@ -6466,12 +6600,23 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       // missões sobreviveria ao logout se não fosse limpo aqui. Sem isto,
       // registar uma nova conta logo em seguida (sem dar reload manual)
       // ainda herdaria os dados da sessão anterior.
-      if (typeof window.wkzResetProfileForNewAccount === 'function') window.wkzResetProfileForNewAccount();
+      // [FIX-CADASTRO-04] userPoints/WKZ_REFERRAL_STATE/WKZ_USER_INTERESTS
+      // são zerados ANTES de wkzResetProfileForNewAccount(), porque esta
+      // última já persiste o snapshot "vazio" em localStorage (via os
+      // renderX() que chama internamente) — se a ordem fosse invertida, o
+      // snapshot persistido capturaria pontos/indicações ainda com o
+      // valor antigo.
       if (typeof window.cpResetMissoes === 'function') window.cpResetMissoes();
       if (typeof userPoints !== 'undefined' && userPoints) { userPoints.balance = 0; userPoints.lifetime = 0; userPoints.redeemNow = 0; }
       if (typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE) { window.WKZ_REFERRAL_STATE.activeReferrals = 0; window.WKZ_REFERRAL_STATE.creditsBRL = 0; }
       if (typeof WKZ_USER_INTERESTS !== 'undefined') WKZ_USER_INTERESTS.length = 0;
       if (window._cpAvatarState) { window._cpAvatarState.mode = 'logo'; window._cpAvatarState.payload = null; }
+      if (typeof window.wkzResetProfileForNewAccount === 'function') window.wkzResetProfileForNewAccount();
+      /* [FIX-CADASTRO-04] Cinto de segurança: garante que nada de
+         "atividade" sobrevive no localStorage após o logout, mesmo que
+         wkzResetProfileForNewAccount() acima falhe silenciosamente por
+         algum motivo (ex.: função ainda não carregada). */
+      if (typeof window.wkzClearActivityState === 'function') window.wkzClearActivityState();
 
       // [v2.9.13] Atualiza o estado de login do comprador (mock) — esconde
       // imediatamente os elementos buyer-only, ex.: "Meus Favoritos".
@@ -6699,6 +6844,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
         };
         CP_DISPUTES.unshift(newDispute);
         renderDisputes();
+        /* [FIX-CADASTRO-04] Persiste a nova disputa — ver wkzSaveActivityState. */
+        if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
         showToast && showToast('Disputa submetida com sucesso! ID: ' + order);
 
         // [FIX-item4] Espelha a disputa no painel do vendedor e na Central
@@ -6878,6 +7025,9 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     if (typeof wkzGetSharedDisputes !== 'function') { renderDisputes(); return; }
     wkzGetSharedDisputes().forEach(_wkzApplySharedDisputeToCp);
     renderDisputes();
+    /* [FIX-CADASTRO-04] Persiste após sincronizar com o registo partilhado
+       — ver wkzSaveActivityState. */
+    if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
   }
   window.wkzHydrateBuyerDisputes = wkzHydrateBuyerDisputes;
 
@@ -7159,6 +7309,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
     if (isDefault) CP_CARDS.forEach(function(c){ c.isDefault = false; });
     CP_CARDS.push(entry);
     renderWallet();
+    /* [FIX-CADASTRO-04] Persiste o novo cartão — ver wkzSaveActivityState. */
+    if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
     return true; /* close modal */
   };
 
@@ -9053,3 +9205,19 @@ function wkzRateLimit(actionKey, maxAttempts, windowMs) {
   return true;
 }
 window.wkzRateLimit = wkzRateLimit;
+
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-CADASTRO-04] Dispara a restauração da atividade real da conta
+   (ver window.wkzRestoreActivityState, definida mais acima) assim que
+   TODO o HTML já foi processado — incluindo wkz-buyer.js, carregado
+   DEPOIS deste ficheiro, que é onde userPoints/WKZ_USER_INTERESTS são
+   declarados. DOMContentLoaded só dispara depois de todos os <script>
+   síncronos do documento terem executado, garantindo que userPoints já
+   existe quando wkzRestoreActivityState() tentar lê-lo/escrevê-lo. */
+(function () {
+  function _run() {
+    if (typeof window.wkzRestoreActivityState === 'function') window.wkzRestoreActivityState();
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') _run();
+  else document.addEventListener('DOMContentLoaded', _run);
+})();
