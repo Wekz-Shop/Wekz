@@ -12299,9 +12299,14 @@ let _regProfileIncomplete = false;
    (userPoints, WKZ_REFERRAL_STATE, WKZ_USER_INTERESTS, avatar) vive
    neste arquivo/escopo global e é resetado diretamente aqui. */
 function _wkzResetForNewRegistration() {
-  if (typeof window.wkzResetProfileForNewAccount === 'function') window.wkzResetProfileForNewAccount();
   if (typeof window.cpResetMissoes === 'function') window.cpResetMissoes();
 
+  /* [FIX-CADASTRO-04] userPoints/WKZ_REFERRAL_STATE/WKZ_USER_INTERESTS são
+     zerados ANTES de wkzResetProfileForNewAccount() (chamada logo abaixo),
+     porque esta última já persiste o snapshot "vazio" em localStorage via
+     os renderX() que chama internamente — se a ordem fosse invertida, o
+     snapshot persistido capturaria pontos/indicações ainda com o valor
+     antigo (ver wkzSaveActivityState em wkz-core.js). */
   if (typeof userPoints !== 'undefined' && userPoints) {
     userPoints.balance = 0;
     userPoints.lifetime = 0;
@@ -12313,6 +12318,8 @@ function _wkzResetForNewRegistration() {
   }
   if (typeof WKZ_USER_INTERESTS !== 'undefined') WKZ_USER_INTERESTS.length = 0;
   if (window._cpAvatarState) { window._cpAvatarState.mode = 'logo'; window._cpAvatarState.payload = null; }
+
+  if (typeof window.wkzResetProfileForNewAccount === 'function') window.wkzResetProfileForNewAccount();
 
   // [FIX-CADASTRO-03] phone/doc/cep/país são dados PESSOAIS identificáveis
   // (telefone, CPF/CNPJ, CEP) — diferente de idioma/moeda (mantidos de
