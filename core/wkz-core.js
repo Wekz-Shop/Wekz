@@ -1937,6 +1937,32 @@ window.wkzSyncProfileDisplay = function(name, email) {
   } catch (e) { /* localStorage indisponível (modo privado) — segue sem persistir */ }
 };
 
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-ENDERECO-01] Fonte única de LEITURA do nome da conta logada —
+   contraparte de wkzSyncProfileDisplay() (que só grava). Antes desta
+   função, vários pontos fora do "Meu Perfil" (barra de fidelidade do
+   carrinho, endereços salvos do checkout) tinham o nome "João da Silva"
+   escrito directamente no código, nunca lido de lugar nenhum — por isso
+   continuava a aparecer para qualquer conta, mesmo depois do
+   FIX-CADASTRO-01/04 já terem corrigido nome/e-mail em #cpUserName,
+   #cpHdrName e no localStorage.
+
+   Lê primeiro do localStorage (funciona mesmo antes do DOM da página
+   actual ter sido montado/sincronizado — ex.: quando o checkout constrói
+   _SAVED_ADDRS no carregamento do script), com fallback para o texto já
+   sincronizado no cabeçalho, e por fim para a persona de demonstração
+   "Alexandre Kz" (mesmo default já usado em #cpHdrName no HTML) quando
+   ainda não há nenhuma conta registada nesta sessão/navegador. */
+window.wkzGetDisplayName = function() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('wkz_registered_profile') || 'null');
+    if (saved && saved.name) return saved.name;
+  } catch (e) { /* localStorage indisponível — segue para o fallback de DOM */ }
+  var el = document.getElementById('cpHdrName') || document.getElementById('cpUserName');
+  var txt = el ? (el.textContent || '').trim() : '';
+  return txt || 'Alexandre Kz';
+};
+
 /* [FIX-CADASTRO-01] Ao abrir o app, aplica o cadastro salvo na sessão
    anterior (se existir) — assim a conta continua "logada" com os dados
    reais mesmo depois de recarregar a página, como em qualquer
@@ -5132,14 +5158,14 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   /* [FIX-CADASTRO-04] cpBuildLevelInsight() tinha 'Alexandre' escrito
      directamente no código — a saudação do Kz Copilot ("Olá, Alexandre!")
      NUNCA usava o nome da conta real, nem depois do FIX-CADASTRO-01 já ter
-     corrigido #cpUserName/#cpHdrName em todo o resto da página. Lê agora o
-     primeiro nome de #cpUserName (mesma fonte já sincronizada por
-     wkzSyncProfileDisplay a cada cadastro/edição de perfil) — sem conta
-     registada ainda, mantém "Alexandre" como nome da persona de
-     demonstração, igual ao resto da página nesse cenário. */
+     corrigido #cpUserName/#cpHdrName em todo o resto da página. Reaproveita
+     agora window.wkzGetDisplayName() (fonte única também usada pela barra
+     de fidelidade do carrinho e pelos endereços do checkout — ver
+     [FIX-ENDERECO-01]) e extrai só o primeiro nome, mais adequado a uma
+     saudação curta. */
   function _cpDisplayFirstName() {
-    var el = document.getElementById('cpUserName');
-    var full = el ? (el.textContent || '').trim() : '';
+    var full = (typeof window.wkzGetDisplayName === 'function') ? window.wkzGetDisplayName() : 'Alexandre Kz';
+    full = (full || '').trim();
     return full ? full.split(' ')[0] : 'Alexandre';
   }
   function cpBuildLevelInsight() {
