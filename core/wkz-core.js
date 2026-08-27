@@ -1963,6 +1963,43 @@ window.wkzGetDisplayName = function() {
   return txt || 'Alexandre Kz';
 };
 
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-LOGOUT-01] Contraparte de "apagar" para wkzSyncProfileDisplay().
+   PROBLEMA: cpLogout() já zerava a ATIVIDADE da conta (pedidos, pontos,
+   disputas — FIX-CADASTRO-04) mas nunca tocava na IDENTIDADE
+   (wkz_registered_profile) — a única coisa que persiste essa chave é o
+   próximo cadastro/login, então o nome real (ex.: "Wekz") continuava
+   disponível via window.wkzGetDisplayName() mesmo depois de sair da
+   conta, e vazava em qualquer lugar que lesse essa fonte (ex.: barra de
+   fidelidade do carrinho — ver FIX-LOGOUT-01 em renderCartLoyaltyBar,
+   wkz-buyer.js). Logout tem que ser simétrico ao cadastro: se um limpa
+   e o outro preenche, ambos precisam mexer nos MESMOS dados. */
+window.wkzClearIdentityState = function() {
+  try { localStorage.removeItem('wkz_registered_profile'); } catch (e) { /* ignore */ }
+  WKZ_PROFILE_EXTRA.phone = '';
+  WKZ_PROFILE_EXTRA.doc = '';
+  WKZ_PROFILE_EXTRA.cep = '';
+  WKZ_PROFILE_EXTRA.country = 'PT';
+  WKZ_PROFILE_EXTRA.countryLabel = '🇵🇹 Portugal';
+  WKZ_PROFILE_EXTRA.lang = '🇧🇷 Português (Brasil)';
+  WKZ_PROFILE_EXTRA.curr = '🇧🇷 BRL — Real Brasileiro';
+  WKZ_PROFILE_EXTRA.memberSince = '';
+  WKZ_PROFILE_EXTRA._bonusAwarded = false;
+  /* Volta ao texto estático original do HTML (persona de demonstração,
+     não uma conta real) — o mesmo estado de quem nunca cadastrou nada
+     nesta sessão/navegador. Os elementos ficam ocultos de qualquer forma
+     enquanto deslogado (data-wkz-auth-gate="buyer"), isto é só reforço
+     para quem ler wkzGetDisplayName() antes do próximo cadastro/login. */
+  ['cpUserName', 'cpHdrName'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = 'Alexandre Kz';
+  });
+  var emailEl = document.getElementById('cpUserEmail');
+  if (emailEl) emailEl.textContent = '';
+  var initialEl = document.getElementById('cpHdrAvatarInitial');
+  if (initialEl) initialEl.textContent = 'A';
+};
+
 /* [FIX-CADASTRO-01] Ao abrir o app, aplica o cadastro salvo na sessão
    anterior (se existir) — assim a conta continua "logada" com os dados
    reais mesmo depois de recarregar a página, como em qualquer
@@ -6643,6 +6680,13 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
          wkzResetProfileForNewAccount() acima falhe silenciosamente por
          algum motivo (ex.: função ainda não carregada). */
       if (typeof window.wkzClearActivityState === 'function') window.wkzClearActivityState();
+      /* [FIX-LOGOUT-01] Faltava esta linha: sem ela, a IDENTIDADE (nome/
+         e-mail/telefone/"membro desde") da conta que acabou de sair
+         continuava disponível via wkz_registered_profile e vazava em
+         qualquer lugar que lesse window.wkzGetDisplayName() — ex.: nome
+         "fantasma" na barra de fidelidade do carrinho, mesmo com os
+         pontos já corretamente zerados. */
+      if (typeof window.wkzClearIdentityState === 'function') window.wkzClearIdentityState();
 
       // [v2.9.13] Atualiza o estado de login do comprador (mock) — esconde
       // imediatamente os elementos buyer-only, ex.: "Meus Favoritos".
