@@ -164,3 +164,46 @@ de perfil ainda não auditado; não foi tocada aqui. O placeholder
 "Ex: João da Silva Santos" no formulário de denúncia (`wkz-core.js`) é só
 texto de exemplo dentro de um campo de input, nunca exibido como dado
 real — não é um bug.
+
+---
+
+## Adenda 2 — FIX-LOGOUT-01 (logout incompleto: identidade não era limpa)
+
+**Pedido do usuário:** 2 screenshots — após clicar em "Sair da conta"
+(confirmado pela tela de login em seguida, sem sessão ativa), a página
+"Meu Carrinho" continuava mostrando "Wekz" no card de pontos/nível.
+Pedido explícito: login e logout têm que estar totalmente atrelados à
+conta — deslogar não pode deixar nada da conta anterior ativo, e logar
+deve restaurar tudo daquela conta especificamente, "referência das
+grandes concorrentes".
+
+**Diagnóstico:** gap real no `cpLogout()`, exposto (não causado) pelo
+FIX-ENDERECO-01 acima. Antes, `cpLogout()` já zerava a *atividade* da
+conta (pedidos/pontos/disputas — FIX-CADASTRO-04) mas nunca tocava na
+*identidade* — a chave `wkz_registered_profile` no `localStorage` (nome/
+e-mail/telefone/"membro desde") não era removida no logout, só era
+sobrescrita no próximo cadastro/login. Como `window.wkzGetDisplayName()`
+(criada no fix anterior) lê essa chave primeiro, continuava devolvendo o
+nome da conta que acabou de sair enquanto nenhuma conta nova fizesse
+login — daí "Wekz" sobreviver ao logout no card do carrinho. Cadastro e
+logout são operações espelhadas (uma preenche, a outra devia apagar os
+mesmos dados) e só uma das duas mexia nesses campos.
+
+**Correção:**
+- Nova `window.wkzClearIdentityState()` em `wkz-core.js` — contraparte de
+  apagar de `wkzSyncProfileDisplay()` (que só grava): remove
+  `wkz_registered_profile` do `localStorage`, reseta `WKZ_PROFILE_EXTRA`
+  aos valores originais e devolve `#cpUserName`/`#cpHdrName`/
+  `#cpUserEmail`/`#cpHdrAvatarInitial` ao estado padrão de demonstração
+  (mesmo estado de quem nunca cadastrou nada nesta sessão). Chamada
+  agora em `cpLogout()`, ao lado do já existente `wkzClearActivityState()`.
+- `renderCartLoyaltyBar()` (`wkz-buyer.js`) passou a verificar
+  `window.wkzBuyerLoggedIn` (flag de sessão já usada em todo o resto do
+  site) antes de desenhar qualquer nome/pontos/nível — deslogado, mostra
+  um convite genérico "Entre na sua conta..." com botão "Entrar", em vez
+  de qualquer card personalizado. Mesmo padrão do AliExpress/Shopee/
+  Mercado Livre/Amazon: zero dado de conta visível sem sessão ativa.
+
+Arquivos: `core/wkz-core.js` (~60 linhas), `buyer/wkz-buyer.js`
+(~24 linhas), ambos sobre a versão já entregue nas adendas anteriores.
+Sintaxe validada com `node -c`.
