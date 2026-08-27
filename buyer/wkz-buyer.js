@@ -8373,6 +8373,21 @@ function updatePtsRedeem(val) {
 function renderCartLoyaltyBar() {
   var el = document.getElementById('cartLoyaltyBar');
   if (!el) return;
+  /* [FIX-LOGOUT-01] Sem sessão activa, este card não deve existir —
+     mostrar nome/pontos/nível de "alguém" enquanto deslogado é exatamente
+     o "nada dele pode ficar ativo" que o próprio card violava (mesmo já
+     zerado, um card com nível "Bronze" e nome de conta real ainda é dado
+     de conta pessoal). Comportamento igual ao de AliExpress/Shopee/
+     Mercado Livre/Amazon: convite para entrar, sem widget de fidelidade
+     nenhum visível a quem não está logado. */
+  if (!window.wkzBuyerLoggedIn) {
+    el.innerHTML = `
+      <div class="clb-guest" style="text-align:center;padding:12px 8px;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Entre na sua conta para ganhar pontos e ver seu nível</div>
+        <button class="btn-outline" style="padding:7px 18px;font-size:12px;" onclick="MapsTo('auth')">Entrar</button>
+      </div>`;
+    return;
+  }
   var level    = _wkzLevel(userPoints.balance);
   var next     = _wkzNextLevel(userPoints.balance);
   var pct      = next
