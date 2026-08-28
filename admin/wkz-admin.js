@@ -52,20 +52,10 @@ function switchAdminTab(tab, el) {
   if (mainEl) mainEl.scrollTop = 0;
 
   // Atualiza fade do nav carousel (fix: chamada direta evita problema de ordering dos patches)
-  /* [FIX-admin-nav] admNavFadeInit NUNCA foi definida em lugar nenhum do
-     projeto (confirmado por busca em todo o código — wkz-buyer.js já a
-     referencia da mesma forma, mas sempre atrás de "typeof === 'function'",
-     igual às outras 4 chamadas a initAllScrollFades()/admNavFadeInit no
-     resto do código). Aqui, sem essa blindagem, TODA chamada de
-     switchAdminTab() lançava ReferenceError sem ser capturado — o que
-     interrompia a função assim que chegava aqui, ANTES de rodar
-     renderAdminStores()/renderAdminKyc()/renderAdminReports()/
-     renderCommHistory()/renderSecurityPanel() logo abaixo, e antes do
-     patchSwitchAdminTabAll() (mais adiante no arquivo) rodar
-     initAdmKzIaPanel()/renderDisputas()/renderSaques()/syncOverviewKPIs()
-     ao trocar de aba. Mesmo padrão defensivo já usado em todo o resto do
-     projeto para esta mesma função — sem inventar comportamento visual
-     novo que não existe em nenhum CSS/HTML do projeto. */
+  /* [FIX-admin-nav] admNavFadeInit ficou sem definição por várias sprints
+     (histórico do bug documentado abaixo, junto da implementação real).
+     A blindagem "typeof === 'function'" permanece por segurança/consistência
+     com o resto do projeto, mesmo agora que a função existe. */
   setTimeout(function(){ if (typeof admNavFadeInit === 'function') admNavFadeInit(); }, 30);
 
   // Lazy render
@@ -74,6 +64,38 @@ function switchAdminTab(tab, el) {
   if (tab === 'product-reports')  renderAdminReports();
   if (tab === 'comunicados')      renderCommHistory();
   if (tab === 'seguranca')        renderSecurityPanel();
+}
+
+/* ── FIX-SCROLL-FADE-01 (débito técnico registrado no Sprint M18) ──────────
+   admNavFadeInit()/admNavScroll() nunca tinham sido definidas — o fade nas
+   pontas de #admNavTrack (CSS já existia: .adm-nav-track.fade-left-hidden/
+   .fade-right-hidden) ficava sempre estático. admNavScroll() é a mesma
+   função referenciada em wkz-admin.html via onscroll="admNavScroll(this)"
+   no <nav id="admNav">; antes disso não existir, cada scroll do menu no
+   mobile lançava ReferenceError silenciosamente (não travava a app, mas
+   nunca atualizava o fade). Implementação segue o mesmo padrão já validado
+   em initStoresScrollFade() (wkz-buyer.js): esconde o degradê esquerdo no
+   início do scroll e o direito no fim.
+   ─────────────────────────────────────────────────────────────────────── */
+function admNavScroll(el) {
+  const track = document.getElementById('admNavTrack');
+  if (!track || !el) return;
+  const maxScroll = el.scrollWidth - el.clientWidth;
+  const atStart = el.scrollLeft <= 4;
+  const atEnd   = el.scrollLeft >= maxScroll - 4;
+  track.classList.toggle('fade-left-hidden',  atStart);
+  track.classList.toggle('fade-right-hidden', atEnd || maxScroll <= 0);
+}
+
+let _admNavFadeResizeBound = false;
+function admNavFadeInit() {
+  const nav = document.getElementById('admNav');
+  if (!nav) return;
+  admNavScroll(nav); // estado inicial (ex.: ao trocar de aba, o scroll pode já não estar em 0)
+  if (!_admNavFadeResizeBound) {
+    window.addEventListener('resize', function(){ admNavScroll(nav); });
+    _admNavFadeResizeBound = true;
+  }
 }
 
 /* Estado do filtro de stores ativo */
