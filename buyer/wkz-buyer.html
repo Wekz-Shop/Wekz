@@ -852,12 +852,11 @@ document.addEventListener('DOMContentLoaded', function() {
            em várias linhas assim que houvesse muitas lojas — inviável quando a
            plataforma estiver em operação real com dezenas/centenas de lojas.
            Mesmo padrão de arrasto (mobile) + setas de canto (desktop) já usado
-           no Flash Sale Hero (.flashhero-*), mas com fade REAL nas pontas via
-           initStoresScrollFade() (wkz-buyer.js) — ao contrário de
-           initAllScrollFades(), referenciada em vários pontos do projeto mas
-           nunca implementada (fade estático, sempre visível mesmo no início/fim
-           do scroll). "Ver todas →" continua sendo o atalho pra quem prefere
-           grade completa em vez de arrastar. -->
+           no Flash Sale Hero (.flashhero-*), com fade REAL nas pontas via
+           initStoresScrollFade() (wkz-buyer.js) — mesmo padrão usado por
+           initAllScrollFades() (Categorias) desde o FIX-SCROLL-FADE-01.
+           "Ver todas →" continua sendo o atalho pra quem prefere grade
+           completa em vez de arrastar. -->
       <div class="stores-scroll-wrap">
         <button type="button" class="carousel-arrow carousel-arrow-left" onclick="scrollStores(-1)" aria-label="Ver lojas anteriores">‹</button>
         <div class="stores-scroll-track" id="storesScrollTrack">

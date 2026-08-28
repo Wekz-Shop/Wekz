@@ -447,10 +447,7 @@ function scrollStores(dir){
   g.scrollBy({ left: dir * step, behavior: 'smooth' });
 }
 
-// Fade real nas pontas do carrossel de lojas — ao contrário de
-// initAllScrollFades() (referenciada em ~6 pontos do projeto mas nunca
-// implementada, confirmado por busca em todo o código-fonte; ver comentário
-// em switchAdminTab(), wkz-admin.js), esta função realmente liga/desliga a
+// Fade real nas pontas do carrossel de lojas — esta função liga/desliga a
 // opacidade dos gradientes de acordo com a posição do scroll: esconde o fade
 // esquerdo quando já está no início, e o direito quando chega ao fim.
 let _storesScrollFadeBound = false;
@@ -472,6 +469,39 @@ function initStoresScrollFade(){
     grid.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     _storesScrollFadeBound = true;
+  }
+}
+
+/* ── FIX-SCROLL-FADE-01 (débito técnico registrado no Sprint M18) ──────────
+   initAllScrollFades() era referenciada em ~6 pontos do projeto (sempre
+   atrás de "typeof === 'function'") mas nunca tinha sido definida — o fade
+   estático de .cats-scroll-track (CSS já existia:
+   .cats-scroll-track.fade-left-hidden/.fade-right-hidden) nunca respondia
+   ao scroll real do carrossel de categorias no mobile (#catsGrid dentro de
+   #catsScrollTrack). Implementação segue o mesmo padrão já validado acima
+   em initStoresScrollFade(). No desktop (.cats-grid vira CSS grid sem
+   overflow-x), maxScroll <= 0 e ambos os fades ficam ocultos — comportamento
+   correto, nada aparece indevidamente.
+   ─────────────────────────────────────────────────────────────────────── */
+let _catsScrollFadeBound = false;
+function initAllScrollFades(){
+  const track = document.getElementById('catsScrollTrack');
+  const grid  = document.getElementById('catsGrid');
+  if(!track || !grid) return;
+
+  function update(){
+    const maxScroll = grid.scrollWidth - grid.clientWidth;
+    const atStart = grid.scrollLeft <= 4;
+    const atEnd   = grid.scrollLeft >= maxScroll - 4;
+    track.classList.toggle('fade-left-hidden',  atStart);
+    track.classList.toggle('fade-right-hidden', atEnd || maxScroll <= 0);
+  }
+
+  update();
+  if(!_catsScrollFadeBound){
+    grid.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    _catsScrollFadeBound = true;
   }
 }
 
