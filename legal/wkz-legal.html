@@ -543,7 +543,15 @@
   </div>
   <div class="inner-page-body">
     <div class="legal-doc">
-      <div class="legal-toc"><h4>Sumário</h4><a onclick="document.getElementById('t1').scrollIntoView({behavior:'smooth'})">1. Aceitação dos Termos</a><a onclick="document.getElementById('t2').scrollIntoView({behavior:'smooth'})">2. Cadastro e Conta</a><a onclick="document.getElementById('t3').scrollIntoView({behavior:'smooth'})">3. Conduta do Usuário</a><a onclick="document.getElementById('t4').scrollIntoView({behavior:'smooth'})">4. Compras e Pagamentos</a><a onclick="document.getElementById('t5').scrollIntoView({behavior:'smooth'})">5. Responsabilidades</a><a onclick="document.getElementById('t6').scrollIntoView({behavior:'smooth'})">6. Propriedade Intelectual</a><a onclick="document.getElementById('t7').scrollIntoView({behavior:'smooth'})">7. Devolução e Arrependimento</a><a onclick="document.getElementById('t8').scrollIntoView({behavior:'smooth'})">8. Disputas e Mediação</a><a onclick="document.getElementById('t9').scrollIntoView({behavior:'smooth'})">9. Rescisão</a></div>
+      <!-- [FIX-SEC-ONCLICK-01] Convertido de onclick="document.getElementById('tN')
+           .scrollIntoView(...)" para data-scroll-to="tN" — delegação central
+           definida em wkz-core.js. Primeira conversão real de onclick→addEventListener
+           do projeto (prova de conceito da Sprint M22). tabindex+role adicionados
+           de brinde: os <a> originais não tinham href nem eram focáveis por teclado
+           (mesmo problema que já existia antes, agora resolvido pela mesma
+           delegação — sem precisar de onkeydown inline por item, ao contrário do
+           padrão usado em outros pontos do projeto). -->
+      <div class="legal-toc"><h4>Sumário</h4><a data-scroll-to="t1" tabindex="0" role="link">1. Aceitação dos Termos</a><a data-scroll-to="t2" tabindex="0" role="link">2. Cadastro e Conta</a><a data-scroll-to="t3" tabindex="0" role="link">3. Conduta do Usuário</a><a data-scroll-to="t4" tabindex="0" role="link">4. Compras e Pagamentos</a><a data-scroll-to="t5" tabindex="0" role="link">5. Responsabilidades</a><a data-scroll-to="t6" tabindex="0" role="link">6. Propriedade Intelectual</a><a data-scroll-to="t7" tabindex="0" role="link">7. Devolução e Arrependimento</a><a data-scroll-to="t8" tabindex="0" role="link">8. Disputas e Mediação</a><a data-scroll-to="t9" tabindex="0" role="link">9. Rescisão</a></div>
       <div class="legal-content">
         <h3 id="t1">1. Aceitação dos Termos</h3>
         <p>Ao criar uma conta ou realizar qualquer transação na plataforma WeKz Shop ("Plataforma"), você concorda integralmente com estes Termos de Uso, nossa Política de Privacidade e todas as políticas aplicáveis. Se não concordar com qualquer disposição, não utilize nossos serviços.</p>
