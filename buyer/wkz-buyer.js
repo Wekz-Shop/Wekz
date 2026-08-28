@@ -1397,7 +1397,7 @@ const TRANSLATIONS = {
     trustDelivery: 'Entrega Rápida',
     trustDeliverySub: 'Frete grátis acima de R$150',
     trustReturn: 'Devolução Fácil',
-    trustReturnSub: '30 dias sem perguntas',
+    trustReturnSub: '7 dias sem justificativa', // [FIX-JUR-02] era '30 dias sem perguntas' — contradizia CDC art.49/#sec-devolucao (7 dias sem justificativa; 8-30 dias só p/ defeito)
     trustPayment: 'Pagamento Seguro',
     trustPaymentSub: 'Pix, cartão, boleto',
     trustSupport: 'Suporte 24/7',
@@ -1662,7 +1662,7 @@ const TRANSLATIONS = {
     trustDelivery: 'Fast Delivery',
     trustDeliverySub: 'Free shipping over $30',
     trustReturn: 'Easy Returns',
-    trustReturnSub: '30 days, no questions asked',
+    trustReturnSub: '7 days, no questions asked', // [FIX-JUR-02] sincronizado com a correção pt (CDC art.49 = 7 dias, não 30)
     trustPayment: 'Secure Payment',
     trustPaymentSub: 'Cards, PayPal, Boleto',
     trustSupport: '24/7 Support',
@@ -1919,7 +1919,7 @@ const TRANSLATIONS = {
     trustDelivery: 'Entrega Rápida',
     trustDeliverySub: 'Envío gratis en pedidos +$30',
     trustReturn: 'Devolución Fácil',
-    trustReturnSub: '30 días sin preguntas',
+    trustReturnSub: '7 días sin preguntas', // [FIX-JUR-02] sincronizado com a correção pt (CDC art.49 = 7 dias, não 30)
     trustPayment: 'Pago Seguro',
     trustPaymentSub: 'Tarjeta, transferencia, boleto',
     trustSupport: 'Soporte 24/7',
@@ -2176,7 +2176,7 @@ const TRANSLATIONS = {
     trustDelivery: '快速配送',
     trustDeliverySub: '满¥200免运费',
     trustReturn: '轻松退货',
-    trustReturnSub: '30天无理由退货',
+    trustReturnSub: '7天无理由退货', // [FIX-JUR-02] sincronizado com a correção pt (CDC art.49 = 7 dias, não 30)
     trustPayment: '安全支付',
     trustPaymentSub: '支付宝、微信、银行卡',
     trustSupport: '24/7客服',
@@ -2433,7 +2433,7 @@ const TRANSLATIONS = {
     trustDelivery: 'Livraison Rapide',
     trustDeliverySub: 'Livraison gratuite dès 30€',
     trustReturn: 'Retours Faciles',
-    trustReturnSub: '30 jours sans questions',
+    trustReturnSub: '7 jours sans questions', // [FIX-JUR-02] sincronizado com a correção pt (CDC art.49 = 7 dias, não 30)
     trustPayment: 'Paiement Sécurisé',
     trustPaymentSub: 'CB, virement, boleto',
     trustSupport: 'Support 24/7',
@@ -2690,7 +2690,7 @@ const TRANSLATIONS = {
     trustDelivery: 'Schnelle Lieferung',
     trustDeliverySub: 'Kostenlos ab 30€',
     trustReturn: 'Einfache Rückgabe',
-    trustReturnSub: '30 Tage ohne Fragen',
+    trustReturnSub: '7 Tage ohne Fragen', // [FIX-JUR-02] sincronizado com a correção pt (CDC art.49 = 7 dias, não 30)
     trustPayment: 'Sichere Zahlung',
     trustPaymentSub: 'Karte, PayPal, Überweisung',
     trustSupport: '24/7 Support',
@@ -2947,7 +2947,7 @@ const TRANSLATIONS = {
     trustDelivery: '迅速配送',
     trustDeliverySub: '¥3,000以上で送料無料',
     trustReturn: '簡単返品',
-    trustReturnSub: '30日間返品保証',
+    trustReturnSub: '7日間返品保証', // [FIX-JUR-02] sincronizado com a correção pt (CDC art.49 = 7 dias, não 30)
     trustPayment: '安全決済',
     trustPaymentSub: 'クレジット・PayPay・銀行振込',
     trustSupport: '24/7サポート',

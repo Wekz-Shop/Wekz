@@ -891,7 +891,12 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="trust-icon"><span class="wkz-icon wkz-icon-rotateccw"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></span></div>
         <div>
           <div class="trust-title">Devolução Fácil</div>
-          <div class="trust-desc">30 dias sem perguntas</div>
+          <!-- [FIX-JUR-02] Era "30 dias sem perguntas" — a plataforma só dispensa
+               justificativa nos primeiros 7 dias (CDC art. 49); de 8 a 30 dias a
+               devolução exige defeito/divergência com o anúncio (ver #sec-devolucao
+               e Termos t7). Texto anterior contradizia a própria política detalhada
+               do site e podia configurar publicidade enganosa (CDC art. 37). -->
+          <div class="trust-desc">7 dias sem justificativa</div>
         </div>
       </div>
       <div class="trust-item" role="link" tabindex="0" aria-label="Ver segurança e proteção da compra" onclick="window.location.href='../legal/wkz-legal.html#pg-seguranca'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
@@ -1184,7 +1189,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <p>🛡 Proteção WeKz Buyer — Reembolso garantido em até 30 dias</p>
         <p id="pdpProtVerifiedLine">✅ Vendedor verificado com 4.9 estrelas (12k+ vendas)</p>
         <p>🔒 Pagamento processado com criptografia AES-256</p>
-        <p>📦 Devolução gratuita dentro de 15 dias</p>
+        <!-- [FIX-JUR-02] Era "Devolução gratuita dentro de 15 dias" — número não
+             batia com nenhuma outra referência do site (7 ou 30 dias). Alinhado à
+             política real: 7 dias de arrependimento incondicional (CDC art. 49)
+             + até 30 dias em caso de defeito/divergência (extensão comercial WeKz,
+             ver Termos t7 e #sec-devolucao). "Gratuita" removido daqui porque só
+             se aplica ao caso de defeito — no arrependimento simples, o frete de
+             volta é por conta do comprador (já explicado no FAQ de devoluções). -->
+        <p>📦 7 dias de arrependimento + até 30 dias em caso de defeito</p>
         <p id="pdpProtSeloLine" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.07);">🏅 <a onclick="showPage('pg-garantia-autenticidade')" style="color:var(--teal);cursor:pointer;font-weight:600;text-decoration:none;">Garantia de Autenticidade WeKz</a> — Saiba como verificamos cada produto</p>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;">
@@ -2296,7 +2308,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="ckout-trust">
           <div class="ckout-trust-item">🔒 <span>Pagamento criptografado AES-256</span></div>
           <div class="ckout-trust-item">🛡 <span>Proteção WeKz Buyer inclusa</span></div>
-          <div class="ckout-trust-item">↩️ <span>Devolução grátis em 30 dias</span></div>
+          <!-- [FIX-JUR-02] Era "Devolução grátis em 30 dias" — no ponto exato de
+               pagamento, uma promessa de devolução grátis por 30 dias sem
+               qualificação é o texto mais arriscado do fluxo (o frete de retorno
+               do arrependimento simples de 7 dias é por conta do comprador; a
+               gratuidade só vale para defeito/divergência, ver #sec-devolucao).
+               Trocado por uma claim curta e 100% precisa, sem overclaim de
+               gratuidade. -->
+          <div class="ckout-trust-item">↩️ <span>7 dias de arrependimento</span></div>
           <div class="ckout-trust-item">✅ <span>Vendedor verificado WeKz</span></div>
         </div>
       </div>
