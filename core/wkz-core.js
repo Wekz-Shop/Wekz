@@ -9291,3 +9291,54 @@ window.wkzRateLimit = wkzRateLimit;
   if (document.readyState === 'complete' || document.readyState === 'interactive') _run();
   else document.addEventListener('DOMContentLoaded', _run);
 })();
+
+/* ══════════════════════════════════════════════════════════════════════
+   [FIX-SEC-ONCLICK-01] Sprint M22 — passo 1 de N da migração de onclick
+   inline para addEventListener (débito de segurança registrado na
+   auditoria: CSP dos 4 módulos ainda depende de 'unsafe-inline' em
+   script-src por causa de ~1.171 atributos onclick espalhados entre HTML
+   estático e strings de template dentro do JS).
+
+   ESTE ARQUIVO SOZINHO NÃO REMOVE 'unsafe-inline' — só cria a base
+   reutilizável para migrar onclick um por um, com segurança, sem quebrar
+   nada de uma vez. Ver CHANGELOG_SPRINT_M22.md para o raciocínio completo
+   e o plano dos próximos passos.
+
+   Por que delegação de evento (no document) em vez de addEventListener
+   direto em cada elemento: ~24% dos onclick do projeto são gerados
+   dentro de strings de template no JS (renderCats(), renderAdminStores(),
+   cards de produto, etc.) — ou seja, o elemento não existe no DOM no
+   momento em que a página carrega. addEventListener direto exigiria
+   re-vincular o listener toda vez que o HTML for re-renderizado (fácil de
+   esquecer, fácil de duplicar listener). Delegação resolve isso: um único
+   listener no document, que funciona para qualquer elemento presente no
+   momento do clique — estático ou recém-inserido via innerHTML.
+
+   USO — troque:
+     onclick="document.getElementById('t1').scrollIntoView({behavior:'smooth'})"
+   por:
+     data-scroll-to="t1"
+   Nenhuma chamada JS adicional é necessária nas páginas — a delegação
+   abaixo já cobre qualquer elemento com data-scroll-to, em qualquer um
+   dos 4 módulos (wkz-core.js é compartilhado por todos).
+
+   Este padrão (data-attribute + delegação central) é o modelo a seguir
+   nas próximas sprints para os outros tipos de onclick do projeto
+   (navegação de página, toggles, abrir modal, etc.) — cada tipo vira uma
+   nova ramificação dentro do mesmo listener central, em vez de um
+   listener novo por padrão de interação.
+   ══════════════════════════════════════════════════════════════════════ */
+document.addEventListener('click', function (ev) {
+  var scrollTarget = ev.target.closest ? ev.target.closest('[data-scroll-to]') : null;
+  if (!scrollTarget) return;
+  var id = scrollTarget.getAttribute('data-scroll-to');
+  var el = id && document.getElementById(id);
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth' });
+});
+document.addEventListener('keydown', function (ev) {
+  if (ev.key !== 'Enter' && ev.key !== ' ') return;
+  var scrollTarget = ev.target.closest ? ev.target.closest('[data-scroll-to]') : null;
+  if (!scrollTarget) return;
+  ev.preventDefault();
+  scrollTarget.click();
+});
