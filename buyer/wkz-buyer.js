@@ -688,7 +688,11 @@ function removeCartItem(idx){
 
 /* ─── CLEAR CART ─── */
 function clearCart(){
-  cartItemsData.length = 0;
+  // [FIX-CART-PERSIST-01] mesmo motivo do finalizeOrder() acima — splice()
+  // em vez de "length = 0" pra disparar 'cart:change' e persistir o carrinho
+  // vazio (sem isto, "Limpar tudo" pareceria funcionar, mas um F5 logo depois
+  // trazia os itens antigos de volta, vindos do snapshot salvo desatualizado).
+  cartItemsData.splice(0, cartItemsData.length);
   updateCartUI();
   showToast('🗑 Carrinho limpo com sucesso');
 }
@@ -5817,7 +5821,15 @@ function ckoutGoTo(step) { _ckoutGoto(step); }
 // FIX FUNC-02: limpeza do carrinho só ocorre quando o utilizador sai conscientemente
 // do ecrã de confirmação. Chamada pelos botões "Continuar Comprando" e "Ver Meus Pedidos".
 function finalizeOrder(dest) {
-  if (typeof cartItemsData !== 'undefined') cartItemsData.length = 0;
+  // [FIX-CART-PERSIST-01] Trocado de "cartItemsData.length = 0" para splice():
+  // makeReactive() (wkz-bus.js) ignora deliberadamente a mutação de 'length'
+  // pra não duplicar o evento 'cart:change' — mas isso também significa que
+  // "cartItemsData.length = 0" nunca disparava o evento que agora persiste o
+  // carrinho em localStorage (ver wkzSaveActivityState em wkz-core.js). Sem
+  // esta troca, um pedido finalizado ainda apareceria no carrinho após dar
+  // F5 — o snapshot salvo ficaria com os itens já comprados. splice() muta
+  // via índices, que o Proxy intercepta normalmente.
+  if (typeof cartItemsData !== 'undefined') cartItemsData.splice(0, cartItemsData.length);
   if (typeof updateCartUI === 'function') updateCartUI();
   if (typeof renderCart === 'function') renderCart();
   if (typeof showPage === 'function') showPage(dest);
@@ -7319,6 +7331,14 @@ function addToCart(productIndex){
     showToast('🛒 "' + name + '" adicionado ao carrinho!');
   }
 
+  // [FIX-CART-PERSIST-01] Sprint M23 — marca "agora" como último momento em
+  // que algo foi adicionado ao carrinho. Usado só pelo lembrete de carrinho
+  // abandonado (wkzCheckCartReminder, mais abaixo neste arquivo) pra saber
+  // há quanto tempo os itens estão parados ali — não conta remoções nem
+  // mudanças de quantidade de propósito, só adições novas, que é o sinal
+  // real de "a pessoa estava comprando e foi embora".
+  window._wkzCartLastAddedTs = Date.now();
+
   updateCartUI();
 }
 
@@ -7548,6 +7568,16 @@ function updateCartUI(){
 
   // ── 7. Re-render cart items list ──
   renderCart();
+
+  // [FIX-CART-PERSIST-01] Sprint M23 — persiste o carrinho a cada mutação,
+  // reaproveitando o snapshot já usado por pedidos/disputas/pontos (ver
+  // wkzSaveActivityState em wkz-core.js). updateCartUI() é chamado por TODAS
+  // as ~22 funções que mutam o carrinho no projeto (addToCart, alterar
+  // quantidade, remover item, aplicar cupom, clearCart, finalizeOrder...) —
+  // centralizar aqui evita ter que lembrar de chamar isto em cada uma delas
+  // individualmente (e esquecer uma seria exatamente o tipo de bug sutil que
+  // corrigimos nesta mesma sprint com clearCart()/finalizeOrder()).
+  if (typeof window.wkzSaveActivityState === 'function') window.wkzSaveActivityState();
 }
 
 function wishToggle(btn, productIndex, evt){
