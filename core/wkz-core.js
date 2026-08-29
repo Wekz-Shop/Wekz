@@ -5730,7 +5730,17 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
           ? { balance: userPoints.balance, lifetime: userPoints.lifetime, redeemNow: userPoints.redeemNow } : null,
         referral: (typeof window.WKZ_REFERRAL_STATE === 'object' && window.WKZ_REFERRAL_STATE)
           ? { activeReferrals: window.WKZ_REFERRAL_STATE.activeReferrals, creditsBRL: window.WKZ_REFERRAL_STATE.creditsBRL } : null,
-        interests: (typeof WKZ_USER_INTERESTS !== 'undefined') ? WKZ_USER_INTERESTS.slice() : []
+        interests: (typeof WKZ_USER_INTERESTS !== 'undefined') ? WKZ_USER_INTERESTS.slice() : [],
+        // [FIX-CART-PERSIST-01] Sprint M23 — cartItemsData nunca tinha sido
+        // incluído aqui: o carrinho nascia sempre vazio (const cartItemsData =
+        // WkzBus.makeReactive([], 'cart')) a cada carregamento de página,
+        // mesmo com itens adicionados minutos antes. Sem isto, um "carrinho
+        // abandonado" de verdade (fechar a aba, voltar depois) era impossível
+        // de detectar — não sobrava nada pra lembrar a pessoa. cartLastAddedTs
+        // é gravado em addToCart() (wkz-buyer.js) e usado pelo lembrete de
+        // carrinho abandonado (ver wkzCheckCartReminder, também neste arquivo).
+        cart: (typeof cartItemsData !== 'undefined') ? cartItemsData.slice() : [],
+        cartLastAddedTs: window._wkzCartLastAddedTs || null
       };
       localStorage.setItem(WKZ_ACTIVITY_KEY, JSON.stringify(snapshot));
     } catch (e) { /* localStorage indisponível (modo privado) — segue sem persistir */ }
@@ -5777,6 +5787,16 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
       WKZ_USER_INTERESTS.length = 0;
       Array.prototype.push.apply(WKZ_USER_INTERESTS, saved.interests);
     }
+    // [FIX-CART-PERSIST-01] Restaura o carrinho salvo. Usa splice() (não
+    // "length = 0" + push) pra já disparar 'cart:change' corretamente pelo
+    // Proxy reativo assim que os itens voltam — updateCartUI()/renderCart()
+    // (chamados por quem invoca wkzRestoreActivityState, guardados por
+    // typeof) já refletem o carrinho restaurado sem precisar de mais nada.
+    if (Array.isArray(saved.cart) && typeof cartItemsData !== 'undefined') {
+      cartItemsData.splice(0, cartItemsData.length);
+      saved.cart.forEach(function(item) { cartItemsData.push(item); });
+    }
+    if (typeof saved.cartLastAddedTs === 'number') window._wkzCartLastAddedTs = saved.cartLastAddedTs;
 
     renderOrders();
     renderPurchaseHistory();
@@ -9277,6 +9297,43 @@ function wkzRateLimit(actionKey, maxAttempts, windowMs) {
 window.wkzRateLimit = wkzRateLimit;
 
 /* ══════════════════════════════════════════════════════════════════════
+   [FIX-CART-PERSIST-01 / lembrete de carrinho abandonado] Sprint M23.
+   Só faz sentido no Buyer (única página com conceito de carrinho) — por
+   isso a checagem de document.getElementById('cartFreeShippingBar'), um
+   elemento que só existe em wkz-buyer.html, funcionando como "estamos na
+   página certa?" sem precisar de um sinalizador novo. Tudo dentro de
+   try/catch: sessionStorage pode não existir (modo privado) ou nem estar
+   definido neste ambiente (harnesses de teste, por exemplo) — o lembrete
+   simplesmente não aparece nesses casos, nunca quebra o carregamento.
+   ══════════════════════════════════════════════════════════════════════ */
+function wkzCheckCartReminder() {
+  try {
+    if (typeof cartItemsData === 'undefined' || !cartItemsData.length) return;
+    if (!document.getElementById('cartFreeShippingBar')) return; // não é a página do Buyer
+    if (typeof window.showToast !== 'function') return;
+    var ts = window._wkzCartLastAddedTs;
+    if (typeof ts !== 'number') return;
+
+    var THIRTY_MIN = 30 * 60 * 1000;
+    if (Date.now() - ts < THIRTY_MIN) return; // "recente" não é abandono — só incomodaria à toa
+
+    // Um lembrete por "geração" do carrinho, não um por F5 dentro da mesma sessão.
+    var flagKey = 'wkz_cart_reminder_shown';
+    if (sessionStorage.getItem(flagKey) === String(ts)) return;
+    sessionStorage.setItem(flagKey, String(ts));
+
+    var totalQty = cartItemsData.reduce(function(acc, c) { return acc + (c.qty || 1); }, 0);
+    var label = totalQty === 1 ? '1 item' : totalQty + ' itens';
+    window.showToast(
+      '🛒 Você deixou ' + label + ' no carrinho — ' +
+      '<span data-nav-to="cart" style="text-decoration:underline;font-weight:700;cursor:pointer;">continue de onde parou</span>',
+      8000
+    );
+  } catch (e) { /* nunca deixa o lembrete quebrar o carregamento da página */ }
+}
+window.wkzCheckCartReminder = wkzCheckCartReminder;
+
+/* ══════════════════════════════════════════════════════════════════════
    [FIX-CADASTRO-04] Dispara a restauração da atividade real da conta
    (ver window.wkzRestoreActivityState, definida mais acima) assim que
    TODO o HTML já foi processado — incluindo wkz-buyer.js, carregado
@@ -9287,6 +9344,10 @@ window.wkzRateLimit = wkzRateLimit;
 (function () {
   function _run() {
     if (typeof window.wkzRestoreActivityState === 'function') window.wkzRestoreActivityState();
+    // Lembrete de carrinho vem depois da restauração (precisa do carrinho já
+    // repovoado) e com um pequeno atraso — mostrar instantaneamente, antes da
+    // página sequer renderizar, seria mais intrusivo que um "bem-vindo de volta".
+    setTimeout(function() { if (typeof window.wkzCheckCartReminder === 'function') window.wkzCheckCartReminder(); }, 1200);
   }
   if (document.readyState === 'complete' || document.readyState === 'interactive') _run();
   else document.addEventListener('DOMContentLoaded', _run);
@@ -9330,10 +9391,21 @@ window.wkzRateLimit = wkzRateLimit;
    ══════════════════════════════════════════════════════════════════════ */
 document.addEventListener('click', function (ev) {
   var scrollTarget = ev.target.closest ? ev.target.closest('[data-scroll-to]') : null;
-  if (!scrollTarget) return;
-  var id = scrollTarget.getAttribute('data-scroll-to');
-  var el = id && document.getElementById(id);
-  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth' });
+  if (scrollTarget) {
+    var id = scrollTarget.getAttribute('data-scroll-to');
+    var el = id && document.getElementById(id);
+    if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  // [FIX-CART-PERSIST-01] Sprint M23 — segundo ramo do mesmo listener central
+  // (padrão descrito na Sprint M22: cada tipo de interação vira um ramo novo
+  // aqui, em vez de mais um listener espalhado). Usado pelo link "continue de
+  // onde parou" dentro do toast do lembrete de carrinho abandonado — nasce já
+  // sem onclick, não é uma conversão de algo que existia antes.
+  var navTarget = ev.target.closest ? ev.target.closest('[data-nav-to]') : null;
+  if (navTarget && typeof window.MapsTo === 'function') {
+    window.MapsTo(navTarget.getAttribute('data-nav-to'));
+  }
 });
 document.addEventListener('keydown', function (ev) {
   if (ev.key !== 'Enter' && ev.key !== ' ') return;
