@@ -9405,8 +9405,100 @@ document.addEventListener('click', function (ev) {
   var navTarget = ev.target.closest ? ev.target.closest('[data-nav-to]') : null;
   if (navTarget && typeof window.MapsTo === 'function') {
     window.MapsTo(navTarget.getAttribute('data-nav-to'));
+    return;
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     [FIX-SEC-ONCLICK-02] Sprint M24 — dispatcher genérico de ações.
+     Cobre a maioria dos ~1.171 onclick que ainda restavam no projeto (a
+     Sprint M22 só tinha resolvido o caso estreito de "rolar até uma
+     seção"). Em vez de um ramo novo pra cada função diferente (o projeto
+     chama dezenas de funções distintas via onclick — switchAdminTab,
+     secAction, applyTemplate...), um único mecanismo genérico:
+
+       onclick="minhaFuncao('a', 'b')"
+     vira:
+       data-action="minhaFuncao" data-args='["a","b"]'
+
+     SENTINELAS especiais dentro de data-args (substituídas antes da
+     chamada, nunca viram o argumento literal "$this" etc.):
+       "$this"       → o próprio elemento clicado (equivalente ao "this"
+                        que o onclick antigo recebia implicitamente)
+       "$event"      → o objeto do evento de clique
+       "$tabBtn:xxx" → document.querySelector('[data-tab="xxx"]') — caso
+                        específico do Admin, onde um card de KPI precisa
+                        passar o BOTÃO de uma aba diferente da que foi
+                        clicada (ex.: "Revisar →" no card de KYC troca pra
+                        aba KYC E marca o botão de navegação da aba KYC
+                        como ativo, não o card em si)
+
+     data-action2/data-args2 (opcionais): uma SEGUNDA ação disparada logo
+     após a primeira, com sua própria lista de argumentos — cobre os poucos
+     casos de "onclick=\"funcA();funcB();\"" (duas chamadas encadeadas,
+     cada uma com aridade própria) sem precisar de uma estrutura JSON mais
+     complexa pra um punhado de casos.
+
+     Só chama window[nomeDaFunção] se already for uma function de verdade
+     — nunca executa uma string arbitrária (isto não é um eval genérico:
+     só despacha para funções que já existem no escopo global da própria
+     aplicação, do mesmo jeito que onclick="foo()" já fazia).
+     ════════════════════════════════════════════════════════════════════ */
+  var actionTarget = ev.target.closest ? ev.target.closest('[data-action]') : null;
+  if (actionTarget) {
+    _wkzDispatchAction(actionTarget, ev, 'data-action', 'data-args');
+    var action2 = actionTarget.getAttribute('data-action2');
+    if (action2) _wkzDispatchAction(actionTarget, ev, 'data-action2', 'data-args2');
+    return;
+  }
+
+  // [FIX-SEC-ONCLICK-02] Navegação simples (onclick="window.location.href='...'").
+  var hrefTarget = ev.target.closest ? ev.target.closest('[data-nav-href]') : null;
+  if (hrefTarget) {
+    window.location.href = hrefTarget.getAttribute('data-nav-href');
+    return;
+  }
+
+  // [FIX-SEC-ONCLICK-02] Fechar modal ao clicar no fundo (fora do conteúdo).
+  // Precisa ser ev.target === backdrop (não closest — um clique em QUALQUER
+  // filho do modal não pode fechar o modal por engano, só o fundo em si).
+  var backdrop = ev.target.hasAttribute && ev.target.hasAttribute('data-close-on-backdrop')
+    ? ev.target : null;
+  if (backdrop) {
+    var closeFn = backdrop.getAttribute('data-close-on-backdrop');
+    if (typeof window[closeFn] === 'function') window[closeFn]();
+    return;
+  }
+
+  // [FIX-SEC-ONCLICK-02] Disparar clique num elemento escondido (ex.: botão
+  // estilizado que abre o seletor de arquivo nativo de um <input type=file>
+  // oculto). onclick="document.getElementById('x').click()" vira
+  // data-click-target="x".
+  var clickTrigger = ev.target.closest ? ev.target.closest('[data-click-target]') : null;
+  if (clickTrigger) {
+    var targetEl = document.getElementById(clickTrigger.getAttribute('data-click-target'));
+    if (targetEl && targetEl.click) targetEl.click();
   }
 });
+
+function _wkzDispatchAction(el, ev, actionAttr, argsAttr) {
+  var fnName = el.getAttribute(actionAttr);
+  var fn = fnName && window[fnName];
+  if (typeof fn !== 'function') return;
+  var argsRaw = el.getAttribute(argsAttr);
+  var args = [];
+  if (argsRaw) {
+    try { args = JSON.parse(argsRaw); } catch (e) { args = []; }
+    args = args.map(function (a) {
+      if (a === '$this') return el;
+      if (a === '$event') return ev;
+      if (typeof a === 'string' && a.indexOf('$tabBtn:') === 0) {
+        return document.querySelector('[data-tab="' + a.slice(8) + '"]');
+      }
+      return a;
+    });
+  }
+  fn.apply(null, args);
+}
 document.addEventListener('keydown', function (ev) {
   if (ev.key !== 'Enter' && ev.key !== ' ') return;
   var scrollTarget = ev.target.closest ? ev.target.closest('[data-scroll-to]') : null;
