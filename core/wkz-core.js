@@ -9484,6 +9484,15 @@ function _wkzDispatchAction(el, ev, actionAttr, argsAttr) {
   var fnName = el.getAttribute(actionAttr);
   var fn = fnName && window[fnName];
   if (typeof fn !== 'function') return;
+  // [FIX-SEC-ONCLICK-03] Sprint M25 — alguns onclick convertidos viviam em
+  // <a href="#"> com "return false" no final (impede o salto pro topo da
+  // página). Sob addEventListener, "return false" não existe mais — o
+  // equivalente é preventDefault(). Chamado sempre, incondicionalmente:
+  // nenhum data-action até agora depende do comportamento padrão do
+  // elemento acontecer (nenhum é um <button type="submit"> de verdade
+  // nem precisa do href sendo seguido), então isto é seguro em todos os
+  // casos já convertidos e nos futuros.
+  if (ev && ev.preventDefault) ev.preventDefault();
   var argsRaw = el.getAttribute(argsAttr);
   var args = [];
   if (argsRaw) {
