@@ -545,9 +545,9 @@ function openKycReview(id) {
     </div>` : `<div class="adm-kyc-doc-card" style="opacity:0.5;text-align:center;color:var(--muted);font-size:12px;">${icon} ${title} — não enviado</div>`;
 
   const actionsHtml = (k.status === 'pending' || k.status === 'under-review') ? `
-      <button class="adm-btn-approve" style="flex:1;min-width:140px;padding:11px;" onclick="admApproveKyc('${k.id}');_admCloseKycModal();">✓ Aprovar Verificação</button>
-      <button class="adm-btn-reject" style="flex:1;min-width:140px;padding:11px;" onclick="admRejectKyc('${k.id}');_admCloseKycModal();">✕ Recusar</button>
-      <button class="adm-btn-view" style="flex:1;min-width:140px;padding:11px;" onclick="admRequestMoreKycDocs('${k.id}')">${WKZ_ICO.mail} Solicitar Mais Documentos</button>`
+      <button class="adm-btn-approve" style="flex:1;min-width:140px;padding:11px;" data-action="admApproveKyc" data-args='["${k.id}"]' data-action2="_admCloseKycModal" data-args2="[]">✓ Aprovar Verificação</button>
+      <button class="adm-btn-reject" style="flex:1;min-width:140px;padding:11px;" data-action="admRejectKyc" data-args='["${k.id}"]' data-action2="_admCloseKycModal" data-args2="[]">✕ Recusar</button>
+      <button class="adm-btn-view" style="flex:1;min-width:140px;padding:11px;" data-action="admRequestMoreKycDocs" data-args='["${k.id}"]'>${WKZ_ICO.mail} Solicitar Mais Documentos</button>`
     : `<div style="padding:6px 0;color:${k.status === 'approved' ? '#22C55E' : '#EF4444'};font-size:13px;font-weight:600;">${k.status === 'approved' ? WKZ_ICO.check + ' Verificação já aprovada.' : WKZ_ICO.xCircle + ' Verificação já recusada.'}</div>`;
 
   // C2: sanitiza campos provenientes de dados de utilizador antes de injetar no modal KYC
@@ -1109,7 +1109,7 @@ function renderKzRadar() {
           <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">${alert.detail}</div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-size:10px;color:var(--muted);">${WKZ_ICO.clock} ${alert.timestamp}</span>
-            ${alert.actions.map((a, i) => `<button onclick="kzRadarAction('${alert.id}','${a}')" style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid ${i===0?'rgba(0,180,171,0.4)':'rgba(239,68,68,0.4)'};background:${i===0?'rgba(0,180,171,0.1)':'rgba(239,68,68,0.08)'};color:${i===0?'var(--teal)':'#EF4444'};transition:all 0.2s;">${a}</button>`).join('')}
+            ${alert.actions.map((a, i) => `<button data-action="kzRadarAction" data-args='["${alert.id}","${a}"]' style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid ${i===0?'rgba(0,180,171,0.4)':'rgba(239,68,68,0.4)'};background:${i===0?'rgba(0,180,171,0.1)':'rgba(239,68,68,0.08)'};color:${i===0?'var(--teal)':'#EF4444'};transition:all 0.2s;">${a}</button>`).join('')}
           </div>
         </div>
       </div>`;
@@ -1163,8 +1163,8 @@ function renderSecurityPanel() {
           <div class="adm-suspect-name">${s.name}</div>
           <div class="adm-suspect-detail">${s.detail}</div>
           <div style="display:flex;gap:6px;margin-top:8px;">
-            <button class="adm-sec-btn adm-sec-btn-block" onclick="secSuspendAccount(${i})">Suspender</button>
-            <button class="adm-sec-btn adm-sec-btn-view" onclick="secViewAccount(${i})">Ver Detalhes</button>
+            <button class="adm-sec-btn adm-sec-btn-block" data-action="secSuspendAccount" data-args='[${i}]'>Suspender</button>
+            <button class="adm-sec-btn adm-sec-btn-view" data-action="secViewAccount" data-args='[${i}]'>Ver Detalhes</button>
           </div>
         </div>
         <div>
@@ -1197,7 +1197,7 @@ function renderFraudReports() {
       <div class="adm-sec-alert-actions">
         ${r.status === 'resolvida'
           ? '<span style="font-size:10px;color:#22C55E;font-weight:700;white-space:nowrap;">Resolvido</span>'
-          : `<button class="adm-sec-btn" style="background:rgba(0,180,171,0.12);color:var(--teal);border:1px solid rgba(0,180,171,0.3);" onclick="resolveFraudReport('${r.id}')">Marcar Resolvido</button>`}
+          : `<button class="adm-sec-btn" style="background:rgba(0,180,171,0.12);color:var(--teal);border:1px solid rgba(0,180,171,0.3);" data-action="resolveFraudReport" data-args='["${r.id}"]'>Marcar Resolvido</button>`}
       </div>
     </div>`).join('');
 }
@@ -1763,7 +1763,7 @@ function renderDisputas(filter) {
 
   list.innerHTML = data.map(d => `
     <div class="adm-disputa-card sev-${d.severity}" id="admDisputa_${d.id}">
-      <div class="adm-disputa-header" onclick="openDisputaChat('${d.id}')">
+      <div class="adm-disputa-header" data-action="openDisputaChat" data-args='["${d.id}"]'>
         <div class="adm-disputa-id-badge sev-${d.severity}">${d.id}</div>
         <div class="adm-disputa-meta">
           <div class="adm-disputa-title">${d.title}</div>
@@ -1778,8 +1778,15 @@ function renderDisputas(filter) {
           <div class="adm-disputa-motivo"><strong>Motivo:</strong> <span style="color:var(--muted);">${d.motivo}</span></div>
         </div>
         <div class="adm-disputa-btns">
-          <button class="adm-btn-view" onclick="event.stopPropagation();openDisputaChat('${d.id}')">${WKZ_ICO.chat} Chat</button>
-          ${d.severity !== 'resolved' ? `<button class="adm-btn-refund" onclick="event.stopPropagation();admResolveDispute('${d.id}','refund_buyer')" style="font-size:11px;padding:7px 10px;">↩ Reembolsar</button>` : ''}
+          <!-- [FIX-SEC-ONCLICK-02] Sprint M24 — event.stopPropagation() removido:
+               servia só pra impedir que clicar nestes botões TAMBÉM disparasse o
+               onclick do <div> pai (linha acima). Com a delegação central por
+               closest('[data-action]'), o elemento MAIS PRÓXIMO do clique já
+               "vence" sozinho — o clique no botão nunca chega a considerar o
+               data-action do pai. O stopPropagation() virou desnecessário, não
+               foi só apagado sem motivo. -->
+          <button class="adm-btn-view" data-action="openDisputaChat" data-args='["${d.id}"]'>${WKZ_ICO.chat} Chat</button>
+          ${d.severity !== 'resolved' ? `<button class="adm-btn-refund" data-action="admResolveDispute" data-args='["${d.id}","refund_buyer"]' style="font-size:11px;padding:7px 10px;">↩ Reembolsar</button>` : ''}
         </div>
       </div>
     </div>`).join('');
@@ -1822,9 +1829,9 @@ function openDisputaChat(id) {
   const actionsEl = document.getElementById('disputaChatActions');
   if (d.severity !== 'resolved') {
     actionsEl.innerHTML = `
-      <button class="adm-btn-refund"  onclick="admResolveDispute('${d.id}','refund_buyer')">↩ Reembolsar Comprador (100%)</button>
-      <button class="adm-btn-release" onclick="admResolveDispute('${d.id}','release_seller')">${WKZ_ICO.check} Liberar para Lojista</button>
-      <button class="adm-btn-partial" onclick="admResolveDispute('${d.id}','partial_split')">${WKZ_ICO.scale} Divisão Parcial (50/50)</button>`;
+      <button class="adm-btn-refund"  data-action="admResolveDispute" data-args='["${d.id}","refund_buyer"]'>↩ Reembolsar Comprador (100%)</button>
+      <button class="adm-btn-release" data-action="admResolveDispute" data-args='["${d.id}","release_seller"]'>${WKZ_ICO.check} Liberar para Lojista</button>
+      <button class="adm-btn-partial" data-action="admResolveDispute" data-args='["${d.id}","partial_split"]'>${WKZ_ICO.scale} Divisão Parcial (50/50)</button>`;
   } else {
     actionsEl.innerHTML = `<div style="padding:4px 0;color:#22C55E;font-size:13px;font-weight:600;">${WKZ_ICO.check} Disputa já resolvida.</div>`;
   }
@@ -2038,7 +2045,7 @@ function renderSaques(filter) {
     const liquidoExpress = liquido * (1 - taxaExpress);
     const taxaValBRL     = fmtBRL(liquido * taxaExpress);
     return `
-      <tr onclick="openSaqueDetail('${s.id}')">
+      <tr data-action="openSaqueDetail" data-args='["${s.id}"]'>
         <td>
           <div class="adm-saque-loja">
             <div class="adm-saque-loja-avatar">${s.avatar}</div>
@@ -2055,22 +2062,27 @@ function renderSaques(filter) {
         </td>
         <td><span class="adm-saque-comissao">${fmtBRL(comissaoVal)} <span style="font-size:10px;font-weight:500;color:var(--muted);">(${s.comissao}%)</span></span></td>
         <td><span class="adm-saque-liquido">${fmtBRL(liquido)}</span></td>
-        <td onclick="event.stopPropagation()">
+        <!-- [FIX-SEC-ONCLICK-02] event.stopPropagation() removido desta <td> — mesmo
+             motivo documentado em renderDisputas(): com delegação por
+             closest('[data-action]'), o botão "Antecipar" (data-action próprio)
+             já vence sozinho sobre o data-action da <tr>, sem precisar bloquear
+             a propagação manualmente. -->
+        <td>
           ${s.status !== 'approved' ? `
           <div class="adm-antecipar-cell">
             <div class="adm-antecipar-info">
               <span class="adm-antecipar-val">${fmtBRL(liquidoExpress)}</span>
               <span class="adm-antecipar-fee">−3% · desc. ${taxaValBRL}</span>
             </div>
-            <button class="adm-btn-antecipar" onclick="admAnteciparSaque('${s.id}')">${WKZ_ICO.zap} Antecipar</button>
+            <button class="adm-btn-antecipar" data-action="admAnteciparSaque" data-args='["${s.id}"]'>${WKZ_ICO.zap} Antecipar</button>
           </div>` : '<span style="color:var(--muted);font-size:12px;">—</span>'}
         </td>
         <td style="color:var(--muted);font-size:12px;">${s.data}</td>
         <td><span class="adm-saque-status ${s.status}">${s.antecipado ? WKZ_ICO.zap + ' ' : ''}${statusLabel[s.status]}</span></td>
         <td>
-          <div class="adm-saque-action-btns" onclick="event.stopPropagation()">
-            ${s.status !== 'approved' ? `<button class="adm-btn-approve" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();admApprovePayout('${s.id}')">${WKZ_ICO.check} Aprovar</button>` : ''}
-            ${s.status === 'pending'  ? `<button class="adm-btn-reject"  style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();admHoldPayout('${s.id}')">${WKZ_ICO.lock} Reter</button>` : ''}
+          <div class="adm-saque-action-btns">
+            ${s.status !== 'approved' ? `<button class="adm-btn-approve" style="padding:6px 12px;font-size:12px;" data-action="admApprovePayout" data-args='["${s.id}"]'>${WKZ_ICO.check} Aprovar</button>` : ''}
+            ${s.status === 'pending'  ? `<button class="adm-btn-reject"  style="padding:6px 12px;font-size:12px;" data-action="admHoldPayout" data-args='["${s.id}"]'>${WKZ_ICO.lock} Reter</button>` : ''}
           </div>
         </td>
       </tr>`;
@@ -2950,7 +2962,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
             <div class="kz-copilot-label">${WKZ_ICO.sparkles} Kz Dispute Copilot · Análise em Progresso</div>
             <div class="kz-copilot-title">Lince Cibernético está analisando o caso...</div>
           </div>
-          <button class="kz-copilot-close" onclick="closeKzCopilot()">✕</button>
+          <button class="kz-copilot-close" data-action="closeKzCopilot" data-args="[]">✕</button>
         </div>
         <div class="kz-copilot-thinking">
           <div class="kz-copilot-dots"><span></span><span></span><span></span></div>
@@ -2975,7 +2987,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
             <div class="kz-copilot-label">${WKZ_ICO.sparkles} Kz Dispute Copilot · Parecer Gerado</div>
             <div class="kz-copilot-title">Análise: Disputa ${d.id} — ${d.motivo}</div>
           </div>
-          <button class="kz-copilot-close" onclick="closeKzCopilot()">✕</button>
+          <button class="kz-copilot-close" data-action="closeKzCopilot" data-args="[]">✕</button>
         </div>
         <div class="kz-copilot-summary">
           ${vd.icon} ${vd.summary}<br><br>${vd.reason}
@@ -2986,7 +2998,7 @@ function wkzSellerUpdateOrderStatus(orderId, newStatus, extra) {
             <div class="kz-copilot-verdict-rec">${vd.recLabel}</div>
             <div class="kz-copilot-verdict-text">Confiança do Kz: <strong>${vd.confidence}%</strong> · baseado em ${d.msgs.length} msg(s) e política WeKz §4</div>
           </div>
-          <button class="kz-copilot-verdict-btn ${vd.btnClass}" onclick="admResolveDispute('${d.id}','${vd.btnAction}');closeKzCopilot();">${vd.btnLabel}</button>
+          <button class="kz-copilot-verdict-btn ${vd.btnClass}" data-action="admResolveDispute" data-args='["${d.id}","${vd.btnAction}"]' data-action2="closeKzCopilot" data-args2="[]">${vd.btnLabel}</button>
         </div>
         <div class="kz-copilot-conf">
           <span>Confiança</span>

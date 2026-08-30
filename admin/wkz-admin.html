@@ -66,7 +66,7 @@
         <span class="adm-mobile-badge-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
         <span class="adm-mobile-badge-label">Admin</span>
       </div>
-      <button class="btn-icon btn-icon-compact" onclick="wkzToggleTheme()" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro" id="wkzThemeToggleBtn" style="margin-left:8px;">
+      <button class="btn-icon btn-icon-compact" data-action="wkzToggleTheme" data-args="[]" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro" id="wkzThemeToggleBtn" style="margin-left:8px;">
         <span class="wkz-icon wkz-icon-theme-light" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
         <span class="wkz-icon wkz-icon-theme-dark" aria-hidden="true" style="display:none;"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
       </button>
@@ -90,57 +90,57 @@
           <div class="adm-user-name" id="admUserName">Administrador</div>
           <div class="adm-user-badge"><svg class="adm-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Super Admin</div>
         </div>
-        <button class="btn-icon btn-icon-compact" onclick="wkzToggleTheme()" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro" id="wkzThemeToggleBtnDesktop" style="margin-left:auto;">
+        <button class="btn-icon btn-icon-compact" data-action="wkzToggleTheme" data-args="[]" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro" id="wkzThemeToggleBtnDesktop" style="margin-left:auto;">
           <span class="wkz-icon wkz-icon-theme-light" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
           <span class="wkz-icon wkz-icon-theme-dark" aria-hidden="true" style="display:none;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
         </button>
       </div>
       <div class="adm-nav-track" id="admNavTrack">
       <nav class="adm-nav" id="admNav" onscroll="admNavScroll(this)">
-        <div class="adm-nav-item active" data-tab="overview" onclick="switchAdminTab('overview', this)">
+        <div class="adm-nav-item active" data-tab="overview" data-action="switchAdminTab" data-args='["overview","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Visão Geral
         </div>
-        <div class="adm-nav-item" data-tab="store-approval" onclick="switchAdminTab('store-approval', this)">
+        <div class="adm-nav-item" data-tab="store-approval" data-action="switchAdminTab" data-args='["store-approval","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Aprovação de Lojas
           <span class="adm-nav-badge" id="navBadgeStores">7</span>
         </div>
-        <div class="adm-nav-item" data-tab="kyc" onclick="switchAdminTab('kyc', this)">
+        <div class="adm-nav-item" data-tab="kyc" data-action="switchAdminTab" data-args='["kyc","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> KYC/KYB
           <span class="adm-nav-badge adm-badge-orange" id="navBadgeKyc">4</span>
         </div>
-        <div class="adm-nav-item" data-tab="product-reports" onclick="switchAdminTab('product-reports', this)">
+        <div class="adm-nav-item" data-tab="product-reports" data-action="switchAdminTab" data-args='["product-reports","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Moderação de Produtos
           <span class="adm-nav-badge adm-badge-red" id="navBadgeReports">3</span>
         </div>
-        <div class="adm-nav-item" data-tab="billing" onclick="switchAdminTab('billing', this)">
+        <div class="adm-nav-item" data-tab="billing" data-action="switchAdminTab" data-args='["billing","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Faturamento
         </div>
-        <div class="adm-nav-item" data-tab="users" onclick="switchAdminTab('users', this)">
+        <div class="adm-nav-item" data-tab="users" data-action="switchAdminTab" data-args='["users","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Usuários
         </div>
-        <div class="adm-nav-item" data-tab="comunicados" onclick="switchAdminTab('comunicados', this)">
+        <div class="adm-nav-item" data-tab="comunicados" data-action="switchAdminTab" data-args='["comunicados","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Comunicados
         </div>
-        <div class="adm-nav-item" data-tab="seguranca" onclick="switchAdminTab('seguranca', this)">
+        <div class="adm-nav-item" data-tab="seguranca" data-action="switchAdminTab" data-args='["seguranca","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Segurança
           <span class="adm-nav-badge adm-badge-red">2</span>
         </div>
-        <div class="adm-nav-item" data-tab="configuracoes" onclick="switchAdminTab('configuracoes', this)">
+        <div class="adm-nav-item" data-tab="configuracoes" data-action="switchAdminTab" data-args='["configuracoes","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config
         </div>
-        <div class="adm-nav-item" data-tab="kz-ia" onclick="switchAdminTab('kz-ia', this)">
+        <div class="adm-nav-item" data-tab="kz-ia" data-action="switchAdminTab" data-args='["kz-ia","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Kz IA
         </div>
-        <div class="adm-nav-item" data-tab="disputas" onclick="switchAdminTab('disputas', this)">
+        <div class="adm-nav-item" data-tab="disputas" data-action="switchAdminTab" data-args='["disputas","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Disputas
           <span class="adm-nav-badge adm-badge-orange" id="navBadgeDisputas">5</span>
         </div>
-        <div class="adm-nav-item" data-tab="saques" onclick="switchAdminTab('saques', this)">
+        <div class="adm-nav-item" data-tab="saques" data-action="switchAdminTab" data-args='["saques","$this"]'>
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Saques / Payouts
           <span class="adm-nav-badge" id="navBadgeSaques">8</span>
         </div>
         <div class="adm-nav-sep"></div>
-        <div class="adm-nav-item adm-nav-danger" onclick="window.location.href='../buyer/wkz-buyer.html'">
+        <div class="adm-nav-item adm-nav-danger" data-nav-href="../buyer/wkz-buyer.html\">
           <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar ao Site
         </div>
       </nav>
@@ -161,7 +161,7 @@
           <div class="adm-kz-greeting" id="admKzGreeting">Olá, Gestor!</div>
           <div class="adm-kz-msg" id="admKzMsg">Carregando análise da plataforma...</div>
         </div>
-        <button class="adm-kz-refresh" onclick="refreshAdminKzMsg()" title="Nova análise">↻ Analisar</button>
+        <button class="adm-kz-refresh" data-action="refreshAdminKzMsg" data-args="[]" title="Nova análise">↻ Analisar</button>
       </div>
 
       <!-- ══ PAINEL: VISÃO GERAL ══ -->
@@ -238,28 +238,28 @@
           <div class="adm-kpi">
             <div class="adm-kpi-num adm-kpi-warn" id="kpiStoresNum">7</div>
             <div class="adm-kpi-label">Lojas aguardando aprovação</div>
-            <button class="adm-kpi-btn" onclick="switchAdminTab('store-approval', document.querySelector('[data-tab=\'store-approval\']'))">Revisar →</button>
+            <button class="adm-kpi-btn" data-action="switchAdminTab" data-args='["store-approval","$tabBtn:store-approval"]'>Revisar →</button>
           </div>
           <div class="adm-kpi" id="kpiCardKyc">
             <div class="adm-kpi-num adm-kpi-warn" id="kpiKycNum">4</div>
             <div class="adm-kpi-label">Verificações KYC/KYB pendentes</div>
             <div class="adm-kpi-sublabel" id="kpiKycRisco" style="font-size:10px;color:#EF4444;margin-top:2px;min-height:14px;"></div>
-            <button class="adm-kpi-btn" onclick="switchAdminTab('kyc', document.querySelector('[data-tab=\'kyc\']'))">Revisar →</button>
+            <button class="adm-kpi-btn" data-action="switchAdminTab" data-args='["kyc","$tabBtn:kyc"]'>Revisar →</button>
           </div>
           <div class="adm-kpi">
             <div class="adm-kpi-num adm-kpi-danger" id="kpiReportsNum">3</div>
             <div class="adm-kpi-label">Produtos com denúncias ativas</div>
-            <button class="adm-kpi-btn" onclick="switchAdminTab('product-reports', document.querySelector('[data-tab=\'product-reports\']'))">Moderar →</button>
+            <button class="adm-kpi-btn" data-action="switchAdminTab" data-args='["product-reports","$tabBtn:product-reports"]'>Moderar →</button>
           </div>
           <div class="adm-kpi">
             <div class="adm-kpi-num adm-kpi-ok">98.7%</div>
             <div class="adm-kpi-label">Uptime da plataforma (30d)</div>
-            <button class="adm-kpi-btn" onclick="admShowUptimeDetail()">Status →</button>
+            <button class="adm-kpi-btn" data-action="admShowUptimeDetail" data-args="[]">Status →</button>
           </div>
           <div class="adm-kpi">
             <div class="adm-kpi-num adm-kpi-ok">4.89</div>
             <div class="adm-kpi-label">NPS médio da plataforma</div>
-            <button class="adm-kpi-btn" onclick="admShowNpsDetail()">Detalhes →</button>
+            <button class="adm-kpi-btn" data-action="admShowNpsDetail" data-args="[]">Detalhes →</button>
           </div>
         </div>
 
@@ -273,13 +273,13 @@
             <div class="adm-kpi-num adm-kpi-danger" id="kpiDisputasAtivas">–</div>
             <div class="adm-kpi-label">Disputas abertas</div>
             <div class="adm-kpi-sublabel" id="kpiDisputasEsc" style="font-size:10px;color:#F59E0B;margin-top:2px;min-height:14px;"></div>
-            <button class="adm-kpi-btn" onclick="switchAdminTab('disputas', document.querySelector('[data-tab=\'disputas\']'))">Mediar →</button>
+            <button class="adm-kpi-btn" data-action="switchAdminTab" data-args='["disputas","$tabBtn:disputas"]'>Mediar →</button>
           </div>
           <div class="adm-kpi" id="kpiCardRetido">
             <div class="adm-kpi-num adm-kpi-warn" id="kpiVolumeRetido">–</div>
             <div class="adm-kpi-label">Volume retido em saques</div>
             <div class="adm-kpi-sublabel" id="kpiSaquesCount" style="font-size:10px;color:var(--muted);margin-top:2px;min-height:14px;"></div>
-            <button class="adm-kpi-btn" onclick="switchAdminTab('saques', document.querySelector('[data-tab=\'saques\']'))">Liberar →</button>
+            <button class="adm-kpi-btn" data-action="switchAdminTab" data-args='["saques","$tabBtn:saques"]'>Liberar →</button>
           </div>
         </div>
 
@@ -326,18 +326,18 @@
         <!-- Modal genérico de detalhe (Status da Plataforma / NPS) —
              [FIX-admin-audit v1.0] "Status →" e "Detalhes →" não tinham
              onclick nenhum; reaproveita este modal para os dois. -->
-        <div id="admInfoModal" class="adm-modal-overlay" style="display:none;" onclick="if(event.target===this)closeAdmInfoModal()">
+        <div id="admInfoModal" class="adm-modal-overlay" style="display:none;" data-close-on-backdrop="closeAdmInfoModal">
           <div class="adm-modal-box" style="max-width:520px;">
             <div class="adm-modal-header">
               <div>
                 <div class="adm-modal-title" id="admInfoModalTitle">—</div>
                 <div class="adm-modal-sub" id="admInfoModalSub">—</div>
               </div>
-              <button class="adm-modal-close" onclick="closeAdmInfoModal()">✕</button>
+              <button class="adm-modal-close" data-action="closeAdmInfoModal" data-args="[]">✕</button>
             </div>
             <div id="admInfoModalBody" style="padding:20px 24px;"></div>
             <div style="padding:0 24px 20px;">
-              <button class="adm-btn-view" onclick="closeAdmInfoModal()" style="width:100%;">Fechar</button>
+              <button class="adm-btn-view" data-action="closeAdmInfoModal" data-args="[]" style="width:100%;">Fechar</button>
             </div>
           </div>
         </div>
@@ -351,9 +351,9 @@
         </div>
         <div class="adm-filter-track">
           <div class="adm-filter-scroll">
-          <button class="adm-filter active" id="filterStoresAllBtn" onclick="filterAdminStores('all',this)">Todas (<span id="countStoresAll">7</span>)</button>
-          <button class="adm-filter" onclick="filterAdminStores('pending',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes (<span id="countStoresPending">5</span>)</button>
-          <button class="adm-filter" onclick="filterAdminStores('docs',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Docs (<span id="countStoresDocs">2</span>)</button>
+          <button class="adm-filter active" id="filterStoresAllBtn" data-action="filterAdminStores" data-args='["all","$this"]'>Todas (<span id="countStoresAll">7</span>)</button>
+          <button class="adm-filter" data-action="filterAdminStores" data-args='["pending","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes (<span id="countStoresPending">5</span>)</button>
+          <button class="adm-filter" data-action="filterAdminStores" data-args='["docs","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Docs (<span id="countStoresDocs">2</span>)</button>
           </div>
         </div>
         <div id="admStoreList" class="adm-store-list">
@@ -369,11 +369,11 @@
         </div>
         <div class="adm-filter-track">
           <div class="adm-filter-scroll">
-          <button class="adm-filter active" id="filterKycAllBtn" onclick="filterAdminKyc('all',this)">Todas (<span id="countKycAll">6</span>)</button>
-          <button class="adm-filter" onclick="filterAdminKyc('pending',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes (<span id="countKycPending">2</span>)</button>
-          <button class="adm-filter" onclick="filterAdminKyc('under-review',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Em Análise (<span id="countKycReview">2</span>)</button>
-          <button class="adm-filter" onclick="filterAdminKyc('approved',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Aprovados (<span id="countKycApproved">1</span>)</button>
-          <button class="adm-filter" onclick="filterAdminKyc('rejected',this)">✕ Recusados (<span id="countKycRejected">1</span>)</button>
+          <button class="adm-filter active" id="filterKycAllBtn" data-action="filterAdminKyc" data-args='["all","$this"]'>Todas (<span id="countKycAll">6</span>)</button>
+          <button class="adm-filter" data-action="filterAdminKyc" data-args='["pending","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendentes (<span id="countKycPending">2</span>)</button>
+          <button class="adm-filter" data-action="filterAdminKyc" data-args='["under-review","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Em Análise (<span id="countKycReview">2</span>)</button>
+          <button class="adm-filter" data-action="filterAdminKyc" data-args='["approved","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Aprovados (<span id="countKycApproved">1</span>)</button>
+          <button class="adm-filter" data-action="filterAdminKyc" data-args='["rejected","$this"]'>✕ Recusados (<span id="countKycRejected">1</span>)</button>
           </div>
         </div>
         <div id="admKycList" class="adm-store-list">
@@ -389,10 +389,10 @@
         </div>
         <div class="adm-filter-track">
           <div class="adm-filter-scroll">
-          <button class="adm-filter active" id="filterReportsAllBtn" onclick="filterAdminReports('all',this)">Todas (<span id="countReportsAll">15</span>)</button>
-          <button class="adm-filter" id="filterReportsUrgentBtn" onclick="filterAdminReports('urgent',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Urgente (<span id="countReportsUrgent">3</span>)</button>
-          <button class="adm-filter" onclick="filterAdminReports('review',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Em Análise (<span id="countReportsReview">12</span>)</button>
-          <button class="adm-filter" onclick="filterAdminReports('resolved',this)"><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Resolvidas</button>
+          <button class="adm-filter active" id="filterReportsAllBtn" data-action="filterAdminReports" data-args='["all","$this"]'>Todas (<span id="countReportsAll">15</span>)</button>
+          <button class="adm-filter" id="filterReportsUrgentBtn" data-action="filterAdminReports" data-args='["urgent","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Urgente (<span id="countReportsUrgent">3</span>)</button>
+          <button class="adm-filter" data-action="filterAdminReports" data-args='["review","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Em Análise (<span id="countReportsReview">12</span>)</button>
+          <button class="adm-filter" data-action="filterAdminReports" data-args='["resolved","$this"]'><svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Resolvidas</button>
           </div>
         </div>
         <div id="admReportList" class="adm-report-list">
@@ -492,9 +492,9 @@
           <div class="adm-comm-field">
             <label class="adm-comm-label">Destinatários</label>
             <div class="adm-comm-audience">
-              <button class="adm-aud-btn active" id="audAll" onclick="setAudience('all',this)"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Todos (318K)</button>
-              <button class="adm-aud-btn" id="audSellers" onclick="setAudience('sellers',this)"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Vendedores (12,8K)</button>
-              <button class="adm-aud-btn" id="audBuyers" onclick="setAudience('buyers',this)"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Compradores (305K)</button>
+              <button class="adm-aud-btn active" id="audAll" data-action="setAudience" data-args='["all","$this"]'><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Todos (318K)</button>
+              <button class="adm-aud-btn" id="audSellers" data-action="setAudience" data-args='["sellers","$this"]'><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Vendedores (12,8K)</button>
+              <button class="adm-aud-btn" id="audBuyers" data-action="setAudience" data-args='["buyers","$this"]'><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Compradores (305K)</button>
             </div>
           </div>
 
@@ -512,10 +512,10 @@
           <div class="adm-comm-field">
             <label class="adm-comm-label">Templates rápidos</label>
             <div class="adm-tpl-row">
-              <button class="adm-tpl-btn" onclick="applyTemplate('manutencao')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Manutenção</button>
-              <button class="adm-tpl-btn" onclick="applyTemplate('promoçao')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promoção</button>
-              <button class="adm-tpl-btn" onclick="applyTemplate('novidade')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Novidade</button>
-              <button class="adm-tpl-btn" onclick="applyTemplate('alerta')"><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Alerta</button>
+              <button class="adm-tpl-btn" data-action="applyTemplate" data-args='["manutencao"]'><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Manutenção</button>
+              <button class="adm-tpl-btn" data-action="applyTemplate" data-args='["promoçao"]'><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promoção</button>
+              <button class="adm-tpl-btn" data-action="applyTemplate" data-args='["novidade"]'><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Novidade</button>
+              <button class="adm-tpl-btn" data-action="applyTemplate" data-args='["alerta"]'><svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Alerta</button>
             </div>
           </div>
 
@@ -543,7 +543,7 @@
             </div>
           </div>
 
-          <button class="adm-comm-send" onclick="sendBroadcast()" id="commSendBtn">
+          <button class="adm-comm-send" data-action="sendBroadcast" data-args="[]" id="commSendBtn">
             <svg class="adm-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Comunicado
           </button>
         </div>
@@ -628,8 +628,8 @@
               <div class="adm-sec-alert-time">há 12 min</div>
             </div>
             <div class="adm-sec-alert-actions">
-              <button class="adm-sec-btn adm-sec-btn-block" onclick="secAction('block','V8821')">Bloquear</button>
-              <button class="adm-sec-btn adm-sec-btn-view" onclick="secAction('view','V8821')">Ver</button>
+              <button class="adm-sec-btn adm-sec-btn-block" data-action="secAction" data-args='["block","V8821"]'>Bloquear</button>
+              <button class="adm-sec-btn adm-sec-btn-view" data-action="secAction" data-args='["view","V8821"]'>Ver</button>
             </div>
           </div>
           <div class="adm-sec-alert adm-sec-alert-red">
@@ -640,8 +640,8 @@
               <div class="adm-sec-alert-time">há 3 min</div>
             </div>
             <div class="adm-sec-alert-actions">
-              <button class="adm-sec-btn adm-sec-btn-block" onclick="secAction('blockip','103.55')">Bloquear IP</button>
-              <button class="adm-sec-btn adm-sec-btn-view" onclick="secAction('view','ip')">Ver</button>
+              <button class="adm-sec-btn adm-sec-btn-block" data-action="secAction" data-args='["blockip","103.55"]'>Bloquear IP</button>
+              <button class="adm-sec-btn adm-sec-btn-view" data-action="secAction" data-args='["view","ip"]'>Ver</button>
             </div>
           </div>
         </div>
@@ -752,7 +752,7 @@
             <input type="range" class="adm-rate-slider" min="3" max="20" value="5" oninput="updateRate('Livros',this)">
             <span class="adm-rate-val">5%</span>
           </div>
-          <button class="adm-config-save" onclick="saveRates()"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Taxas</button>
+          <button class="adm-config-save" data-action="saveRates" data-args="[]"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Taxas</button>
         </div>
 
         <!-- Limites operacionais -->
@@ -778,7 +778,7 @@
             <span class="adm-limit-label">Taxa de chargeback máx. (%)</span>
             <input type="number" id="limitChargebackMax" class="adm-limit-input wkz-input wkz-input--sm" value="1.5" min="0.5" max="5" step="0.1">
           </div>
-          <button class="adm-config-save" onclick="saveLimits()"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Limites</button>
+          <button class="adm-config-save" data-action="saveLimits" data-args="[]"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Limites</button>
         </div>
 
         <!-- ── 📈 KZ FX GUARD — Proteção Cambial ── -->
@@ -853,7 +853,7 @@
             </div>
           </div>
           <div class="kz-fxguard-footer">
-            <button class="kz-fxguard-save" onclick="kzFxGuardSave()"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Aplicar Spreads</button>
+            <button class="kz-fxguard-save" data-action="kzFxGuardSave" data-args="[]"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Aplicar Spreads</button>
             <div class="kz-fxguard-note">O spread é somado à taxa base antes de exibir o preço na PDP. Ex: R$ 1.249,90 × <strong>taxa JPY × (1 + 2%)</strong> = proteção contra volatilidade cambial.</div>
           </div>
         </div>
@@ -883,28 +883,28 @@
 
         <!-- Quick action chips -->
         <div class="adm-kzia-chips">
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Como está o faturamento hoje?')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Como está o faturamento hoje?"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Faturamento
           </button>
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Quais lojas precisam de atenção imediata?')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Quais lojas precisam de atenção imediata?"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Lojas Pendentes
           </button>
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Há alertas de segurança ativos?')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Há alertas de segurança ativos?"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Segurança
           </button>
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Gera uma análise completa da plataforma')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Gera uma análise completa da plataforma"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Análise Geral
           </button>
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Produtos com mais denúncias esta semana?')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Produtos com mais denúncias esta semana?"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Moderação
           </button>
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Como estão as disputas e mediações em aberto?')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Como estão as disputas e mediações em aberto?"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Disputas
           </button>
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Quais saques estão pendentes e qual o risco?')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Quais saques estão pendentes e qual o risco?"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Saques
           </button>
-          <button class="adm-kzia-chip-btn" onclick="admKzIaQuick('Há indicadores de fraude ou risco alto no momento?')">
+          <button class="adm-kzia-chip-btn" data-action="admKzIaQuick" data-args='["Há indicadores de fraude ou risco alto no momento?"]'>
             <svg class="adm-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Fraude
           </button>
         </div>
@@ -917,7 +917,7 @@
           <input type="text" class="adm-kzia-input wkz-input" id="admKzIaInput"
             placeholder="Pergunte algo ao Kz... (ex: 'Como está o GMV?')"
             onkeydown="if(event.key==='Enter')admKzIaSend()">
-          <button class="adm-kzia-send" onclick="admKzIaSend()">
+          <button class="adm-kzia-send" data-action="admKzIaSend" data-args="[]">
             <svg class="adm-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Enviar
           </button>
@@ -946,14 +946,14 @@
 
         <!-- Filtros -->
         <div class="adm-filter-row">
-          <button class="adm-filter active" onclick="filterDisputas('all',this)">Todas <span id="dFilterAll"></span></button>
-          <button class="adm-filter" onclick="filterDisputas('open',this)">
+          <button class="adm-filter active" data-action="filterDisputas" data-args='["all","$this"]'>Todas <span id="dFilterAll"></span></button>
+          <button class="adm-filter" data-action="filterDisputas" data-args='["open","$this"]'>
             <span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;margin-right:4px;"></span>Abertas
           </button>
-          <button class="adm-filter" onclick="filterDisputas('escalated',this)">
+          <button class="adm-filter" data-action="filterDisputas" data-args='["escalated","$this"]'>
             <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;display:inline-block;margin-right:4px;"></span>Escaladas
           </button>
-          <button class="adm-filter" onclick="filterDisputas('resolved',this)">
+          <button class="adm-filter" data-action="filterDisputas" data-args='["resolved","$this"]'>
             <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;display:inline-block;margin-right:4px;"></span>Resolvidas
           </button>
         </div>
@@ -962,14 +962,14 @@
         <div id="disputasList" style="display:flex;flex-direction:column;gap:14px;"></div>
 
         <!-- Modal de chat tripartite -->
-        <div id="disputaChatModal" class="adm-modal-overlay" style="display:none;" onclick="if(event.target===this)closeDisputaChat()">
+        <div id="disputaChatModal" class="adm-modal-overlay" style="display:none;" data-close-on-backdrop="closeDisputaChat">
           <div class="adm-modal-box adm-disputa-modal">
             <div class="adm-modal-header">
               <div>
                 <div class="adm-modal-title" id="disputaChatTitle">Disputa #WKZ—...</div>
                 <div class="adm-modal-sub" id="disputaChatSub">Comprador vs Lojista — Mediação ativa</div>
               </div>
-              <button class="adm-modal-close" onclick="closeDisputaChat()">✕</button>
+              <button class="adm-modal-close" data-action="closeDisputaChat" data-args="[]">✕</button>
             </div>
 
             <!-- Partes envolvidas -->
@@ -984,7 +984,7 @@
             <!-- Input admin -->
             <div class="adm-disputa-input-row" style="flex-wrap:wrap;gap:8px;">
               <div style="display:flex;gap:8px;width:100%;align-items:center;flex-wrap:wrap;">
-                <button class="kz-copilot-btn" onclick="activateKzDisputeCopilot()" id="kzCopilotTriggerBtn">
+                <button class="kz-copilot-btn" data-action="activateKzDisputeCopilot" data-args="[]" id="kzCopilotTriggerBtn">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                   <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M12 3l1.6 4.9L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.1z"/><path d="M19 15l.8 2.3L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.7z"/><path d="M5 15l.7 2 2 .7-2 .7L5 20l-.7-1.6L2 17.7l2.3-.7z"/></svg> Consultar Parecer do Kz
                 </button>
@@ -997,13 +997,13 @@
               </select>
               <!-- Anexo de prova visual (oculto) -->
               <input type="file" id="disputaAttachInput" accept="image/*" style="display:none;" onchange="handleDisputaAttach(this)">
-              <button class="adm-attach-btn" onclick="document.getElementById('disputaAttachInput').click()" title="Anexar prova visual (foto do produto)">
+              <button class="adm-attach-btn" data-click-target="disputaAttachInput\" title="Anexar prova visual (foto do produto)">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
               </button>
               <input type="text" class="adm-disputa-input wkz-input" id="disputaChatInput"
                 placeholder="Escreva uma mensagem de mediação..."
                 onkeydown="if(event.key==='Enter')sendDisputaMsg()">
-              <button class="adm-disputa-send" onclick="sendDisputaMsg()">
+              <button class="adm-disputa-send" data-action="sendDisputaMsg" data-args="[]">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
@@ -1031,14 +1031,14 @@
 
         <!-- Filtros -->
         <div class="adm-filter-row">
-          <button class="adm-filter active" onclick="filterSaques('all',this)">Todos</button>
-          <button class="adm-filter" onclick="filterSaques('pending',this)">
+          <button class="adm-filter active" data-action="filterSaques" data-args='["all","$this"]'>Todos</button>
+          <button class="adm-filter" data-action="filterSaques" data-args='["pending","$this"]'>
             <span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;margin-right:4px;"></span>Pendentes
           </button>
-          <button class="adm-filter" onclick="filterSaques('hold',this)">
+          <button class="adm-filter" data-action="filterSaques" data-args='["hold","$this"]'>
             <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;display:inline-block;margin-right:4px;"></span>Retidos
           </button>
-          <button class="adm-filter" onclick="filterSaques('approved',this)">
+          <button class="adm-filter" data-action="filterSaques" data-args='["approved","$this"]'>
             <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;display:inline-block;margin-right:4px;"></span>Aprovados
           </button>
         </div>
@@ -1064,20 +1064,20 @@
         </div>
 
         <!-- Modal de detalhe do saque -->
-        <div id="saqueDetailModal" class="adm-modal-overlay" style="display:none;" onclick="if(event.target===this)closeSaqueDetail()">
+        <div id="saqueDetailModal" class="adm-modal-overlay" style="display:none;" data-close-on-backdrop="closeSaqueDetail">
           <div class="adm-modal-box" style="max-width:520px;">
             <div class="adm-modal-header">
               <div>
                 <div class="adm-modal-title" id="saqueDetailTitle">Saque #SW001</div>
                 <div class="adm-modal-sub">Detalhes da solicitação de saque</div>
               </div>
-              <button class="adm-modal-close" onclick="closeSaqueDetail()">✕</button>
+              <button class="adm-modal-close" data-action="closeSaqueDetail" data-args="[]">✕</button>
             </div>
             <div id="saqueDetailBody" style="padding:20px 24px;"></div>
             <div style="padding:0 24px 20px;display:flex;gap:10px;flex-wrap:wrap;">
               <button class="adm-btn-approve" id="saqueDetailApprove" style="flex:1;"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><polyline points="20 6 9 17 4 12"/></svg> Aprovar Saque</button>
               <button class="adm-btn-reject"  id="saqueDetailHold"    style="flex:1;"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Reter para Análise</button>
-              <button class="adm-btn-view"    onclick="closeSaqueDetail()" style="flex:1;">Fechar</button>
+              <button class="adm-btn-view"    data-action="closeSaqueDetail" data-args="[]" style="flex:1;">Fechar</button>
             </div>
           </div>
         </div>
