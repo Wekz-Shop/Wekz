@@ -85,7 +85,7 @@ function initDashOverview(forceRefresh){
         <div style="font-size:12px;color:var(--muted);margin-top:2px;">${formatPrice(p.p)} · <span style="color:${statusColor};font-weight:600;">${statusLabel}</span></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil} Editar</button>
+        <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;" data-action="openEditProductModal" data-args='[${i}]'>${WKZ_ICO.pencil} Editar</button>
       </div>
     </div>`;
   }).join('');
@@ -257,8 +257,8 @@ function renderMyProducts(page){
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span></div>
         <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales}</div></div>
         <div style="display:flex;gap:6px;margin-top:8px;">
-          <button class="btn-cart" style="flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:12px;" onclick="openEditProductModal(${i})">${WKZ_ICO.pencil} Editar</button>
-          <button class="btn-cart" title="${pauseTitle}" style="flex:0;padding:10px 12px;background:${pauseBg};border:1px solid ${pauseBorder};color:${pauseColor};font-size:14px;" onclick="togglePauseProduct(${i})">${pauseLabel}</button>
+          <button class="btn-cart" style="flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:12px;" data-action="openEditProductModal" data-args='[${i}]'>${WKZ_ICO.pencil} Editar</button>
+          <button class="btn-cart" title="${pauseTitle}" style="flex:0;padding:10px 12px;background:${pauseBg};border:1px solid ${pauseBorder};color:${pauseColor};font-size:14px;" data-action="togglePauseProduct" data-args='[${i}]'>${pauseLabel}</button>
         </div>
       </div>
     </div>`;
@@ -283,7 +283,7 @@ function buildMyProductsPaginationHTML(current, total){
     opts = opts || {};
     const isActive = targetPage === current && !opts.isNav;
     const isDisabled = !!opts.disabled;
-    return `<button ${isDisabled?'disabled':''} style="padding:8px 14px;border-radius:8px;border:1px solid ${isActive?'var(--teal)':'var(--border)'};background:${isActive?'rgba(0,180,171,0.1)':'var(--card)'};color:${isActive?'var(--teal)':'var(--muted)'};cursor:${isDisabled?'default':'pointer'};font-size:13px;opacity:${isDisabled?'0.4':'1'};transition:var(--transition);" ${isDisabled?'':`onclick="renderMyProducts(${targetPage})"`}>${label}</button>`;
+    return `<button ${isDisabled?'disabled':''} style="padding:8px 14px;border-radius:8px;border:1px solid ${isActive?'var(--teal)':'var(--border)'};background:${isActive?'rgba(0,180,171,0.1)':'var(--card)'};color:${isActive?'var(--teal)':'var(--muted)'};cursor:${isDisabled?'default':'pointer'};font-size:13px;opacity:${isDisabled?'0.4':'1'};transition:var(--transition);" ${isDisabled?'':`data-action="renderMyProducts" data-args='[${targetPage}]'`}>${label}</button>`;
   };
   const ellipsis = '<span style="padding:0 4px;color:var(--muted);">…</span>';
   let nums = [];
@@ -325,7 +325,7 @@ function openEditProductModal(idx){
   }
   modal.innerHTML = `
   <div class="modal" style="max-width:520px;width:94%;max-height:90vh;overflow-y:auto;padding:28px;">
-    <button class="modal-close" onclick="closeEditProductModal()" style="top:14px;right:14px;">✕</button>
+    <button class="modal-close" data-action="closeEditProductModal" data-args="[]" style="top:14px;right:14px;">✕</button>
     <div class="modal-title" style="font-size:18px;margin-bottom:4px;">${WKZ_ICO.pencil} Editar Produto</div>
     <div class="modal-sub" style="margin-bottom:20px;">Altere os dados e clique em Salvar</div>
     <div class="form-group">
@@ -371,8 +371,8 @@ function openEditProductModal(idx){
     ${_epField('ep-short-desc','Descrição curta',p.shortDesc,'textarea')}
     ${_epField('ep-desc','Descrição completa',p.desc,'textarea')}
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap;">
-      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="closeEditProductModal()">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="saveEditProduct(${idx})">${WKZ_ICO.save} Salvar Alterações</button>
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-action="closeEditProductModal" data-args="[]">Cancelar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="saveEditProduct" data-args='[${idx}]'>${WKZ_ICO.save} Salvar Alterações</button>
     </div>
   </div>`;
   modal.classList.add('open');
@@ -525,7 +525,7 @@ function initDashReviews(forceRefresh){
         <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px;">${r.text}</div>
         ${replied
           ? `<span id="rev-btn-${idx}" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#22C55E;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);padding:4px 12px;border-radius:6px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg> Respondido</span>`
-          : `<button id="rev-btn-${idx}" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--teal);background:none;border:1px solid rgba(0,180,171,0.3);padding:5px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='rgba(0,180,171,0.08)';this.style.borderColor='var(--teal)'" onmouseleave="this.style.background='none';this.style.borderColor='rgba(0,180,171,0.3)'" onclick="openReviewReplyModal(this, '${safeNome}', '${safeText}', ${idx})"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Responder</button>`
+          : `<button id="rev-btn-${idx}" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--teal);background:none;border:1px solid rgba(0,180,171,0.3);padding:5px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='rgba(0,180,171,0.08)';this.style.borderColor='var(--teal)'" onmouseleave="this.style.background='none';this.style.borderColor='rgba(0,180,171,0.3)'" data-action="openReviewReplyModal" data-args='["$this","${safeNome}","${safeText}",${idx}]'><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Responder</button>`
         }
       </div>
     </div>`;
@@ -560,7 +560,7 @@ function initAddProductPage(){
   const ep = document.getElementById('emojiPicker2');
   if(ep){
     const emojis = ['📱','💻','⌚','🎧','📷','🕹','🖥','⌨','🖱','📺','👟','👗','👜','💄','🏠','🛋','🍳','📚','⚽','🚗','🐾','👶','💊','🎵','🎮','🔧','💡','🌿'];
-    ep.innerHTML = emojis.map(e=>`<span style="font-size:26px;cursor:pointer;padding:4px;border-radius:8px;transition:var(--transition);" onclick="selectProdEmoji('${e}',this)" onmouseover="this.style.background='rgba(0,180,171,0.15)'" onmouseout="this.style.background=''">${e}</span>`).join('');
+    ep.innerHTML = emojis.map(e=>`<span style="font-size:26px;cursor:pointer;padding:4px;border-radius:8px;transition:var(--transition);" data-action="selectProdEmoji" data-args='["${e}","$this"]' onmouseover="this.style.background='rgba(0,180,171,0.15)'" onmouseout="this.style.background=''">${e}</span>`).join('');
   }
   renderPhotoSlots();
   updateFinalSummary();
@@ -689,7 +689,7 @@ function addSpec(){
   row.innerHTML = `
     <input class="form-input wkz-input" type="text" placeholder="Nome (ex: Processador)" style="flex:1;">
     <input class="form-input wkz-input" type="text" placeholder="Valor (ex: Snapdragon 8 Gen 3)" style="flex:2;">
-    <button type="button" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;font-size:16px;cursor:pointer;flex-shrink:0;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;" onclick="removeSpec('${id}')">✕</button>`;
+    <button type="button" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;font-size:16px;cursor:pointer;flex-shrink:0;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;" data-action="removeSpec" data-args='["${id}}"]'>✕</button>`;
   list.appendChild(row);
 }
 
@@ -710,7 +710,7 @@ function addVariation(){
       <select class="form-select wkz-select wkz-select--lg" style="flex:1;">
         <option>Cor</option><option>Tamanho</option><option>Armazenamento</option><option>Material</option><option>Modelo</option>
       </select>
-      <button type="button" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;font-size:14px;cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="removeVar('${id}')">✕</button>
+      <button type="button" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;font-size:14px;cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;" data-action="removeVar" data-args='["${id}}"]'>✕</button>
     </div>
     <input class="form-input wkz-input" type="text" placeholder="Opções separadas por vírgula (ex: Preto, Branco, Azul)">`;
   list.appendChild(row);
@@ -808,7 +808,7 @@ function renderPhotoSlots(){
         ${i===0 ? SVG_PIN+' Principal' : 'Foto '+(i+1)}
       </span>
       <button style="position:absolute;top:6px;right:6px;background:rgba(239,68,68,0.85);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;"
-              onclick="removePhoto('${slot.id}')" aria-label="Remover foto">${SVG_XBTN}</button>
+              data-action="removePhoto" data-args='["${slot.id}"]' aria-label="Remover foto">${SVG_XBTN}</button>
     </div>`;
   }).join('');
   if(addedPhotoSlots.length > 0 && addedPhotoSlots[0].dataUrl){
@@ -1021,7 +1021,7 @@ function filterOrders(type, el){
    ─────────────────────────────────────────────────────────────────────── */
 
 /* ─── WeKz Custom Radio Helper ─── */
-/* Usage: onclick="_wkzRadio('groupId','hiddenInputId','value',this)" */
+/* Usage: data-action="_wkzRadio" data-args='["groupId","hiddenInputId","value","$this"]' */
 function _wkzRadio(groupId, inputId, val, el){
   const group = document.getElementById(groupId);
   if(group){
@@ -1125,7 +1125,7 @@ function openGlobalShippingModalLegacy(){
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" flex-shrink="0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div style="font-size:12px;color:var(--muted);">O valor exato do frete é calculado automaticamente ao adicionar produtos ao carrinho, com base no destino e peso.</div>
     </div>
-    <button onclick="document.getElementById('wkzGlobalShippingModal').classList.remove('open')" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(37,99,235,0.15));border:1px solid rgba(124,58,237,0.35);color:var(--purple);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">Entendido</button>
+    <button data-close-modal-class="wkzGlobalShippingModal" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(37,99,235,0.15));border:1px solid rgba(124,58,237,0.35);color:var(--purple);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">Entendido</button>
   `, { maxWidth: '480px' });
 }
 
@@ -1164,8 +1164,8 @@ function openSaqueModal(){
       <div style="display:flex;justify-content:space-between;font-weight:700;margin-top:4px;padding-top:4px;border-top:1px solid rgba(0,180,171,0.2);"><span>Valor líquido:</span><span style="color:#22C55E;" id="sw-resumo-liq">R$ 12.480,00</span></div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzSaqueModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="confirmarSaque()">${WKZ_ICO.card} Confirmar Saque</button>
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzSaqueModal">Cancelar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="confirmarSaque" data-args="[]">${WKZ_ICO.card} Confirmar Saque</button>
     </div>
   `, {maxWidth:'480px'});
   // Live update resumo
@@ -1197,27 +1197,27 @@ function openExtratoModal(){
     <div class="form-group">
       <label class="form-label">Período <span class="req">*</span></label>
       <div id="ext-periodo-group" style="display:flex;flex-direction:column;gap:6px;">
-        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid rgba(0,180,171,0.4);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_extPeriodo('mes',this)">
+        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid rgba(0,180,171,0.4);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_extPeriodo" data-args='["mes","$this"]'>
           <div class="ext-radio-dot" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--teal);background:var(--teal);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg></div>
           Mês atual (Maio 2026)
         </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_extPeriodo('mes-ant',this)">
+        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_extPeriodo" data-args='["mes-ant","$this"]'>
           <div class="ext-radio-dot" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;"></div>
           Mês anterior (Abril 2026)
         </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_extPeriodo('trim',this)">
+        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_extPeriodo" data-args='["trim","$this"]'>
           <div class="ext-radio-dot" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;"></div>
           Último trimestre
         </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_extPeriodo('semestre',this)">
+        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_extPeriodo" data-args='["semestre","$this"]'>
           <div class="ext-radio-dot" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;"></div>
           Último semestre
         </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_extPeriodo('ano',this)">
+        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_extPeriodo" data-args='["ano","$this"]'>
           <div class="ext-radio-dot" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;"></div>
           Ano atual (2026)
         </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_extPeriodo('custom',this)">
+        <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_extPeriodo" data-args='["custom","$this"]'>
           <div class="ext-radio-dot" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;"></div>
           Período personalizado
         </label>
@@ -1248,8 +1248,8 @@ function openExtratoModal(){
       </div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzExtratoModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="exportarExtrato()">${WKZ_ICO.download} Exportar</button>
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzExtratoModal">Cancelar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="exportarExtrato" data-args="[]">${WKZ_ICO.download} Exportar</button>
     </div>
   `, {maxWidth:'480px'});
   // Wire period selection helper
@@ -1309,14 +1309,14 @@ function openReviewReplyModal(btn, autorNome, textoAvaliacao, reviewIdx){
     <div style="margin-bottom:16px;">
       <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Respostas rápidas:</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.2s;" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="document.getElementById('rev-reply-text').value='Muito obrigado pela sua avaliação! É um prazer atender você. Qualquer dúvida, estamos à disposição!'">Agradecimento</button>
-        <button style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.2s;" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="document.getElementById('rev-reply-text').value='Obrigado pelo feedback! Lamentamos qualquer inconveniente. Por favor, entre em contato pelo nosso chat para resolvermos isso imediatamente.'">Problema</button>
-        <button style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.2s;" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="document.getElementById('rev-reply-text').value='Ficamos felizes que tenha gostado! Volte sempre — temos muitas novidades chegando em breve!'">Elogio</button>
+        <button style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.2s;" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--border)'" data-set-value-target="rev-reply-text" data-set-value="Muito obrigado pela sua avaliação! É um prazer atender você. Qualquer dúvida, estamos à disposição!">Agradecimento</button>
+        <button style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.2s;" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--border)'" data-set-value-target="rev-reply-text" data-set-value="Obrigado pelo feedback! Lamentamos qualquer inconveniente. Por favor, entre em contato pelo nosso chat para resolvermos isso imediatamente.">Problema</button>
+        <button style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.2s;" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--border)'" data-set-value-target="rev-reply-text" data-set-value="Ficamos felizes que tenha gostado! Volte sempre — temos muitas novidades chegando em breve!">Elogio</button>
       </div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzReviewReplyModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;display:flex;align-items:center;gap:7px;" onclick="enviarRespostaReview('${safeNomeJs}', ${reviewIdx !== undefined ? reviewIdx : -1})">
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzReviewReplyModal">Cancelar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;display:flex;align-items:center;gap:7px;" data-action="enviarRespostaReview" data-args='["${safeNomeJs}",${reviewIdx !== undefined ? reviewIdx : -1}]'>
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
         Publicar Resposta
       </button>
@@ -1376,8 +1376,8 @@ function openDisputeReplyModal(pedido, produto, comprador, motivo, data){
       ${WKZ_ICO.clock} Você tem <strong style="color:#F59E0B;">até 48h</strong> para responder. Sem resposta, a WeKz decide automaticamente a favor do comprador.
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzDisputaModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="enviarRespostaDisputa('${pedido}')">${WKZ_ICO.scale} Enviar Resposta</button>
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzDisputaModal">Cancelar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="enviarRespostaDisputa" data-args='["${pedido}}"]'>${WKZ_ICO.scale} Enviar Resposta</button>
     </div>
   `, {maxWidth:'520px'});
 }
@@ -1468,8 +1468,8 @@ function openMarketingModal(tipo){
         Essa ferramenta faz parte dos planos <strong style="color:#c4b5fd;">Pro</strong> e <strong style="color:#c4b5fd;">Enterprise</strong> do WeKz Seller Premium. Assine um desses planos para liberar CPC nos resultados de busca e páginas de categoria.
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Agora não</button>
-        <button class="btn-primary" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open'); openPremiumPlansModal();">${WKZ_ICO.star} Ver Planos</button>
+        <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzMarketingModal">Agora não</button>
+        <button class="btn-primary" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzMarketingModal" data-action2="openPremiumPlansModal" data-args2="[]">${WKZ_ICO.star} Ver Planos</button>
       </div>
     `, {maxWidth:'440px'});
     return;
@@ -1483,22 +1483,22 @@ function openMarketingModal(tipo){
           <label class="form-label">Código do cupom <span class="req">*</span></label>
           <div style="display:flex;gap:8px;">
             <input class="form-input" id="mk-cupom-code" type="text" placeholder="Ex: VERAO20" maxlength="20" style="text-transform:uppercase;flex:1;">
-            <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:0 14px;border-radius:10px;cursor:pointer;font-size:12px;white-space:nowrap;" onclick="gerarCodigoCupom()">${WKZ_ICO.dice} Gerar</button>
+            <button style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:0 14px;border-radius:10px;cursor:pointer;font-size:12px;white-space:nowrap;" data-action="gerarCodigoCupom" data-args="[]">${WKZ_ICO.dice} Gerar</button>
           </div>
         </div>
         <div class="form-row-2col">
         <div class="form-group">
             <label class="form-label">Tipo de desconto</label>
             <div id="mk-cupom-tipo-group" style="display:flex;flex-direction:column;gap:6px;">
-              <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid rgba(0,180,171,0.4);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_wkzRadio('mk-cupom-tipo-group','mk-cupom-tipo','percent',this)">
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid rgba(0,180,171,0.4);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_wkzRadio" data-args='["mk-cupom-tipo-group","mk-cupom-tipo","percent","$this"]'>
                 <div class="wkz-rdot" style="width:15px;height:15px;border-radius:50%;border:2px solid var(--teal);background:var(--teal);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg></div>
                 Percentual (%)
               </label>
-              <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_wkzRadio('mk-cupom-tipo-group','mk-cupom-tipo','fixed',this)">
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_wkzRadio" data-args='["mk-cupom-tipo-group","mk-cupom-tipo","fixed","$this"]'>
                 <div class="wkz-rdot" style="width:15px;height:15px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;"></div>
                 Valor fixo (R$)
               </label>
-              <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_wkzRadio('mk-cupom-tipo-group','mk-cupom-tipo','frete',this)">
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_wkzRadio" data-args='["mk-cupom-tipo-group","mk-cupom-tipo","frete","$this"]'>
                 <div class="wkz-rdot" style="width:15px;height:15px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;"></div>
                 Frete grátis
               </label>
@@ -1525,8 +1525,8 @@ function openMarketingModal(tipo){
           <input class="form-input" id="mk-cupom-minimo" type="number" min="0" step="0.01" placeholder="0 = sem mínimo">
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="salvarMarketing('cupom')">${WKZ_ICO.gift} Criar Cupom</button>
+          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzMarketingModal">Cancelar</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="salvarMarketing" data-args='["cupom"]'>${WKZ_ICO.gift} Criar Cupom</button>
         </div>`
     },
     flash: {
@@ -1536,7 +1536,7 @@ function openMarketingModal(tipo){
         <div class="form-group">
           <label class="form-label">Produto <span class="req">*</span></label>
           <div style="position:relative;">
-            <div id="mk-flash-prod-btn" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:border-color 0.2s;user-select:none;" onclick="_wkzDropToggle('mk-flash-prod-dd')" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor=document.getElementById('mk-flash-prod-dd').style.display==='block'?'var(--teal)':'var(--border)'">
+            <div id="mk-flash-prod-btn" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:border-color 0.2s;user-select:none;" data-action="_wkzDropToggle" data-args='["mk-flash-prod-dd"]' onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor=document.getElementById('mk-flash-prod-dd').style.display==='block'?'var(--teal)':'var(--border)'">
               <span id="mk-flash-prod-label">${products[0]?.e||WKZ_ICO.package + ''} ${(products[0]?.n||'').slice(0,38)} — ${formatPrice(products[0]?.p||0)}</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
             </div>
@@ -1565,7 +1565,7 @@ function openMarketingModal(tipo){
             <label class="form-label">Duração</label>
             <div id="mk-flash-duracao-group" style="display:flex;flex-direction:column;gap:5px;">
               ${[{v:'1',l:'1 hora'},{v:'2',l:'2 horas'},{v:'4',l:'4 horas',sel:true},{v:'6',l:'6 horas'},{v:'12',l:'12 horas'},{v:'24',l:'24 horas'}].map(opt=>`
-              <label style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--card2);border:1px solid ${opt.sel?'rgba(0,180,171,0.4)':'var(--border)'};border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" onclick="_wkzRadio('mk-flash-duracao-group','mk-flash-duracao','${opt.v}',this)">
+              <label style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--card2);border:1px solid ${opt.sel?'rgba(0,180,171,0.4)':'var(--border)'};border-radius:8px;cursor:pointer;font-size:13px;transition:border-color 0.2s;" data-action="_wkzRadio" data-args='["mk-flash-duracao-group","mk-flash-duracao","${opt.v}","$this"]'>
                 <div class="wkz-rdot" style="width:15px;height:15px;border-radius:50%;border:2px solid ${opt.sel?'var(--teal)':'var(--border)'};background:${opt.sel?'var(--teal)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;">${opt.sel?'<svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>':''}</div>
                 ${opt.l}
               </label>`).join('')}
@@ -1577,8 +1577,8 @@ function openMarketingModal(tipo){
           ${WKZ_ICO.zap} Seu produto ganhará destaque na seção Flash Sale durante o período ativo. Promoções com ≥20% de desconto têm prioridade na vitrine.
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;">
-          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#FF6B35,#FF2D7A);border:none;" onclick="salvarMarketing('flash')">${WKZ_ICO.zap} Ativar Flash Sale</button>
+          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzMarketingModal">Cancelar</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#FF6B35,#FF2D7A);border:none;" data-action="salvarMarketing" data-args='["flash"]'>${WKZ_ICO.zap} Ativar Flash Sale</button>
         </div>`
     },
     ads: {
@@ -1592,7 +1592,7 @@ function openMarketingModal(tipo){
         <div class="form-group">
           <label class="form-label">Produto a anunciar <span class="req">*</span></label>
           <div style="position:relative;">
-            <div id="mk-ads-prod-btn" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:border-color 0.2s;user-select:none;" onclick="_wkzDropToggle('mk-ads-prod-dd')" onmouseenter="this.style.borderColor='#a78bfa'" onmouseleave="this.style.borderColor=document.getElementById('mk-ads-prod-dd').style.display==='block'?'#a78bfa':'var(--border)'">
+            <div id="mk-ads-prod-btn" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:border-color 0.2s;user-select:none;" data-action="_wkzDropToggle" data-args='["mk-ads-prod-dd"]' onmouseenter="this.style.borderColor='#a78bfa'" onmouseleave="this.style.borderColor=document.getElementById('mk-ads-prod-dd').style.display==='block'?'#a78bfa':'var(--border)'">
               <span id="mk-ads-prod-label">${products[0]?.e||WKZ_ICO.package + ''} ${(products[0]?.n||'').slice(0,40)}</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
             </div>
@@ -1622,8 +1622,8 @@ function openMarketingModal(tipo){
           </div>
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#7C3AED,#a78bfa);border:none;" onclick="salvarMarketing('ads')">${WKZ_ICO.megaphone} Ativar Anúncio</button>
+          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzMarketingModal">Cancelar</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#7C3AED,#a78bfa);border:none;" data-action="salvarMarketing" data-args='["ads"]'>${WKZ_ICO.megaphone} Ativar Anúncio</button>
         </div>`
     },
     frete: {
@@ -1652,8 +1652,8 @@ function openMarketingModal(tipo){
           <input class="form-input" id="mk-frete-minimo" type="number" min="0" step="0.01" placeholder="0 = sem valor mínimo">
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzMarketingModal').classList.remove('open')">Cancelar</button>
-          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#22C55E,#059669);border:none;" onclick="salvarMarketing('frete')">${WKZ_ICO.truck} Ativar Frete Grátis</button>
+          <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzMarketingModal">Cancelar</button>
+          <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#22C55E,#059669);border:none;" data-action="salvarMarketing" data-args='["frete"]'>${WKZ_ICO.truck} Ativar Frete Grátis</button>
         </div>`
     }
   };
@@ -1836,7 +1836,7 @@ function openReportVendas(){
 
     <!-- Filtros de período -->
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 14px;">
-      ${periodos.map((p,i)=>`<button id="rv-periodo-${i}" onclick="rvSetPeriodo(${i})" style="padding:5px 12px;border-radius:50px;border:1px solid ${i===2?'var(--teal)':'var(--border)'};background:${i===2?'rgba(0,180,171,0.12)':'transparent'};color:${i===2?'var(--teal)':'var(--muted)'};font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">${p}</button>`).join('')}
+      ${periodos.map((p,i)=>`<button id="rv-periodo-${i}" data-action="rvSetPeriodo" data-args='[${i}]' style="padding:5px 12px;border-radius:50px;border:1px solid ${i===2?'var(--teal)':'var(--border)'};background:${i===2?'rgba(0,180,171,0.12)':'transparent'};color:${i===2?'var(--teal)':'var(--muted)'};font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">${p}</button>`).join('')}
     </div>
     <div id="rv-custom-range" style="display:none;margin-bottom:12px;">
       <div style="display:flex;gap:8px;">
@@ -1929,8 +1929,8 @@ function openReportVendas(){
     </div>
 
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" onclick="document.getElementById('wkzReportVendasModal').classList.remove('open')">Fechar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="exportarRelatorio('vendas','rv-fmt')">
+      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" data-close-modal-class="wkzReportVendasModal">Fechar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="exportarRelatorio" data-args='["vendas","rv-fmt"]'>
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Exportar Relatório
       </button>
@@ -2049,8 +2049,8 @@ function openReportEstoque(){
     </div>
 
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" onclick="document.getElementById('wkzReportEstoqueModal').classList.remove('open')">Fechar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" onclick="exportarRelatorio('estoque')">
+      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" data-close-modal-class="wkzReportEstoqueModal">Fechar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="exportarRelatorio" data-args='["estoque"]'>
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Exportar Inventário
       </button>
@@ -2156,8 +2156,8 @@ function openReportFinanceiro(){
     </div>
 
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" onclick="document.getElementById('wkzReportFinanceiroModal').classList.remove('open')">Fechar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#7C3AED,#a78bfa);border:none;" onclick="exportarRelatorio('financeiro')">
+      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" data-close-modal-class="wkzReportFinanceiroModal">Fechar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#7C3AED,#a78bfa);border:none;" data-action="exportarRelatorio" data-args='["financeiro"]'>
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Exportar Extrato
       </button>
@@ -2274,8 +2274,8 @@ function openReportAvaliacoes(){
     </div>
 
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" onclick="document.getElementById('wkzReportAvaliacoesModal').classList.remove('open')">Fechar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#F59E0B,#FB923C);border:none;" onclick="exportarRelatorio('avaliacoes')">
+      <button class="btn-add-cart" style="padding:11px 20px;font-size:13px;" data-close-modal-class="wkzReportAvaliacoesModal">Fechar</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;background:linear-gradient(135deg,#F59E0B,#FB923C);border:none;" data-action="exportarRelatorio" data-args='["avaliacoes"]'>
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Exportar Avaliações
       </button>
@@ -2390,10 +2390,10 @@ function openOrderDetailModal(id, produto, comprador, valor, status, data, ender
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-      <button class="btn-add-cart" style="padding:10px 16px;font-size:12px;" onclick="document.getElementById('wkzOrderDetailModal').classList.remove('open')">Fechar</button>
-      ${isDisputa ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" onclick="document.getElementById(\'wkzOrderDetailModal\').classList.remove(\'open\')">${WKZ_ICO.scale} Ver Disputa</button>' : ''}
+      <button class="btn-add-cart" style="padding:10px 16px;font-size:12px;" data-close-modal-class="wkzOrderDetailModal">Fechar</button>
+      ${isDisputa ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" data-close-modal-class="wkzOrderDetailModal">${WKZ_ICO.scale} Ver Disputa</button>' : ''}
       ${isSent ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="showToast(\' + WKZ_ICO.clipboard + \' Código de rastreio copiado!\')">${WKZ_ICO.package} Copiar Rastreio</button>' : ''}
-      ${isPago ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="marcarEnviado(\''+id+'\',this)">${WKZ_ICO.truck} Marcar como Enviado</button>' : ''}
+      ${isPago ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" data-action="marcarEnviado" data-args=\'["'+id+'","$this"]\'>${WKZ_ICO.truck} Marcar como Enviado</button>' : ''}
     </div>
   `, {maxWidth:'560px'});
 }
@@ -2663,8 +2663,8 @@ function openDispatchModal(pedidoId) {
       </select>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button class="btn-add-cart" style="padding:10px 16px;font-size:12px;" onclick="document.getElementById('wkzDispatchModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:10px 20px;font-size:12px;" onclick="wkzSellerConfirmDispatch('${pedidoId}', document.getElementById('wkzDispatchTrkInput').value, document.getElementById('wkzDispatchCarrierSelect').value, this)">
+      <button class="btn-add-cart" style="padding:10px 16px;font-size:12px;" data-close-modal-class="wkzDispatchModal">Cancelar</button>
+      <button class="btn-primary" style="padding:10px 20px;font-size:12px;" data-action="wkzSellerConfirmDispatch" data-args='["${pedidoId}","$value:wkzDispatchTrkInput","$value:wkzDispatchCarrierSelect","$this"]'>
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>
         Confirmar Envio
       </button>
@@ -3073,7 +3073,7 @@ function openDisputeDetailModal(pedido, produto, comprador, motivo, statusInfo, 
     </div>
     <div style="background:${cor.bg};border:1px solid ${cor.border};border-radius:10px;padding:14px;text-align:center;color:${cor.text};font-weight:700;font-size:13px;">${escapeHtml(veredito)}</div>
     <div style="margin-top:16px;text-align:right;">
-      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzDisputeDetailModal').classList.remove('open')">Fechar</button>
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzDisputeDetailModal">Fechar</button>
     </div>
   `, {maxWidth:'480px'});
 }
@@ -3724,7 +3724,7 @@ var WkzKYC = (function() {
         // RG
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.file} RG ou CPF</label>' +
-          '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" onclick="document.getElementById(\'kycRG\').click();" id="kycRGZone">' +
+          '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" data-click-target="kycRG" id="kycRGZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de RG ou CPF</div>' +
             '<div style="font-size:11px;color:var(--muted);">Frente e verso (JPG/PNG, máx 10MB)</div>' +
@@ -3735,7 +3735,7 @@ var WkzKYC = (function() {
         // CNPJ
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.building} CNPJ e Inscrição Estadual</label>' +
-          '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" onclick="document.getElementById(\'kycCNPJ\').click();" id="kycCNPJZone">' +
+          '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" data-click-target="kycCNPJ" id="kycCNPJZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de CNPJ</div>' +
             '<div style="font-size:11px;color:var(--muted);">Comprovante de inscrição (PDF/JPG, máx 10MB)</div>' +
@@ -3746,7 +3746,7 @@ var WkzKYC = (function() {
         // Comprovante
         '<div>' +
           '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.home} Comprovante de Residência/Sede</label>' +
-          '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" onclick="document.getElementById(\'kycComp\').click();" id="kycCompZone">' +
+          '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" data-click-target="kycComp" id="kycCompZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de Comprovante</div>' +
             '<div style="font-size:11px;color:var(--muted);">Conta de água/luz/internet/telefone (máx 10MB)</div>' +
@@ -3759,10 +3759,10 @@ var WkzKYC = (function() {
         '</div>' +
       '</form>' +
       '<div style="display:flex;gap:10px;margin-top:20px;">' +
-        '<button style="flex:1;background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;" onclick="wkzSubmitKYC();">' +
+        '<button style="flex:1;background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;" data-action="wkzSubmitKYC" data-args="[]">' +
           '✓ Enviar para Verificação' +
         '</button>' +
-        '<button style="flex:1;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-weight:700;cursor:pointer;" onclick="_wkzModal(null);">' +
+        '<button style="flex:1;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-weight:700;cursor:pointer;" data-action="_wkzModal" data-args="[null]">' +
           'Cancelar' +
         '</button>' +
       '</div>' +
@@ -4073,7 +4073,7 @@ function abrirModalDeixarDeVender(){
           ${openDisputes > 0 ? '<li>'+openDisputes+' disputa(s) aguardando sua resposta</li>' : ''}
         </ul>
       </div>
-      <div style="text-align:right;"><button class="btn-primary" style="padding:10px 20px;font-size:13px;" onclick="document.getElementById('wkzLeaveSellerModal').classList.remove('open')">Entendi</button></div>
+      <div style="text-align:right;"><button class="btn-primary" style="padding:10px 20px;font-size:13px;" data-close-modal-class="wkzLeaveSellerModal">Entendi</button></div>
     `, {maxWidth:'440px'});
     return;
   }
@@ -4088,8 +4088,8 @@ function abrirModalDeixarDeVender(){
       <input class="form-input" id="leaveSellerConfirmInput" type="text" placeholder="ENCERRAR" style="text-transform:uppercase;">
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px;">
-      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" onclick="document.getElementById('wkzLeaveSellerModal').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 22px;font-size:13px;background:#EF4444;" onclick="confirmarDeixarDeVender()">Encerrar Conta de Vendedor</button>
+      <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzLeaveSellerModal">Cancelar</button>
+      <button class="btn-primary" style="padding:11px 22px;font-size:13px;background:#EF4444;" data-action="confirmarDeixarDeVender" data-args="[]">Encerrar Conta de Vendedor</button>
     </div>
   `, {maxWidth:'440px'});
 }
@@ -4224,13 +4224,13 @@ function renderReports(filter){
       actionHTML = r.defesaSubmitted
         ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">${WKZ_ICO.shield} Defesa enviada. Aguardando análise da equipe WeKz.</div>'
         : '<div style="margin-top:14px;">'
-          + '<button onclick="toggleDefesaForm(\''+r.id+'\')" style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">${WKZ_ICO.shield} Apresentar Defesa</button>'
+          + '<button data-action="toggleDefesaForm" data-args=\'["'+r.id+'"]\' style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">${WKZ_ICO.shield} Apresentar Defesa</button>'
           + '<div id="defesa-form-'+r.id+'" style="display:none;margin-top:10px;">'
           + '<textarea id="defesa-text-'+r.id+'" placeholder="Explique sua versão dos fatos sobre esta denúncia..." style="width:100%;min-height:90px;padding:10px;font-size:12px;font-family:inherit;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;"></textarea>'
-          + '<button onclick="submitDefesa(\''+r.id+'\')" style="margin-top:8px;width:100%;padding:8px;background:var(--teal);border:none;color:#04201e;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Enviar Defesa</button>'
+          + '<button data-action="submitDefesa" data-args=\'["'+r.id+'"]\' style="margin-top:8px;width:100%;padding:8px;background:var(--teal);border:none;color:#04201e;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Enviar Defesa</button>'
           + '</div></div>';
     } else if(r.status !== 'resolvida'){
-      actionHTML = '<button onclick="advanceStatus(\''+r.id+'\')" style="margin-top:14px;width:100%;padding:8px;background:rgba(0,180,171,0.08);border:1px dashed rgba(0,180,171,0.3);color:var(--teal);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" title="Simula o avanço da análise interna da equipe WeKz">${WKZ_ICO.zap} [Demo] Simular avanço da análise WeKz</button>';
+      actionHTML = '<button data-action="advanceStatus" data-args=\'["'+r.id+'"]\' style="margin-top:14px;width:100%;padding:8px;background:rgba(0,180,171,0.08);border:1px dashed rgba(0,180,171,0.3);color:var(--teal);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" title="Simula o avanço da análise interna da equipe WeKz">${WKZ_ICO.zap} [Demo] Simular avanço da análise WeKz</button>';
     }
 
     var logsHTML = r.logs.map(function(log){
@@ -4240,7 +4240,7 @@ function renderReports(filter){
     }).join('');
 
     return '<div class="denuncia-item" id="dItem-'+r.id+'">'
-      + '<div class="denuncia-header" onclick="toggleDenuncia(\''+r.id+'\')">'
+      + '<div class="denuncia-header" data-action="toggleDenuncia" data-args=\'["'+r.id+'"]\'>'
       + '<span style="font-size:24px;flex-shrink:0;">'+r.productEmoji+'</span>'
       + '<div class="denuncia-info"><div class="denuncia-title">'+escapeHtml(r.productName)+'</div>'
       + '<div class="denuncia-meta"><span>${WKZ_ICO.clipboard} '+r.id+'</span><span>'+r.reasonLabel+'</span><span>${WKZ_ICO.clock} '+formatLogTime(r.createdAt)+'</span></div></div>'
