@@ -9451,10 +9451,36 @@ document.addEventListener('click', function (ev) {
     return;
   }
 
+  /* [FIX-SEC-ONCLICK-04] Sprint M26 — fechar modal via classList (padrão do
+     Seller: modais usam classe "open" em vez de style.display, ao contrário
+     do Admin). onclick="document.getElementById('x').classList.remove('open')"
+     vira data-close-modal-class="x". Também dispara data-action2/data-args2
+     se presentes, no mesmo elemento — cobre os casos de "fecha ESTE modal E
+     abre outro em seguida" sem precisar duplicar a lógica de encadeamento. */
+  var closeModalTarget = ev.target.closest ? ev.target.closest('[data-close-modal-class]') : null;
+  if (closeModalTarget) {
+    var modalEl = document.getElementById(closeModalTarget.getAttribute('data-close-modal-class'));
+    if (modalEl && modalEl.classList) modalEl.classList.remove('open');
+    var cmAction2 = closeModalTarget.getAttribute('data-action2');
+    if (cmAction2) _wkzDispatchAction(closeModalTarget, ev, 'data-action2', 'data-args2');
+    return;
+  }
+
   // [FIX-SEC-ONCLICK-02] Navegação simples (onclick="window.location.href='...'").
   var hrefTarget = ev.target.closest ? ev.target.closest('[data-nav-href]') : null;
   if (hrefTarget) {
     window.location.href = hrefTarget.getAttribute('data-nav-href');
+    return;
+  }
+
+  // [FIX-SEC-ONCLICK-04] Sprint M26 — define o valor de um input/textarea a
+  // partir de um texto fixo (ex.: botões de resposta rápida pré-escrita).
+  // onclick="document.getElementById('x').value='texto'" vira
+  // data-set-value-target="x" data-set-value="texto".
+  var setValueTarget = ev.target.closest ? ev.target.closest('[data-set-value-target]') : null;
+  if (setValueTarget) {
+    var svEl = document.getElementById(setValueTarget.getAttribute('data-set-value-target'));
+    if (svEl) svEl.value = setValueTarget.getAttribute('data-set-value') || '';
     return;
   }
 
@@ -9502,6 +9528,14 @@ function _wkzDispatchAction(el, ev, actionAttr, argsAttr) {
       if (a === '$event') return ev;
       if (typeof a === 'string' && a.indexOf('$tabBtn:') === 0) {
         return document.querySelector('[data-tab="' + a.slice(8) + '"]');
+      }
+      // [FIX-SEC-ONCLICK-04] Sprint M26 — lê o valor atual de um input/select
+      // no momento do clique (ex.: onclick="minhaFuncao(document.getElementById('x').value)").
+      // Resolvido em tempo de clique, não de carregamento da página — o valor
+      // reflete o que a pessoa digitou/selecionou até aquele momento.
+      if (typeof a === 'string' && a.indexOf('$value:') === 0) {
+        var vEl = document.getElementById(a.slice(7));
+        return vEl ? vEl.value : '';
       }
       return a;
     });
