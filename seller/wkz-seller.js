@@ -2754,7 +2754,20 @@ function wkzSellerConfirmDispatch(orderId, trackingCode, carrier, btn) {
   }
 
   /* 6 — Atualiza botão na tabela para "Ver Rastreio" */
-  document.querySelectorAll('button[onclick*="marcarEnviado(\'' + orderId + '\'"]').forEach(function(b) {
+  /* [FIX-SEC-ONCLICK-06] Sprint M27 — mesma correção: o seletor CSS
+     [onclick*="marcarEnviado(...)"] parava de encontrar o botão depois que
+     a Sprint M26 converteu marcarEnviado pra data-action — o botão nunca
+     mais atualizava para "Ver Rastreio" depois de confirmar o despacho.
+     Corrigido filtrando por data-args em vez de depender do texto do onclick. */
+  document.querySelectorAll('button[data-action="marcarEnviado"], button[onclick*="marcarEnviado(\'' + orderId + '\'"]').forEach(function(b) {
+    var mvArgsRaw = b.getAttribute('data-args');
+    var mvMatches = false;
+    if (mvArgsRaw) {
+      try { var mvArgs = JSON.parse(mvArgsRaw); if (mvArgs[0] === orderId) mvMatches = true; } catch (e) {}
+    } else {
+      mvMatches = true; // veio do seletor de onclick antigo (fallback), já bate por construção
+    }
+    if (!mvMatches) return;
     b.innerHTML = WKZ_ICO.mapPin + ' Rastreio';
     b.onclick = function() { showToast(WKZ_ICO.package + ' Rastreio ' + orderId + ': ' + trk + ' (' + carrier + ')'); };
   });
@@ -3911,7 +3924,22 @@ window.kzNegSetMargin = function (val) {
   var input = document.getElementById('kzNegMarginInput');
   if (input) input.value = val;
   document.querySelectorAll('#kzNegMarginChips .filter-chip').forEach(function (b) { b.classList.remove('active'); });
-  var activeBtn = document.querySelector('#kzNegMarginChips .filter-chip[onclick*="kzNegSetMargin(' + val + ')"]');
+  /* [FIX-SEC-ONCLICK-06] Sprint M27 — mesma classe de bug encontrada e
+     corrigida no wkz-buyer.js/wkz-core.js desta sprint: este seletor CSS
+     procurava o botão certo pelo TEXTO do onclick ([onclick*="..."]).
+     A Sprint M26 converteu kzNegSetMargin pra data-action, o que quebrou
+     silenciosamente esse destaque visual — o chip clicado parava de ficar
+     marcado como ativo. Corrigido checando data-args primeiro. */
+  var activeBtn = null;
+  document.querySelectorAll('#kzNegMarginChips .filter-chip').forEach(function (b) {
+    var chipArgsRaw = b.getAttribute('data-args');
+    if (chipArgsRaw) {
+      try { var chipArgs = JSON.parse(chipArgsRaw); if (String(chipArgs[0]) === String(val)) activeBtn = b; } catch (e) {}
+    }
+  });
+  if (!activeBtn) {
+    activeBtn = document.querySelector('#kzNegMarginChips .filter-chip[onclick*="kzNegSetMargin(' + val + ')"]');
+  }
   if (activeBtn) activeBtn.classList.add('active');
   kzNegMarginPreview(val);
 };
