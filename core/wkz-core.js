@@ -6154,7 +6154,12 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   window.cpRefreshOrders = function() {
     /* FUNC-05 */
-    var btn = document.querySelector('[onclick="cpRefreshOrders()"]');
+    /* [FIX-SEC-ONCLICK-06] Sprint M27 — mesma classe de bug: este seletor
+       procurava o botão pelo texto exato do onclick. O botão já foi
+       convertido pra data-action="cpRefreshOrders" nesta sprint — sem
+       este fix, o spinner de "Sincronizando…" parava de aparecer (a
+       função ainda funcionava, só a animação de carregamento sumia). */
+    var btn = document.querySelector('[data-action="cpRefreshOrders"], [onclick="cpRefreshOrders()"]');
     if (btn && btn._syncing) return;
     if (btn) {
       btn._syncing = true; btn._origHTML = btn.innerHTML;
@@ -8314,8 +8319,15 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
 
   function _cpMarkPendingReviewDone(orderId) {
     document.querySelectorAll('.cp-review-item').forEach(function(item) {
+      /* [FIX-SEC-ONCLICK-06] Sprint M27 — mesma classe de bug do searchFaqs()
+         acima: este código procurava o orderId dentro do texto bruto do
+         onclick. Como o elemento .cp-review-item já foi convertido pra
+         data-action/data-args nesta mesma sprint, o onclick não existe mais
+         — checa data-args (JSON) primeiro, com o texto bruto como fallback. */
       var onclickAttr = item.getAttribute('onclick') || '';
-      if (onclickAttr.indexOf(orderId) !== -1) {
+      var argsRaw = item.getAttribute('data-args') || '';
+      var matchesOrder = argsRaw.indexOf(orderId) !== -1 || onclickAttr.indexOf(orderId) !== -1;
+      if (matchesOrder) {
         item.style.transition = 'opacity 0.4s';
         item.style.opacity = '0.4';
         item.style.pointerEvents = 'none';
@@ -9120,8 +9132,27 @@ window.searchFaqs = function() {
     const activeBtn = document.querySelector('.faq-theme-btn.active') || document.querySelector('.faq-theme-btn');
     let theme = 'pedidos';
     if (activeBtn) {
-      const m = (activeBtn.getAttribute('onclick') || '').match(/showFaqTheme\('([a-z]+)'/);
-      if (m) theme = m[1];
+      /* [FIX-SEC-ONCLICK-06] Sprint M27 — este código lia o atributo onclick
+         do botão ativo via regex pra descobrir qual tema estava selecionado
+         (onclick="showFaqTheme('vendedor',this)" → extrai "vendedor"). A
+         Sprint M25 converteu esse onclick para data-action/data-args, o que
+         SILENCIOSAMENTE quebrou esta leitura — a busca com campo vazio
+         voltava sempre para o tema "pedidos", ignorando o tema realmente
+         selecionado. Bug real, já estava em produção. Corrigido lendo
+         data-args (JSON) primeiro; o regex no onclick fica como fallback
+         só por segurança, caso algum ponto não convertido ainda exista. */
+      var dataArgsRaw = activeBtn.getAttribute('data-args');
+      var themeFound = false;
+      if (dataArgsRaw) {
+        try {
+          var parsedArgs = JSON.parse(dataArgsRaw);
+          if (parsedArgs && typeof parsedArgs[0] === 'string') { theme = parsedArgs[0]; themeFound = true; }
+        } catch (e) { /* ignora, cai no fallback abaixo */ }
+      }
+      if (!themeFound) {
+        const m = (activeBtn.getAttribute('onclick') || '').match(/showFaqTheme\('([a-z]+)'/);
+        if (m) theme = m[1];
+      }
     }
     window.showFaqTheme(theme, activeBtn);
     return;
@@ -9446,8 +9477,7 @@ document.addEventListener('click', function (ev) {
   var actionTarget = ev.target.closest ? ev.target.closest('[data-action]') : null;
   if (actionTarget) {
     _wkzDispatchAction(actionTarget, ev, 'data-action', 'data-args');
-    var action2 = actionTarget.getAttribute('data-action2');
-    if (action2) _wkzDispatchAction(actionTarget, ev, 'data-action2', 'data-args2');
+    _wkzDispatchAction2(actionTarget, ev);
     return;
   }
 
@@ -9456,13 +9486,20 @@ document.addEventListener('click', function (ev) {
      do Admin). onclick="document.getElementById('x').classList.remove('open')"
      vira data-close-modal-class="x". Também dispara data-action2/data-args2
      se presentes, no mesmo elemento — cobre os casos de "fecha ESTE modal E
-     abre outro em seguida" sem precisar duplicar a lógica de encadeamento. */
+     abre outro em seguida" sem precisar duplicar a lógica de encadeamento.
+     [FIX-SEC-ONCLICK-05] Sprint M27 — o valor pode incluir a classe depois
+     de dois-pontos ("id:classe") pra casos que não usam "open" (o Buyer tem
+     modais que usam "active"/"visible" também). Sem dois-pontos, assume
+     "open" (mesmo padrão do Seller, continua funcionando sem mudança lá). */
   var closeModalTarget = ev.target.closest ? ev.target.closest('[data-close-modal-class]') : null;
   if (closeModalTarget) {
-    var modalEl = document.getElementById(closeModalTarget.getAttribute('data-close-modal-class'));
-    if (modalEl && modalEl.classList) modalEl.classList.remove('open');
-    var cmAction2 = closeModalTarget.getAttribute('data-action2');
-    if (cmAction2) _wkzDispatchAction(closeModalTarget, ev, 'data-action2', 'data-args2');
+    var cmcRaw = closeModalTarget.getAttribute('data-close-modal-class');
+    var cmcColonIdx = cmcRaw.indexOf(':');
+    var cmcId = cmcColonIdx === -1 ? cmcRaw : cmcRaw.slice(0, cmcColonIdx);
+    var cmcClass = cmcColonIdx === -1 ? 'open' : cmcRaw.slice(cmcColonIdx + 1);
+    var modalEl = document.getElementById(cmcId);
+    if (modalEl && modalEl.classList) modalEl.classList.remove(cmcClass);
+    _wkzDispatchAction2(closeModalTarget, ev);
     return;
   }
 
@@ -9487,11 +9524,20 @@ document.addEventListener('click', function (ev) {
   // [FIX-SEC-ONCLICK-02] Fechar modal ao clicar no fundo (fora do conteúdo).
   // Precisa ser ev.target === backdrop (não closest — um clique em QUALQUER
   // filho do modal não pode fechar o modal por engano, só o fundo em si).
+  // [FIX-SEC-ONCLICK-05] Sprint M27 — aceita um argumento opcional depois de
+  // dois-pontos ("funcao:arg"), pros poucos casos em que a função de fechar
+  // precisa saber QUAL sheet/modal fechar (ex.: closePdpSheet('bsHistorico') —
+  // várias sheets diferentes usam a mesma função de fechar, com ids diferentes).
   var backdrop = ev.target.hasAttribute && ev.target.hasAttribute('data-close-on-backdrop')
     ? ev.target : null;
   if (backdrop) {
-    var closeFn = backdrop.getAttribute('data-close-on-backdrop');
-    if (typeof window[closeFn] === 'function') window[closeFn]();
+    var bdRaw = backdrop.getAttribute('data-close-on-backdrop');
+    var bdColonIdx = bdRaw.indexOf(':');
+    var closeFn = bdColonIdx === -1 ? bdRaw : bdRaw.slice(0, bdColonIdx);
+    var closeArg = bdColonIdx === -1 ? null : bdRaw.slice(bdColonIdx + 1);
+    if (typeof window[closeFn] === 'function') {
+      if (closeArg !== null) window[closeFn](closeArg); else window[closeFn]();
+    }
     return;
   }
 
@@ -9537,10 +9583,42 @@ function _wkzDispatchAction(el, ev, actionAttr, argsAttr) {
         var vEl = document.getElementById(a.slice(7));
         return vEl ? vEl.value : '';
       }
+      // [FIX-SEC-ONCLICK-05] Sprint M27 — lê uma variável global no momento
+      // do clique (ex.: onclick="minhaFuncao(currentPdpIndex)" — currentPdpIndex
+      // é uma variável de página que muda conforme o produto sendo visto).
+      // Igual ao $value:, mas para variáveis JS soltas em vez de campos de
+      // formulário.
+      if (typeof a === 'string' && a.indexOf('$var:') === 0) {
+        return window[a.slice(5)];
+      }
+      // [FIX-SEC-ONCLICK-05] Sprint M27 — seletor CSS genérico, pros poucos
+      // casos que precisam de algo além de id (ex.: document.querySelector
+      // ('.auth-tab')). Mais poderoso que $tabBtn:, então só use quando
+      // $tabBtn:/$this não resolverem — o seletor é sempre fixo no HTML,
+      // nunca vem de entrada do usuário.
+      if (typeof a === 'string' && a.indexOf('$query:') === 0) {
+        return document.querySelector(a.slice(7));
+      }
       return a;
     });
   }
   fn.apply(null, args);
+}
+
+/* [FIX-SEC-ONCLICK-05] Sprint M27 — dispara data-action2/data-args2 se
+   presentes no elemento, com atraso opcional via data-action2-delay
+   (milissegundos). Cobre o caso de "fecha isto, DEPOIS de uma pausa breve
+   pra terminar a animação, navega pra outro lugar" — sem o atraso, a
+   navegação cortaria a transição visual pela metade. */
+function _wkzDispatchAction2(el, ev) {
+  var action2 = el.getAttribute('data-action2');
+  if (!action2) return;
+  var delay = parseInt(el.getAttribute('data-action2-delay'), 10);
+  if (delay > 0) {
+    setTimeout(function () { _wkzDispatchAction(el, ev, 'data-action2', 'data-args2'); }, delay);
+  } else {
+    _wkzDispatchAction(el, ev, 'data-action2', 'data-args2');
+  }
 }
 document.addEventListener('keydown', function (ev) {
   if (ev.key !== 'Enter' && ev.key !== ' ') return;
