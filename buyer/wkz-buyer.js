@@ -1221,11 +1221,22 @@ function syncWishHearts(){
   document.querySelectorAll('.product-card').forEach(card => {
     const btn = card.querySelector('.product-wish');
     if(!btn) return;
-    /* Try to find product index from onclick attr */
-    const onclickStr = btn.getAttribute('onclick') || '';
-    const m = onclickStr.match(/wishToggle\s*\(\s*this\s*,\s*(\d+)/);
-    if(!m) return;
-    const idx = parseInt(m[1]);
+    /* [FIX-SEC-ONCLICK-06] Sprint M27 — mesma classe de bug do searchFaqs()
+       (wkz-core.js): este código extraía o índice do produto do texto bruto
+       do onclick via regex. Convertido pra data-action nesta sprint, então
+       lê data-args (posição 1: ["$this", indice, "$event"]) primeiro —
+       o regex no onclick antigo fica só como fallback de segurança. */
+    let idx = null;
+    const argsRaw = btn.getAttribute('data-args');
+    if (argsRaw) {
+      try { const parsed = JSON.parse(argsRaw); if (typeof parsed[1] === 'number') idx = parsed[1]; } catch(e) {}
+    }
+    if (idx === null) {
+      const onclickStr = btn.getAttribute('onclick') || '';
+      const m = onclickStr.match(/wishToggle\s*\(\s*this\s*,\s*(\d+)/);
+      if(!m) return;
+      idx = parseInt(m[1]);
+    }
     const p = products[idx];
     if(!p) return;
     const productId = p.n + '_' + p.p;
@@ -1237,10 +1248,19 @@ function syncWishHearts(){
   document.querySelectorAll('.store-card').forEach(card => {
     const btn = card.querySelector('.btn-follow, .btn-unfollow');
     if(!btn) return;
-    const onclickStr = btn.getAttribute('onclick') || '';
-    const m = onclickStr.match(/toggleFollowStoreByName\s*\(\s*'([^']+)'/);
-    if(!m) return;
-    const storeName = m[1];
+    /* [FIX-SEC-ONCLICK-06] Sprint M27 — mesma correção: lê data-args
+       (posição 0: [nomeDaLoja, "$this"]) antes do texto bruto do onclick. */
+    let storeName = null;
+    const followArgsRaw = btn.getAttribute('data-args');
+    if (followArgsRaw) {
+      try { const parsed = JSON.parse(followArgsRaw); if (typeof parsed[0] === 'string') storeName = parsed[0]; } catch(e) {}
+    }
+    if (storeName === null) {
+      const onclickStr = btn.getAttribute('onclick') || '';
+      const m = onclickStr.match(/toggleFollowStoreByName\s*\(\s*'([^']+)'/);
+      if(!m) return;
+      storeName = m[1];
+    }
     const isFollowed = followedStores.some(fs => fs.n === storeName);
     btn.textContent = isFollowed ? '💔 Deixar de Seguir' : 'Seguir Loja';
     btn.className = isFollowed ? 'btn-unfollow' : 'btn-follow';
@@ -6675,10 +6695,19 @@ function cartBuyExpressNow(idx) {
   window.kzcInjectCompareButtons = function() {
     document.querySelectorAll('.product-card[data-name]').forEach(card => {
       if (card.querySelector('.kzc-compare-btn')) return; // já tem
-      // Descobrir índice via onclick do card
-      const m = (card.getAttribute('onclick') || '').match(/openProduct\((\d+)\)/);
-      if (!m) return;
-      const idx = parseInt(m[1], 10);
+      // Descobrir índice via data-args do card (antes: via onclick, quebrado
+      // pela conversão desta sprint — [FIX-SEC-ONCLICK-06], mesma correção
+      // aplicada em searchFaqs()/_cpMarkPendingReviewDone()/wishToggle sync).
+      let idx = null;
+      const cardArgsRaw = card.getAttribute('data-args');
+      if (cardArgsRaw) {
+        try { const parsed = JSON.parse(cardArgsRaw); if (typeof parsed[0] === 'number') idx = parsed[0]; } catch(e) {}
+      }
+      if (idx === null) {
+        const m = (card.getAttribute('onclick') || '').match(/openProduct\((\d+)\)/);
+        if (!m) return;
+        idx = parseInt(m[1], 10);
+      }
       if (isNaN(idx)) return;
 
       const btn = document.createElement('button');
