@@ -169,7 +169,7 @@ function renderAdminStores(filter = 'all') {
   if (filter !== 'all') data = data.filter(s => s.status === filter);
 
   if (data.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhuma loja nesta categoria no momento.</div>';
+    list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhuma loja nesta categoria no momento.</div>`;
     return;
   }
 
@@ -448,7 +448,7 @@ function renderAdminKyc(filter) {
   if (_admKycActiveFilter !== 'all') data = data.filter(k => k.status === _admKycActiveFilter);
 
   if (data.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhuma verificação nesta categoria.</div>';
+    list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhuma verificação nesta categoria.</div>`;
     return;
   }
 
@@ -645,7 +645,7 @@ function renderAdminReports(filter = 'all') {
   let data = [...ADMIN_REPORTS];
   if (filter === 'urgent')   data = data.filter(r => r.severity === 'urgent');
   if (filter === 'review')   data = data.filter(r => r.severity === 'review');
-  if (filter === 'resolved') { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhum produto resolvido recente.</div>'; return; }
+  if (filter === 'resolved') { list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);">${WKZ_ICO.check} Nenhum produto resolvido recente.</div>`; return; }
 
   list.innerHTML = data.map(r => `
     <div class="adm-report-card" id="admReport_${r.id}" data-rid="${r.id}">
@@ -1503,29 +1503,29 @@ function kzUpdateIntlShipping(kzLang, kzCurr) {
 /* Banco de respostas contextuais do Kz para o painel admin */
 const KZ_IA_RESPONSES = {
   faturamento: [
-    'Meus sensores financeiros estão ativos! ${WKZ_ICO.barChart} O <strong>GMV de Maio 2025 é R$ 4.872.340</strong>, com alta de +23,4% em relação a Abril. A receita líquida WeKz está em <strong>R$ 389.787</strong> (margem 8%). Excelente performance — <em>Eletrônicos domina 72%</em> do volume.',
-    'Análise de faturamento concluída! ${WKZ_ICO.money} Maio está <strong>+23,4% acima do mês anterior</strong>. Total de <strong>38.491 pedidos</strong> processados. O ticket médio é R$ 126,58 — <em>acima da meta de R$ 120</em>.',
+    `Meus sensores financeiros estão ativos! ${WKZ_ICO.barChart} O <strong>GMV de Maio 2025 é R$ 4.872.340</strong>, com alta de +23,4% em relação a Abril. A receita líquida WeKz está em <strong>R$ 389.787</strong> (margem 8%). Excelente performance — <em>Eletrônicos domina 72%</em> do volume.`,
+    `Análise de faturamento concluída! ${WKZ_ICO.money} Maio está <strong>+23,4% acima do mês anterior</strong>. Total de <strong>38.491 pedidos</strong> processados. O ticket médio é R$ 126,58 — <em>acima da meta de R$ 120</em>.`,
   ],
   lojas: [
-    'Escaneando lojas pendentes... ${WKZ_ICO.store} Atualmente <strong>7 lojas aguardam aprovação</strong>: 5 pendentes de revisão e 2 com documentação incompleta. Recomendo priorizar <em>GlowBeauty Shop</em> e <em>PetLife Store</em> que estão há mais de 48h sem resposta.',
-    'Radar de lojas ativo! ${WKZ_ICO.search} <strong>12.847 lojas ativas</strong> no período. Das 7 pendentes, 2 apresentam documentação incompleta — enviar e-mail automático de solicitação é a ação recomendada.',
+    `Escaneando lojas pendentes... ${WKZ_ICO.store} Atualmente <strong>7 lojas aguardam aprovação</strong>: 5 pendentes de revisão e 2 com documentação incompleta. Recomendo priorizar <em>GlowBeauty Shop</em> e <em>PetLife Store</em> que estão há mais de 48h sem resposta.`,
+    `Radar de lojas ativo! ${WKZ_ICO.search} <strong>12.847 lojas ativas</strong> no período. Das 7 pendentes, 2 apresentam documentação incompleta — enviar e-mail automático de solicitação é a ação recomendada.`,
   ],
   seguranca: [
-    'Auditoria de segurança iniciada! ${WKZ_ICO.lock} Tenho <strong>2 alertas ativos</strong>: 1 tentativa de acesso com credenciais inválidas (IP: 192.168.x.x) e 1 padrão suspeito de pedidos repetitivos. <em>Score de risco: 7.2/10</em> — ação preventiva recomendada.',
-    'Sensores de segurança detectaram atividade incomum! ${WKZ_ICO.warning} <strong>2 contas suspeitas</strong> identificadas com padrão de fraude (múltiplos pedidos em curto período). Uptime da plataforma: <strong>98,7%</strong> nos últimos 30 dias.',
+    `Auditoria de segurança iniciada! ${WKZ_ICO.lock} Tenho <strong>2 alertas ativos</strong>: 1 tentativa de acesso com credenciais inválidas (IP: 192.168.x.x) e 1 padrão suspeito de pedidos repetitivos. <em>Score de risco: 7.2/10</em> — ação preventiva recomendada.`,
+    `Sensores de segurança detectaram atividade incomum! ${WKZ_ICO.warning} <strong>2 contas suspeitas</strong> identificadas com padrão de fraude (múltiplos pedidos em curto período). Uptime da plataforma: <strong>98,7%</strong> nos últimos 30 dias.`,
   ],
   analise: [
-    'Análise completa da plataforma WeKz — Maio 2025: ${WKZ_ICO.trendUp} GMV: <strong>R$ 4.87M (+23,4%)</strong> · Net Revenue: <strong>R$ 389K (+19,1%)</strong> · Pedidos: <strong>38.491 (+5,9%)</strong> · Lojas ativas: <strong>12.847</strong> · NPS médio: <strong>4.89/5.0</strong> · Uptime: <strong>98,7%</strong>. Status geral: <em>Plataforma saudável!</em>',
-    'Visão 360° do ecossistema WeKz detectada! ${WKZ_ICO.globe} Destaques: <strong>Eletrônicos lidera com R$ 3,5M</strong> em GMV. Taxa de chargeback em <strong>0,8%</strong> (abaixo do limite de 1%). <em>3 produtos com denúncias urgentes</em> aguardam moderação. Recomendo ação antes das 18h.',
+    `Análise completa da plataforma WeKz — Maio 2025: ${WKZ_ICO.trendUp} GMV: <strong>R$ 4.87M (+23,4%)</strong> · Net Revenue: <strong>R$ 389K (+19,1%)</strong> · Pedidos: <strong>38.491 (+5,9%)</strong> · Lojas ativas: <strong>12.847</strong> · NPS médio: <strong>4.89/5.0</strong> · Uptime: <strong>98,7%</strong>. Status geral: <em>Plataforma saudável!</em>`,
+    `Visão 360° do ecossistema WeKz detectada! ${WKZ_ICO.globe} Destaques: <strong>Eletrônicos lidera com R$ 3,5M</strong> em GMV. Taxa de chargeback em <strong>0,8%</strong> (abaixo do limite de 1%). <em>3 produtos com denúncias urgentes</em> aguardam moderação. Recomendo ação antes das 18h.`,
   ],
   moderacao: [
-    'Moderação de produtos: escaneando base de dados... ${WKZ_ICO.warning} <strong>3 produtos com denúncias urgentes</strong> identificados: Smartphone Xclone (8 reportes), Tênis Supreme XLR (12 reportes — uso de marca), Suplemento "Emagrece Já" (5 reportes — alegações médicas). Ação de takedown recomendada nos 3.',
-    'Radar de denúncias ativo! ${WKZ_ICO.warning} <strong>15 produtos em análise</strong> neste ciclo: 3 urgentes, 12 em revisão. <em>Tênis Supreme XLR Ultra</em> lidera com 12 reportes de uso indevido de marca registrada — prioridade máxima.',
+    `Moderação de produtos: escaneando base de dados... ${WKZ_ICO.warning} <strong>3 produtos com denúncias urgentes</strong> identificados: Smartphone Xclone (8 reportes), Tênis Supreme XLR (12 reportes — uso de marca), Suplemento "Emagrece Já" (5 reportes — alegações médicas). Ação de takedown recomendada nos 3.`,
+    `Radar de denúncias ativo! ${WKZ_ICO.warning} <strong>15 produtos em análise</strong> neste ciclo: 3 urgentes, 12 em revisão. <em>Tênis Supreme XLR Ultra</em> lidera com 12 reportes de uso indevido de marca registrada — prioridade máxima.`,
   ],
   default: [
     'Lince Cibernético a postos! 🐱 Pode perguntar sobre faturamento, lojas pendentes, segurança, moderação de produtos ou qualquer métrica da plataforma. Estou monitorando o ecossistema WeKz em tempo real.',
-    'Sensores ativados! Ao seu dispor, Gestor. ${WKZ_ICO.target} Tenho acesso a todos os dados do painel — faturamento, aprovações, segurança, comunicados e configurações. O que deseja analisar?',
-    'Centro de Comando WeKz operacional! ${WKZ_ICO.shield} Maio 2025 está com <strong>performance acima da meta</strong> em todos os KPIs principais. GMV +23,4%, NPS 4.89, Uptime 98,7%. Alguma área específica para investigar?',
+    `Sensores ativados! Ao seu dispor, Gestor. ${WKZ_ICO.target} Tenho acesso a todos os dados do painel — faturamento, aprovações, segurança, comunicados e configurações. O que deseja analisar?`,
+    `Centro de Comando WeKz operacional! ${WKZ_ICO.shield} Maio 2025 está com <strong>performance acima da meta</strong> em todos os KPIs principais. GMV +23,4%, NPS 4.89, Uptime 98,7%. Alguma área específica para investigar?`,
   ],
 };
 
@@ -1757,7 +1757,7 @@ function renderDisputas(filter) {
   if (badge) badge.textContent = open;
 
   if (data.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--muted);">${WKZ_ICO.check} Nenhuma disputa nesta categoria.</div>';
+    list.innerHTML = `<div style="text-align:center;padding:48px;color:var(--muted);">${WKZ_ICO.check} Nenhuma disputa nesta categoria.</div>`;
     return;
   }
 
@@ -2058,7 +2058,7 @@ function renderSaques(filter) {
         <td><div class="adm-saque-val-main">${fmtBRL(s.saldo)}</div></td>
         <td>
           <div class="adm-saque-val-main">${fmtBRL(s.solicitado)}</div>
-          ${s.risco === 'high' ? '<div class="adm-saque-val-sub" style="color:#EF4444;">${WKZ_ICO.warning} Risco alto</div>' : s.risco === 'med' ? '<div class="adm-saque-val-sub" style="color:#F59E0B;">${WKZ_ICO.warning} Verificar</div>' : ''}
+          ${s.risco === 'high' ? `<div class="adm-saque-val-sub" style="color:#EF4444;">${WKZ_ICO.warning} Risco alto</div>` : s.risco === 'med' ? `<div class="adm-saque-val-sub" style="color:#F59E0B;">${WKZ_ICO.warning} Verificar</div>` : ''}
         </td>
         <td><span class="adm-saque-comissao">${fmtBRL(comissaoVal)} <span style="font-size:10px;font-weight:500;color:var(--muted);">(${s.comissao}%)</span></span></td>
         <td><span class="adm-saque-liquido">${fmtBRL(liquido)}</span></td>
