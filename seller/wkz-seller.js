@@ -386,7 +386,7 @@ function _epField(id, label, value, type){
   const val = (value === undefined || value === null) ? '' : value;
   const borderStyle = isEmpty ? 'border-color:#F59E0B;' : '';
   const tooltip = isEmpty ? 'title="Este campo está vazio — não foi preenchido na publicação do produto"' : '';
-  const warnIcon = isEmpty ? ' <span style="color:#F59E0B;font-size:11px;" title="Campo vazio">${WKZ_ICO.warning} vazio na publicação</span>' : '';
+  const warnIcon = isEmpty ? ' <span style="color:#F59E0B;font-size:11px;" title="Campo vazio">' + WKZ_ICO.warning + ' vazio na publicação</span>' : '';
   if(type === 'textarea'){
     return `<div class="form-group">
       <label class="form-label">${label}${warnIcon}</label>
@@ -1377,7 +1377,7 @@ function openDisputeReplyModal(pedido, produto, comprador, motivo, data){
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn-add-cart" style="padding:11px 22px;font-size:13px;" data-close-modal-class="wkzDisputaModal">Cancelar</button>
-      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="enviarRespostaDisputa" data-args='["${pedido}}"]'>${WKZ_ICO.scale} Enviar Resposta</button>
+      <button class="btn-primary" style="padding:11px 24px;font-size:13px;" data-action="enviarRespostaDisputa" data-args='["${pedido}"]'>${WKZ_ICO.scale} Enviar Resposta</button>
     </div>
   `, {maxWidth:'520px'});
 }
@@ -1798,7 +1798,7 @@ function salvarMarketing(tipo){
         SELLER_COUPONS[freteCode]={disc:0,type:'frete',label:'Frete Grátis aplicado!',validade:null,usos:0,_used:0,seller:sellerStore};
       }
       if(typeof renderProducts==='function') renderProducts();
-      return WKZ_ICO.truck + ' Frete Grátis ativado! Produtos da loja <strong>'+sellerStore+'</strong> ganham o selo ${WKZ_ICO.truck} Grátis nas buscas e no carrinho. Cupom <strong>FRETE0</strong> activado.';
+      return WKZ_ICO.truck + ' Frete Grátis ativado! Produtos da loja <strong>'+sellerStore+'</strong> ganham o selo ' + WKZ_ICO.truck + ' Grátis nas buscas e no carrinho. Cupom <strong>FRETE0</strong> activado.';
     }
   };
   const result = msgs[tipo]?.();
@@ -2391,9 +2391,9 @@ function openOrderDetailModal(id, produto, comprador, valor, status, data, ender
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn-add-cart" style="padding:10px 16px;font-size:12px;" data-close-modal-class="wkzOrderDetailModal">Fechar</button>
-      ${isDisputa ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" data-close-modal-class="wkzOrderDetailModal">${WKZ_ICO.scale} Ver Disputa</button>' : ''}
-      ${isSent ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" onclick="showToast(\' + WKZ_ICO.clipboard + \' Código de rastreio copiado!\')">${WKZ_ICO.package} Copiar Rastreio</button>' : ''}
-      ${isPago ? '<button class="btn-primary" style="padding:10px 16px;font-size:12px;" data-action="marcarEnviado" data-args=\'["'+id+'","$this"]\'>${WKZ_ICO.truck} Marcar como Enviado</button>' : ''}
+      ${isDisputa ? `<button class="btn-primary" style="padding:10px 16px;font-size:12px;background:linear-gradient(135deg,#EF4444,#F97316);border:none;" data-close-modal-class="wkzOrderDetailModal">${WKZ_ICO.scale} Ver Disputa</button>` : ''}
+      ${isSent ? `<button class="btn-primary" style="padding:10px 16px;font-size:12px;" data-action="showToast" data-args='["Código de rastreio copiado!"]'>${WKZ_ICO.package} Copiar Rastreio</button>` : ''}
+      ${isPago ? `<button class="btn-primary" style="padding:10px 16px;font-size:12px;" data-action="marcarEnviado" data-args='["${id}","$this"]'>${WKZ_ICO.truck} Marcar como Enviado</button>` : ''}
     </div>
   `, {maxWidth:'560px'});
 }
@@ -3736,7 +3736,7 @@ var WkzKYC = (function() {
       '<form id="kycForm" style="display:flex;flex-direction:column;gap:16px;">' +
         // RG
         '<div>' +
-          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.file} RG ou CPF</label>' +
+          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">' + WKZ_ICO.file + ' RG ou CPF</label>' +
           '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" data-click-target="kycRG" id="kycRGZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de RG ou CPF</div>' +
@@ -3747,7 +3747,7 @@ var WkzKYC = (function() {
         '</div>' +
         // CNPJ
         '<div>' +
-          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.building} CNPJ e Inscrição Estadual</label>' +
+          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">' + WKZ_ICO.building + ' CNPJ e Inscrição Estadual</label>' +
           '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" data-click-target="kycCNPJ" id="kycCNPJZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de CNPJ</div>' +
@@ -3758,7 +3758,7 @@ var WkzKYC = (function() {
         '</div>' +
         // Comprovante
         '<div>' +
-          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">${WKZ_ICO.home} Comprovante de Residência/Sede</label>' +
+          '<label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">' + WKZ_ICO.home + ' Comprovante de Residência/Sede</label>' +
           '<div style="border:2px dashed rgba(34,197,94,0.3);border-radius:10px;padding:20px;text-align:center;background:rgba(34,197,94,0.04);cursor:pointer;" data-click-target="kycComp" id="kycCompZone">' +
             '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
             '<div style="font-weight:700;color:var(--text);margin-bottom:4px;">Upload de Comprovante</div>' +
@@ -4217,7 +4217,7 @@ function renderReports(filter){
   if(filter === 'closed') data = data.filter(function(r){ return r.status === 'resolvida'; });
 
   if(!data.length){
-    list.innerHTML = '<div class="denuncias-empty"><div class="big-icon">${WKZ_ICO.shield}</div><p>Nenhuma denúncia encontrada.</p></div>';
+    list.innerHTML = '<div class="denuncias-empty"><div class="big-icon">' + WKZ_ICO.shield + '</div><p>Nenhuma denúncia encontrada.</p></div>';
     return;
   }
 
@@ -4250,28 +4250,28 @@ function renderReports(filter){
     var actionHTML = '';
     if(r.status === 'defesa'){
       actionHTML = r.defesaSubmitted
-        ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">${WKZ_ICO.shield} Defesa enviada. Aguardando análise da equipe WeKz.</div>'
+        ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-size:12px;color:#A78BFA;">' + WKZ_ICO.shield + ' Defesa enviada. Aguardando análise da equipe WeKz.</div>'
         : '<div style="margin-top:14px;">'
-          + '<button data-action="toggleDefesaForm" data-args=\'["'+r.id+'"]\' style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">${WKZ_ICO.shield} Apresentar Defesa</button>'
+          + '<button data-action="toggleDefesaForm" data-args=\'["'+r.id+'"]\' style="width:100%;padding:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#A78BFA;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);">' + WKZ_ICO.shield + ' Apresentar Defesa</button>'
           + '<div id="defesa-form-'+r.id+'" style="display:none;margin-top:10px;">'
           + '<textarea id="defesa-text-'+r.id+'" placeholder="Explique sua versão dos fatos sobre esta denúncia..." style="width:100%;min-height:90px;padding:10px;font-size:12px;font-family:inherit;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;"></textarea>'
           + '<button data-action="submitDefesa" data-args=\'["'+r.id+'"]\' style="margin-top:8px;width:100%;padding:8px;background:var(--teal);border:none;color:#04201e;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Enviar Defesa</button>'
           + '</div></div>';
     } else if(r.status !== 'resolvida'){
-      actionHTML = '<button data-action="advanceStatus" data-args=\'["'+r.id+'"]\' style="margin-top:14px;width:100%;padding:8px;background:rgba(0,180,171,0.08);border:1px dashed rgba(0,180,171,0.3);color:var(--teal);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" title="Simula o avanço da análise interna da equipe WeKz">${WKZ_ICO.zap} [Demo] Simular avanço da análise WeKz</button>';
+      actionHTML = '<button data-action="advanceStatus" data-args=\'["'+r.id+'"]\' style="margin-top:14px;width:100%;padding:8px;background:rgba(0,180,171,0.08);border:1px dashed rgba(0,180,171,0.3);color:var(--teal);border-radius:8px;font-size:11px;cursor:pointer;transition:var(--transition);" title="Simula o avanço da análise interna da equipe WeKz">' + WKZ_ICO.zap + ' [Demo] Simular avanço da análise WeKz</button>';
     }
 
     var logsHTML = r.logs.map(function(log){
       return '<div class="log-entry"><div class="log-dot" style="background:'+log.color+';box-shadow:0 0 6px '+log.color+'55;"></div>'
         + '<div class="log-content"><div class="log-text">'+escapeHtml(log.text)+'</div>'
-        + '<div class="log-time">${WKZ_ICO.clock} '+formatLogTime(log.time)+'</div></div></div>';
+        + '<div class="log-time">' + WKZ_ICO.clock + ' '+formatLogTime(log.time)+'</div></div></div>';
     }).join('');
 
     return '<div class="denuncia-item" id="dItem-'+r.id+'">'
       + '<div class="denuncia-header" data-action="toggleDenuncia" data-args=\'["'+r.id+'"]\'>'
       + '<span style="font-size:24px;flex-shrink:0;">'+r.productEmoji+'</span>'
       + '<div class="denuncia-info"><div class="denuncia-title">'+escapeHtml(r.productName)+'</div>'
-      + '<div class="denuncia-meta"><span>${WKZ_ICO.clipboard} '+r.id+'</span><span>'+r.reasonLabel+'</span><span>${WKZ_ICO.clock} '+formatLogTime(r.createdAt)+'</span></div></div>'
+      + '<div class="denuncia-meta"><span>' + WKZ_ICO.clipboard + ' '+r.id+'</span><span>'+r.reasonLabel+'</span><span>' + WKZ_ICO.clock + ' '+formatLogTime(r.createdAt)+'</span></div></div>'
       + '<span class="denuncia-status '+si.cls+'">'+si.label+'</span>'
       + '<span class="denuncia-chevron">▼</span></div>'
       + '<div class="denuncia-logs"><div class="status-pipeline">'+pipelineHTML+'</div>'
