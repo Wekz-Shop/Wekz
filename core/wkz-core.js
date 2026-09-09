@@ -4359,6 +4359,39 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
    ══════════════════════════════════════════════════════════════════════ */
 (function() {
   /* Banco de dados de produtos mockados com inteligência WeKz */
+  /* ============================================================
+     TODO [kz-magic-fill-backend] — AGUARDANDO INTEGRAÇÃO REAL DE IA/BACK-END
+     ------------------------------------------------------------
+     Status atual (fase front-end): o "Preenchimento Mágico por IA" é uma
+     SIMULAÇÃO. Não existe nenhuma chamada de rede — nada acessa, baixa ou
+     lê de fato o conteúdo do link colado pelo usuário. `matchPreset()`
+     apenas procura palavras-chave no próprio texto/URL digitado e devolve
+     um dos 5 produtos fixos abaixo (ou o DEFAULT_PRESET genérico se nada
+     bater). O título/descrição/specs retornados são sempre os mesmos,
+     independente do produto real por trás do link.
+
+     O QUE FALTA PARA SER REAL:
+       1. Back-end/endpoint que receba a URL colada e:
+          a) chame um modelo de IA com capacidade de leitura de URL/web
+             (extrai título, specs, imagens, preço a partir da página), OU
+          b) faça scraping server-side + parse de Open Graph / JSON-LD da
+             página de origem (funciona bem em lojas próprias; sites como
+             Amazon bloqueiam scraping automatizado — ver ressalva de ToS
+             abaixo), OU
+          c) use a API oficial do marketplace de origem, se houver parceria.
+       2. Endpoint deve devolver JSON estruturado (title, shortDesc, desc,
+          tags, category, brand, images[], price) no mesmo formato que
+          `preset` já usa aqui — assim o restante de `kzMagicFill()`
+          (animação de digitação, preview, etc.) não muda.
+       3. Ressalva jurídica: extrair texto/imagens de páginas de terceiros
+          (ex.: Amazon) pode esbarrar em Termos de Uso e direitos autorais
+          do conteúdo (descrição e fotos pertencem à marca/varejista) —
+          validar com jurídico antes de ativar scraping em produção.
+
+     Até lá, o array abaixo (KZ_PRODUCT_PRESETS) e o DEFAULT_PRESET servem
+     só para permitir testar/validar a UX do fluxo de cadastro com dados
+     realistas. Não remover sem substituir pela integração real.
+     ============================================================ */
   const KZ_PRODUCT_PRESETS = [
     {
       keywords: ['fone','headphone','sony','xm','bluetooth','áudio','audio','earphone','airpod'],
@@ -5118,6 +5151,8 @@ wkzLog('[WkzShop v2.8.8] ✓ Blindagem Jurídica carregada (Marco Civil, CDC, ST
   };
 
   function matchPreset(query) {
+    // TODO [kz-magic-fill-backend]: troca de keyword-match local por chamada
+    // real de IA/scraping — ver bloco de explicação acima de KZ_PRODUCT_PRESETS.
     const q = query.toLowerCase();
     for (const preset of KZ_PRODUCT_PRESETS) {
       if (preset.keywords.some(kw => q.includes(kw))) return preset;
@@ -8505,6 +8540,10 @@ window.cpSimulateReferralConversion = function() {
 })();
 
   window.kzMagicFill = function() {
+    // TODO [kz-magic-fill-backend]: `prompt` aqui é só texto local (link colado
+    // ou descrição digitada) usado no keyword-match de matchPreset(). Nenhuma
+    // requisição é feita a esse link. Ver TODO detalhado acima de
+    // KZ_PRODUCT_PRESETS para o que falta pra virar uma extração real.
     const prompt   = (document.getElementById('kzMagicPrompt')?.value || '').trim();
     const fillBtn  = document.getElementById('kzMagicFillBtn');
     const statusEl = document.getElementById('kzMagicStatus');
