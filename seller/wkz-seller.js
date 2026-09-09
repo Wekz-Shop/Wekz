@@ -579,9 +579,15 @@ function addProdGoStep(step){
     if(currentAddProdStep===1){
       const t = document.getElementById('ap-title')?.value.trim();
       const c = document.getElementById('ap-cat')?.value;
+      /* FIX [ap-step1-short-desc]: "Descrição Curta" é marcada com * (obrigatório)
+         na tela (ver wkz-seller.html, label de ap-short-desc), mas não era
+         validada aqui — dava para avançar de etapa sem preenchê-la, e o campo
+         só seria pego (vazio) na hora de publicar, sem aviso claro nesta etapa. */
+      const sd = document.getElementById('ap-short-desc')?.value.trim();
       const d = document.getElementById('ap-desc')?.value.trim();
       if(!t){ showToast(WKZ_ICO.warning + ' Preencha o Título do Produto'); return; }
       if(!c){ showToast(WKZ_ICO.warning + ' Selecione uma Categoria'); return; }
+      if(!sd){ showToast(WKZ_ICO.warning + ' Preencha a Descrição Curta'); return; }
       if(!d){ showToast(WKZ_ICO.warning + ' Preencha a Descrição Completa'); return; }
     }
     if(currentAddProdStep===3){
