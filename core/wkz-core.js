@@ -8530,58 +8530,64 @@ window.cpSimulateReferralConversion = function() {
     /* Audit log */
     admAuditAdd && admAuditAdd('🤖', `Kz Magic Fill acionado — prompt: "${prompt.substring(0,60)}${prompt.length>60?'...':''}"`, 'Admin WeKz');
 
-    const steps = [
-      { delay: 300,  msg: '🔍 Identificando categoria e marca...' },
-      { delay: 800,  msg: '📝 Gerando título otimizado para SEO...' },
-      { delay: 1400, msg: '✍ Redigindo descrição persuasiva...' },
-      { delay: 2000, msg: '🏷 Sugerindo tags de alta conversão...' },
-      { delay: 2600, msg: '✅ Preenchimento concluído pelo Kz!' },
-    ];
-
-    steps.forEach(({ delay, msg }) => {
-      setTimeout(() => { if (statusTx) statusTx.textContent = msg; }, delay);
-    });
-
+    /* FIX [kz-magic-fill-sync] — Antes existiam DUAS linhas do tempo
+       rodando em paralelo e desacopladas uma da outra:
+         1) a lista `steps` acima, com setTimeouts fixos (300..2600ms)
+            que trocavam o texto de status — inclusive já anunciando
+            "✅ Preenchimento concluído pelo Kz!" aos 2600ms;
+         2) o preenchimento de fato dos campos, que só COMEÇAVA aos
+            600ms e ainda somava +100/+200/+400/+600ms de atraso
+            artificial extra entre campos — terminando de verdade só
+            perto dos 3.1s-4s (dependendo do tamanho dos textos do
+            preset), fora do controle de quem lia a segunda lista.
+       Resultado: a mensagem de "concluído" aparecia na tela antes do
+       preenchimento real terminar, e o botão continuava preso em
+       "⚡ Escaneando..." por mais 1-2s depois disso — dando a
+       impressão de que a IA tinha travado (o que o usuário reportou).
+       Agora há UMA ÚNICA linha do tempo: cada mensagem de status nasce
+       junto com a ação real que ela descreve (via await sequencial),
+       os atrasos artificiais extras foram removidos, e o botão só sai
+       de "Escaneando..." exatamente quando o último campo termina de
+       ser preenchido. O tempo total também caiu de ~3-4s para ~1.2-1.5s. */
     setTimeout(async function() {
-      /* Preenche título */
-      await setFieldAnimated('ap-title', preset.title, 0);
-      /* Atualiza contador de título */
-      const countEl = document.getElementById('ap-title-count');
-      if (countEl) countEl.textContent = preset.title.length + '/120';
+      if (statusTx) statusTx.textContent = '🔍 Identificando categoria e marca...';
 
-      /* Preenche categoria */
+      /* Preenche categoria (troca de valor é instantânea, sem animação) */
       if (preset.category) {
         const catEl = document.getElementById('ap-cat');
         if (catEl) { catEl.value = preset.category; if (typeof loadSubcats === 'function') loadSubcats(); }
       }
-
       /* Preenche marca */
-      if (preset.brand) await setFieldAnimated('ap-brand', preset.brand, 100);
+      if (preset.brand) await setFieldAnimated('ap-brand', preset.brand, 0);
 
-      /* Preenche descrição curta */
-      await setFieldAnimated('ap-short-desc', preset.shortDesc, 200);
+      if (statusTx) statusTx.textContent = '📝 Gerando título otimizado para SEO...';
+      await setFieldAnimated('ap-title', preset.title, 0);
+      const countEl = document.getElementById('ap-title-count');
+      if (countEl) countEl.textContent = preset.title.length + '/120';
 
-      /* Preenche descrição completa */
-      await setFieldAnimated('ap-desc', preset.desc, 400);
+      if (statusTx) statusTx.textContent = '✍ Redigindo descrição persuasiva...';
+      await setFieldAnimated('ap-short-desc', preset.shortDesc, 0);
+      await setFieldAnimated('ap-desc', preset.desc, 0);
 
-      /* Preenche tags */
-      await setFieldAnimated('ap-tags', preset.tags, 600);
-      if (typeof renderTagsPrev === 'function') setTimeout(renderTagsPrev, 700);
+      if (statusTx) statusTx.textContent = '🏷 Sugerindo tags de alta conversão...';
+      await setFieldAnimated('ap-tags', preset.tags, 0);
+      if (typeof renderTagsPrev === 'function') renderTagsPrev();
 
       /* Atualiza preview */
-      if (typeof updateProductPreview === 'function') setTimeout(updateProductPreview, 800);
+      if (typeof updateProductPreview === 'function') updateProductPreview();
 
-      /* Encerra scanning */
+      /* Encerra scanning — agora acontece de fato quando o preenchimento termina */
+      if (statusTx) statusTx.textContent = '✅ Preenchimento concluído pelo Kz!';
+      if (block)   block.classList.remove('is-scanning');
+      if (lince)   lince.classList.remove('scanning');
+      if (fillBtn) { fillBtn.disabled = false; fillBtn.textContent = '✨ Preencher Agora'; }
       setTimeout(function() {
-        if (block)   block.classList.remove('is-scanning');
-        if (lince)   lince.classList.remove('scanning');
-        if (fillBtn) { fillBtn.disabled = false; fillBtn.textContent = '✨ Preencher Agora'; }
         if (statusTx) statusTx.textContent = '✅ Formulário preenchido! Revise e ajuste conforme necessário.';
-        showToast && showToast('✨ Kz preencheu o formulário! Revise os dados antes de publicar.');
-        admAuditAdd && admAuditAdd('✨', `Kz Magic Fill concluído — produto "${preset.title.substring(0,50)}..."`, 'Kz IA');
-      }, 900);
+      }, 600);
+      showToast && showToast('✨ Kz preencheu o formulário! Revise os dados antes de publicar.');
+      admAuditAdd && admAuditAdd('✨', `Kz Magic Fill concluído — produto "${preset.title.substring(0,50)}..."`, 'Kz IA');
 
-    }, 600);
+    }, 250);
   };
 })();
 
