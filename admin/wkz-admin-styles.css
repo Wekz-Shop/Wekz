@@ -626,259 +626,17 @@ body.adm-mode .flash-back-btn {
   display: none;
 }
 
-@media(max-width:768px) {
-.adm-mobile-topbar {
-    display: block;
-    position: sticky;
-    top: 0;
-    z-index: 200;
-    height: 58px; /* altura fixa = exatamente o valor de top do nav (adm-sidebar), eliminando o gap onde o conteúdo aparecia ao rolar */
-    background: var(--card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0,180,171,0.2);
-    box-shadow: 0 2px 20px rgba(0,0,0,0.4), 0 0 0 0;
-  }
-.adm-mobile-topbar::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #00B4AB, #7C3AED, #2563EB);
-  }
-.adm-mobile-topbar-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px 10px;
-    height: 100%; /* preenche os 58px do topbar */
-    box-sizing: border-box;
-  }
-.adm-mobile-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-.adm-mobile-logo-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-.adm-mobile-logo-name {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    background: linear-gradient(135deg, #00B4AB, #7C3AED);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    line-height: 1;
-  }
-.adm-mobile-logo-sub {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 9px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: rgba(148,163,184,0.8);
-    line-height: 1;
-  }
-.adm-mobile-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(0,180,171,0.1);
-    border: 1px solid rgba(0,180,171,0.3);
-    border-radius: 50px;
-    padding: 5px 12px;
-    box-shadow: 0 0 12px rgba(0,180,171,0.15);
-  }
-.adm-mobile-badge-icon { font-size: 13px; }
-.adm-mobile-badge-label {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--teal);
-  }
-.adm-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-.adm-sidebar {
-    min-height: unset;
-    flex-direction: column;
-    overflow: visible;
-    padding: 0;
-    gap: 0;
-    border-right: none;
-    border-bottom: none;
-    position: sticky;
-    top: 58px; /* below adm-mobile-topbar */
-    z-index: 100;
-    background: var(--card);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-  }
-.adm-sidebar-brand,
-  .adm-user-card,
-  .adm-nav-sep { display: none !important; }
-.adm-nav-track {
-    position: relative;
-    overflow: hidden;
-    /* borda inferior como trilho */
-    border-bottom: 1px solid var(--border);
-  }
-.adm-nav-track::before,
-  .adm-nav-track::after {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0; z-index: 10;
-    width: 44px;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-.adm-nav-track::before {
-    left: 0;
-    background: linear-gradient(to right, var(--dark) 0%, transparent 100%);
-  }
-.adm-nav-track::after {
-    right: 0;
-    background: linear-gradient(to left, var(--dark) 0%, transparent 100%);
-  }
-.adm-nav-track.fade-left-hidden::before  { opacity: 0; }
-.adm-nav-track.fade-right-hidden::after  { opacity: 0; }
-.adm-nav {
-    flex-direction: row !important;
-    padding: 0 8px !important;
-    gap: 0 !important;
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    white-space: nowrap !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    width: 100% !important;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    align-items: stretch !important;
-    border-bottom: none !important;
-    box-sizing: border-box !important;
-  }
-.adm-nav::-webkit-scrollbar { display: none !important; }
-.adm-nav-item {
-    flex-shrink: 0 !important;
-    scroll-snap-align: start;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    padding: 8px 12px !important;
-    border-radius: 0 !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    white-space: nowrap !important;
-    background: transparent !important;
-    border: none !important;
-    color: var(--muted) !important;
-    transition: color 0.2s ease !important;
-    cursor: pointer !important;
-    position: relative !important;
-  }
-.adm-nav-item:hover {
-    background: transparent !important;
-    border: none !important;
-    color: var(--text) !important;
-  }
-.adm-nav-item.active {
-    background: transparent !important;
-    border: none !important;
-    color: var(--teal) !important;
-    font-weight: 800 !important;
-  }
-.adm-nav-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 2px;
-    background: var(--teal);
-    border-radius: 2px 2px 0 0;
-    box-shadow: 0 0 8px rgba(0,180,171,0.6);
-  }
-.adm-nav-item.adm-nav-danger {
-    color: rgba(239,68,68,0.65) !important;
-    border: none !important;
-    background: transparent !important;
-  }
-.adm-nav-item.adm-nav-danger:hover {
-    color: var(--c-error) !important;
-    background: transparent !important;
-    border: none !important;
-  }
-.adm-ico { display: inline-block; vertical-align: middle; flex-shrink: 0; }
-.adm-nav-badge {
-    font-size: 9px !important;
-    padding: 2px 6px !important;
-    margin-left: 2px !important;
-  }
-.adm-main { padding: 14px 12px 80px !important; }
-.adm-kz-banner {
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-  }
-.adm-kz-float {
-    flex-shrink: 0;
-    flex-basis: 48px;   /* largura fixa — impede o float de roubar espaço do body */
-    width: 48px;
-    align-items: center;
-  }
-.adm-kz-mascot svg {
-    width: 38px !important;
-    height: 38px !important;
-  }
-.adm-kz-chip {
-    display: none;
-  }
-.adm-kz-body {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    white-space: normal; /* garante quebra de linha normal */
-  }
-.adm-kz-label {
-    font-size: 9px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* mostra "✦ Lince Cibernético" — compensa o chip oculto */
-    display: block;
-  }
-.adm-kz-greeting {
-    font-size: 13px;
-    line-height: 1.3;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-.adm-kz-msg {
-    font-size: 12px;
-    line-height: 1.5;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    /* -webkit-line-clamp removido: cortava mensagem do Kz no mobile */
-  }
-.adm-kz-refresh {
-    align-self: flex-start;
-    flex-shrink: 0;
-    padding: 5px 8px;
-    font-size: 10px;
-    white-space: nowrap;
-  }
-}
+/* [FIX-mobile-cascade v1.0] O bloco @media(max-width:768px) que estava
+   aqui (topbar mobile, sidebar->nav horizontal, adm-kz-banner compacto)
+   foi MOVIDO para o final do arquivo. Motivo: ele ficava ANTES das
+   regras base (.adm-sidebar-brand, .adm-nav, .adm-kz-banner etc., mais
+   abaixo neste arquivo) — e em CSS, com especificidade igual, quem vem
+   DEPOIS no arquivo vence, media query ou não. Resultado: a maior parte
+   deste bloco era derrubada pelas regras base, e o layout desktop
+   continuava sendo aplicado em telas de celular (só as propriedades
+   marcadas !important sobreviviam). Ver final do arquivo para o bloco
+   completo, agora reposicionado depois de todas as regras base que ele
+   precisa sobrescrever. Nenhuma regra foi alterada, só reordenada. */
 
 .adm-sidebar-brand {
   display: flex;
@@ -980,70 +738,16 @@ body.adm-mode .flash-back-btn {
 .adm-main { padding: 16px; }
 }
 
-@media(max-width:600px) {
-.adm-metrics-grid {
-    grid-template-columns: 1fr;
-  }
-.adm-kpi-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-.adm-billing-grid {
-    grid-template-columns: 1fr;
-  }
-.adm-sec-kpi-row {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-.adm-metric-value {
-    font-size: clamp(17px, 5.5vw, 24px) !important;
-    overflow-wrap: break-word;
-    word-break: break-all;
-    line-height: 1.2;
-  }
-.adm-kpi-num {
-    font-size: clamp(20px, 7vw, 28px) !important;
-  }
-.adm-sec-kpi-num {
-    font-size: clamp(18px, 6vw, 26px) !important;
-  }
-.adm-metric-card {
-    padding: 14px 12px;
-    gap: 10px;
-  }
-.adm-metric-icon {
-    font-size: 22px !important;
-  }
-.adm-metric-label {
-    font-size: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-.adm-metric-sub {
-    font-size: 10px;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-.adm-chart-card {
-    padding: 14px 12px;
-    overflow-x: auto;
-  }
-.adm-bar-chart {
-    min-width: 260px;
-  }
-.adm-store-card, .adm-report-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-.adm-store-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-.adm-page-title {
-    font-size: 18px !important;
-  }
-}
+/* [FIX-mobile-cascade v1.0] O bloco @media(max-width:600px) que estava
+   aqui (grid de métricas/KPIs em 1-2 colunas, cards compactos, fonte
+   fluida) também foi MOVIDO para o final do arquivo, pelo mesmo motivo
+   do bloco de topbar/sidebar logo acima: ele vinha ANTES de
+   .adm-metrics-grid, .adm-kpi-row, .adm-metric-card etc. (definidas mais
+   abaixo), então a regra base — sem @media, mas posicionada depois —
+   sempre vencia a cascata e os cards de métricas continuavam em grid
+   multi-coluna larga (260px/180px mínimos) mesmo em telas de 400px,
+   causando overflow horizontal (exatamente o sintoma reportado: "só
+   versão desktop" / cards cortados na lateral). Ver final do arquivo. */
 
 .adm-panel { display: none; animation: wkzFadeIn 0.3s ease; }
 
@@ -2657,3 +2361,365 @@ textarea.wkz-input { resize: none; line-height: 1.5; }
 .btn-icon:hover{border-color:var(--teal);color:var(--teal);}
 .btn-icon:focus{outline:none;}
 .btn-icon-compact{padding:8px 9px!important;}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   [FIX-mobile-cascade v1.0] — Overrides mobile reposicionados
+   Sprint M-fix — Admin: layout mobile não estava sendo aplicado
+
+   Os dois blocos abaixo (@media max-width:768px e @media max-width:600px)
+   são EXATAMENTE os mesmos que existiam mais acima no arquivo, perto de
+   .adm-layout/.adm-sidebar e de .adm-metrics-grid/.adm-kpi-row — só
+   foram REORDENADOS pra cá, depois de todas as regras base que
+   sobrescrevem. Nenhuma propriedade, seletor ou valor foi alterado
+   (exceto duas linhas novas de min-width:0, ver [FIX-grid-shrink] abaixo).
+
+   Causa raiz do bug: em CSS, entre duas regras de mesma especificidade,
+   vence a que aparece DEPOIS no arquivo — estar dentro de @media não dá
+   prioridade extra sobre isso. Os blocos mobile estavam ANTES das
+   regras .adm-sidebar-brand, .adm-nav, .adm-kz-banner, .adm-metrics-grid,
+   .adm-kpi-row, .adm-metric-card etc., então a versão desktop (definida
+   depois) sempre vencia — inclusive em telas de celular. Resultado
+   visível: sidebar completa (todos os 13 itens) espremida na tela em vez
+   de virar nav horizontal, e cards de métricas em grid larga cortando
+   conteúdo na lateral (overflow horizontal), exatamente como reportado
+   nos screenshots do Admin no celular.
+
+   Segunda causa, independente, corrigida junto ([FIX-grid-shrink]): o
+   item de grid .adm-sidebar não tinha min-width:0, então o CSS Grid
+   media o "auto" do 1fr pela largura mínima do conteúdo interno (soma
+   de todos os itens do nav), não pela viewport — mesmo com overflow-x:
+   auto no nav aninhado. Isso sozinho já causava overflow horizontal de
+   ~1590px numa tela de 412px, independente do bug de cascata acima.
+
+   Com os blocos aqui embaixo — depois de TODAS as regras base do
+   arquivo, e com min-width:0 nos pontos certos — a cascata e o
+   encolhimento do grid funcionam como pretendido em qualquer largura de
+   tela, sem precisar adicionar !important em nada. ════════════════════
+   ════════════════════════════════════════════════════════════════════ */
+
+@media(max-width:768px) {
+.adm-mobile-topbar {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    height: 58px; /* altura fixa = exatamente o valor de top do nav (adm-sidebar), eliminando o gap onde o conteúdo aparecia ao rolar */
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,180,171,0.2);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.4), 0 0 0 0;
+  }
+.adm-mobile-topbar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00B4AB, #7C3AED, #2563EB);
+  }
+.adm-mobile-topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 10px;
+    height: 100%; /* preenche os 58px do topbar */
+    box-sizing: border-box;
+  }
+.adm-mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+.adm-mobile-logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+.adm-mobile-logo-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #00B4AB, #7C3AED);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+.adm-mobile-logo-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(148,163,184,0.8);
+    line-height: 1;
+  }
+.adm-mobile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,180,171,0.1);
+    border: 1px solid rgba(0,180,171,0.3);
+    border-radius: 50px;
+    padding: 5px 12px;
+    box-shadow: 0 0 12px rgba(0,180,171,0.15);
+  }
+.adm-mobile-badge-icon { font-size: 13px; }
+.adm-mobile-badge-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--teal);
+  }
+.adm-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+.adm-sidebar {
+    min-height: unset;
+    min-width: 0; /* [FIX-grid-shrink] item de grid não encolhe abaixo do
+      min-content do conteúdo interno por padrão (min-width:auto implícito
+      do CSS Grid) — mesmo com overflow-x:auto no nav aninhado, sem isso
+      a sidebar inteira ficava do tamanho da soma de todos os itens do
+      menu (~1590px), estourando a viewport em telas de celular. */
+    flex-direction: column;
+    overflow: visible;
+    padding: 0;
+    gap: 0;
+    border-right: none;
+    border-bottom: none;
+    position: sticky;
+    top: 58px; /* below adm-mobile-topbar */
+    z-index: 100;
+    background: var(--card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+.adm-sidebar-brand,
+  .adm-user-card,
+  .adm-nav-sep { display: none !important; }
+.adm-nav-track {
+    position: relative;
+    overflow: hidden;
+    min-width: 0; /* mesmo motivo do .adm-sidebar acima — propaga o
+      encolhimento até o container que efetivamente teria overflow-x. */
+    /* borda inferior como trilho */
+    border-bottom: 1px solid var(--border);
+  }
+.adm-nav-track::before,
+  .adm-nav-track::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; z-index: 10;
+    width: 44px;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+.adm-nav-track::before {
+    left: 0;
+    background: linear-gradient(to right, var(--dark) 0%, transparent 100%);
+  }
+.adm-nav-track::after {
+    right: 0;
+    background: linear-gradient(to left, var(--dark) 0%, transparent 100%);
+  }
+.adm-nav-track.fade-left-hidden::before  { opacity: 0; }
+.adm-nav-track.fade-right-hidden::after  { opacity: 0; }
+.adm-nav {
+    flex-direction: row !important;
+    padding: 0 8px !important;
+    gap: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    white-space: nowrap !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    width: 100% !important;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    align-items: stretch !important;
+    border-bottom: none !important;
+    box-sizing: border-box !important;
+  }
+.adm-nav::-webkit-scrollbar { display: none !important; }
+.adm-nav-item {
+    flex-shrink: 0 !important;
+    scroll-snap-align: start;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px 12px !important;
+    border-radius: 0 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--muted) !important;
+    transition: color 0.2s ease !important;
+    cursor: pointer !important;
+    position: relative !important;
+  }
+.adm-nav-item:hover {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text) !important;
+  }
+.adm-nav-item.active {
+    background: transparent !important;
+    border: none !important;
+    color: var(--teal) !important;
+    font-weight: 800 !important;
+  }
+.adm-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background: var(--teal);
+    border-radius: 2px 2px 0 0;
+    box-shadow: 0 0 8px rgba(0,180,171,0.6);
+  }
+.adm-nav-item.adm-nav-danger {
+    color: rgba(239,68,68,0.65) !important;
+    border: none !important;
+    background: transparent !important;
+  }
+.adm-nav-item.adm-nav-danger:hover {
+    color: var(--c-error) !important;
+    background: transparent !important;
+    border: none !important;
+  }
+.adm-ico { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.adm-nav-badge {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+    margin-left: 2px !important;
+  }
+.adm-main { padding: 14px 12px 80px !important; }
+.adm-kz-banner {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+.adm-kz-float {
+    flex-shrink: 0;
+    flex-basis: 48px;   /* largura fixa — impede o float de roubar espaço do body */
+    width: 48px;
+    align-items: center;
+  }
+.adm-kz-mascot svg {
+    width: 38px !important;
+    height: 38px !important;
+  }
+.adm-kz-chip {
+    display: none;
+  }
+.adm-kz-body {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: normal; /* garante quebra de linha normal */
+  }
+.adm-kz-label {
+    font-size: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* mostra "✦ Lince Cibernético" — compensa o chip oculto */
+    display: block;
+  }
+.adm-kz-greeting {
+    font-size: 13px;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+.adm-kz-msg {
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    /* -webkit-line-clamp removido: cortava mensagem do Kz no mobile */
+  }
+.adm-kz-refresh {
+    align-self: flex-start;
+    flex-shrink: 0;
+    padding: 5px 8px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+}
+
+@media(max-width:600px) {
+.adm-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+.adm-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+.adm-billing-grid {
+    grid-template-columns: 1fr;
+  }
+.adm-sec-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+.adm-metric-value {
+    font-size: clamp(17px, 5.5vw, 24px) !important;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    line-height: 1.2;
+  }
+.adm-kpi-num {
+    font-size: clamp(20px, 7vw, 28px) !important;
+  }
+.adm-sec-kpi-num {
+    font-size: clamp(18px, 6vw, 26px) !important;
+  }
+.adm-metric-card {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+.adm-metric-icon {
+    font-size: 22px !important;
+  }
+.adm-metric-label {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+.adm-metric-sub {
+    font-size: 10px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+.adm-chart-card {
+    padding: 14px 12px;
+    overflow-x: auto;
+  }
+.adm-bar-chart {
+    min-width: 260px;
+  }
+.adm-store-card, .adm-report-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+.adm-store-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+.adm-page-title {
+    font-size: 18px !important;
+  }
+}
