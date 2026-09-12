@@ -309,10 +309,15 @@ function admApproveStore(id, name) {
   if (typeof window.wkzUpdateSharedStoreRequest === 'function') {
     window.wkzUpdateSharedStoreRequest(id, { status: 'approved' });
   }
-  /* [v1.9.0] Actualiza mock supplier user status → desbloqueia Painel do Fornecedor */
-  if (typeof window.spdSetApprovalStatus === 'function') {
-    window.spdSetApprovalStatus('approved');
-  }
+  /* [FIX-fornecedores-escopo v1.1] Removido o gancho para
+     window.spdSetApprovalStatus(...) que existia aqui (e em
+     admRejectStore/admApproveKyc/admRejectKyc) — ele preparava o
+     desbloqueio de um "Painel do Fornecedor" que não existe no projeto
+     atual. Como a função nunca está definida hoje, o if(typeof===
+     'function') sempre falhava e o gancho não fazia nada na prática;
+     removido só para não deixar vestígio de uma feature fora de
+     escopo (mesma decisão da remoção do card "Fornecedores
+     Verificados" e das 2 mensagens do Kz Admin). */
 }
 
 function admRejectStore(id, name) {
@@ -333,10 +338,6 @@ function admRejectStore(id, name) {
   /* [FIX-seller-approval v1.0] Ver comentário equivalente em admApproveStore(). */
   if (typeof window.wkzUpdateSharedStoreRequest === 'function') {
     window.wkzUpdateSharedStoreRequest(id, { status: 'rejected' });
-  }
-  /* [v1.9.0] Actualiza mock supplier user status → mostra tela de rejeição */
-  if (typeof window.spdSetApprovalStatus === 'function') {
-    window.spdSetApprovalStatus('rejected');
   }
 }
 
@@ -593,7 +594,6 @@ function admApproveKyc(id) {
   admSyncKycBadge();
   admAuditAdd('✅', `KYC "${k.vendorName}" aprovado (protocolo ${k.protocol})`, 'Admin WeKz');
   showToast(WKZ_ICO.check + ' KYC de "' + k.vendorName + '" aprovado! Loja liberada para vender.');
-  if (typeof window.spdSetApprovalStatus === 'function') window.spdSetApprovalStatus('approved');
 }
 
 function admRejectKyc(id) {
@@ -612,7 +612,6 @@ function admRejectKyc(id) {
   admSyncKycBadge();
   admAuditAdd('🚫', `KYC "${k.vendorName}" recusado (protocolo ${k.protocol})`, 'Admin WeKz');
   showToast(WKZ_ICO.xCircle + ' KYC de "' + k.vendorName + '" recusado. Vendedor notificado.');
-  if (typeof window.spdSetApprovalStatus === 'function') window.spdSetApprovalStatus('rejected');
 }
 
 function admRequestMoreKycDocs(id) {
