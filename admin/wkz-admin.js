@@ -731,8 +731,12 @@ const KZ_ADMIN_MSGS = [
   'Radar WeKz ativo: <strong>Eletrônicos domina 72%</strong> do GMV este mês. Considere campanhas de diversificação em Moda e Casa.',
   'Gestão eficiente detectada! <strong>98,7% de uptime</strong> este mês. Os servidores estão em plena forma, Gestor.',
   'Análise de risco: <strong>2 vendedores</strong> apresentam padrão suspeito de pedidos em curto período. Revisão preventiva recomendada.',
-  'Novo módulo ativo! <strong>4 fornecedores</strong> aguardam verificação de conta no painel B2B. Revise CNPJ/documentos internacionais para manter o SLA.',
-  'Destaque B2B: <strong>18 fornecedores Premium</strong> ativos este mês geraram <strong>R$ 1,24M</strong> em volume atacado. Comissão B2B acumulada: R$ 43.533.',
+  /* [FIX-fornecedores-escopo v1.0] Removidas 2 mensagens que citavam um
+     "painel B2B de fornecedores" — a plataforma por enquanto só tem
+     compradores e vendedores; esse módulo não existe ainda, e a IA do
+     admin não deve mencionar um recurso inexistente. Ver também a
+     remoção do card "Fornecedores Verificados" em Usuários (mesmo
+     motivo). */
 ];
 
 function refreshAdminKzMsg() {
@@ -845,10 +849,20 @@ const COMM_HISTORY = [
 ];
 
 const COMM_TEMPLATES = {
+  /* [FIX-comunicados-templates v1.0] Os 3 templates abaixo (promoçao,
+     novidade, alerta) tinham "WKZ_ICO.xxx + ' '" concatenado dentro do
+     título. WKZ_ICO.* é uma string de marcação SVG feita para ser
+     injetada via innerHTML (usada em toasts/banners) — aqui ela ia
+     parar num campo de texto puro (<input>/<textarea>.value e depois
+     .textContent no preview), então em vez de um ícone aparecia o
+     código-fonte do SVG literal no Título e no Preview — Push
+     Notification. Removido; título volta a ser só texto, igual ao
+     template "manutencao" (que nunca teve esse prefixo e sempre
+     funcionou certo). */
   manutencao: { title:'Manutenção programada — [DATA] às [HH]h', msg:'Nossa plataforma ficará temporariamente indisponível para manutenção. Agradecemos a compreensão!' },
-  promoçao:   { title:WKZ_ICO.award + ' [NOME DA PROMOÇÃO] — até [X]% OFF!', msg:'Aproveite ofertas exclusivas em toda a plataforma. Promoção válida até [DATA]!' },
-  novidade:   { title:WKZ_ICO.sparkles + ' Novidade: [NOME DA FEATURE]', msg:'Lançamos [descrição]. Acesse agora e descubra todas as melhorias!' },
-  alerta:     { title:WKZ_ICO.warning + ' Aviso importante para [PÚBLICO]', msg:'[DESCREVA O ALERTA DE FORMA CLARA E OBJETIVA].' },
+  promoçao:   { title:'[NOME DA PROMOÇÃO] — até [X]% OFF!', msg:'Aproveite ofertas exclusivas em toda a plataforma. Promoção válida até [DATA]!' },
+  novidade:   { title:'Novidade: [NOME DA FEATURE]', msg:'Lançamos [descrição]. Acesse agora e descubra todas as melhorias!' },
+  alerta:     { title:'Aviso importante para [PÚBLICO]', msg:'[DESCREVA O ALERTA DE FORMA CLARA E OBJETIVA].' },
 };
 
 function setAudience(aud, btn) {

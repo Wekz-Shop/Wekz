@@ -453,14 +453,12 @@
               <div class="adm-metric-change adm-up">↑ +341 este mês</div>
             </div>
           </div>
-          <div class="adm-metric-card adm-metric-net">
-            <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 002 2h16a2 2 0 002-2V8l-7 5V8l-7 5V4H2v16z"/><line x1="17" y1="18" x2="17.01" y2="18" stroke-width="3"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3"/><line x1="7" y1="18" x2="7.01" y2="18" stroke-width="3"/></svg></div>
-            <div class="adm-metric-body">
-              <div class="adm-metric-label">Fornecedores Verificados</div>
-              <div class="adm-metric-value">247</div>
-              <div class="adm-metric-change adm-up">↑ +18 este mês</div>
-            </div>
-          </div>
+          <!-- [FIX-fornecedores-escopo v1.0] Card "Fornecedores Verificados"
+               removido: a plataforma por enquanto só tem compradores e
+               vendedores, sem programa de fornecedores/B2B. O total
+               "318.492 usuários registrados" no cabeçalho já soma apenas
+               Compradores (305.645) + Vendedores Ativos (12.847), então
+               remover este card não muda nenhum número exibido. -->
           <div class="adm-metric-card adm-metric-gross">
             <div class="adm-metric-icon"><svg class="adm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
             <div class="adm-metric-body">
