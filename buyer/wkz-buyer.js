@@ -1833,6 +1833,25 @@ const TRANSLATIONS = {
     trkSearchPlaceholder: 'Código do pedido (ex: WKZ-8821) ou código de rastreio',
     trkSearchBtn: 'Rastrear',
     trkRecentOrdersTitle: 'Pedidos recentes',
+    stockOutLabel: 'Esgotado temporariamente',
+    stockOutToastTitle: 'Produto esgotado',
+    stockOutToastSubTpl: '"{product}" está fora de estoque. Ative o alerta para ser avisado quando voltar.',
+    stockOutCopy: 'Este produto está temporariamente fora de estoque. Ative o alerta para ser o primeiro a saber quando voltar.',
+    stockCriticalLabelTpl: 'Restam apenas {stock} unidades!',
+    stockCriticalToastTitleTpl: '🔥 Quase esgotando — só {stock}!',
+    stockCriticalToastSubTpl: '"{product}" está acabando. Várias pessoas estão olhando agora.',
+    stockCriticalCopyTpl: '<strong>Alta demanda!</strong> Com {stock} unidades restantes e múltiplos compradores ativos, este produto pode esgotar a qualquer momento.',
+    stockLowLabelTpl: 'Estoque baixo — {stock} unidades',
+    stockLowToastTitleTpl: '⚠ Estoque baixo — {stock} unidades',
+    stockLowToastSubTpl: '"{product}" está com poucas unidades. Garanta o seu antes que acabe.',
+    stockLowCopyTpl: '<strong>{stock} unidades disponíveis.</strong> Produto com alta saída — garanta o seu antes que esgote.',
+    stockModerateLabelTpl: '{stock} unidades disponíveis',
+    stockModerateCopyTpl: 'Produto disponível com {stock} unidades em estoque.',
+    stockNormalLabel: 'Em estoque',
+    stockNormalCopy: 'Disponível. Envio em 1-2 dias úteis após confirmação do pagamento.',
+    pdpStockPrefix: 'Estoque:',
+    pdpStockOutShort: 'Esgotado',
+    pdpStockUnitsShort: 'unidades',
   },
 
   en: {
@@ -2286,6 +2305,25 @@ const TRANSLATIONS = {
     trkSearchPlaceholder: 'Order code (e.g. WKZ-8821) or tracking code',
     trkSearchBtn: 'Track',
     trkRecentOrdersTitle: 'Recent orders',
+    stockOutLabel: 'Temporarily out of stock',
+    stockOutToastTitle: 'Product out of stock',
+    stockOutToastSubTpl: '"{product}" is out of stock. Turn on the alert to be notified when it\'s back.',
+    stockOutCopy: 'This product is temporarily out of stock. Turn on the alert to be the first to know when it returns.',
+    stockCriticalLabelTpl: 'Only {stock} left!',
+    stockCriticalToastTitleTpl: '🔥 Almost sold out — only {stock} left!',
+    stockCriticalToastSubTpl: '"{product}" is running out. Several people are viewing it right now.',
+    stockCriticalCopyTpl: '<strong>High demand!</strong> With {stock} units left and multiple active buyers, this product could sell out any moment.',
+    stockLowLabelTpl: 'Low stock — {stock} units',
+    stockLowToastTitleTpl: '⚠ Low stock — {stock} units',
+    stockLowToastSubTpl: '"{product}" has few units left. Get yours before it\'s gone.',
+    stockLowCopyTpl: '<strong>{stock} units available.</strong> This product sells fast — get yours before it sells out.',
+    stockModerateLabelTpl: '{stock} units available',
+    stockModerateCopyTpl: 'Product available with {stock} units in stock.',
+    stockNormalLabel: 'In stock',
+    stockNormalCopy: 'Available. Ships in 1-2 business days after payment is confirmed.',
+    pdpStockPrefix: 'Stock:',
+    pdpStockOutShort: 'Sold out',
+    pdpStockUnitsShort: 'units',
   },
 
   es: {
@@ -2739,6 +2777,25 @@ const TRANSLATIONS = {
     trkSearchPlaceholder: 'Código del pedido (ej: WKZ-8821) o código de seguimiento',
     trkSearchBtn: 'Rastrear',
     trkRecentOrdersTitle: 'Pedidos recientes',
+    stockOutLabel: 'Agotado temporalmente',
+    stockOutToastTitle: 'Producto agotado',
+    stockOutToastSubTpl: '"{product}" está agotado. Activa la alerta para que te avisemos cuando vuelva.',
+    stockOutCopy: 'Este producto está agotado temporalmente. Activa la alerta para ser el primero en saber cuándo vuelva.',
+    stockCriticalLabelTpl: '¡Solo quedan {stock} unidades!',
+    stockCriticalToastTitleTpl: '🔥 Casi agotado — ¡solo {stock}!',
+    stockCriticalToastSubTpl: '"{product}" se está agotando. Varias personas lo están viendo ahora.',
+    stockCriticalCopyTpl: '<strong>¡Alta demanda!</strong> Con {stock} unidades restantes y varios compradores activos, este producto puede agotarse en cualquier momento.',
+    stockLowLabelTpl: 'Stock bajo — {stock} unidades',
+    stockLowToastTitleTpl: '⚠ Stock bajo — {stock} unidades',
+    stockLowToastSubTpl: '"{product}" tiene pocas unidades. Consigue el tuyo antes de que se agote.',
+    stockLowCopyTpl: '<strong>{stock} unidades disponibles.</strong> Producto de alta rotación — consigue el tuyo antes de que se agote.',
+    stockModerateLabelTpl: '{stock} unidades disponibles',
+    stockModerateCopyTpl: 'Producto disponible con {stock} unidades en stock.',
+    stockNormalLabel: 'En stock',
+    stockNormalCopy: 'Disponible. Se envía en 1-2 días hábiles tras confirmar el pago.',
+    pdpStockPrefix: 'Stock:',
+    pdpStockOutShort: 'Agotado',
+    pdpStockUnitsShort: 'unidades',
   },
 
   zh: {
@@ -3192,6 +3249,25 @@ const TRANSLATIONS = {
     trkSearchPlaceholder: '订单号（例如 WKZ-8821）或物流单号',
     trkSearchBtn: '查询',
     trkRecentOrdersTitle: '近期订单',
+    stockOutLabel: '暂时缺货',
+    stockOutToastTitle: '商品已售罄',
+    stockOutToastSubTpl: '“{product}”已缺货。开启提醒，补货后第一时间通知您。',
+    stockOutCopy: '该商品暂时缺货。开启提醒，第一时间获知补货消息。',
+    stockCriticalLabelTpl: '仅剩 {stock} 件！',
+    stockCriticalToastTitleTpl: '🔥 即将售罄——仅剩 {stock} 件！',
+    stockCriticalToastSubTpl: '“{product}”即将售罄，目前有多人正在浏览。',
+    stockCriticalCopyTpl: '<strong>需求火爆！</strong> 仅剩 {stock} 件库存，且有多位买家正在关注，随时可能售罄。',
+    stockLowLabelTpl: '库存不足——仅剩 {stock} 件',
+    stockLowToastTitleTpl: '⚠ 库存不足——仅剩 {stock} 件',
+    stockLowToastSubTpl: '“{product}”库存不多，欲购从速。',
+    stockLowCopyTpl: '<strong>现有库存 {stock} 件。</strong> 该商品热销中——欲购从速。',
+    stockModerateLabelTpl: '现有库存 {stock} 件',
+    stockModerateCopyTpl: '该商品现有库存 {stock} 件。',
+    stockNormalLabel: '有货',
+    stockNormalCopy: '现货供应。付款确认后1-2个工作日内发货。',
+    pdpStockPrefix: '库存：',
+    pdpStockOutShort: '已售罄',
+    pdpStockUnitsShort: '件',
   },
 
   fr: {
@@ -3645,6 +3721,25 @@ const TRANSLATIONS = {
     trkSearchPlaceholder: 'Code de commande (ex : WKZ-8821) ou numéro de suivi',
     trkSearchBtn: 'Suivre',
     trkRecentOrdersTitle: 'Commandes récentes',
+    stockOutLabel: 'Temporairement en rupture',
+    stockOutToastTitle: 'Produit en rupture',
+    stockOutToastSubTpl: '« {product} » est en rupture de stock. Activez l\'alerte pour être prévenu du retour.',
+    stockOutCopy: 'Ce produit est temporairement en rupture de stock. Activez l\'alerte pour être informé en premier de son retour.',
+    stockCriticalLabelTpl: 'Plus que {stock} en stock !',
+    stockCriticalToastTitleTpl: '🔥 Presque épuisé — plus que {stock} !',
+    stockCriticalToastSubTpl: '« {product} » se fait rare. Plusieurs personnes le consultent en ce moment.',
+    stockCriticalCopyTpl: '<strong>Forte demande !</strong> Avec {stock} unités restantes et plusieurs acheteurs actifs, ce produit peut être épuisé à tout moment.',
+    stockLowLabelTpl: 'Stock faible — {stock} unités',
+    stockLowToastTitleTpl: '⚠ Stock faible — {stock} unités',
+    stockLowToastSubTpl: '« {product} » ne compte que peu d\'unités. Assurez le vôtre avant la rupture.',
+    stockLowCopyTpl: '<strong>{stock} unités disponibles.</strong> Produit très demandé — assurez le vôtre avant la rupture.',
+    stockModerateLabelTpl: '{stock} unités disponibles',
+    stockModerateCopyTpl: 'Produit disponible avec {stock} unités en stock.',
+    stockNormalLabel: 'En stock',
+    stockNormalCopy: 'Disponible. Expédié sous 1 à 2 jours ouvrés après confirmation du paiement.',
+    pdpStockPrefix: 'Stock :',
+    pdpStockOutShort: 'Épuisé',
+    pdpStockUnitsShort: 'unités',
   },
 
   de: {
@@ -4098,6 +4193,25 @@ const TRANSLATIONS = {
     trkSearchPlaceholder: 'Bestellcode (z.B. WKZ-8821) oder Sendungsnummer',
     trkSearchBtn: 'Verfolgen',
     trkRecentOrdersTitle: 'Letzte Bestellungen',
+    stockOutLabel: 'Vorübergehend nicht vorrätig',
+    stockOutToastTitle: 'Produkt nicht vorrätig',
+    stockOutToastSubTpl: '„{product}“ ist nicht vorrätig. Aktivieren Sie den Alarm, um benachrichtigt zu werden.',
+    stockOutCopy: 'Dieses Produkt ist vorübergehend nicht vorrätig. Aktivieren Sie den Alarm, um als Erster informiert zu werden.',
+    stockCriticalLabelTpl: 'Nur noch {stock} Stück verfügbar!',
+    stockCriticalToastTitleTpl: '🔥 Fast ausverkauft — nur noch {stock}!',
+    stockCriticalToastSubTpl: '„{product}“ wird knapp. Mehrere Personen schauen es sich gerade an.',
+    stockCriticalCopyTpl: '<strong>Hohe Nachfrage!</strong> Mit nur noch {stock} Stück und mehreren aktiven Käufern kann dieses Produkt jederzeit ausverkauft sein.',
+    stockLowLabelTpl: 'Geringer Bestand — {stock} Stück',
+    stockLowToastTitleTpl: '⚠ Geringer Bestand — {stock} Stück',
+    stockLowToastSubTpl: '„{product}“ hat nur noch wenige Einheiten. Sichern Sie sich Ihres, bevor es ausverkauft ist.',
+    stockLowCopyTpl: '<strong>{stock} Stück verfügbar.</strong> Stark nachgefragtes Produkt — sichern Sie sich Ihres rechtzeitig.',
+    stockModerateLabelTpl: '{stock} Stück verfügbar',
+    stockModerateCopyTpl: 'Produkt verfügbar mit {stock} Stück auf Lager.',
+    stockNormalLabel: 'Auf Lager',
+    stockNormalCopy: 'Verfügbar. Versand innerhalb von 1-2 Werktagen nach Zahlungsbestätigung.',
+    pdpStockPrefix: 'Bestand:',
+    pdpStockOutShort: 'Ausverkauft',
+    pdpStockUnitsShort: 'Stück',
   },
 
   ja: {
@@ -4551,6 +4665,25 @@ const TRANSLATIONS = {
     trkSearchPlaceholder: '注文コード（例：WKZ-8821）または追跡番号',
     trkSearchBtn: '追跡する',
     trkRecentOrdersTitle: '最近の注文',
+    stockOutLabel: '一時的に在庫切れ',
+    stockOutToastTitle: '在庫切れの商品',
+    stockOutToastSubTpl: '「{product}」は在庫切れです。再入荷通知をオンにしてお知らせを受け取りましょう。',
+    stockOutCopy: 'この商品は一時的に在庫切れです。再入荷通知をオンにして、いち早くお知らせを受け取りましょう。',
+    stockCriticalLabelTpl: '残りわずか{stock}点！',
+    stockCriticalToastTitleTpl: '🔥 まもなく完売——残り{stock}点！',
+    stockCriticalToastSubTpl: '「{product}」は残りわずかです。今、複数の人が閲覧しています。',
+    stockCriticalCopyTpl: '<strong>人気商品！</strong> 残り{stock}点、複数の購入希望者がいるため、いつ完売してもおかしくありません。',
+    stockLowLabelTpl: '残りわずか——{stock}点',
+    stockLowToastTitleTpl: '⚠ 在庫少——残り{stock}点',
+    stockLowToastSubTpl: '「{product}」は在庫が少なくなっています。売り切れる前にお早めに。',
+    stockLowCopyTpl: '<strong>在庫{stock}点。</strong> 人気商品のため、売り切れる前にお早めに。',
+    stockModerateLabelTpl: '在庫{stock}点',
+    stockModerateCopyTpl: 'この商品は在庫{stock}点で購入可能です。',
+    stockNormalLabel: '在庫あり',
+    stockNormalCopy: '在庫あり。お支払い確認後1〜2営業日以内に発送します。',
+    pdpStockPrefix: '在庫：',
+    pdpStockOutShort: '完売',
+    pdpStockUnitsShort: '点',
   },
 };
 
@@ -4849,6 +4982,13 @@ function applyTranslations() {
      chamada de novo ao trocar idioma — reusa o código já digitado em
      #trkInput (sempre reflete o pedido atualmente exibido) só quando essa
      é a página ativa, mesma lógica de guarda usada para loja/categoria. */
+  /* [FIX v30] Widget de estoque da PDP (urgência/escassez) nunca era
+     re-renderizado ao trocar idioma — currentPdpIndex (já existente,
+     setado por openProduct()) diz qual produto está aberto agora. */
+  if (typeof currentPdpIndex !== 'undefined' && currentPdpIndex != null
+      && document.body.getAttribute('data-view') === 'product' && typeof renderStockWidget === 'function') {
+    renderStockWidget(currentPdpIndex);
+  }
   if (document.body.getAttribute('data-view') === 'tracking' && typeof loadTracking === 'function') {
     const trkInputEl = document.getElementById('trkInput');
     if (trkInputEl && trkInputEl.value) loadTracking(trkInputEl.value);
@@ -6245,7 +6385,7 @@ function openProduct(i){
     // Update qty max label
     var p=products[i];
     var qtyMax=document.getElementById('pdpQtyMax');
-    if(qtyMax&&p) qtyMax.textContent='Estoque: '+(p.stock===0?'Esgotado':(p.stock+' unidades'));
+    if(qtyMax&&p) qtyMax.textContent=t('pdpStockPrefix')+' '+(p.stock===0?t('pdpStockOutShort'):(p.stock+' '+t('pdpStockUnitsShort')));
     // Reset qty to 1 on product change
     var qn=document.getElementById('qtyNum'); if(qn) qn.textContent='1';
     // Reset stock toast shown flag for new product
@@ -9188,43 +9328,43 @@ function _stockLevel(stock) {
 function _stockConfig(level, stock, productName) {
   const configs = {
     out: {
-      label: 'Esgotado temporariamente',
+      label: t('stockOutLabel'),
       icon: '😔', accentColor: '#64748B',
-      toastTitle: 'Produto esgotado',
-      toastSub: `"${productName}" está fora de estoque. Ative o alerta para ser avisado quando voltar.`,
-      copy: 'Este produto está temporariamente fora de estoque. Ative o alerta para ser o primeiro a saber quando voltar.',
+      toastTitle: t('stockOutToastTitle'),
+      toastSub: t('stockOutToastSubTpl').replace('{product}', productName),
+      copy: t('stockOutCopy'),
       showBar: false, showToast: false,
     },
     critical: {
-      label: `Restam apenas ${stock} unidades!`,
+      label: t('stockCriticalLabelTpl').replace('{stock}', stock),
       icon: '🔥', accentColor: '#EF4444',
-      toastTitle: `🔥 Quase esgotando — só ${stock} ${stock === 1 ? 'unidade' : 'unidades'}!`,
-      toastSub: `"${productName}" está acabando. Várias pessoas estão olhando agora.`,
-      copy: `<strong>Alta demanda!</strong> Com ${stock} ${stock === 1 ? 'unidade restante' : 'unidades restantes'} e múltiplos compradores ativos, este produto pode esgotar a qualquer momento.`,
+      toastTitle: t('stockCriticalToastTitleTpl').replace('{stock}', stock),
+      toastSub: t('stockCriticalToastSubTpl').replace('{product}', productName),
+      copy: t('stockCriticalCopyTpl').replace('{stock}', stock),
       showBar: true, showToast: true,
     },
     low: {
-      label: `Estoque baixo — ${stock} unidades`,
+      label: t('stockLowLabelTpl').replace('{stock}', stock),
       icon: '⚠', accentColor: '#FF6B35',
-      toastTitle: `⚠ Estoque baixo — ${stock} unidades`,
-      toastSub: `"${productName}" está com poucas unidades. Garanta o seu antes que acabe.`,
-      copy: `<strong>${stock} unidades disponíveis.</strong> Produto com alta saída — garanta o seu antes que esgote.`,
+      toastTitle: t('stockLowToastTitleTpl').replace('{stock}', stock),
+      toastSub: t('stockLowToastSubTpl').replace('{product}', productName),
+      copy: t('stockLowCopyTpl').replace('{stock}', stock),
       showBar: true, showToast: true,
     },
     moderate: {
-      label: `${stock} unidades disponíveis`,
+      label: t('stockModerateLabelTpl').replace('{stock}', stock),
       icon: '📦', accentColor: '#F59E0B',
       toastTitle: null, // não dispara toast para moderado
       toastSub: null,
-      copy: `Produto disponível com ${stock} unidades em estoque.`,
+      copy: t('stockModerateCopyTpl').replace('{stock}', stock),
       showBar: true, showToast: false,
     },
     normal: {
-      label: 'Em estoque',
+      label: t('stockNormalLabel'),
       icon: '✅', accentColor: '#22C55E',
       toastTitle: null,
       toastSub: null,
-      copy: 'Disponível. Envio em 1-2 dias úteis após confirmação do pagamento.',
+      copy: t('stockNormalCopy'),
       showBar: false, showToast: false,
     },
   };
