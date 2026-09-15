@@ -57,6 +57,9 @@ forçada).
   `CAT_I18N_MAP` (já existente em core.js, usado antes só pela home).
 - `loadTracking()`: stepper, ETA/contagem regressiva, histórico, ações,
   card do pacote e bloco de custódia inteiro (5 estados) traduzidos.
+- `_stockConfig()` (widget de urgência/escassez de estoque da PDP —
+  "Restam apenas X unidades!", "Esgotado temporariamente" etc., os 5
+  estados) traduzido; hook de re-render adicionado via `currentPdpIndex`.
 - Corrigido o seletor `.footer-col h4` → `.footer-nav-col summary`; todos
   os 22 links do rodapé receberam `data-i18n`.
 - `applyTranslations()`/`updateCurrency()` agora re-renderizam Loja,
@@ -79,6 +82,13 @@ forçada).
 - **`title` de compliance no rodapé** (menções a Art. 49 CDC, Art. 19 MCI,
   NF-e) mantidos só em PT — são referências à legislação brasileira
   especificamente; recomendo não traduzir automaticamente texto legal.
+- **Não auditado ainda nesta sprint:** Carrinho, Checkout, Wishlist,
+  Chat/mensagens, ticker social da PDP ("18 vendidos nas últimas 2h"),
+  ferramenta de Comparar Produtos. Uma varredura rápida por padrões
+  (`grep` de literais em PT) não encontrou volume significativo de texto
+  fixo no Carrinho — parece já usar `t()` corretamente — mas não fiz a
+  verificação linha a linha que fiz nas páginas acima. Recomendo abrir
+  cada uma nos 7 idiomas antes de considerar o módulo de i18n "fechado".
 
 ## Como validar
 
