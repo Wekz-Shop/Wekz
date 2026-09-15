@@ -3294,7 +3294,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="page-category" class="page">
   <div class="tpl-page">
     <div class="tpl-breadcrumb">
-      <span data-action="showPage" data-args='["home"]'><span class="wkz-icon wkz-icon-home"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span> Home</span>
+      <span data-action="showPage" data-args='["home"]'><span class="wkz-icon wkz-icon-home"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span> <span data-i18n="breadcrumbHome">Home</span></span>
       <span class="sep">›</span>
       <span id="catBreadcrumb" style="color:var(--teal);">Categoria</span>
     </div>
@@ -3305,77 +3305,77 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="tpl-page-sub" id="catTemplateSub">18.400+ produtos • Vendedores verificados • Frete grátis em muitos itens</div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-        <select class="form-select wkz-select wkz-select--lg" id="catSortSelect" data-title="Ordenar por" onchange="renderCatProducts()">
-          <option value="">Mais relevantes</option>
-          <option value="price-asc">Menor preço</option>
-          <option value="price-desc">Maior preço</option>
-          <option value="rating">Melhor avaliação</option>
-          <option value="sales">Mais vendidos</option>
+        <select class="form-select wkz-select wkz-select--lg" id="catSortSelect" data-title="Ordenar por" data-i18n-title="catSortTitleAttr" onchange="renderCatProducts()">
+          <option value="" data-i18n="catMostRelevant">Mais relevantes</option>
+          <option value="price-asc" data-i18n="sortPriceAsc">Menor preço</option>
+          <option value="price-desc" data-i18n="sortPriceDesc">Maior preço</option>
+          <option value="rating" data-i18n="sortBestRating">Melhor avaliação</option>
+          <option value="sales" data-i18n="sortBestSelling">Mais vendidos</option>
         </select>
-        <select class="form-select wkz-select wkz-select--lg" id="catPerPageSelect" data-title="Por página" onchange="renderCatProducts()">
-          <option value="10">10 por página</option>
-          <option value="20">20 por página</option>
-          <option value="30">30 por página</option>
+        <select class="form-select wkz-select wkz-select--lg" id="catPerPageSelect" data-title="Por página" data-i18n-title="catPerPageTitleAttr" onchange="renderCatProducts()">
+          <option value="10" data-i18n="perPage10">10 por página</option>
+          <option value="20" data-i18n="perPage20">20 por página</option>
+          <option value="30" data-i18n="perPage30">30 por página</option>
         </select>
       </div>
     </div>
     <div class="listing-layout">
       <!-- Sidebar Filters -->
       <div class="listing-sidebar">
-        <h3>🎯 Filtrar</h3>
+        <h3 data-i18n="filterTitle">🎯 Filtrar</h3>
         <div class="sidebar-filter-group">
-          <div class="sfg-label">Buscar nesta categoria</div>
-          <input type="text" id="catKeywordSearch" class="wkz-input wkz-input--sm" style="width:100%;" placeholder="Ex.: RTX, 256GB, algodão..." autocomplete="off" oninput="renderCatProducts()" onkeydown="if(event.key==='Escape'){this.value='';renderCatProducts();}">
+          <div class="sfg-label" data-i18n="filterSearchInCat">Buscar nesta categoria</div>
+          <input type="text" id="catKeywordSearch" class="wkz-input wkz-input--sm" style="width:100%;" placeholder="Ex.: RTX, 256GB, algodão..." data-i18n-placeholder="filterKeywordPh" autocomplete="off" oninput="renderCatProducts()" onkeydown="if(event.key==='Escape'){this.value='';renderCatProducts();}">
         </div>
         <div class="sidebar-filter-group">
-          <div class="sfg-label">Faixa de Preço</div>
+          <div class="sfg-label" data-i18n="filterPriceRange">Faixa de Preço</div>
           <div class="price-range-wrap">
             <input type="range" class="price-range-slider" id="catPriceSlider" min="0" max="5000" value="5000" oninput="updatePriceRange(this.value)">
             <div class="price-range-labels"><span>R$ 0</span><span id="catPriceLabel">R$ 5.000</span></div>
           </div>
           <div class="filter-price-row" style="margin-top:10px;">
-            <input type="number" id="catPriceMin" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Mín" min="0" inputmode="numeric" oninput="syncCatPriceInputs()" onkeydown="if(event.key==='Enter'){this.blur();renderCatProducts();}">
+            <input type="number" id="catPriceMin" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Mín" data-i18n-placeholder="filterPriceMinPh" min="0" inputmode="numeric" oninput="syncCatPriceInputs()" onkeydown="if(event.key==='Enter'){this.blur();renderCatProducts();}">
             <span style="color:var(--muted);">—</span>
-            <input type="number" id="catPriceMax" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Máx" min="0" inputmode="numeric" oninput="syncCatPriceInputs()" onkeydown="if(event.key==='Enter'){this.blur();renderCatProducts();}">
+            <input type="number" id="catPriceMax" class="filter-input-sm wkz-input wkz-input--sm" placeholder="Máx" data-i18n-placeholder="filterPriceMaxPh" min="0" inputmode="numeric" oninput="syncCatPriceInputs()" onkeydown="if(event.key==='Enter'){this.blur();renderCatProducts();}">
           </div>
         </div>
         <div class="sidebar-filter-group">
-          <div class="sfg-label">Avaliação</div>
-          <div class="sfg-item"><input type="radio" name="catRating" value="4.5" onchange="renderCatProducts()"> <span>4.5★ ou mais</span></div>
-          <div class="sfg-item"><input type="radio" name="catRating" value="4" onchange="renderCatProducts()"> <span>4★ ou mais</span></div>
-          <div class="sfg-item"><input type="radio" name="catRating" checked value="0" onchange="renderCatProducts()"> <span>Todas</span></div>
+          <div class="sfg-label" data-i18n="filterRating">Avaliação</div>
+          <div class="sfg-item"><input type="radio" name="catRating" value="4.5" onchange="renderCatProducts()"> <span data-i18n="filterRating45">4.5★ ou mais</span></div>
+          <div class="sfg-item"><input type="radio" name="catRating" value="4" onchange="renderCatProducts()"> <span data-i18n="filterRating4">4★ ou mais</span></div>
+          <div class="sfg-item"><input type="radio" name="catRating" checked value="0" onchange="renderCatProducts()"> <span data-i18n="filterAll">Todas</span></div>
         </div>
         <div class="sidebar-filter-group">
-          <div class="sfg-label">Origem</div>
-          <div class="sfg-item"><input type="radio" name="catOrigin" value="" checked onchange="onCatOriginChange()"> <span>Todas</span></div>
-          <div class="sfg-item"><input type="radio" name="catOrigin" value="nacional" onchange="onCatOriginChange()"> <span>🇧🇷 Nacional</span></div>
-          <div class="sfg-item"><input type="radio" name="catOrigin" value="internacional" onchange="onCatOriginChange()"> <span>🌍 Internacional</span></div>
+          <div class="sfg-label" data-i18n="filterOrigin">Origem</div>
+          <div class="sfg-item"><input type="radio" name="catOrigin" value="" checked onchange="onCatOriginChange()"> <span data-i18n="filterAll">Todas</span></div>
+          <div class="sfg-item"><input type="radio" name="catOrigin" value="nacional" onchange="onCatOriginChange()"> <span data-i18n="filterNational">🇧🇷 Nacional</span></div>
+          <div class="sfg-item"><input type="radio" name="catOrigin" value="internacional" onchange="onCatOriginChange()"> <span data-i18n="filterInternational">🌍 Internacional</span></div>
           <div id="catUfWrap" style="display:none;margin-top:8px;">
-            <select class="form-select wkz-select wkz-select--sm" id="catUfSelect" data-title="Estado" style="width:100%;" onchange="renderCatProducts()">
-              <option value="">Todos os Estados</option>
+            <select class="form-select wkz-select wkz-select--sm" id="catUfSelect" data-title="Estado" data-i18n-title="filterState" style="width:100%;" onchange="renderCatProducts()">
+              <option value="" data-i18n="filterAllStates">Todos os Estados</option>
             </select>
           </div>
           <div id="catCountryWrap" style="display:none;margin-top:8px;">
-            <select class="form-select wkz-select wkz-select--sm" id="catCountrySelect" data-title="País" style="width:100%;" onchange="renderCatProducts()">
-              <option value="">Todos os Países</option>
+            <select class="form-select wkz-select wkz-select--sm" id="catCountrySelect" data-title="País" data-i18n-title="filterCountry" style="width:100%;" onchange="renderCatProducts()">
+              <option value="" data-i18n="filterAllCountries">Todos os Países</option>
             </select>
           </div>
         </div>
         <div id="catExtraFacets"><!-- facetas dinâmicas da categoria (marca, tamanho, plataforma...) --></div>
         <div class="sidebar-filter-group">
-          <div class="sfg-label">Envio</div>
-          <div class="sfg-item"><input type="checkbox" id="cfFree" onchange="renderCatProducts()"> <span>Frete Grátis</span><span class="sfg-count" id="cfFreeCount">0</span></div>
-          <div class="sfg-item"><input type="checkbox" id="cfFast" onchange="renderCatProducts()"> <span>Entrega Rápida</span><span class="sfg-count" id="cfFastCount">0</span></div>
+          <div class="sfg-label" data-i18n="filterShipping">Envio</div>
+          <div class="sfg-item"><input type="checkbox" id="cfFree" onchange="renderCatProducts()"> <span data-i18n="filterFreeShipChk">Frete Grátis</span><span class="sfg-count" id="cfFreeCount">0</span></div>
+          <div class="sfg-item"><input type="checkbox" id="cfFast" onchange="renderCatProducts()"> <span data-i18n="filterFastShipChk">Entrega Rápida</span><span class="sfg-count" id="cfFastCount">0</span></div>
         </div>
         <div class="sidebar-filter-group">
-          <div class="sfg-label">Condição</div>
-          <div class="sfg-item"><input type="radio" name="catCond" value="" checked onchange="renderCatProducts()"> <span>Todas</span></div>
-          <div class="sfg-item"><input type="radio" name="catCond" value="novo" onchange="renderCatProducts()"> <span>Novo</span></div>
-          <div class="sfg-item"><input type="radio" name="catCond" value="usado" onchange="renderCatProducts()"> <span>Usado</span></div>
-          <div class="sfg-item"><input type="radio" name="catCond" value="recondicionado" onchange="renderCatProducts()"> <span>Recondicionado</span></div>
+          <div class="sfg-label" data-i18n="filterCondition">Condição</div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="" checked onchange="renderCatProducts()"> <span data-i18n="filterAll">Todas</span></div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="novo" onchange="renderCatProducts()"> <span data-i18n="filterCondNew">Novo</span></div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="usado" onchange="renderCatProducts()"> <span data-i18n="filterCondUsed">Usado</span></div>
+          <div class="sfg-item"><input type="radio" name="catCond" value="recondicionado" onchange="renderCatProducts()"> <span data-i18n="filterCondRefurb">Recondicionado</span></div>
         </div>
-        <button class="filter-apply-btn" style="width:100%;" data-action="renderCatProducts" data-args="[]">Aplicar Filtros</button>
-        <button class="filter-clear-btn" style="width:100%;margin-top:8px;" data-action="clearCatFilters" data-args="[]">✕ Limpar</button>
+        <button class="filter-apply-btn" style="width:100%;" data-action="renderCatProducts" data-args="[]" data-i18n="filterApplyBtn">Aplicar Filtros</button>
+        <button class="filter-clear-btn" style="width:100%;margin-top:8px;" data-action="clearCatFilters" data-args="[]" data-i18n="filterClearBtn">✕ Limpar</button>
       </div>
       <!-- Product Grid -->
       <div>
@@ -3393,9 +3393,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="page-store-detail" class="page">
   <div style="max-width:1400px;margin:0 auto;padding:32px;">
     <div class="tpl-breadcrumb">
-      <span data-action="showPage" data-args='["home"]'><span class="wkz-icon wkz-icon-home"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span> Home</span>
+      <span data-action="showPage" data-args='["home"]'><span class="wkz-icon wkz-icon-home"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span> <span data-i18n="breadcrumbHome">Home</span></span>
       <span class="sep">›</span>
-      <span data-action="showPage" data-args='["stores"]'>Lojas</span>
+      <span data-action="showPage" data-args='["stores"]'><span data-i18n="breadcrumbStores">Lojas</span></span>
       <span class="sep">›</span>
       <span id="storeTplName" style="color:var(--teal);">TechStore</span>
     </div>
@@ -3408,10 +3408,10 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="store-tpl-name" id="storeTplTitle">TechStore Brasil</div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
             <span style="font-size:13px;display:flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F59E0B" stroke="#F59E0B" stroke-width="1" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> 4.9</span>
-            <span class="store-tag" style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg> Verificado</span>
+            <span class="store-tag" style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg> <span data-i18n="storeVerifiedBadge">Verificado</span></span>
             <!-- [REMOVIDO v2.1] Badge loja-oficial conforme solicitado pelo usuário -->
-            <span class="store-tag" style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg> Resposta rápida</span>
-            <span style="font-size:12px;color:var(--muted);">Membro desde 2022</span>
+            <span class="store-tag" style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg> <span data-i18n="storeQuickReplyBadge">Resposta rápida</span></span>
+            <span style="font-size:12px;color:var(--muted);"><span data-i18n="storeMemberSince">Membro desde</span> 2022</span>
           </div>
           <div class="store-tpl-stats" id="storeTplStats"></div>
         </div>
@@ -3419,10 +3419,10 @@ document.addEventListener('DOMContentLoaded', function() {
           <button class="btn-follow" data-action="showToast" data-args='["Seguindo a loja!"]'>
             <span style="display:inline-flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> Seguir</span>
           </button>
-          <button class="btn-primary" data-action="showToast" data-args='["Chat iniciado!"]'>
-            <span style="display:inline-flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Chat</span>
+          <button class="btn-primary" onclick="showToast(t('storeChatToast'))">
+            <span style="display:inline-flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> <span data-i18n="storeChatBtn">Chat</span></span>
           </button>
-          <button class="btn-icon" data-action="showToast" data-args='["Reporte enviado"]' title="Reportar loja">
+          <button class="btn-icon" onclick="showToast(t('storeReportToast'))" data-i18n-title="storeReportTitle" title="Reportar loja">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
           </button>
         </div>
@@ -3432,7 +3432,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;" id="storePolicies"></div>
     <!-- Store Products -->
     <div class="section-header" style="margin-bottom:20px;">
-      <h2 class="section-title"><span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> Produtos da <span id="storeTplNameTitle">Loja</span></h2>
+      <h2 class="section-title" id="storeProductsHeading"><span class="wkz-icon wkz-icon-tag"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> <span id="storeProductsOfWrap"><span data-i18n="storeProductsOfLabel">Produtos da</span> <span id="storeTplNameTitle">Loja</span></span></h2>
       <!-- [FIX v?] Selects agora ficam num container flex dedicado (igual ao
            cabeçalho de Eletrônicos) em vez de soltos direto no
            .section-header. Isso resolve dois problemas de uma vez: (1) o
@@ -3443,13 +3443,13 @@ document.addEventListener('DOMContentLoaded', function() {
            Eletrônicos. (2) Prepara a página para volumes grandes de produtos
            por loja (visão futura) com o mesmo padrão de 10/20/30 por página. -->
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-        <select class="form-select wkz-select wkz-select--lg" id="storeSortSelect" data-title="Ordenar por" onchange="renderStoreProducts()">
-          <option value="sales">Mais vendidos</option><option value="price-asc">Menor preço</option><option value="price-desc">Maior preço</option><option value="new">Mais novos</option>
+        <select class="form-select wkz-select wkz-select--lg" id="storeSortSelect" data-title="Ordenar por" data-i18n-title="storeSortTitleAttr" onchange="renderStoreProducts()">
+          <option value="sales" data-i18n="sortBestSelling">Mais vendidos</option><option value="price-asc" data-i18n="sortPriceAsc">Menor preço</option><option value="price-desc" data-i18n="sortPriceDesc">Maior preço</option><option value="new" data-i18n="sortNewest">Mais novos</option>
         </select>
-        <select class="form-select wkz-select wkz-select--lg" id="storePerPageSelect" data-title="Por página" onchange="renderStoreProducts()">
-          <option value="10">10 por página</option>
-          <option value="20">20 por página</option>
-          <option value="30">30 por página</option>
+        <select class="form-select wkz-select wkz-select--lg" id="storePerPageSelect" data-title="Por página" data-i18n-title="storePerPageTitleAttr" onchange="renderStoreProducts()">
+          <option value="10" data-i18n="perPage10">10 por página</option>
+          <option value="20" data-i18n="perPage20">20 por página</option>
+          <option value="30" data-i18n="perPage30">30 por página</option>
         </select>
       </div>
     </div>
@@ -3459,7 +3459,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:32px;" id="storePagination"></div>
     <!-- Store Reviews -->
     <div style="margin-top:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;">
-      <h3 style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="#F59E0B" stroke="#F59E0B" stroke-width="1" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> Avaliações da Loja</h3>
+      <h3 style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="#F59E0B" stroke="#F59E0B" stroke-width="1" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> <span data-i18n="storeReviewsTitleLabel">Avaliações da Loja</span></h3>
       <div id="storeReviewsList"></div>
     </div>
   </div>
@@ -3473,10 +3473,10 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="trk-topbar">
       <button class="trk-back" data-action="showPage" data-args='["home"]'>
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Home
+        <span data-i18n="breadcrumbHome">Home</span>
       </button>
-      <button class="trk-back" data-action="showPage" data-args='["client-profile"]'>Meus Pedidos</button>
-      <span class="trk-title">Rastrear Pedido</span>
+      <button class="trk-back" data-action="showPage" data-args='["client-profile"]'><span data-i18n="breadcrumbMyOrders">Meus Pedidos</span></button>
+      <span class="trk-title" data-i18n="trkPageTitle">Rastrear Pedido</span>
     </div>
 
     <div class="wkz-kz-illus-wrap">
@@ -3487,36 +3487,36 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- BUG-05 FIX: Banner de modo demonstração -->
     <div id="trkDemoBanner" style="display:flex;align-items:center;gap:10px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#FCD34D;">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span><strong style="color:#FDE68A;">⚙ Modo Demonstração</strong> — Os dados de rastreamento exibidos são fictícios. A integração com transportadoras reais (Correios, DHL, FedEx) será activada após o lançamento.</span>
+      <span data-i18n="trkDemoBannerText" data-i18n-html><strong style="color:#FDE68A;">⚙ Modo Demonstração</strong> — Os dados de rastreamento exibidos são fictícios. A integração com transportadoras reais (Correios, DHL, FedEx) será activada após o lançamento.</span>
     </div>
 
     <!-- Search -->
     <div class="trk-search-bar">
-      <input type="text" id="trkInput" placeholder="Código do pedido (ex: WKZ-8821) ou código de rastreio" value="WKZ-8821">
+      <input type="text" id="trkInput" placeholder="Código do pedido (ex: WKZ-8821) ou código de rastreio" data-i18n-placeholder="trkSearchPlaceholder" value="WKZ-8821">
       <button data-action="loadTracking" data-args='["$value:trkInput"]'>
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Rastrear
+        <span data-i18n="trkSearchBtn">Rastrear</span>
       </button>
     </div>
 
     <!-- Recent orders -->
-    <div class="trk-recent-title">Pedidos recentes</div>
+    <div class="trk-recent-title" data-i18n="trkRecentOrdersTitle">Pedidos recentes</div>
     <div class="trk-recent-chips">
       <div class="trk-recent-chip" data-action="loadTracking" data-args='["WKZ-8821"]'>
         <div class="chip-dot" style="background:#FF6B35;"></div>
-        WKZ-8821 · Saiu p/ entrega
+        WKZ-8821 · <span data-i18n="stepOutForDelivery">Saiu p/ entrega</span>
       </div>
       <div class="trk-recent-chip" data-action="loadTracking" data-args='["WKZ-8654"]'>
         <div class="chip-dot" style="background:#22C55E;"></div>
-        WKZ-8654 · Entregue
+        WKZ-8654 · <span data-i18n="stepDelivered">Entregue</span>
       </div>
       <div class="trk-recent-chip" data-action="loadTracking" data-args='["WKZ-8412"]'>
         <div class="chip-dot" style="background:var(--teal);"></div>
-        WKZ-8412 · Em trânsito
+        WKZ-8412 · <span data-i18n="stepTransit">Em trânsito</span>
       </div>
       <div class="trk-recent-chip" data-action="loadTracking" data-args='["WKZ-8200"]'>
         <div class="chip-dot" style="background:var(--muted);"></div>
-        WKZ-8200 · Confirmado
+        WKZ-8200 · <span data-i18n="stepConfirmed">Confirmado</span>
       </div>
     </div>
 
@@ -5225,12 +5225,12 @@ body.kzlive-active .bottom-nav {
           <details open>
             <summary>Comprar</summary>
             <div class="footer-col-links">
-              <a data-action="showPage" data-args='["pg-comprar-categorias"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>Todas as categorias</a>
-              <a data-action="showPage" data-args='["pg-comprar-ofertas"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/></svg>Ofertas do dia</a>
-              <a data-action="showPage" data-args='["pg-flash-info"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>Flash Sale</a>
-              <a data-action="showPage" data-args='["pg-live-info"]' style="display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-block;width:6px;height:6px;background:#EF4444;border-radius:50%;animation:kzlive-pulse 1.2s infinite;flex-shrink:0;"></span>Kz Live Shopping</a>
-              <a data-action="showPage" data-args='["pg-comprar-novos"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Produtos novos</a>
-              <a data-action="showPage" data-args='["pg-comprar-mais-vendidos"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>Mais vendidos</a>
+              <a data-action="showPage" data-args='["pg-comprar-categorias"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg><span data-i18n="footerAllCategories">Todas as categorias</span></a>
+              <a data-action="showPage" data-args='["pg-comprar-ofertas"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/></svg><span data-i18n="footerDealsOfDay">Ofertas do dia</span></a>
+              <a data-action="showPage" data-args='["pg-flash-info"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg><span data-i18n="footerFlashSale">Flash Sale</span></a>
+              <a data-action="showPage" data-args='["pg-live-info"]' style="display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-block;width:6px;height:6px;background:#EF4444;border-radius:50%;animation:kzlive-pulse 1.2s infinite;flex-shrink:0;"></span><span data-i18n="footerKzLive">Kz Live Shopping</span></a>
+              <a data-action="showPage" data-args='["pg-comprar-novos"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg><span data-i18n="footerNewProducts">Produtos novos</span></a>
+              <a data-action="showPage" data-args='["pg-comprar-mais-vendidos"]'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg><span data-i18n="sortBestSelling">Mais vendidos</span></a>
             </div>
           </details>
         </div>
@@ -5241,15 +5241,15 @@ body.kzlive-active .bottom-nav {
             <summary>Vender</summary>
             <div class="footer-col-links">
               <!-- 1. Abrir Minha Loja → landing page explicativa com CTA para cadastro -->
-              <a data-nav-href="../seller/wkz-seller.html#pg-abrir-loja" title="Saiba como abrir sua loja no WeKz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><rect x="9" y="13" width="6" height="9"/></svg>Abrir Minha Loja</a>
+              <a data-nav-href="../seller/wkz-seller.html#pg-abrir-loja" title="Saiba como abrir sua loja no WeKz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><rect x="9" y="13" width="6" height="9"/></svg><span data-i18n="footerOpenStore">Abrir Minha Loja</span></a>
               <!-- 2. Como Funciona → Engrenagem WeKz + Neutralidade Tecnológica (Art. 19 MCI) -->
-              <a data-nav-href="../seller/wkz-seller.html#pg-vender" title="Fluxo de intermediação e declaração de neutralidade tecnológica"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Como Funciona</a>
+              <a data-nav-href="../seller/wkz-seller.html#pg-vender" title="Fluxo de intermediação e declaração de neutralidade tecnológica"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span data-i18n="footerHowItWorks">Como Funciona</span></a>
               <!-- 3. Taxas e Comissões → Transparência + Regra NFS-e/NF-e -->
-              <a data-nav-href="../seller/wkz-seller.html#pg-vender-taxas" title="Tabela de tarifas e obrigações fiscais do Seller (NF-e)"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Taxas e Comissões</a>
+              <a data-nav-href="../seller/wkz-seller.html#pg-vender-taxas" title="Tabela de tarifas e obrigações fiscais do Seller (NF-e)"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span data-i18n="footerFeesCommissions">Taxas e Comissões</span></a>
               <!-- 4. Central do Vendedor → landing page explicativa com CTA para dashboard -->
-              <a data-nav-href="../seller/wkz-seller.html#pg-central-vendedor" title="Conheça as ferramentas da Central do Vendedor WeKz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M3 17h4v4H3z"/></svg>Central do Vendedor</a>
+              <a data-nav-href="../seller/wkz-seller.html#pg-central-vendedor" title="Conheça as ferramentas da Central do Vendedor WeKz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M3 17h4v4H3z"/></svg><span data-i18n="footerSellerCenter">Central do Vendedor</span></a>
               <!-- 5. Políticas Comerciais → CDC Art. 49, Brand Protection, Arbitragem -->
-              <a data-nav-href="../seller/wkz-seller.html#pg-vender-politicas" title="Compliance, CDC, combate à contrafação e mediação de disputas"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>Políticas Comerciais</a>
+              <a data-nav-href="../seller/wkz-seller.html#pg-vender-politicas" title="Compliance, CDC, combate à contrafação e mediação de disputas"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg><span data-i18n="footerBizPolicies">Políticas Comerciais</span></a>
             </div>
           </details>
         </div>
@@ -5259,12 +5259,12 @@ body.kzlive-active .bottom-nav {
           <details>
             <summary>Suporte</summary>
             <div class="footer-col-links">
-              <a data-nav-href="../legal/wkz-legal.html#pg-suporte"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>Central de Ajuda e FAQs da Plataforma</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-seguranca"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>Segurança &amp; Proteção da Compra</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-disputes"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Mediação de Disputas &amp; Reembolsos</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-tracking-info"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Rastreamento de Envios</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-returns"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Diretrizes de Devolução de Lojistas</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-techsupport"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Suporte Técnico Plataforma 24/7</a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-suporte"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg><span data-i18n="footerHelpCenter">Central de Ajuda e FAQs da Plataforma</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-seguranca"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg><span data-i18n="footerPurchaseSecurity">Segurança &amp; Proteção da Compra</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-disputes"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg><span data-i18n="footerDisputes">Mediação de Disputas &amp; Reembolsos</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-tracking-info"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span data-i18n="footerShipTracking">Rastreamento de Envios</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-returns"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg><span data-i18n="footerReturnGuidelines">Diretrizes de Devolução de Lojistas</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-techsupport"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span data-i18n="footerTechSupport">Suporte Técnico Plataforma 24/7</span></a>
             </div>
           </details>
         </div>
@@ -5274,12 +5274,12 @@ body.kzlive-active .bottom-nav {
           <details>
             <summary>WeKz</summary>
             <div class="footer-col-links">
-              <a data-nav-href="../legal/wkz-legal.html#pg-wekz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Sobre nós</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-terms"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>Termos de Uso</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-privacy"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Privacidade &amp; LGPD</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-antifraude"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>Anti-fraude</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-garantia-autenticidade"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="8" r="7"/><polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88"/></svg>Garantia de Autenticidade</a>
-              <a data-nav-href="../legal/wkz-legal.html#pg-wcag"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Acessibilidade</a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-wekz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg><span data-i18n="footerAboutUs">Sobre nós</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-terms"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg><span data-i18n="footerTerms">Termos de Uso</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-privacy"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><span data-i18n="footerPrivacyLgpd">Privacidade &amp; LGPD</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-antifraude"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg><span data-i18n="footerAntiFraud">Anti-fraude</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-garantia-autenticidade"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="8" r="7"/><polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88"/></svg><span data-i18n="footerAuthenticity">Garantia de Autenticidade</span></a>
+              <a data-nav-href="../legal/wkz-legal.html#pg-wcag"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;opacity:.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span data-i18n="footerAccessibility">Acessibilidade</span></a>
             </div>
           </details>
         </div>

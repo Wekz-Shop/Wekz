@@ -207,8 +207,8 @@ function renderProducts(list, page){
     pageList = list.slice(startIdx, startIdx + perPage);
     const rangeStart = totalItems ? startIdx + 1 : 0;
     const rangeEnd = Math.min(startIdx + perPage, totalItems);
-    const sortLabel = sortSel?.options[sortSel.selectedIndex]?.textContent || 'Relevância';
-    if(rb) rb.innerHTML = totalItems ? `<div class="search-result-bar"><span class="srb-count"><strong>${totalItems}</strong> produto${totalItems!==1?'s':''} <span style="color:var(--muted);font-weight:400;">(mostrando ${rangeStart}–${rangeEnd})</span></span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sortLabel}</span></div>` : '';
+    const sortLabel = sortSel?.options[sortSel.selectedIndex]?.textContent || t('sortRelevance');
+    if(rb) rb.innerHTML = totalItems ? `<div class="search-result-bar"><span class="srb-count">${t('resultsTotalTpl').replace('{n}','<strong>'+totalItems+'</strong>')} <span style="color:var(--muted);font-weight:400;">${t('showingRangeTpl').replace('{a}',rangeStart).replace('{b}',rangeEnd)}</span></span><span style="font-size:12px;color:var(--muted);">${t('sortedByLabel')} ${sortLabel}</span></div>` : '';
     if(pag) pag.innerHTML = totalPages > 1 ? buildFeatPaginationHTML(featCurrentPage, totalPages) : '';
     // Rola para o topo da grade ao trocar de página (não no carregamento inicial)
     if(typeof page === 'number') g.scrollIntoView({behavior:'smooth', block:'start'});
@@ -240,17 +240,17 @@ function renderProducts(list, page){
       <div class="product-img"><wkz-product-image src="${p.img||''}" emoji="${p.e}" alt="${p.n}"></wkz-product-image>
         <div class="product-badges">
           ${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}
-          ${p.badge==='new'?'<span class="badge badge-new">NOVO</span>':''}
+          ${p.badge==='new'?`<span class="badge badge-new">${t('badgeNew')}</span>`:''}
           ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
-          ${p._sponsored?'<span class="badge badge-ad">📢 Patrocinado</span>':''}
-          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">🚚 Grátis</span>':''}
-          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">🏷 Cupom</span>':''}
+          ${p._sponsored?`<span class="badge badge-ad">${t('badgeSponsored')}</span>`:''}
+          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?`<span class="badge badge-frete">${t('badgeFreeShip')}</span>`:''}
+          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?`<span class="badge badge-coupon">${t('badgeCoupon')}</span>`:''}
         </div>
         <button class="product-wish" data-action="wishToggle" data-args='["$this",${realIdx},"$event"]'>♡</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.n}</div>
-        <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?'<span class="store-official-tag">🏅 Loja Oficial</span>':''}</div>
+        <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?`<span class="store-official-tag">${t('officialStoreTag')}</span>`:''}</div>
         <div class="product-price">
           <span class="price-main">${formatPrice(p.p)}</span>
           <span class="price-old">${formatPrice(p.op)}</span>
@@ -258,10 +258,10 @@ function renderProducts(list, page){
         </div>
         <div class="product-meta">
           <div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div>
-          <div class="product-sales">${p.sales} vendidos</div>
+          <div class="product-sales">${p.sales} ${t('sold')}</div>
         </div>
-        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> Adicionar ao carrinho</span></button>
-        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> Comprar Agora</span></button>
+        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> ${t('addToCart')}</span></button>
+        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> ${t('buyNowPlain')}</span></button>
       </div>
     </div>`;
   }).join('');
@@ -291,9 +291,9 @@ function buildFeatPaginationHTML(current, total){
     nums.push(total);
   }
 
-  let html = pageBtn('‹ Anterior', current-1, {isNav:true, disabled: current===1});
+  let html = pageBtn(t('prevPageBtn'), current-1, {isNav:true, disabled: current===1});
   html += nums.map(n => n==='...' ? ellipsis : pageBtn(String(n), n)).join('');
-  html += pageBtn('Próxima ›', current+1, {isNav:true, disabled: current===total});
+  html += pageBtn(t('nextPageBtn'), current+1, {isNav:true, disabled: current===total});
   return html;
 }
 
@@ -1637,6 +1637,202 @@ const TRANSLATIONS = {
     cpTrackNoEvents: 'Ainda sem eventos registados.',
     cpTrackViewFullBtn: 'Ver Página Completa de Rastreio',
     minutes: 'minutos',
+
+    // ── Novas chaves i18n (loja, listagem, footer, moedas) — Sprint M30 ──
+    badgeNew: 'NOVO',
+    badgeSponsored: '📢 Patrocinado',
+    badgeCoupon: '🏷 Cupom',
+    badgeFreeShip: '🚚 Grátis',
+    officialStoreTag: '🏅 Loja Oficial',
+    buyNowPlain: 'Comprar Agora',
+    sortRelevance: 'Relevância',
+    sortedByLabel: 'Ordenado por:',
+    resultsFoundTpl: '{n} produto(s) encontrado(s)',
+    resultsTotalTpl: '{n} produto(s)',
+    showingRangeTpl: '(mostrando {a}–{b})',
+    prevPageBtn: '‹ Anterior',
+    nextPageBtn: 'Próxima ›',
+    noProductsFoundTitle: 'Nenhum produto encontrado',
+    tryAdjustFilters: 'Tente ajustar ou',
+    clearFiltersLink: 'limpar os filtros',
+    storeNoProductsMsg: 'Esta loja ainda não tem produtos publicados',
+    breadcrumbHome: 'Home',
+    breadcrumbStores: 'Lojas',
+    storeVerifiedBadge: 'Verificado',
+    storeQuickReplyBadge: 'Resposta rápida',
+    storeMemberSince: 'Membro desde',
+    storeFollowBtn: '+ Seguir',
+    storeUnfollowBtn: '💔 Deixar de Seguir',
+    storeChatBtn: 'Chat',
+    storeReportTitle: 'Reportar loja',
+    storeFollowToast: 'Seguindo a loja!',
+    storeChatToast: 'Chat iniciado!',
+    storeReportToast: 'Reporte enviado',
+    storeStatSales: 'Vendas',
+    storeStatFollowers: 'Seguidores',
+    storeStatProducts: 'Produtos',
+    storeStatRating: 'Avaliação',
+    storeProductsHeadingTpl: 'Produtos da {store}',
+    storeSortTitleAttr: 'Ordenar por',
+    storePerPageTitleAttr: 'Por página',
+    sortBestSelling: 'Mais vendidos',
+    sortPriceAsc: 'Menor preço',
+    sortPriceDesc: 'Maior preço',
+    sortNewest: 'Mais novos',
+    perPage10: '10 por página',
+    perPage20: '20 por página',
+    perPage30: '30 por página',
+    storeReviewsTitle: '⭐ Avaliações da Loja',
+    reviewVerifiedBadge: 'Compra verificada',
+    policyReturn30: '30 dias devolução',
+    policyOriginal: 'Produto original',
+    policyShip24h: 'Envio em 24h',
+    policyFastReply: 'Resp. imediata',
+    policySealed: 'Lacrado garantido',
+    policySerial: 'Serial válido',
+    policyExpressShip: 'Envio expresso',
+    policyAntiFraud: 'Anti-fraude ativo',
+    policySizeExchange: 'Troca de tamanho',
+    policyCertOriginal: 'Original certif.',
+    policyFreeShip: 'Frete grátis',
+    policyReviews50k: '+50k avaliações',
+    policyAuthentic: 'Produto autêntico',
+    policyInvoice: 'Nota fiscal',
+    policyPremiumPkg: 'Embalagem premium',
+    policyCrueltyFree: 'Cruelty-free',
+    policyTestStore: 'Loja de testes',
+    policyDevEnv: 'Ambiente de dev',
+    footerAllCategories: 'Todas as categorias',
+    footerDealsOfDay: 'Ofertas do dia',
+    footerFlashSale: 'Flash Sale',
+    footerKzLive: 'Kz Live Shopping',
+    footerNewProducts: 'Produtos novos',
+    footerOpenStore: 'Abrir Minha Loja',
+    footerHowItWorks: 'Como Funciona',
+    footerFeesCommissions: 'Taxas e Comissões',
+    footerSellerCenter: 'Central do Vendedor',
+    footerBizPolicies: 'Políticas Comerciais',
+    footerHelpCenter: 'Central de Ajuda e FAQs da Plataforma',
+    footerPurchaseSecurity: 'Segurança & Proteção da Compra',
+    footerDisputes: 'Mediação de Disputas & Reembolsos',
+    footerShipTracking: 'Rastreamento de Envios',
+    footerReturnGuidelines: 'Diretrizes de Devolução de Lojistas',
+    footerTechSupport: 'Suporte Técnico Plataforma 24/7',
+    footerAboutUs: 'Sobre nós',
+    footerTerms: 'Termos de Uso',
+    footerPrivacyLgpd: 'Privacidade & LGPD',
+    footerAntiFraud: 'Anti-fraude',
+    footerAuthenticity: 'Garantia de Autenticidade',
+    footerAccessibility: 'Acessibilidade',
+    currBRL: 'Real Brasileiro',
+    currUSD: 'Dólar Americano',
+    currEUR: 'Euro',
+    currGBP: 'Libra Esterlina',
+    currJPY: 'Iene Japonês',
+    currARS: 'Peso Argentino',
+    currMXN: 'Peso Mexicano',
+    currCNY: 'Yuan Chinês',
+    selectCurrencyTitle: 'Selecionar Moeda',
+    selectLangTitle: 'Selecionar Idioma',
+    catMostRelevant: 'Mais relevantes',
+    sortBestRating: 'Melhor avaliação',
+    filterTitle: '🎯 Filtrar',
+    filterSearchInCat: 'Buscar nesta categoria',
+    filterPriceRange: 'Faixa de Preço',
+    filterRating: 'Avaliação',
+    filterRating45: '4.5★ ou mais',
+    filterRating4: '4★ ou mais',
+    filterAll: 'Todas',
+    filterOrigin: 'Origem',
+    filterNational: '🇧🇷 Nacional',
+    filterInternational: '🌍 Internacional',
+    filterState: 'Estado',
+    filterAllStates: 'Todos os Estados',
+    filterCountry: 'País',
+    filterAllCountries: 'Todos os Países',
+    filterShipping: 'Envio',
+    filterFreeShipChk: 'Frete Grátis',
+    filterFastShipChk: 'Entrega Rápida',
+    filterCondition: 'Condição',
+    filterCondNew: 'Novo',
+    filterCondUsed: 'Usado',
+    filterCondRefurb: 'Recondicionado',
+    filterApplyBtn: 'Aplicar Filtros',
+    filterClearBtn: '✕ Limpar',
+    filterPriceMinPh: 'Mín',
+    filterPriceMaxPh: 'Máx',
+    filterKeywordPh: 'Ex.: RTX, 256GB, algodão...',
+    catSortTitleAttr: 'Ordenar por',
+    catPerPageTitleAttr: 'Por página',
+    storeProductsOfLabel: 'Produtos da',
+    storeReviewsTitleLabel: 'Avaliações da Loja',
+    productWordPlural2: 'produtos',
+    trustSellersVerified: 'Vendedores verificados',
+    trustFreeShip: 'Frete grátis em muitos itens',
+    trkNotFoundTitle: 'Pedido não encontrado',
+    trkNotFoundSubTpl: 'Verifique o código {code} e tente novamente.',
+    trkNotFoundDemoHint: '(Em modo demo apenas os códigos WKZ-8821, WKZ-8654, WKZ-8412 e WKZ-8200 são válidos)',
+    trkDemoNoticeText: '⚙ <strong>Dados fictícios</strong> — este pedido é de demonstração. Rastreamento real disponível após integração com transportadoras.',
+    trkUrgencyText: 'Seu pedido está com o entregador agora! Fique atento — pode chegar a qualquer momento.',
+    stepConfirmed: 'Confirmado',
+    stepSeparated: 'Separado',
+    stepDispatched: 'Despachado',
+    stepTransit: 'Em trânsito',
+    stepOutForDelivery: 'Saiu p/ entrega',
+    stepDelivered: 'Entregue',
+    trkHistoryTitle: 'Histórico de Eventos',
+    trkFinalStatusLabel: 'Status final',
+    trkDeliveredOnTpl: '✅ Entregue em {date}',
+    trkEtaLabel: 'Previsão de Entrega',
+    trkDaysUnit: 'dias',
+    trkHoursUnit: 'hrs',
+    trkMinUnit: 'min',
+    trkSecUnit: 'seg',
+    trkRouteLabel: '🗺 Rota de entrega —',
+    trkPackageTitle: 'Pacote',
+    trkQtyLabel: 'Qtd:',
+    trkCopyBtn: 'Copiar',
+    trkActionsTitle: 'Ações',
+    trkOrderPrefix: 'Pedido',
+    trkConfirmReceiptBtn: 'Confirmar Recebimento',
+    trkReceiptConfirmedLabel: 'Recebimento Confirmado',
+    trkContactSellerTpl: 'Contactar Vendedor ({seller} ⭐{rating})',
+    trkReportProblemBtn: 'Reportar Problema na Entrega',
+    trkProblemReportedTpl: 'Problema Reportado — Protocolo {protocol}',
+    trkRateProductBtn: '⭐ Avaliar Produto',
+    trkReviewSentLabel: 'Avaliação Enviada',
+    trkCodeCopiedToast: '📋 Código copiado!',
+    trkEscrowConfirmedTitle: 'Pagamento Retido em Custódia',
+    trkEscrowConfirmedDesc: 'Seu pagamento foi recebido e está <strong style="color:var(--text);">retido com segurança</strong> na WeKz. O vendedor ainda não tem acesso ao valor.',
+    trkEscrowConfirmedNote: 'O valor só é transferido ao vendedor após confirmação da entrega. Em caso de problema, você recebe de volta.',
+    trkEscrowTransitTitle: 'Pagamento em Custódia — Pedido em Trânsito',
+    trkEscrowTransitDesc: 'Seu dinheiro continua <strong style="color:var(--text);">retido pela WeKz</strong>. O vendedor receberá somente após você confirmar a entrega.',
+    trkEscrowTransitNote: 'Prazo de liberação automática: 7 dias após confirmação de entrega pelo rastreamento.',
+    trkEscrowOutDeliveryTitle: 'Quase lá — Pagamento ainda retido',
+    trkEscrowOutDeliveryDesc: 'O pedido está <strong style="color:#ffa07a;">saindo para entrega</strong>. Seu pagamento permanece protegido em nossa conta de custódia garantida até a validação da entrega.',
+    trkEscrowOutDeliveryNote: 'Ao confirmar o recebimento, o pagamento é liberado imediatamente ao vendedor.',
+    trkEscrowOutDeliveryCta: '✅ Confirmar Recebimento Agora',
+    trkEscrowDeliveredTitle: 'Entregue — Aguardando Liberação',
+    trkEscrowDeliveredDesc: 'Produto entregue! O pagamento será <strong style="color:#4ade80;">liberado ao vendedor em até 7 dias</strong> ou imediatamente se você confirmar abaixo.',
+    trkEscrowDeliveredNote: 'Após o prazo ou sua confirmação, o vendedor recebe o valor líquido (descontada a comissão WeKz).',
+    trkEscrowDeliveredCta: '✅ Liberar Pagamento ao Vendedor',
+    trkEscrowReleasedTitle: 'Pagamento Liberado ao Vendedor',
+    trkEscrowReleasedDesc: 'Tudo certo! O valor deste pedido já foi <strong style="color:#4ade80;">transferido ao vendedor</strong> (descontada a comissão WeKz).',
+    trkEscrowReleasedNote: 'Obrigado por comprar na WeKz Shop. Aproveite para avaliar sua compra ao lado.',
+    estepPaid: 'Pago',
+    estepPreparing: 'Em preparo',
+    estepShipped: 'Enviado',
+    estepReleased: 'Liberado',
+    estepInYourCity: 'Na sua cidade',
+    estepReview: 'Avaliação',
+    estepReleasedCheck: '✔ Liberado',
+    trkHeroDeliveryLabel: 'Entrega',
+    trkPageTitle: 'Rastrear Pedido',
+    breadcrumbMyOrders: 'Meus Pedidos',
+    trkDemoBannerText: '<strong style="color:#FDE68A;">⚙ Modo Demonstração</strong> — Os dados de rastreamento exibidos são fictícios. A integração com transportadoras reais (Correios, DHL, FedEx) será activada após o lançamento.',
+    trkSearchPlaceholder: 'Código do pedido (ex: WKZ-8821) ou código de rastreio',
+    trkSearchBtn: 'Rastrear',
+    trkRecentOrdersTitle: 'Pedidos recentes',
   },
 
   en: {
@@ -1894,6 +2090,202 @@ const TRANSLATIONS = {
     cpTrackNoEvents: 'No events recorded yet.',
     cpTrackViewFullBtn: 'View Full Tracking Page',
     minutes: 'minutes',
+
+    // ── Novas chaves i18n (loja, listagem, footer, moedas) — Sprint M30 ──
+    badgeNew: 'NEW',
+    badgeSponsored: '📢 Sponsored',
+    badgeCoupon: '🏷 Coupon',
+    badgeFreeShip: '🚚 Free',
+    officialStoreTag: '🏅 Official Store',
+    buyNowPlain: 'Buy Now',
+    sortRelevance: 'Relevance',
+    sortedByLabel: 'Sorted by:',
+    resultsFoundTpl: '{n} product(s) found',
+    resultsTotalTpl: '{n} product(s)',
+    showingRangeTpl: '(showing {a}–{b})',
+    prevPageBtn: '‹ Previous',
+    nextPageBtn: 'Next ›',
+    noProductsFoundTitle: 'No products found',
+    tryAdjustFilters: 'Try adjusting or',
+    clearFiltersLink: 'clear the filters',
+    storeNoProductsMsg: 'This store hasn\'t published any products yet',
+    breadcrumbHome: 'Home',
+    breadcrumbStores: 'Stores',
+    storeVerifiedBadge: 'Verified',
+    storeQuickReplyBadge: 'Fast reply',
+    storeMemberSince: 'Member since',
+    storeFollowBtn: '+ Follow',
+    storeUnfollowBtn: '💔 Unfollow',
+    storeChatBtn: 'Chat',
+    storeReportTitle: 'Report store',
+    storeFollowToast: 'Now following the store!',
+    storeChatToast: 'Chat started!',
+    storeReportToast: 'Report sent',
+    storeStatSales: 'Sales',
+    storeStatFollowers: 'Followers',
+    storeStatProducts: 'Products',
+    storeStatRating: 'Rating',
+    storeProductsHeadingTpl: 'Products from {store}',
+    storeSortTitleAttr: 'Sort by',
+    storePerPageTitleAttr: 'Per page',
+    sortBestSelling: 'Best sellers',
+    sortPriceAsc: 'Lowest price',
+    sortPriceDesc: 'Highest price',
+    sortNewest: 'Newest',
+    perPage10: '10 per page',
+    perPage20: '20 per page',
+    perPage30: '30 per page',
+    storeReviewsTitle: '⭐ Store Reviews',
+    reviewVerifiedBadge: 'Verified purchase',
+    policyReturn30: '30-day returns',
+    policyOriginal: 'Genuine product',
+    policyShip24h: 'Ships in 24h',
+    policyFastReply: 'Instant reply',
+    policySealed: 'Sealed guarantee',
+    policySerial: 'Valid serial number',
+    policyExpressShip: 'Express shipping',
+    policyAntiFraud: 'Anti-fraud active',
+    policySizeExchange: 'Size exchange',
+    policyCertOriginal: 'Certified genuine',
+    policyFreeShip: 'Free shipping',
+    policyReviews50k: '+50k reviews',
+    policyAuthentic: 'Authentic product',
+    policyInvoice: 'Tax invoice',
+    policyPremiumPkg: 'Premium packaging',
+    policyCrueltyFree: 'Cruelty-free',
+    policyTestStore: 'Test store',
+    policyDevEnv: 'Dev environment',
+    footerAllCategories: 'All categories',
+    footerDealsOfDay: 'Deals of the day',
+    footerFlashSale: 'Flash Sale',
+    footerKzLive: 'Kz Live Shopping',
+    footerNewProducts: 'New products',
+    footerOpenStore: 'Open My Store',
+    footerHowItWorks: 'How It Works',
+    footerFeesCommissions: 'Fees and Commissions',
+    footerSellerCenter: 'Seller Center',
+    footerBizPolicies: 'Business Policies',
+    footerHelpCenter: 'Help Center & Platform FAQs',
+    footerPurchaseSecurity: 'Security & Purchase Protection',
+    footerDisputes: 'Dispute Mediation & Refunds',
+    footerShipTracking: 'Shipment Tracking',
+    footerReturnGuidelines: 'Seller Return Guidelines',
+    footerTechSupport: '24/7 Platform Tech Support',
+    footerAboutUs: 'About us',
+    footerTerms: 'Terms of Use',
+    footerPrivacyLgpd: 'Privacy & Data Protection',
+    footerAntiFraud: 'Anti-fraud',
+    footerAuthenticity: 'Authenticity Guarantee',
+    footerAccessibility: 'Accessibility',
+    currBRL: 'Brazilian Real',
+    currUSD: 'US Dollar',
+    currEUR: 'Euro',
+    currGBP: 'British Pound',
+    currJPY: 'Japanese Yen',
+    currARS: 'Argentine Peso',
+    currMXN: 'Mexican Peso',
+    currCNY: 'Chinese Yuan',
+    selectCurrencyTitle: 'Select Currency',
+    selectLangTitle: 'Select Language',
+    catMostRelevant: 'Most relevant',
+    sortBestRating: 'Top rated',
+    filterTitle: '🎯 Filter',
+    filterSearchInCat: 'Search in this category',
+    filterPriceRange: 'Price Range',
+    filterRating: 'Rating',
+    filterRating45: '4.5★ or more',
+    filterRating4: '4★ or more',
+    filterAll: 'All',
+    filterOrigin: 'Origin',
+    filterNational: '🇧🇷 Domestic',
+    filterInternational: '🌍 International',
+    filterState: 'State',
+    filterAllStates: 'All States',
+    filterCountry: 'Country',
+    filterAllCountries: 'All Countries',
+    filterShipping: 'Shipping',
+    filterFreeShipChk: 'Free Shipping',
+    filterFastShipChk: 'Fast Delivery',
+    filterCondition: 'Condition',
+    filterCondNew: 'New',
+    filterCondUsed: 'Used',
+    filterCondRefurb: 'Refurbished',
+    filterApplyBtn: 'Apply Filters',
+    filterClearBtn: '✕ Clear',
+    filterPriceMinPh: 'Min',
+    filterPriceMaxPh: 'Max',
+    filterKeywordPh: 'E.g.: RTX, 256GB, cotton...',
+    catSortTitleAttr: 'Sort by',
+    catPerPageTitleAttr: 'Per page',
+    storeProductsOfLabel: 'Products from',
+    storeReviewsTitleLabel: 'Store Reviews',
+    productWordPlural2: 'products',
+    trustSellersVerified: 'Verified sellers',
+    trustFreeShip: 'Free shipping on many items',
+    trkNotFoundTitle: 'Order not found',
+    trkNotFoundSubTpl: 'Check the code {code} and try again.',
+    trkNotFoundDemoHint: '(In demo mode only codes WKZ-8821, WKZ-8654, WKZ-8412 and WKZ-8200 are valid)',
+    trkDemoNoticeText: '⚙ <strong>Sample data</strong> — this order is for demonstration. Real tracking will be available after carrier integration.',
+    trkUrgencyText: 'Your order is with the courier now! Stay alert — it could arrive any moment.',
+    stepConfirmed: 'Confirmed',
+    stepSeparated: 'Picked',
+    stepDispatched: 'Dispatched',
+    stepTransit: 'In transit',
+    stepOutForDelivery: 'Out for delivery',
+    stepDelivered: 'Delivered',
+    trkHistoryTitle: 'Event History',
+    trkFinalStatusLabel: 'Final status',
+    trkDeliveredOnTpl: '✅ Delivered on {date}',
+    trkEtaLabel: 'Estimated Delivery',
+    trkDaysUnit: 'days',
+    trkHoursUnit: 'hrs',
+    trkMinUnit: 'min',
+    trkSecUnit: 'sec',
+    trkRouteLabel: '🗺 Delivery route —',
+    trkPackageTitle: 'Package',
+    trkQtyLabel: 'Qty:',
+    trkCopyBtn: 'Copy',
+    trkActionsTitle: 'Actions',
+    trkOrderPrefix: 'Order',
+    trkConfirmReceiptBtn: 'Confirm Receipt',
+    trkReceiptConfirmedLabel: 'Receipt Confirmed',
+    trkContactSellerTpl: 'Contact Seller ({seller} ⭐{rating})',
+    trkReportProblemBtn: 'Report Delivery Problem',
+    trkProblemReportedTpl: 'Problem Reported — Ticket {protocol}',
+    trkRateProductBtn: '⭐ Rate Product',
+    trkReviewSentLabel: 'Review Submitted',
+    trkCodeCopiedToast: '📋 Code copied!',
+    trkEscrowConfirmedTitle: 'Payment Held in Escrow',
+    trkEscrowConfirmedDesc: 'Your payment was received and is <strong style="color:var(--text);">safely held</strong> by WeKz. The seller does not have access to the funds yet.',
+    trkEscrowConfirmedNote: 'Funds are only transferred to the seller after delivery is confirmed. If there is a problem, you get your money back.',
+    trkEscrowTransitTitle: 'Payment in Escrow — Order in Transit',
+    trkEscrowTransitDesc: 'Your money remains <strong style="color:var(--text);">held by WeKz</strong>. The seller only receives it after you confirm delivery.',
+    trkEscrowTransitNote: 'Automatic release deadline: 7 days after delivery is confirmed by tracking.',
+    trkEscrowOutDeliveryTitle: 'Almost there — Payment still held',
+    trkEscrowOutDeliveryDesc: 'The order is <strong style="color:#ffa07a;">out for delivery</strong>. Your payment remains protected in our escrow account until delivery is validated.',
+    trkEscrowOutDeliveryNote: 'Once you confirm receipt, the payment is released to the seller immediately.',
+    trkEscrowOutDeliveryCta: '✅ Confirm Receipt Now',
+    trkEscrowDeliveredTitle: 'Delivered — Awaiting Release',
+    trkEscrowDeliveredDesc: 'Product delivered! Payment will be <strong style="color:#4ade80;">released to the seller within 7 days</strong>, or immediately if you confirm below.',
+    trkEscrowDeliveredNote: 'After the deadline or your confirmation, the seller receives the net amount (WeKz commission deducted).',
+    trkEscrowDeliveredCta: '✅ Release Payment to Seller',
+    trkEscrowReleasedTitle: 'Payment Released to Seller',
+    trkEscrowReleasedDesc: 'All set! The amount for this order has already been <strong style="color:#4ade80;">transferred to the seller</strong> (WeKz commission deducted).',
+    trkEscrowReleasedNote: 'Thanks for shopping at WeKz Shop. Feel free to rate your purchase alongside.',
+    estepPaid: 'Paid',
+    estepPreparing: 'Preparing',
+    estepShipped: 'Shipped',
+    estepReleased: 'Released',
+    estepInYourCity: 'In your city',
+    estepReview: 'Review',
+    estepReleasedCheck: '✔ Released',
+    trkHeroDeliveryLabel: 'Delivery',
+    trkPageTitle: 'Track Order',
+    breadcrumbMyOrders: 'My Orders',
+    trkDemoBannerText: '<strong style="color:#FDE68A;">⚙ Demo Mode</strong> — The tracking data shown is fictitious. Integration with real carriers (postal service, DHL, FedEx) will be activated after launch.',
+    trkSearchPlaceholder: 'Order code (e.g. WKZ-8821) or tracking code',
+    trkSearchBtn: 'Track',
+    trkRecentOrdersTitle: 'Recent orders',
   },
 
   es: {
@@ -2151,6 +2543,202 @@ const TRANSLATIONS = {
     cpTrackNoEvents: 'Aún no hay eventos registrados.',
     cpTrackViewFullBtn: 'Ver Página Completa de Rastreo',
     minutes: 'minutos',
+
+    // ── Novas chaves i18n (loja, listagem, footer, moedas) — Sprint M30 ──
+    badgeNew: 'NUEVO',
+    badgeSponsored: '📢 Patrocinado',
+    badgeCoupon: '🏷 Cupón',
+    badgeFreeShip: '🚚 Gratis',
+    officialStoreTag: '🏅 Tienda Oficial',
+    buyNowPlain: 'Comprar Ahora',
+    sortRelevance: 'Relevancia',
+    sortedByLabel: 'Ordenado por:',
+    resultsFoundTpl: '{n} producto(s) encontrado(s)',
+    resultsTotalTpl: '{n} producto(s)',
+    showingRangeTpl: '(mostrando {a}–{b})',
+    prevPageBtn: '‹ Anterior',
+    nextPageBtn: 'Siguiente ›',
+    noProductsFoundTitle: 'No se encontraron productos',
+    tryAdjustFilters: 'Intenta ajustar o',
+    clearFiltersLink: 'borrar los filtros',
+    storeNoProductsMsg: 'Esta tienda aún no tiene productos publicados',
+    breadcrumbHome: 'Inicio',
+    breadcrumbStores: 'Tiendas',
+    storeVerifiedBadge: 'Verificado',
+    storeQuickReplyBadge: 'Respuesta rápida',
+    storeMemberSince: 'Miembro desde',
+    storeFollowBtn: '+ Seguir',
+    storeUnfollowBtn: '💔 Dejar de seguir',
+    storeChatBtn: 'Chat',
+    storeReportTitle: 'Reportar tienda',
+    storeFollowToast: '¡Ahora sigues la tienda!',
+    storeChatToast: '¡Chat iniciado!',
+    storeReportToast: 'Reporte enviado',
+    storeStatSales: 'Ventas',
+    storeStatFollowers: 'Seguidores',
+    storeStatProducts: 'Productos',
+    storeStatRating: 'Valoración',
+    storeProductsHeadingTpl: 'Productos de {store}',
+    storeSortTitleAttr: 'Ordenar por',
+    storePerPageTitleAttr: 'Por página',
+    sortBestSelling: 'Más vendidos',
+    sortPriceAsc: 'Menor precio',
+    sortPriceDesc: 'Mayor precio',
+    sortNewest: 'Más nuevos',
+    perPage10: '10 por página',
+    perPage20: '20 por página',
+    perPage30: '30 por página',
+    storeReviewsTitle: '⭐ Reseñas de la Tienda',
+    reviewVerifiedBadge: 'Compra verificada',
+    policyReturn30: 'Devolución en 30 días',
+    policyOriginal: 'Producto original',
+    policyShip24h: 'Envío en 24h',
+    policyFastReply: 'Resp. inmediata',
+    policySealed: 'Sellado garantizado',
+    policySerial: 'Número de serie válido',
+    policyExpressShip: 'Envío exprés',
+    policyAntiFraud: 'Antifraude activo',
+    policySizeExchange: 'Cambio de talla',
+    policyCertOriginal: 'Original certificado',
+    policyFreeShip: 'Envío gratis',
+    policyReviews50k: '+50k reseñas',
+    policyAuthentic: 'Producto auténtico',
+    policyInvoice: 'Factura fiscal',
+    policyPremiumPkg: 'Empaque premium',
+    policyCrueltyFree: 'Libre de crueldad',
+    policyTestStore: 'Tienda de pruebas',
+    policyDevEnv: 'Entorno de desarrollo',
+    footerAllCategories: 'Todas las categorías',
+    footerDealsOfDay: 'Ofertas del día',
+    footerFlashSale: 'Oferta Flash',
+    footerKzLive: 'Kz Live Shopping',
+    footerNewProducts: 'Productos nuevos',
+    footerOpenStore: 'Abrir Mi Tienda',
+    footerHowItWorks: 'Cómo Funciona',
+    footerFeesCommissions: 'Tarifas y Comisiones',
+    footerSellerCenter: 'Centro del Vendedor',
+    footerBizPolicies: 'Políticas Comerciales',
+    footerHelpCenter: 'Centro de Ayuda y FAQs de la Plataforma',
+    footerPurchaseSecurity: 'Seguridad y Protección de Compra',
+    footerDisputes: 'Mediación de Disputas y Reembolsos',
+    footerShipTracking: 'Seguimiento de Envíos',
+    footerReturnGuidelines: 'Directrices de Devolución para Vendedores',
+    footerTechSupport: 'Soporte Técnico 24/7',
+    footerAboutUs: 'Sobre nosotros',
+    footerTerms: 'Términos de Uso',
+    footerPrivacyLgpd: 'Privacidad y Protección de Datos',
+    footerAntiFraud: 'Antifraude',
+    footerAuthenticity: 'Garantía de Autenticidad',
+    footerAccessibility: 'Accesibilidad',
+    currBRL: 'Real Brasileño',
+    currUSD: 'Dólar Estadounidense',
+    currEUR: 'Euro',
+    currGBP: 'Libra Esterlina',
+    currJPY: 'Yen Japonés',
+    currARS: 'Peso Argentino',
+    currMXN: 'Peso Mexicano',
+    currCNY: 'Yuan Chino',
+    selectCurrencyTitle: 'Seleccionar Moneda',
+    selectLangTitle: 'Seleccionar Idioma',
+    catMostRelevant: 'Más relevantes',
+    sortBestRating: 'Mejor valorados',
+    filterTitle: '🎯 Filtrar',
+    filterSearchInCat: 'Buscar en esta categoría',
+    filterPriceRange: 'Rango de Precio',
+    filterRating: 'Valoración',
+    filterRating45: '4.5★ o más',
+    filterRating4: '4★ o más',
+    filterAll: 'Todas',
+    filterOrigin: 'Origen',
+    filterNational: '🇧🇷 Nacional',
+    filterInternational: '🌍 Internacional',
+    filterState: 'Estado',
+    filterAllStates: 'Todos los Estados',
+    filterCountry: 'País',
+    filterAllCountries: 'Todos los Países',
+    filterShipping: 'Envío',
+    filterFreeShipChk: 'Envío Gratis',
+    filterFastShipChk: 'Entrega Rápida',
+    filterCondition: 'Condición',
+    filterCondNew: 'Nuevo',
+    filterCondUsed: 'Usado',
+    filterCondRefurb: 'Reacondicionado',
+    filterApplyBtn: 'Aplicar Filtros',
+    filterClearBtn: '✕ Borrar',
+    filterPriceMinPh: 'Mín',
+    filterPriceMaxPh: 'Máx',
+    filterKeywordPh: 'Ej.: RTX, 256GB, algodón...',
+    catSortTitleAttr: 'Ordenar por',
+    catPerPageTitleAttr: 'Por página',
+    storeProductsOfLabel: 'Productos de',
+    storeReviewsTitleLabel: 'Reseñas de la Tienda',
+    productWordPlural2: 'productos',
+    trustSellersVerified: 'Vendedores verificados',
+    trustFreeShip: 'Envío gratis en muchos artículos',
+    trkNotFoundTitle: 'Pedido no encontrado',
+    trkNotFoundSubTpl: 'Verifica el código {code} e inténtalo de nuevo.',
+    trkNotFoundDemoHint: '(En modo demo solo los códigos WKZ-8821, WKZ-8654, WKZ-8412 y WKZ-8200 son válidos)',
+    trkDemoNoticeText: '⚙ <strong>Datos ficticios</strong> — este pedido es de demostración. El seguimiento real estará disponible tras la integración con transportistas.',
+    trkUrgencyText: '¡Tu pedido ya está con el repartidor! Mantente atento — puede llegar en cualquier momento.',
+    stepConfirmed: 'Confirmado',
+    stepSeparated: 'Separado',
+    stepDispatched: 'Despachado',
+    stepTransit: 'En tránsito',
+    stepOutForDelivery: 'En reparto',
+    stepDelivered: 'Entregado',
+    trkHistoryTitle: 'Historial de Eventos',
+    trkFinalStatusLabel: 'Estado final',
+    trkDeliveredOnTpl: '✅ Entregado el {date}',
+    trkEtaLabel: 'Entrega Estimada',
+    trkDaysUnit: 'días',
+    trkHoursUnit: 'hrs',
+    trkMinUnit: 'min',
+    trkSecUnit: 'seg',
+    trkRouteLabel: '🗺 Ruta de entrega —',
+    trkPackageTitle: 'Paquete',
+    trkQtyLabel: 'Cant.:',
+    trkCopyBtn: 'Copiar',
+    trkActionsTitle: 'Acciones',
+    trkOrderPrefix: 'Pedido',
+    trkConfirmReceiptBtn: 'Confirmar Recepción',
+    trkReceiptConfirmedLabel: 'Recepción Confirmada',
+    trkContactSellerTpl: 'Contactar Vendedor ({seller} ⭐{rating})',
+    trkReportProblemBtn: 'Reportar Problema en la Entrega',
+    trkProblemReportedTpl: 'Problema Reportado — Ticket {protocol}',
+    trkRateProductBtn: '⭐ Valorar Producto',
+    trkReviewSentLabel: 'Reseña Enviada',
+    trkCodeCopiedToast: '📋 ¡Código copiado!',
+    trkEscrowConfirmedTitle: 'Pago Retenido en Custodia',
+    trkEscrowConfirmedDesc: 'Tu pago fue recibido y está <strong style="color:var(--text);">retenido de forma segura</strong> en WeKz. El vendedor aún no tiene acceso al valor.',
+    trkEscrowConfirmedNote: 'El valor solo se transfiere al vendedor tras confirmar la entrega. En caso de problema, se te reembolsa.',
+    trkEscrowTransitTitle: 'Pago en Custodia — Pedido en Tránsito',
+    trkEscrowTransitDesc: 'Tu dinero sigue <strong style="color:var(--text);">retenido por WeKz</strong>. El vendedor lo recibirá solo tras confirmar la entrega.',
+    trkEscrowTransitNote: 'Plazo de liberación automática: 7 días tras la confirmación de entrega por el seguimiento.',
+    trkEscrowOutDeliveryTitle: 'Casi listo — Pago aún retenido',
+    trkEscrowOutDeliveryDesc: 'El pedido está <strong style="color:#ffa07a;">en reparto</strong>. Tu pago permanece protegido en nuestra cuenta de custodia hasta validar la entrega.',
+    trkEscrowOutDeliveryNote: 'Al confirmar la recepción, el pago se libera de inmediato al vendedor.',
+    trkEscrowOutDeliveryCta: '✅ Confirmar Recepción Ahora',
+    trkEscrowDeliveredTitle: 'Entregado — Esperando Liberación',
+    trkEscrowDeliveredDesc: '¡Producto entregado! El pago será <strong style="color:#4ade80;">liberado al vendedor en hasta 7 días</strong>, o de inmediato si confirmas abajo.',
+    trkEscrowDeliveredNote: 'Tras el plazo o tu confirmación, el vendedor recibe el importe neto (descontada la comisión de WeKz).',
+    trkEscrowDeliveredCta: '✅ Liberar Pago al Vendedor',
+    trkEscrowReleasedTitle: 'Pago Liberado al Vendedor',
+    trkEscrowReleasedDesc: '¡Todo listo! El importe de este pedido ya fue <strong style="color:#4ade80;">transferido al vendedor</strong> (descontada la comisión WeKz).',
+    trkEscrowReleasedNote: 'Gracias por comprar en WeKz Shop. Aprovecha para valorar tu compra al lado.',
+    estepPaid: 'Pagado',
+    estepPreparing: 'En preparación',
+    estepShipped: 'Enviado',
+    estepReleased: 'Liberado',
+    estepInYourCity: 'En tu ciudad',
+    estepReview: 'Reseña',
+    estepReleasedCheck: '✔ Liberado',
+    trkHeroDeliveryLabel: 'Entrega',
+    trkPageTitle: 'Rastrear Pedido',
+    breadcrumbMyOrders: 'Mis Pedidos',
+    trkDemoBannerText: '<strong style="color:#FDE68A;">⚙ Modo Demostración</strong> — Los datos de seguimiento mostrados son ficticios. La integración con transportistas reales (correos, DHL, FedEx) se activará tras el lanzamiento.',
+    trkSearchPlaceholder: 'Código del pedido (ej: WKZ-8821) o código de seguimiento',
+    trkSearchBtn: 'Rastrear',
+    trkRecentOrdersTitle: 'Pedidos recientes',
   },
 
   zh: {
@@ -2408,6 +2996,202 @@ const TRANSLATIONS = {
     cpTrackNoEvents: '暂无追踪记录。',
     cpTrackViewFullBtn: '查看完整追踪页面',
     minutes: '分钟',
+
+    // ── Novas chaves i18n (loja, listagem, footer, moedas) — Sprint M30 ──
+    badgeNew: '新品',
+    badgeSponsored: '📢 赞助',
+    badgeCoupon: '🏷 优惠券',
+    badgeFreeShip: '🚚 包邮',
+    officialStoreTag: '🏅 官方旗舰店',
+    buyNowPlain: '立即购买',
+    sortRelevance: '相关度',
+    sortedByLabel: '排序:',
+    resultsFoundTpl: '找到 {n} 件商品',
+    resultsTotalTpl: '共 {n} 件商品',
+    showingRangeTpl: '(显示 {a}–{b})',
+    prevPageBtn: '‹ 上一页',
+    nextPageBtn: '下一页 ›',
+    noProductsFoundTitle: '未找到商品',
+    tryAdjustFilters: '请尝试调整筛选条件，或',
+    clearFiltersLink: '清除筛选',
+    storeNoProductsMsg: '该店铺暂无已上架商品',
+    breadcrumbHome: '首页',
+    breadcrumbStores: '店铺',
+    storeVerifiedBadge: '已认证',
+    storeQuickReplyBadge: '快速回复',
+    storeMemberSince: '入驻于',
+    storeFollowBtn: '+ 关注',
+    storeUnfollowBtn: '💔 取消关注',
+    storeChatBtn: '聊天',
+    storeReportTitle: '举报店铺',
+    storeFollowToast: '已关注该店铺！',
+    storeChatToast: '聊天已开始！',
+    storeReportToast: '举报已提交',
+    storeStatSales: '销量',
+    storeStatFollowers: '关注者',
+    storeStatProducts: '商品数',
+    storeStatRating: '评分',
+    storeProductsHeadingTpl: '{store} 的商品',
+    storeSortTitleAttr: '排序方式',
+    storePerPageTitleAttr: '每页显示',
+    sortBestSelling: '最畅销',
+    sortPriceAsc: '价格从低到高',
+    sortPriceDesc: '价格从高到低',
+    sortNewest: '最新上架',
+    perPage10: '每页10条',
+    perPage20: '每页20条',
+    perPage30: '每页30条',
+    storeReviewsTitle: '⭐ 店铺评价',
+    reviewVerifiedBadge: '已验证购买',
+    policyReturn30: '30天退货',
+    policyOriginal: '正品保证',
+    policyShip24h: '24小时内发货',
+    policyFastReply: '即时回复',
+    policySealed: '保证原封',
+    policySerial: '序列号有效',
+    policyExpressShip: '极速发货',
+    policyAntiFraud: '反欺诈保护',
+    policySizeExchange: '支持换码',
+    policyCertOriginal: '认证正品',
+    policyFreeShip: '包邮',
+    policyReviews50k: '超5万条评价',
+    policyAuthentic: '正品保证',
+    policyInvoice: '提供发票',
+    policyPremiumPkg: '高级包装',
+    policyCrueltyFree: '无动物测试',
+    policyTestStore: '测试店铺',
+    policyDevEnv: '开发环境',
+    footerAllCategories: '所有分类',
+    footerDealsOfDay: '今日特惠',
+    footerFlashSale: '限时秒杀',
+    footerKzLive: 'Kz 直播购物',
+    footerNewProducts: '新品上架',
+    footerOpenStore: '开设我的店铺',
+    footerHowItWorks: '运作方式',
+    footerFeesCommissions: '费率与佣金',
+    footerSellerCenter: '卖家中心',
+    footerBizPolicies: '商业政策',
+    footerHelpCenter: '帮助中心与常见问题',
+    footerPurchaseSecurity: '安全与购物保障',
+    footerDisputes: '纠纷调解与退款',
+    footerShipTracking: '物流追踪',
+    footerReturnGuidelines: '卖家退货指南',
+    footerTechSupport: '7×24小时技术支持',
+    footerAboutUs: '关于我们',
+    footerTerms: '使用条款',
+    footerPrivacyLgpd: '隐私与数据保护',
+    footerAntiFraud: '反欺诈',
+    footerAuthenticity: '正品保障',
+    footerAccessibility: '无障碍服务',
+    currBRL: '巴西雷亚尔',
+    currUSD: '美元',
+    currEUR: '欧元',
+    currGBP: '英镑',
+    currJPY: '日元',
+    currARS: '阿根廷比索',
+    currMXN: '墨西哥比索',
+    currCNY: '人民币',
+    selectCurrencyTitle: '选择货币',
+    selectLangTitle: '选择语言',
+    catMostRelevant: '最相关',
+    sortBestRating: '评分最高',
+    filterTitle: '🎯 筛选',
+    filterSearchInCat: '在此分类中搜索',
+    filterPriceRange: '价格区间',
+    filterRating: '评分',
+    filterRating45: '4.5★ 及以上',
+    filterRating4: '4★ 及以上',
+    filterAll: '全部',
+    filterOrigin: '产地',
+    filterNational: '🇧🇷 国产',
+    filterInternational: '🌍 海外',
+    filterState: '州/省',
+    filterAllStates: '所有州/省',
+    filterCountry: '国家',
+    filterAllCountries: '所有国家',
+    filterShipping: '配送',
+    filterFreeShipChk: '包邮',
+    filterFastShipChk: '快速送达',
+    filterCondition: '成色',
+    filterCondNew: '全新',
+    filterCondUsed: '二手',
+    filterCondRefurb: '翻新',
+    filterApplyBtn: '应用筛选',
+    filterClearBtn: '✕ 清除',
+    filterPriceMinPh: '最低',
+    filterPriceMaxPh: '最高',
+    filterKeywordPh: '例如：RTX、256GB、纯棉...',
+    catSortTitleAttr: '排序方式',
+    catPerPageTitleAttr: '每页显示',
+    storeProductsOfLabel: '的商品',
+    storeReviewsTitleLabel: '店铺评价',
+    productWordPlural2: '件商品',
+    trustSellersVerified: '认证卖家',
+    trustFreeShip: '多款商品包邮',
+    trkNotFoundTitle: '未找到订单',
+    trkNotFoundSubTpl: '请检查订单号 {code} 后重试。',
+    trkNotFoundDemoHint: '（演示模式下仅 WKZ-8821、WKZ-8654、WKZ-8412 和 WKZ-8200 有效）',
+    trkDemoNoticeText: '⚙ <strong>示例数据</strong>——该订单为演示用途。接入真实物流商后将提供真实追踪。',
+    trkUrgencyText: '您的包裹已在配送员手中！请留意，随时可能送达。',
+    stepConfirmed: '已确认',
+    stepSeparated: '已拣货',
+    stepDispatched: '已发出',
+    stepTransit: '运输中',
+    stepOutForDelivery: '派送中',
+    stepDelivered: '已送达',
+    trkHistoryTitle: '事件记录',
+    trkFinalStatusLabel: '最终状态',
+    trkDeliveredOnTpl: '✅ 于 {date} 送达',
+    trkEtaLabel: '预计送达',
+    trkDaysUnit: '天',
+    trkHoursUnit: '时',
+    trkMinUnit: '分',
+    trkSecUnit: '秒',
+    trkRouteLabel: '🗺 配送路线 —',
+    trkPackageTitle: '包裹',
+    trkQtyLabel: '数量：',
+    trkCopyBtn: '复制',
+    trkActionsTitle: '操作',
+    trkOrderPrefix: '订单',
+    trkConfirmReceiptBtn: '确认收货',
+    trkReceiptConfirmedLabel: '已确认收货',
+    trkContactSellerTpl: '联系卖家（{seller} ⭐{rating}）',
+    trkReportProblemBtn: '举报配送问题',
+    trkProblemReportedTpl: '问题已举报——工单号 {protocol}',
+    trkRateProductBtn: '⭐ 评价商品',
+    trkReviewSentLabel: '评价已提交',
+    trkCodeCopiedToast: '📋 编号已复制！',
+    trkEscrowConfirmedTitle: '货款托管保护中',
+    trkEscrowConfirmedDesc: '您的货款已收到，并由 WeKz <strong style="color:var(--text);">安全托管</strong>。卖家目前尚无法提取该款项。',
+    trkEscrowConfirmedNote: '货款将在确认收货后才转给卖家。如有问题，款项将退还给您。',
+    trkEscrowTransitTitle: '货款托管中——订单运输中',
+    trkEscrowTransitDesc: '款项仍由 WeKz <strong style="color:var(--text);">托管保护</strong>。只有在您确认收货后，卖家才会收到款项。',
+    trkEscrowTransitNote: '自动放款期限：物流确认送达后 7 天。',
+    trkEscrowOutDeliveryTitle: '即将送达——货款仍在托管',
+    trkEscrowOutDeliveryDesc: '订单正在<strong style="color:#ffa07a;">派送途中</strong>。您的货款将持续受托管账户保护，直至配送验证完成。',
+    trkEscrowOutDeliveryNote: '确认收货后，货款将立即放款给卖家。',
+    trkEscrowOutDeliveryCta: '✅ 立即确认收货',
+    trkEscrowDeliveredTitle: '已送达——等待放款',
+    trkEscrowDeliveredDesc: '商品已送达！货款将在 <strong style="color:#4ade80;">7天内放款给卖家</strong>，若您在下方确认则立即放款。',
+    trkEscrowDeliveredNote: '期限到达或您确认后，卖家将收到扣除 WeKz 佣金后的净额。',
+    trkEscrowDeliveredCta: '✅ 放款给卖家',
+    trkEscrowReleasedTitle: '货款已放款给卖家',
+    trkEscrowReleasedDesc: '一切就绪！本订单款项已<strong style="color:#4ade80;">转给卖家</strong>（已扣除 WeKz 佣金）。',
+    trkEscrowReleasedNote: '感谢您在 WeKz Shop 购物。欢迎在旁边为本次购买评价。',
+    estepPaid: '已付款',
+    estepPreparing: '备货中',
+    estepShipped: '已发货',
+    estepReleased: '已放款',
+    estepInYourCity: '已到您所在城市',
+    estepReview: '评价',
+    estepReleasedCheck: '✔ 已放款',
+    trkHeroDeliveryLabel: '配送',
+    trkPageTitle: '追踪订单',
+    breadcrumbMyOrders: '我的订单',
+    trkDemoBannerText: '<strong style="color:#FDE68A;">⚙ 演示模式</strong>——当前显示的物流数据为虚构数据。与真实物流商（邮政、DHL、FedEx）的对接将在正式上线后开启。',
+    trkSearchPlaceholder: '订单号（例如 WKZ-8821）或物流单号',
+    trkSearchBtn: '查询',
+    trkRecentOrdersTitle: '近期订单',
   },
 
   fr: {
@@ -2665,6 +3449,202 @@ const TRANSLATIONS = {
     cpTrackNoEvents: 'Aucun événement enregistré pour le moment.',
     cpTrackViewFullBtn: 'Voir la Page de Suivi Complète',
     minutes: 'minutes',
+
+    // ── Novas chaves i18n (loja, listagem, footer, moedas) — Sprint M30 ──
+    badgeNew: 'NOUVEAU',
+    badgeSponsored: '📢 Sponsorisé',
+    badgeCoupon: '🏷 Coupon',
+    badgeFreeShip: '🚚 Gratuit',
+    officialStoreTag: '🏅 Boutique Officielle',
+    buyNowPlain: 'Acheter maintenant',
+    sortRelevance: 'Pertinence',
+    sortedByLabel: 'Trié par :',
+    resultsFoundTpl: '{n} produit(s) trouvé(s)',
+    resultsTotalTpl: '{n} produit(s)',
+    showingRangeTpl: '(affichage {a}–{b})',
+    prevPageBtn: '‹ Précédent',
+    nextPageBtn: 'Suivant ›',
+    noProductsFoundTitle: 'Aucun produit trouvé',
+    tryAdjustFilters: 'Essayez d\'ajuster ou',
+    clearFiltersLink: 'effacez les filtres',
+    storeNoProductsMsg: 'Cette boutique n\'a pas encore publié de produits',
+    breadcrumbHome: 'Accueil',
+    breadcrumbStores: 'Boutiques',
+    storeVerifiedBadge: 'Vérifié',
+    storeQuickReplyBadge: 'Réponse rapide',
+    storeMemberSince: 'Membre depuis',
+    storeFollowBtn: '+ Suivre',
+    storeUnfollowBtn: '💔 Ne plus suivre',
+    storeChatBtn: 'Chat',
+    storeReportTitle: 'Signaler la boutique',
+    storeFollowToast: 'Vous suivez la boutique !',
+    storeChatToast: 'Chat démarré !',
+    storeReportToast: 'Signalement envoyé',
+    storeStatSales: 'Ventes',
+    storeStatFollowers: 'Abonnés',
+    storeStatProducts: 'Produits',
+    storeStatRating: 'Note',
+    storeProductsHeadingTpl: 'Produits de {store}',
+    storeSortTitleAttr: 'Trier par',
+    storePerPageTitleAttr: 'Par page',
+    sortBestSelling: 'Meilleures ventes',
+    sortPriceAsc: 'Prix croissant',
+    sortPriceDesc: 'Prix décroissant',
+    sortNewest: 'Plus récents',
+    perPage10: '10 par page',
+    perPage20: '20 par page',
+    perPage30: '30 par page',
+    storeReviewsTitle: '⭐ Avis sur la Boutique',
+    reviewVerifiedBadge: 'Achat vérifié',
+    policyReturn30: 'Retours sous 30 jours',
+    policyOriginal: 'Produit authentique',
+    policyShip24h: 'Expédié en 24h',
+    policyFastReply: 'Réponse immédiate',
+    policySealed: 'Scellé garanti',
+    policySerial: 'Numéro de série valide',
+    policyExpressShip: 'Expédition express',
+    policyAntiFraud: 'Anti-fraude actif',
+    policySizeExchange: 'Échange de taille',
+    policyCertOriginal: 'Original certifié',
+    policyFreeShip: 'Livraison gratuite',
+    policyReviews50k: '+50k avis',
+    policyAuthentic: 'Produit authentique',
+    policyInvoice: 'Facture fiscale',
+    policyPremiumPkg: 'Emballage premium',
+    policyCrueltyFree: 'Sans cruauté',
+    policyTestStore: 'Boutique de test',
+    policyDevEnv: 'Environnement de dev',
+    footerAllCategories: 'Toutes les catégories',
+    footerDealsOfDay: 'Offres du jour',
+    footerFlashSale: 'Vente Flash',
+    footerKzLive: 'Kz Live Shopping',
+    footerNewProducts: 'Nouveaux produits',
+    footerOpenStore: 'Ouvrir Ma Boutique',
+    footerHowItWorks: 'Comment ça marche',
+    footerFeesCommissions: 'Frais et Commissions',
+    footerSellerCenter: 'Centre Vendeur',
+    footerBizPolicies: 'Politiques Commerciales',
+    footerHelpCenter: 'Centre d\'Aide et FAQ de la Plateforme',
+    footerPurchaseSecurity: 'Sécurité et Protection des Achats',
+    footerDisputes: 'Médiation des Litiges et Remboursements',
+    footerShipTracking: 'Suivi des Envois',
+    footerReturnGuidelines: 'Directives de Retour Vendeurs',
+    footerTechSupport: 'Support Technique 24/7',
+    footerAboutUs: 'À propos de nous',
+    footerTerms: 'Conditions d\'Utilisation',
+    footerPrivacyLgpd: 'Confidentialité et Protection des Données',
+    footerAntiFraud: 'Anti-fraude',
+    footerAuthenticity: 'Garantie d\'Authenticité',
+    footerAccessibility: 'Accessibilité',
+    currBRL: 'Real Brésilien',
+    currUSD: 'Dollar Américain',
+    currEUR: 'Euro',
+    currGBP: 'Livre Sterling',
+    currJPY: 'Yen Japonais',
+    currARS: 'Peso Argentin',
+    currMXN: 'Peso Mexicain',
+    currCNY: 'Yuan Chinois',
+    selectCurrencyTitle: 'Choisir la Devise',
+    selectLangTitle: 'Choisir la Langue',
+    catMostRelevant: 'Plus pertinents',
+    sortBestRating: 'Mieux notés',
+    filterTitle: '🎯 Filtrer',
+    filterSearchInCat: 'Rechercher dans cette catégorie',
+    filterPriceRange: 'Fourchette de Prix',
+    filterRating: 'Évaluation',
+    filterRating45: '4.5★ ou plus',
+    filterRating4: '4★ ou plus',
+    filterAll: 'Toutes',
+    filterOrigin: 'Origine',
+    filterNational: '🇧🇷 National',
+    filterInternational: '🌍 International',
+    filterState: 'État',
+    filterAllStates: 'Tous les États',
+    filterCountry: 'Pays',
+    filterAllCountries: 'Tous les Pays',
+    filterShipping: 'Livraison',
+    filterFreeShipChk: 'Livraison Gratuite',
+    filterFastShipChk: 'Livraison Rapide',
+    filterCondition: 'État du Produit',
+    filterCondNew: 'Neuf',
+    filterCondUsed: 'Occasion',
+    filterCondRefurb: 'Reconditionné',
+    filterApplyBtn: 'Appliquer les Filtres',
+    filterClearBtn: '✕ Effacer',
+    filterPriceMinPh: 'Min',
+    filterPriceMaxPh: 'Max',
+    filterKeywordPh: 'Ex. : RTX, 256Go, coton...',
+    catSortTitleAttr: 'Trier par',
+    catPerPageTitleAttr: 'Par page',
+    storeProductsOfLabel: 'Produits de',
+    storeReviewsTitleLabel: 'Avis sur la Boutique',
+    productWordPlural2: 'produits',
+    trustSellersVerified: 'Vendeurs vérifiés',
+    trustFreeShip: 'Livraison gratuite sur de nombreux articles',
+    trkNotFoundTitle: 'Commande introuvable',
+    trkNotFoundSubTpl: 'Vérifiez le code {code} et réessayez.',
+    trkNotFoundDemoHint: '(En mode démo, seuls les codes WKZ-8821, WKZ-8654, WKZ-8412 et WKZ-8200 sont valides)',
+    trkDemoNoticeText: '⚙ <strong>Données fictives</strong> — cette commande est une démonstration. Le suivi réel sera disponible après intégration avec les transporteurs.',
+    trkUrgencyText: 'Votre colis est chez le livreur ! Restez attentif — il peut arriver à tout moment.',
+    stepConfirmed: 'Confirmé',
+    stepSeparated: 'Préparé',
+    stepDispatched: 'Expédié',
+    stepTransit: 'En transit',
+    stepOutForDelivery: 'En cours de livraison',
+    stepDelivered: 'Livré',
+    trkHistoryTitle: 'Historique des Événements',
+    trkFinalStatusLabel: 'Statut final',
+    trkDeliveredOnTpl: '✅ Livré le {date}',
+    trkEtaLabel: 'Livraison Estimée',
+    trkDaysUnit: 'jours',
+    trkHoursUnit: 'h',
+    trkMinUnit: 'min',
+    trkSecUnit: 'sec',
+    trkRouteLabel: '🗺 Itinéraire de livraison —',
+    trkPackageTitle: 'Colis',
+    trkQtyLabel: 'Qté :',
+    trkCopyBtn: 'Copier',
+    trkActionsTitle: 'Actions',
+    trkOrderPrefix: 'Commande',
+    trkConfirmReceiptBtn: 'Confirmer la Réception',
+    trkReceiptConfirmedLabel: 'Réception Confirmée',
+    trkContactSellerTpl: 'Contacter le Vendeur ({seller} ⭐{rating})',
+    trkReportProblemBtn: 'Signaler un Problème de Livraison',
+    trkProblemReportedTpl: 'Problème Signalé — Dossier {protocol}',
+    trkRateProductBtn: '⭐ Évaluer le Produit',
+    trkReviewSentLabel: 'Avis Envoyé',
+    trkCodeCopiedToast: '📋 Code copié !',
+    trkEscrowConfirmedTitle: 'Paiement Bloqué en Séquestre',
+    trkEscrowConfirmedDesc: 'Votre paiement a été reçu et est <strong style="color:var(--text);">bloqué en toute sécurité</strong> par WeKz. Le vendeur n\'y a pas encore accès.',
+    trkEscrowConfirmedNote: 'Les fonds ne sont transférés au vendeur qu\'après confirmation de la livraison. En cas de problème, vous êtes remboursé.',
+    trkEscrowTransitTitle: 'Paiement en Séquestre — Commande en Transit',
+    trkEscrowTransitDesc: 'Votre argent reste <strong style="color:var(--text);">bloqué par WeKz</strong>. Le vendeur ne le recevra qu\'après votre confirmation de livraison.',
+    trkEscrowTransitNote: 'Délai de libération automatique : 7 jours après confirmation de la livraison par le suivi.',
+    trkEscrowOutDeliveryTitle: 'Presque arrivé — Paiement toujours bloqué',
+    trkEscrowOutDeliveryDesc: 'La commande est <strong style="color:#ffa07a;">en cours de livraison</strong>. Votre paiement reste protégé sur notre compte séquestre jusqu\'à validation de la livraison.',
+    trkEscrowOutDeliveryNote: 'Dès que vous confirmez la réception, le paiement est immédiatement versé au vendeur.',
+    trkEscrowOutDeliveryCta: '✅ Confirmer la Réception Maintenant',
+    trkEscrowDeliveredTitle: 'Livré — En Attente de Libération',
+    trkEscrowDeliveredDesc: 'Produit livré ! Le paiement sera <strong style="color:#4ade80;">libéré au vendeur sous 7 jours</strong>, ou immédiatement si vous confirmez ci-dessous.',
+    trkEscrowDeliveredNote: 'Après le délai ou votre confirmation, le vendeur reçoit le montant net (commission WeKz déduite).',
+    trkEscrowDeliveredCta: '✅ Libérer le Paiement au Vendeur',
+    trkEscrowReleasedTitle: 'Paiement Libéré au Vendeur',
+    trkEscrowReleasedDesc: 'Tout est en ordre ! Le montant de cette commande a déjà été <strong style="color:#4ade80;">transféré au vendeur</strong> (commission WeKz déduite).',
+    trkEscrowReleasedNote: 'Merci d\'avoir acheté sur WeKz Shop. Profitez-en pour évaluer votre achat ci-contre.',
+    estepPaid: 'Payé',
+    estepPreparing: 'En préparation',
+    estepShipped: 'Expédié',
+    estepReleased: 'Libéré',
+    estepInYourCity: 'Dans votre ville',
+    estepReview: 'Avis',
+    estepReleasedCheck: '✔ Libéré',
+    trkHeroDeliveryLabel: 'Livraison',
+    trkPageTitle: 'Suivre la Commande',
+    breadcrumbMyOrders: 'Mes Commandes',
+    trkDemoBannerText: '<strong style="color:#FDE68A;">⚙ Mode Démo</strong> — Les données de suivi affichées sont fictives. L\'intégration avec de vrais transporteurs (poste, DHL, FedEx) sera activée après le lancement.',
+    trkSearchPlaceholder: 'Code de commande (ex : WKZ-8821) ou numéro de suivi',
+    trkSearchBtn: 'Suivre',
+    trkRecentOrdersTitle: 'Commandes récentes',
   },
 
   de: {
@@ -2922,6 +3902,202 @@ const TRANSLATIONS = {
     cpTrackNoEvents: 'Noch keine Ereignisse erfasst.',
     cpTrackViewFullBtn: 'Vollständige Sendungsseite ansehen',
     minutes: 'Minuten',
+
+    // ── Novas chaves i18n (loja, listagem, footer, moedas) — Sprint M30 ──
+    badgeNew: 'NEU',
+    badgeSponsored: '📢 Gesponsert',
+    badgeCoupon: '🏷 Gutschein',
+    badgeFreeShip: '🚚 Gratis',
+    officialStoreTag: '🏅 Offizieller Shop',
+    buyNowPlain: 'Jetzt kaufen',
+    sortRelevance: 'Relevanz',
+    sortedByLabel: 'Sortiert nach:',
+    resultsFoundTpl: '{n} Produkt(e) gefunden',
+    resultsTotalTpl: '{n} Produkt(e)',
+    showingRangeTpl: '(zeige {a}–{b})',
+    prevPageBtn: '‹ Zurück',
+    nextPageBtn: 'Weiter ›',
+    noProductsFoundTitle: 'Keine Produkte gefunden',
+    tryAdjustFilters: 'Versuchen Sie es anzupassen oder',
+    clearFiltersLink: 'Filter löschen',
+    storeNoProductsMsg: 'Dieser Shop hat noch keine Produkte veröffentlicht',
+    breadcrumbHome: 'Startseite',
+    breadcrumbStores: 'Shops',
+    storeVerifiedBadge: 'Verifiziert',
+    storeQuickReplyBadge: 'Schnelle Antwort',
+    storeMemberSince: 'Mitglied seit',
+    storeFollowBtn: '+ Folgen',
+    storeUnfollowBtn: '💔 Entfolgen',
+    storeChatBtn: 'Chat',
+    storeReportTitle: 'Shop melden',
+    storeFollowToast: 'Shop wird jetzt gefolgt!',
+    storeChatToast: 'Chat gestartet!',
+    storeReportToast: 'Meldung gesendet',
+    storeStatSales: 'Verkäufe',
+    storeStatFollowers: 'Follower',
+    storeStatProducts: 'Produkte',
+    storeStatRating: 'Bewertung',
+    storeProductsHeadingTpl: 'Produkte von {store}',
+    storeSortTitleAttr: 'Sortieren nach',
+    storePerPageTitleAttr: 'Pro Seite',
+    sortBestSelling: 'Bestseller',
+    sortPriceAsc: 'Niedrigster Preis',
+    sortPriceDesc: 'Höchster Preis',
+    sortNewest: 'Neueste',
+    perPage10: '10 pro Seite',
+    perPage20: '20 pro Seite',
+    perPage30: '30 pro Seite',
+    storeReviewsTitle: '⭐ Shop-Bewertungen',
+    reviewVerifiedBadge: 'Verifizierter Kauf',
+    policyReturn30: '30 Tage Rückgabe',
+    policyOriginal: 'Originalprodukt',
+    policyShip24h: 'Versand in 24h',
+    policyFastReply: 'Sofortige Antwort',
+    policySealed: 'Versiegelt garantiert',
+    policySerial: 'Gültige Seriennummer',
+    policyExpressShip: 'Expressversand',
+    policyAntiFraud: 'Betrugsschutz aktiv',
+    policySizeExchange: 'Größentausch',
+    policyCertOriginal: 'Zertifiziert original',
+    policyFreeShip: 'Kostenloser Versand',
+    policyReviews50k: '+50k Bewertungen',
+    policyAuthentic: 'Authentisches Produkt',
+    policyInvoice: 'Rechnung inklusive',
+    policyPremiumPkg: 'Premium-Verpackung',
+    policyCrueltyFree: 'Tierversuchsfrei',
+    policyTestStore: 'Test-Shop',
+    policyDevEnv: 'Entwicklungsumgebung',
+    footerAllCategories: 'Alle Kategorien',
+    footerDealsOfDay: 'Angebote des Tages',
+    footerFlashSale: 'Blitzverkauf',
+    footerKzLive: 'Kz Live Shopping',
+    footerNewProducts: 'Neue Produkte',
+    footerOpenStore: 'Meinen Shop eröffnen',
+    footerHowItWorks: 'So funktioniert es',
+    footerFeesCommissions: 'Gebühren und Provisionen',
+    footerSellerCenter: 'Verkäuferzentrum',
+    footerBizPolicies: 'Geschäftsrichtlinien',
+    footerHelpCenter: 'Hilfecenter und Plattform-FAQs',
+    footerPurchaseSecurity: 'Sicherheit und Käuferschutz',
+    footerDisputes: 'Streitschlichtung und Rückerstattung',
+    footerShipTracking: 'Sendungsverfolgung',
+    footerReturnGuidelines: 'Rückgaberichtlinien für Verkäufer',
+    footerTechSupport: '24/7 technischer Support',
+    footerAboutUs: 'Über uns',
+    footerTerms: 'Nutzungsbedingungen',
+    footerPrivacyLgpd: 'Datenschutz',
+    footerAntiFraud: 'Betrugsschutz',
+    footerAuthenticity: 'Echtheitsgarantie',
+    footerAccessibility: 'Barrierefreiheit',
+    currBRL: 'Brasilianischer Real',
+    currUSD: 'US-Dollar',
+    currEUR: 'Euro',
+    currGBP: 'Britisches Pfund',
+    currJPY: 'Japanischer Yen',
+    currARS: 'Argentinischer Peso',
+    currMXN: 'Mexikanischer Peso',
+    currCNY: 'Chinesischer Yuan',
+    selectCurrencyTitle: 'Währung wählen',
+    selectLangTitle: 'Sprache wählen',
+    catMostRelevant: 'Relevanteste',
+    sortBestRating: 'Bestbewertet',
+    filterTitle: '🎯 Filtern',
+    filterSearchInCat: 'In dieser Kategorie suchen',
+    filterPriceRange: 'Preisspanne',
+    filterRating: 'Bewertung',
+    filterRating45: '4.5★ oder mehr',
+    filterRating4: '4★ oder mehr',
+    filterAll: 'Alle',
+    filterOrigin: 'Herkunft',
+    filterNational: '🇧🇷 Inland',
+    filterInternational: '🌍 International',
+    filterState: 'Bundesland',
+    filterAllStates: 'Alle Bundesländer',
+    filterCountry: 'Land',
+    filterAllCountries: 'Alle Länder',
+    filterShipping: 'Versand',
+    filterFreeShipChk: 'Kostenloser Versand',
+    filterFastShipChk: 'Schnelle Lieferung',
+    filterCondition: 'Zustand',
+    filterCondNew: 'Neu',
+    filterCondUsed: 'Gebraucht',
+    filterCondRefurb: 'Generalüberholt',
+    filterApplyBtn: 'Filter Anwenden',
+    filterClearBtn: '✕ Löschen',
+    filterPriceMinPh: 'Min',
+    filterPriceMaxPh: 'Max',
+    filterKeywordPh: 'Z.B.: RTX, 256GB, Baumwolle...',
+    catSortTitleAttr: 'Sortieren nach',
+    catPerPageTitleAttr: 'Pro Seite',
+    storeProductsOfLabel: 'Produkte von',
+    storeReviewsTitleLabel: 'Shop-Bewertungen',
+    productWordPlural2: 'Produkte',
+    trustSellersVerified: 'Verifizierte Verkäufer',
+    trustFreeShip: 'Kostenloser Versand für viele Artikel',
+    trkNotFoundTitle: 'Bestellung nicht gefunden',
+    trkNotFoundSubTpl: 'Überprüfen Sie den Code {code} und versuchen Sie es erneut.',
+    trkNotFoundDemoHint: '(Im Demo-Modus sind nur die Codes WKZ-8821, WKZ-8654, WKZ-8412 und WKZ-8200 gültig)',
+    trkDemoNoticeText: '⚙ <strong>Beispieldaten</strong> — diese Bestellung dient nur zu Demonstrationszwecken. Echtes Tracking ist nach der Integration mit Versanddienstleistern verfügbar.',
+    trkUrgencyText: 'Ihre Bestellung ist jetzt beim Zusteller! Bleiben Sie aufmerksam — sie kann jeden Moment eintreffen.',
+    stepConfirmed: 'Bestätigt',
+    stepSeparated: 'Kommissioniert',
+    stepDispatched: 'Versandt',
+    stepTransit: 'Unterwegs',
+    stepOutForDelivery: 'In Zustellung',
+    stepDelivered: 'Zugestellt',
+    trkHistoryTitle: 'Ereignisverlauf',
+    trkFinalStatusLabel: 'Endstatus',
+    trkDeliveredOnTpl: '✅ Zugestellt am {date}',
+    trkEtaLabel: 'Voraussichtliche Lieferung',
+    trkDaysUnit: 'Tage',
+    trkHoursUnit: 'Std',
+    trkMinUnit: 'Min',
+    trkSecUnit: 'Sek',
+    trkRouteLabel: '🗺 Lieferroute —',
+    trkPackageTitle: 'Paket',
+    trkQtyLabel: 'Menge:',
+    trkCopyBtn: 'Kopieren',
+    trkActionsTitle: 'Aktionen',
+    trkOrderPrefix: 'Bestellung',
+    trkConfirmReceiptBtn: 'Empfang Bestätigen',
+    trkReceiptConfirmedLabel: 'Empfang Bestätigt',
+    trkContactSellerTpl: 'Verkäufer Kontaktieren ({seller} ⭐{rating})',
+    trkReportProblemBtn: 'Lieferproblem Melden',
+    trkProblemReportedTpl: 'Problem Gemeldet — Vorgang {protocol}',
+    trkRateProductBtn: '⭐ Produkt Bewerten',
+    trkReviewSentLabel: 'Bewertung Gesendet',
+    trkCodeCopiedToast: '📋 Code kopiert!',
+    trkEscrowConfirmedTitle: 'Zahlung im Treuhandkonto',
+    trkEscrowConfirmedDesc: 'Ihre Zahlung wurde empfangen und wird von WeKz <strong style="color:var(--text);">sicher verwahrt</strong>. Der Verkäufer hat noch keinen Zugriff auf den Betrag.',
+    trkEscrowConfirmedNote: 'Der Betrag wird erst nach Zustellbestätigung an den Verkäufer überwiesen. Bei Problemen erhalten Sie Ihr Geld zurück.',
+    trkEscrowTransitTitle: 'Zahlung im Treuhandkonto — Bestellung Unterwegs',
+    trkEscrowTransitDesc: 'Ihr Geld wird weiterhin <strong style="color:var(--text);">von WeKz verwahrt</strong>. Der Verkäufer erhält es erst nach Ihrer Zustellbestätigung.',
+    trkEscrowTransitNote: 'Automatische Freigabefrist: 7 Tage nach Zustellbestätigung durch das Tracking.',
+    trkEscrowOutDeliveryTitle: 'Fast da — Zahlung noch einbehalten',
+    trkEscrowOutDeliveryDesc: 'Die Bestellung ist <strong style="color:#ffa07a;">in Zustellung</strong>. Ihre Zahlung bleibt bis zur Zustellbestätigung auf unserem Treuhandkonto geschützt.',
+    trkEscrowOutDeliveryNote: 'Sobald Sie den Empfang bestätigen, wird die Zahlung sofort an den Verkäufer freigegeben.',
+    trkEscrowOutDeliveryCta: '✅ Empfang Jetzt Bestätigen',
+    trkEscrowDeliveredTitle: 'Zugestellt — Freigabe Ausstehend',
+    trkEscrowDeliveredDesc: 'Produkt zugestellt! Die Zahlung wird <strong style="color:#4ade80;">innerhalb von 7 Tagen an den Verkäufer freigegeben</strong>, oder sofort, wenn Sie unten bestätigen.',
+    trkEscrowDeliveredNote: 'Nach Ablauf der Frist oder Ihrer Bestätigung erhält der Verkäufer den Nettobetrag (abzüglich WeKz-Provision).',
+    trkEscrowDeliveredCta: '✅ Zahlung an Verkäufer Freigeben',
+    trkEscrowReleasedTitle: 'Zahlung an Verkäufer Freigegeben',
+    trkEscrowReleasedDesc: 'Alles erledigt! Der Betrag dieser Bestellung wurde bereits <strong style="color:#4ade80;">an den Verkäufer überwiesen</strong> (abzüglich WeKz-Provision).',
+    trkEscrowReleasedNote: 'Danke für Ihren Einkauf bei WeKz Shop. Bewerten Sie gerne Ihren Kauf nebenan.',
+    estepPaid: 'Bezahlt',
+    estepPreparing: 'Wird vorbereitet',
+    estepShipped: 'Versandt',
+    estepReleased: 'Freigegeben',
+    estepInYourCity: 'In Ihrer Stadt',
+    estepReview: 'Bewertung',
+    estepReleasedCheck: '✔ Freigegeben',
+    trkHeroDeliveryLabel: 'Lieferung',
+    trkPageTitle: 'Bestellung verfolgen',
+    breadcrumbMyOrders: 'Meine Bestellungen',
+    trkDemoBannerText: '<strong style="color:#FDE68A;">⚙ Demo-Modus</strong> — Die angezeigten Tracking-Daten sind fiktiv. Die Integration mit echten Versanddienstleistern (Post, DHL, FedEx) wird nach dem Start aktiviert.',
+    trkSearchPlaceholder: 'Bestellcode (z.B. WKZ-8821) oder Sendungsnummer',
+    trkSearchBtn: 'Verfolgen',
+    trkRecentOrdersTitle: 'Letzte Bestellungen',
   },
 
   ja: {
@@ -3179,6 +4355,202 @@ const TRANSLATIONS = {
     cpTrackNoEvents: 'まだ記録されたイベントはありません。',
     cpTrackViewFullBtn: '追跡ページ全体を見る',
     minutes: '分',
+
+    // ── Novas chaves i18n (loja, listagem, footer, moedas) — Sprint M30 ──
+    badgeNew: '新着',
+    badgeSponsored: '📢 広告',
+    badgeCoupon: '🏷 クーポン',
+    badgeFreeShip: '🚚 送料無料',
+    officialStoreTag: '🏅 公式ストア',
+    buyNowPlain: '今すぐ購入',
+    sortRelevance: '関連度',
+    sortedByLabel: '並び替え:',
+    resultsFoundTpl: '{n} 件の商品が見つかりました',
+    resultsTotalTpl: '全 {n} 件',
+    showingRangeTpl: '({a}〜{b} 件を表示)',
+    prevPageBtn: '‹ 前へ',
+    nextPageBtn: '次へ ›',
+    noProductsFoundTitle: '商品が見つかりません',
+    tryAdjustFilters: '条件を変更するか',
+    clearFiltersLink: 'フィルターをクリア',
+    storeNoProductsMsg: 'このショップにはまだ商品がありません',
+    breadcrumbHome: 'ホーム',
+    breadcrumbStores: 'ショップ',
+    storeVerifiedBadge: '認証済み',
+    storeQuickReplyBadge: '迅速な返信',
+    storeMemberSince: '登録日',
+    storeFollowBtn: '+ フォロー',
+    storeUnfollowBtn: '💔 フォロー解除',
+    storeChatBtn: 'チャット',
+    storeReportTitle: 'ショップを報告',
+    storeFollowToast: 'このショップをフォローしました！',
+    storeChatToast: 'チャットを開始しました！',
+    storeReportToast: '報告を送信しました',
+    storeStatSales: '販売数',
+    storeStatFollowers: 'フォロワー',
+    storeStatProducts: '商品数',
+    storeStatRating: '評価',
+    storeProductsHeadingTpl: '{store} の商品',
+    storeSortTitleAttr: '並び替え',
+    storePerPageTitleAttr: '1ページあたり',
+    sortBestSelling: '売れ筋',
+    sortPriceAsc: '価格が安い順',
+    sortPriceDesc: '価格が高い順',
+    sortNewest: '新着順',
+    perPage10: '10件ずつ',
+    perPage20: '20件ずつ',
+    perPage30: '30件ずつ',
+    storeReviewsTitle: '⭐ ショップのレビュー',
+    reviewVerifiedBadge: '購入確認済み',
+    policyReturn30: '30日間返品可能',
+    policyOriginal: '正規品保証',
+    policyShip24h: '24時間以内に発送',
+    policyFastReply: '即時返信',
+    policySealed: '未開封保証',
+    policySerial: 'シリアル番号有効',
+    policyExpressShip: '速達発送',
+    policyAntiFraud: '不正防止対策済み',
+    policySizeExchange: 'サイズ交換可',
+    policyCertOriginal: '認証正規品',
+    policyFreeShip: '送料無料',
+    policyReviews50k: '5万件以上のレビュー',
+    policyAuthentic: '本物保証',
+    policyInvoice: 'インボイス発行',
+    policyPremiumPkg: 'プレミアム梱包',
+    policyCrueltyFree: 'クルエルティフリー',
+    policyTestStore: 'テストストア',
+    policyDevEnv: '開発環境',
+    footerAllCategories: 'すべてのカテゴリー',
+    footerDealsOfDay: '本日のセール',
+    footerFlashSale: 'タイムセール',
+    footerKzLive: 'Kzライブショッピング',
+    footerNewProducts: '新着商品',
+    footerOpenStore: '自分のショップを開く',
+    footerHowItWorks: 'ご利用方法',
+    footerFeesCommissions: '手数料について',
+    footerSellerCenter: 'セラーセンター',
+    footerBizPolicies: '取引ポリシー',
+    footerHelpCenter: 'ヘルプセンター・よくある質問',
+    footerPurchaseSecurity: '安全・購入者保護',
+    footerDisputes: '紛争仲裁・返金',
+    footerShipTracking: '配送追跡',
+    footerReturnGuidelines: '出品者向け返品ガイドライン',
+    footerTechSupport: '24時間365日サポート',
+    footerAboutUs: '会社概要',
+    footerTerms: '利用規約',
+    footerPrivacyLgpd: 'プライバシーポリシー',
+    footerAntiFraud: '不正防止',
+    footerAuthenticity: '真贋保証',
+    footerAccessibility: 'アクセシビリティ',
+    currBRL: 'ブラジルレアル',
+    currUSD: '米ドル',
+    currEUR: 'ユーロ',
+    currGBP: '英ポンド',
+    currJPY: '日本円',
+    currARS: 'アルゼンチンペソ',
+    currMXN: 'メキシコペソ',
+    currCNY: '人民元',
+    selectCurrencyTitle: '通貨を選択',
+    selectLangTitle: '言語を選択',
+    catMostRelevant: '関連度順',
+    sortBestRating: '評価が高い順',
+    filterTitle: '🎯 絞り込み',
+    filterSearchInCat: 'このカテゴリー内を検索',
+    filterPriceRange: '価格帯',
+    filterRating: '評価',
+    filterRating45: '4.5★ 以上',
+    filterRating4: '4★ 以上',
+    filterAll: 'すべて',
+    filterOrigin: '原産地',
+    filterNational: '🇧🇷 国内',
+    filterInternational: '🌍 海外',
+    filterState: '都道府県',
+    filterAllStates: 'すべての都道府県',
+    filterCountry: '国',
+    filterAllCountries: 'すべての国',
+    filterShipping: '配送',
+    filterFreeShipChk: '送料無料',
+    filterFastShipChk: 'お急ぎ便',
+    filterCondition: '状態',
+    filterCondNew: '新品',
+    filterCondUsed: '中古',
+    filterCondRefurb: '整備済み',
+    filterApplyBtn: 'フィルターを適用',
+    filterClearBtn: '✕ クリア',
+    filterPriceMinPh: '最低',
+    filterPriceMaxPh: '最高',
+    filterKeywordPh: '例：RTX、256GB、コットン...',
+    catSortTitleAttr: '並び替え',
+    catPerPageTitleAttr: '1ページあたり',
+    storeProductsOfLabel: 'の商品',
+    storeReviewsTitleLabel: 'ショップのレビュー',
+    productWordPlural2: '点の商品',
+    trustSellersVerified: '認証済み出品者',
+    trustFreeShip: '多くの商品が送料無料',
+    trkNotFoundTitle: '注文が見つかりません',
+    trkNotFoundSubTpl: 'コード {code} を確認してもう一度お試しください。',
+    trkNotFoundDemoHint: '（デモモードでは WKZ-8821、WKZ-8654、WKZ-8412、WKZ-8200 のみ有効です）',
+    trkDemoNoticeText: '⚙ <strong>サンプルデータ</strong>——このご注文はデモ用です。配送業者との連携後に実際の追跡が利用可能になります。',
+    trkUrgencyText: 'ご注文は現在配達員が保持しています！いつ到着してもおかしくありません。',
+    stepConfirmed: '確認済み',
+    stepSeparated: 'ピッキング済み',
+    stepDispatched: '発送済み',
+    stepTransit: '輸送中',
+    stepOutForDelivery: '配達中',
+    stepDelivered: '配達完了',
+    trkHistoryTitle: '配送履歴',
+    trkFinalStatusLabel: '最終ステータス',
+    trkDeliveredOnTpl: '✅ {date} に配達完了',
+    trkEtaLabel: 'お届け予定',
+    trkDaysUnit: '日',
+    trkHoursUnit: '時間',
+    trkMinUnit: '分',
+    trkSecUnit: '秒',
+    trkRouteLabel: '🗺 配送ルート —',
+    trkPackageTitle: '荷物',
+    trkQtyLabel: '数量：',
+    trkCopyBtn: 'コピー',
+    trkActionsTitle: '操作',
+    trkOrderPrefix: '注文',
+    trkConfirmReceiptBtn: '受け取りを確認',
+    trkReceiptConfirmedLabel: '受け取り確認済み',
+    trkContactSellerTpl: '出品者に連絡（{seller} ⭐{rating}）',
+    trkReportProblemBtn: '配送トラブルを報告',
+    trkProblemReportedTpl: '問題を報告済み——受付番号 {protocol}',
+    trkRateProductBtn: '⭐ 商品を評価',
+    trkReviewSentLabel: 'レビュー送信済み',
+    trkCodeCopiedToast: '📋 コードをコピーしました！',
+    trkEscrowConfirmedTitle: '代金は預託保管中',
+    trkEscrowConfirmedDesc: 'お支払いは受領され、WeKz が<strong style="color:var(--text);">安全に預かって</strong>います。出品者はまだこの代金にアクセスできません。',
+    trkEscrowConfirmedNote: '配達確認後に初めて出品者へ送金されます。問題があった場合は返金されます。',
+    trkEscrowTransitTitle: '代金預託中——輸送中の注文',
+    trkEscrowTransitDesc: '代金は引き続き WeKz が<strong style="color:var(--text);">預かって</strong>います。配達確認後にのみ出品者へ送金されます。',
+    trkEscrowTransitNote: '自動放出までの期限：追跡で配達確認後7日間。',
+    trkEscrowOutDeliveryTitle: 'まもなく到着——代金はまだ預託中',
+    trkEscrowOutDeliveryDesc: 'ご注文は<strong style="color:#ffa07a;">配達中</strong>です。配達が確認されるまで、代金は保護預託口座で保管されます。',
+    trkEscrowOutDeliveryNote: '受け取りを確認すると、代金は直ちに出品者へ送金されます。',
+    trkEscrowOutDeliveryCta: '✅ 今すぐ受け取りを確認',
+    trkEscrowDeliveredTitle: '配達完了——放出待ち',
+    trkEscrowDeliveredDesc: '商品が届きました！代金は<strong style="color:#4ade80;">7日以内に出品者へ放出</strong>されます。下記で確認すればすぐに放出されます。',
+    trkEscrowDeliveredNote: '期限到達またはご確認後、出品者は手数料差引後の金額を受け取ります。',
+    trkEscrowDeliveredCta: '✅ 出品者へ代金を放出',
+    trkEscrowReleasedTitle: '出品者への代金放出済み',
+    trkEscrowReleasedDesc: '完了です！本注文の代金はすでに<strong style="color:#4ade80;">出品者へ送金</strong>されました（WeKz手数料差引後）。',
+    trkEscrowReleasedNote: 'WeKz Shopでのお買い上げありがとうございます。ぜひ隣でご購入の評価をお願いします。',
+    estepPaid: '支払い済み',
+    estepPreparing: '準備中',
+    estepShipped: '発送済み',
+    estepReleased: '放出済み',
+    estepInYourCity: 'お住まいの地域に到着',
+    estepReview: 'レビュー',
+    estepReleasedCheck: '✔ 放出済み',
+    trkHeroDeliveryLabel: 'お届け',
+    trkPageTitle: '注文を追跡',
+    breadcrumbMyOrders: 'マイ注文',
+    trkDemoBannerText: '<strong style="color:#FDE68A;">⚙ デモモード</strong>——表示されている追跡データは架空のものです。実際の配送業者（郵便、DHL、FedEx）との連携はローンチ後に有効になります。',
+    trkSearchPlaceholder: '注文コード（例：WKZ-8821）または追跡番号',
+    trkSearchBtn: '追跡する',
+    trkRecentOrdersTitle: '最近の注文',
   },
 };
 
@@ -3232,6 +4604,33 @@ function applyTranslations() {
       }
     }
   });
+
+  /* [FIX v30] Handlers genéricos para placeholder/title/data-title via
+     data-i18n-placeholder / data-i18n-title — assim qualquer <input> ou
+     <select> novo só precisa do atributo no HTML, sem exigir uma linha
+     nova aqui em JS a cada campo (padrão usado no footer/sidebar/loja). */
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const val = t(el.dataset.i18nPlaceholder);
+    if (val && val !== el.dataset.i18nPlaceholder) el.placeholder = val;
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const val = t(el.dataset.i18nTitle);
+    if (val && val !== el.dataset.i18nTitle) {
+      el.title = val;
+      if (el.hasAttribute('data-title')) el.setAttribute('data-title', val);
+    }
+  });
+
+  /* [FIX v30] "Produtos da {Loja}" é label-antes-do-nome em pt/en/es/fr/de,
+     mas em zh/ja o possessivo vem DEPOIS do substantivo ("{Loja} 的商品" /
+     "{Loja} の商品") — nenhuma tradução de texto resolve isso sozinha,
+     porque a ORDEM dos dois <span> no DOM também precisa inverter. */
+  const storeHeadWrap = document.getElementById('storeProductsOfWrap');
+  if (storeHeadWrap) {
+    storeHeadWrap.style.flexDirection = (lang === 'zh' || lang === 'ja') ? 'row-reverse' : 'row';
+    storeHeadWrap.style.display = 'inline-flex';
+    storeHeadWrap.style.gap = '4px';
+  }
 
   /* ── 3. Inputs / placeholders ─────────────────────────────────────── */
   const si = document.getElementById('searchInput');
@@ -3362,7 +4761,11 @@ function applyTranslations() {
   /* ── 13. Footer ────────────────────────────────────────────────────── */
   const fbp = document.querySelector('.footer-brand p');
   if (fbp) fbp.textContent = t('footerDesc');
-  const footerH4s = document.querySelectorAll('.footer-col h4');
+  /* [FIX v30] Esse seletor buscava '.footer-col h4', mas o HTML do rodapé
+     usa <details><summary> (não h4) — o resultado era um NodeList vazio e
+     os 4 títulos de coluna (Comprar/Vender/Suporte/WeKz) NUNCA traduziam,
+     silenciosamente, desde sempre. Corrigido para o seletor real. */
+  const footerH4s = document.querySelectorAll('.footer-nav-col summary');
   ['footerBuy','footerSell','footerSupport','footerAbout'].forEach((k, i) => {
     if (footerH4s[i]) footerH4s[i].textContent = t(k);
   });
@@ -3419,6 +4822,47 @@ function applyTranslations() {
   if (typeof renderWishlist === 'function') renderWishlist();
   if (typeof renderCart     === 'function') renderCart();
 
+  /* [FIX v30] Estas três telas nunca eram re-desenhadas ao trocar de
+     idioma — cada uma tem seu próprio template com texto fixo em PT,
+     então precisam ser chamadas de novo explicitamente aqui (mesmo
+     problema que renderCats() já tinha e foi corrigido acima em
+     [cats-i18n]). Só re-renderiza se a tela relevante existir/estiver
+     em uso, pra não gerar trabalho à toa em outras páginas. */
+  if (typeof currentCatId !== 'undefined' && currentCatId && typeof renderCatProducts === 'function'
+      && document.body.getAttribute('data-view') === 'category') {
+    // [FIX v30] Retraduz também o título/breadcrumb/subtítulo da categoria,
+    // não só a grade de produtos — reaproveita CAT_I18N_MAP (mesmo mapa já
+    // usado por renderCats()/populateSearchCatOptions() em core.js).
+    if (typeof currentCatRawName !== 'undefined' && currentCatRawName && typeof CAT_I18N_MAP !== 'undefined') {
+      const displayName = CAT_I18N_MAP[currentCatRawName] ? t(CAT_I18N_MAP[currentCatRawName]) : currentCatRawName;
+      const bc = document.getElementById('catBreadcrumb');
+      const ti = document.getElementById('catTemplateTitle');
+      if (bc) bc.textContent = displayName;
+      if (ti) ti.textContent = displayName;
+      const sub = document.getElementById('catTemplateSub');
+      const cat = (typeof DB !== 'undefined' && DB.categories) ? DB.categories.find(c=>c.name===currentCatRawName) : null;
+      if (sub && cat) sub.textContent = `${cat.count}+ ${t('productWordPlural2')} · ${t('trustSellersVerified')} · ${t('trustFreeShip')}`;
+    }
+    renderCatProducts();
+  }
+  /* [FIX v30] Página de Rastreio de Pedido: loadTracking() nunca era
+     chamada de novo ao trocar idioma — reusa o código já digitado em
+     #trkInput (sempre reflete o pedido atualmente exibido) só quando essa
+     é a página ativa, mesma lógica de guarda usada para loja/categoria. */
+  if (document.body.getAttribute('data-view') === 'tracking' && typeof loadTracking === 'function') {
+    const trkInputEl = document.getElementById('trkInput');
+    if (trkInputEl && trkInputEl.value) loadTracking(trkInputEl.value);
+  }
+  if (typeof currentOpenStoreId !== 'undefined' && currentOpenStoreId && typeof openStore === 'function'
+      && document.body.getAttribute('data-view') === 'store-detail') {
+    // [FIX v30] só re-renderiza se a página de loja for a que está
+    // ATIVA no momento — openStore() termina com showPage('store-detail'),
+    // então sem essa checagem trocar o idioma enquanto o usuário está em
+    // QUALQUER outra tela (ex.: Home) o teletransportaria de volta pra
+    // uma loja que ele só tinha visitado antes na mesma sessão.
+    openStore(currentOpenStoreId); // reconstrói stats/políticas/reviews/grade já traduzidos
+  }
+
   /* ── 17. CORREÇÃO 3: recalcula scroll das categorias após resize ───── */
   // Dispara um resize sintético para que qualquer carrossel/scroll-fade
   // recalcule overflow e larguras com os novos textos traduzidos.
@@ -3461,8 +4905,12 @@ function updateLang(l) {
   if(typeof wkzSecureStorage!=='undefined'){wkzSecureStorage.set('wkzLang',l);wkzSecureStorage.set('wkzCurrency',pairedCurrency);}else{localStorage.setItem('wkzLang',l);localStorage.setItem('wkzCurrency',pairedCurrency);}
   } catch(e) {}
 
-  const langNames = {pt:'Português 🇧🇷',en:'English 🇺🇸',es:'Español 🇪🇸',zh:'中文 🇨🇳',fr:'Français 🇫🇷',de:'Deutsch 🇩🇪',ja:'日本語 🇯🇵',hi:'हिन्दी 🇮🇳',ru:'Русский 🇷🇺',ko:'한국어 🇰🇷',ar:'العربية 🇸🇦',tr:'Türkçe 🇹🇷',it:'Italiano 🇮🇹',nl:'Nederlands 🇳🇱',pl:'Polski 🇵🇱',sv:'Svenska 🇸🇪'};
-  showToast(`🌐 ${langNames[l] || l} · 💱 ${pairedCurrency}`);
+  // [FIX v30] Antes este mapa duplicava (e desatualizava) a lista de
+  // WKZ_LANGS na mão — ainda citava os 9 idiomas removidos do seletor.
+  // Agora deriva direto de WKZ_LANGS (única fonte de verdade).
+  const langEntry = WKZ_LANGS.find(x => x.code === l);
+  const langDisplay = langEntry ? `${langEntry.name} ${langEntry.flag}` : l;
+  showToast(`🌐 ${langDisplay} · 💱 ${pairedCurrency}`);
 
   // ── Bridge → Kz Global Localizer ──────────────────────────────────────
   kzSyncFromHeader(l, pairedCurrency);
@@ -3486,6 +4934,16 @@ function updateCurrency(c, toast = true) {
   if (typeof renderProducts === 'function') renderProducts();
   if (typeof renderWishlist === 'function') renderWishlist();
   if (typeof renderCart     === 'function') renderCart();
+  /* [FIX v30] Mesma lacuna do applyTranslations(): categoria/loja tinham
+     preços parados na moeda antiga até o usuário forçar outra ação. */
+  if (typeof currentCatId !== 'undefined' && currentCatId && typeof renderCatProducts === 'function'
+      && document.body.getAttribute('data-view') === 'category') {
+    renderCatProducts();
+  }
+  if (typeof currentOpenStoreId !== 'undefined' && currentOpenStoreId && typeof renderStoreProducts === 'function'
+      && document.body.getAttribute('data-view') === 'store-detail') {
+    renderStoreProducts(storeCurrentPage); // só preços/cards; não precisa reabrir a loja inteira
+  }
 
   // CORREÇÃO 4: persiste
   // SEC-01 [UX — aceitável]: preferência de moeda não sensível
@@ -6966,44 +8424,38 @@ function cartBuyExpressNow(idx) {
    WEKZ v1.3.0 — PREMIUM CURRENCY / LANGUAGE PANELS
    ══════════════════════════════════════════════════════════ */
 
+/* [FIX v30 — moedas-reais] Lista restrita às 8 moedas que têm cotação real
+   em `rates`/`symbols` (wkz-core.js). Antes havia 28 opções aqui, mas só
+   8 existiam em `rates` — escolher qualquer uma das outras 20 (CAD, CLP,
+   COP, PEN, CHF, SEK, NOK, PLN, KRW, INR, AUD, SGD, HKD, THB, AED, SAR,
+   ZAR, NGN, EGP, TRY, RUB, UAH) caía no fallback silencioso de
+   updateCurrency() para BRL: o usuário escolhia "Coroa Sueca" e o preço
+   continuava sendo exibido (e cobrado, na mente do usuário) em Real —
+   um problema sério de clareza de preço para o CDC, não só de UX.
+   `name` agora é resolvido via t('curr'+code) em vez de texto fixo em PT,
+   para que o nome da moeda também traduza junto com o idioma. Reintroduzir
+   qualquer moeda daqui exige antes adicionar a taxa real em `rates`/
+   `symbols` (wkz-core.js) — nunca apenas listar aqui. */
 const WKZ_CURRENCIES = [
-  /* Américas */
-  { code: 'BRL', name: 'Real Brasileiro',      flag: '🇧🇷' },
-  { code: 'USD', name: 'US Dollar',            flag: '🇺🇸' },
-  { code: 'CAD', name: 'Dólar Canadense',      flag: '🇨🇦' },
-  { code: 'MXN', name: 'Peso Mexicano',        flag: '🇲🇽' },
-  { code: 'ARS', name: 'Peso Argentino',       flag: '🇦🇷' },
-  { code: 'CLP', name: 'Peso Chileno',         flag: '🇨🇱' },
-  { code: 'COP', name: 'Peso Colombiano',      flag: '🇨🇴' },
-  { code: 'PEN', name: 'Sol Peruano',          flag: '🇵🇪' },
-  /* Europa */
-  { code: 'EUR', name: 'Euro',                 flag: '🇪🇺' },
-  { code: 'GBP', name: 'Libra Esterlina',      flag: '🇬🇧' },
-  { code: 'CHF', name: 'Franco Suíço',         flag: '🇨🇭' },
-  { code: 'SEK', name: 'Coroa Sueca',          flag: '🇸🇪' },
-  { code: 'NOK', name: 'Coroa Norueguesa',     flag: '🇳🇴' },
-  { code: 'PLN', name: 'Zloty Polonês',        flag: '🇵🇱' },
-  /* Ásia / Pacífico */
-  { code: 'JPY', name: 'Iene Japonês',         flag: '🇯🇵' },
-  { code: 'CNY', name: 'Yuan Chinês',          flag: '🇨🇳' },
-  { code: 'KRW', name: 'Won Sul-Coreano',      flag: '🇰🇷' },
-  { code: 'INR', name: 'Rupia Indiana',        flag: '🇮🇳' },
-  { code: 'AUD', name: 'Dólar Australiano',    flag: '🇦🇺' },
-  { code: 'SGD', name: 'Dólar de Singapura',   flag: '🇸🇬' },
-  { code: 'HKD', name: 'Dólar de Hong Kong',   flag: '🇭🇰' },
-  { code: 'THB', name: 'Baht Tailandês',       flag: '🇹🇭' },
-  /* Oriente Médio / África */
-  { code: 'AED', name: 'Dirham dos EAU',       flag: '🇦🇪' },
-  { code: 'SAR', name: 'Riyal Saudita',        flag: '🇸🇦' },
-  { code: 'ZAR', name: 'Rand Sul-Africano',    flag: '🇿🇦' },
-  { code: 'NGN', name: 'Naira Nigeriana',      flag: '🇳🇬' },
-  { code: 'EGP', name: 'Libra Egípcia',        flag: '🇪🇬' },
-  /* Leste Europeu / Outros */
-  { code: 'TRY', name: 'Lira Turca',           flag: '🇹🇷' },
-  { code: 'RUB', name: 'Rublo Russo',          flag: '🇷🇺' },
-  { code: 'UAH', name: 'Hryvnia Ucraniana',    flag: '🇺🇦' },
+  { code: 'BRL', get name(){ return t('currBRL'); }, flag: '🇧🇷' },
+  { code: 'USD', get name(){ return t('currUSD'); }, flag: '🇺🇸' },
+  { code: 'EUR', get name(){ return t('currEUR'); }, flag: '🇪🇺' },
+  { code: 'GBP', get name(){ return t('currGBP'); }, flag: '🇬🇧' },
+  { code: 'JPY', get name(){ return t('currJPY'); }, flag: '🇯🇵' },
+  { code: 'ARS', get name(){ return t('currARS'); }, flag: '🇦🇷' },
+  { code: 'MXN', get name(){ return t('currMXN'); }, flag: '🇲🇽' },
+  { code: 'CNY', get name(){ return t('currCNY'); }, flag: '🇨🇳' },
 ];
 
+/* [FIX v30 — idiomas-reais] Lista restrita aos 7 idiomas que têm dicionário
+   COMPLETO em TRANSLATIONS (pt/en/es/zh/fr/de/ja — 341 chaves cada, ver
+   Sprint M30). Antes havia 16 opções aqui, mas 9 delas (ko/ar/hi/ru/tr/it/
+   nl/pl/sv) não tinham NENHUMA entrada em TRANSLATIONS: escolher qualquer
+   uma delas fazia t() cair no fallback silencioso para 'pt' em toda a
+   interface — a moeda mudava, mas 100% do texto continuava em português.
+   Isso é pior do que não oferecer a opção (promessa quebrada ao usuário).
+   Reintroduzir qualquer um desses exige escrever o dicionário completo
+   primeiro (ver TRANSLATIONS) antes de voltar a listá-lo aqui. */
 const WKZ_LANGS = [
   { code: 'pt', label: 'PT', name: 'Português (BR)',  flag: '🇧🇷' },
   { code: 'en', label: 'EN', name: 'English',         flag: '🇺🇸' },
@@ -7012,15 +8464,6 @@ const WKZ_LANGS = [
   { code: 'fr', label: 'FR', name: 'Français',        flag: '🇫🇷' },
   { code: 'de', label: 'DE', name: 'Deutsch',         flag: '🇩🇪' },
   { code: 'ja', label: 'JP', name: '日本語',          flag: '🇯🇵' },
-  { code: 'ko', label: 'KO', name: '한국어',          flag: '🇰🇷' },
-  { code: 'ar', label: 'AR', name: 'العربية',         flag: '🇸🇦' },
-  { code: 'hi', label: 'HI', name: 'हिन्दी',         flag: '🇮🇳' },
-  { code: 'ru', label: 'RU', name: 'Русский',         flag: '🇷🇺' },
-  { code: 'tr', label: 'TR', name: 'Türkçe',          flag: '🇹🇷' },
-  { code: 'it', label: 'IT', name: 'Italiano',        flag: '🇮🇹' },
-  { code: 'nl', label: 'NL', name: 'Nederlands',      flag: '🇳🇱' },
-  { code: 'pl', label: 'PL', name: 'Polski',          flag: '🇵🇱' },
-  { code: 'sv', label: 'SV', name: 'Svenska',         flag: '🇸🇪' },
 ];
 
 var _wkzOpenPanel = null;
@@ -7102,9 +8545,9 @@ function toggleWkzPanel(type) {
   // Build panel
   let panel;
   if(type === 'currency'){
-    panel = _buildPanel(panelId, '💲', 'Selecionar Moeda', WKZ_CURRENCIES, currCode, 'wkzSelectCurrency');
+    panel = _buildPanel(panelId, '💲', t('selectCurrencyTitle'), WKZ_CURRENCIES, currCode, 'wkzSelectCurrency');
   } else {
-    panel = _buildPanel(panelId, '🌐', 'Selecionar Idioma', WKZ_LANGS, langCode, 'wkzSelectLang');
+    panel = _buildPanel(panelId, '🌐', t('selectLangTitle'), WKZ_LANGS, langCode, 'wkzSelectLang');
   }
   _positionPanel(panel, btn);
 
@@ -10690,14 +12133,20 @@ const CATEGORY_FACETS = {
 };
 
 let currentCatId = '';
+let currentCatRawName = ''; // [FIX v30] nome PT original (chave de DB.categories), usado para re-traduzir ao trocar idioma
 
 function openCategory(name, icon){
   const cat = DB.categories.find(c=>c.name===name) || {name,icon,count:'—',desc:`Produtos em ${name}`};
   currentCatId = CAT_KEY_MAP[name] || cat.id || '';
-  document.getElementById('catBreadcrumb').textContent = name;
+  currentCatRawName = name;
+  const hasT = typeof t === 'function';
+  const displayName = hasT && CAT_I18N_MAP[name] ? t(CAT_I18N_MAP[name]) : name;
+  document.getElementById('catBreadcrumb').textContent = displayName;
   document.getElementById('catTemplateIcon').innerHTML = wkzCatIconSVG(icon || cat.icon);
-  document.getElementById('catTemplateTitle').textContent = name;
-  document.getElementById('catTemplateSub').textContent = `${cat.count}+ produtos · Vendedores verificados · Frete grátis em muitos itens`;
+  document.getElementById('catTemplateTitle').textContent = displayName;
+  document.getElementById('catTemplateSub').textContent = hasT
+    ? `${cat.count}+ ${t('productWordPlural2')} · ${t('trustSellersVerified')} · ${t('trustFreeShip')}`
+    : `${cat.count}+ produtos · Vendedores verificados · Frete grátis em muitos itens`;
   resetCatFilterInputs();
   renderCatExtraFacets();
   renderCatOriginOptions();
@@ -10747,7 +12196,7 @@ function renderCatOriginOptions(){
         const na=(DB.ufList.find(u=>u.uf===a)||{}).name||a, nb=(DB.ufList.find(u=>u.uf===b)||{}).name||b;
         return na.localeCompare(nb,'pt-BR');
       });
-    ufSel.innerHTML = '<option value="">Todos os Estados</option>' + ufs.map(uf=>{
+    ufSel.innerHTML = `<option value="">${typeof t==='function'?t('filterAllStates'):'Todos os Estados'}</option>` + ufs.map(uf=>{
       const info = DB.ufList.find(u=>u.uf===uf);
       return `<option value="${uf}">${escapeHtml(info?info.name:uf)} (${uf})</option>`;
     }).join('');
@@ -10756,7 +12205,7 @@ function renderCatOriginOptions(){
   const countrySel = document.getElementById('catCountrySelect');
   if(countrySel){
     const countries = [...new Set(catProducts.filter(p=>p.origin==='internacional' && p.country).map(p=>p.country))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-    countrySel.innerHTML = '<option value="">Todos os Países</option>' + countries.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    countrySel.innerHTML = `<option value="">${typeof t==='function'?t('filterAllCountries'):'Todos os Países'}</option>` + countries.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
     countrySel.value='';
   }
 }
@@ -10951,7 +12400,9 @@ function renderCatProducts(page){
   const rangeStart = totalItems ? startIdx + 1 : 0;
   const rangeEnd = Math.min(startIdx + perPage, totalItems);
 
-  rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${list.length}</strong> produto${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}${totalItems?` <span style="color:var(--muted);font-weight:400;">(mostrando ${rangeStart}–${rangeEnd})</span>`:''}</span><span style="font-size:12px;color:var(--muted);">Ordenado por: ${sort||'Relevância'}</span></div>`;
+  const sortLabelEl = document.getElementById('catSortSelect');
+  const sortLabel = sortLabelEl?.options[sortLabelEl.selectedIndex]?.textContent || t('catMostRelevant');
+  rb.innerHTML = `<div class="search-result-bar"><span class="srb-count">${t('resultsFoundTpl').replace('{n}','<strong>'+list.length+'</strong>')}${totalItems?` <span style="color:var(--muted);font-weight:400;">${t('showingRangeTpl').replace('{a}',rangeStart).replace('{b}',rangeEnd)}</span>`:''}</span><span style="font-size:12px;color:var(--muted);">${t('sortedByLabel')} ${sortLabel}</span></div>`;
 
   renderCatActiveChips({keywordRaw, minInput, maxInput, sliderMax, ratingVal, originVal, condVal, activeFacets});
 
@@ -10960,8 +12411,8 @@ function renderCatProducts(page){
   if(!list.length){
     g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
       <div style="font-size:40px;margin-bottom:12px;">🔍</div>
-      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">Nenhum produto encontrado</div>
-      <div style="font-size:13px;">Tente ajustar ou <span style="color:var(--teal);cursor:pointer;font-weight:600;" data-action="clearCatFilters" data-args="[]">limpar os filtros</span>.</div>
+      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">${t('noProductsFoundTitle')}</div>
+      <div style="font-size:13px;">${t('tryAdjustFilters')} <span style="color:var(--teal);cursor:pointer;font-weight:600;" data-action="clearCatFilters" data-args="[]">${t('clearFiltersLink')}</span>.</div>
     </div>`;
     if(pag) pag.innerHTML='';
     return;
@@ -10974,21 +12425,21 @@ function renderCatProducts(page){
       <div class="product-img"><wkz-product-image src="${p.img||''}" emoji="${p.e}" alt="${p.n}"></wkz-product-image>
         <div class="product-badges">
           ${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}
-          ${p.badge==='new'?'<span class="badge badge-new">NOVO</span>':''}
+          ${p.badge==='new'?`<span class="badge badge-new">${t('badgeNew')}</span>`:''}
           ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
-          ${p._sponsored?'<span class="badge badge-ad">📢 Patrocinado</span>':''}
-          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">🚚 Grátis</span>':''}
-          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">🏷 Cupom</span>':''}
+          ${p._sponsored?`<span class="badge badge-ad">${t('badgeSponsored')}</span>`:''}
+          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?`<span class="badge badge-frete">${t('badgeFreeShip')}</span>`:''}
+          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?`<span class="badge badge-coupon">${t('badgeCoupon')}</span>`:''}
         </div>
         <button class="product-wish" data-action="wishToggle" data-args='["$this",${realIdx},"$event"]'>♡</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.n}</div>
-        <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?'<span class="store-official-tag">🏅 Loja Oficial</span>':''}</div>
+        <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?`<span class="store-official-tag">${t('officialStoreTag')}</span>`:''}</div>
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span><span class="price-old">${formatPrice(p.op)}</span><span class="price-off">-${p.off}%</span></div>
-        <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales} vendidos</div></div>
-        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> Adicionar ao carrinho</span></button>
-        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> Comprar Agora</span></button>
+        <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales} ${t('sold')}</div></div>
+        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> ${t('addToCart')}</span></button>
+        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> ${t('buyNowPlain')}</span></button>
       </div>
     </div>`;
   }).join('');
@@ -11026,9 +12477,9 @@ function buildCatPaginationHTML(current, total){
     nums.push(total);
   }
 
-  let html = pageBtn('‹ Anterior', current-1, {isNav:true, disabled: current===1});
+  let html = pageBtn(t('prevPageBtn'), current-1, {isNav:true, disabled: current===1});
   html += nums.map(n => n==='...' ? ellipsis : pageBtn(String(n), n)).join('');
-  html += pageBtn('Próxima ›', current+1, {isNav:true, disabled: current===total});
+  html += pageBtn(t('nextPageBtn'), current+1, {isNav:true, disabled: current===total});
   return html;
 }
 
@@ -11084,8 +12535,39 @@ function getPolicyIcon(label){
 }
 
 // ─── STORE DETAIL TEMPLATE ───
+/* [FIX v30] Mapa de textos de política de loja (PT, como cadastrados em
+   DB.stores) → chave i18n. As políticas são um conjunto fechado e genérico
+   (reaproveitado por todas as lojas), então dá pra traduzir de verdade em
+   vez de deixar o texto cru do banco de dados. Texto que não estiver no
+   mapa cai no próprio texto original (nunca quebra, só não traduz). */
+const POLICY_I18N_MAP = {
+  '30 dias devolução': 'policyReturn30',
+  'Produto original': 'policyOriginal',
+  'Envio em 24h': 'policyShip24h',
+  'Resp. imediata': 'policyFastReply',
+  'Lacrado garantido': 'policySealed',
+  'Serial válido': 'policySerial',
+  'Envio expresso': 'policyExpressShip',
+  'Anti-fraude ativo': 'policyAntiFraud',
+  'Troca de tamanho': 'policySizeExchange',
+  'Original certif.': 'policyCertOriginal',
+  'Frete grátis': 'policyFreeShip',
+  '+50k avaliações': 'policyReviews50k',
+  'Produto autêntico': 'policyAuthentic',
+  'Nota fiscal': 'policyInvoice',
+  'Embalagem premium': 'policyPremiumPkg',
+  'Cruelty-free': 'policyCrueltyFree',
+  'Loja de testes': 'policyTestStore',
+  'Ambiente de dev': 'policyDevEnv',
+};
+function _tPolicy(rawText){
+  const key = POLICY_I18N_MAP[rawText];
+  return key ? t(key) : rawText;
+}
+
 function openStore(storeId){
   const s = DB.stores.find(st=>st.id===storeId) || DB.stores[0];
+  currentOpenStoreId = s.id; // [FIX v30] guarda qual loja está aberta para re-render ao trocar idioma
   document.getElementById('storeTplName').textContent = s.name;
   document.getElementById('storeTplBanner').textContent = s.banner;
   document.getElementById('storeTplAvatar').textContent = s.avatar;
@@ -11099,16 +12581,16 @@ function openStore(storeId){
   const realProductCount = products.filter(p => p.s === s.sellerKey).length;
 
   document.getElementById('storeTplStats').innerHTML = [
-    {v:s.sales,l:'Vendas'},
-    {v:s.followers,l:'Seguidores'},
-    {v:realProductCount,l:'Produtos'},
-    {v:s.rating+'★',l:'Avaliação'},
+    {v:s.sales,l:t('storeStatSales')},
+    {v:s.followers,l:t('storeStatFollowers')},
+    {v:realProductCount,l:t('storeStatProducts')},
+    {v:s.rating+'★',l:t('storeStatRating')},
   ].map(st=>`<div class="store-stat"><div class="store-stat-val">${st.v}</div><div class="store-stat-label">${st.l}</div></div>`).join('');
 
   document.getElementById('storePolicies').innerHTML = s.policies.map(p=>`
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
       <div style="display:flex;justify-content:center;align-items:center;margin-bottom:6px;height:28px;color:var(--teal);">${getPolicyIcon(p.t)}</div>
-      <div style="font-size:12px;font-weight:600;">${p.t}</div>
+      <div style="font-size:12px;font-weight:600;">${_tPolicy(p.t)}</div>
     </div>`).join('');
 
   // [FIX v? — pendência #3 "Produtos da Loja"] Filtra de verdade agora:
@@ -11129,7 +12611,7 @@ function openStore(storeId){
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
           <span style="font-size:13px;font-weight:600;">${r.name}</span>
           <span style="color:#F59E0B;font-size:12px;">${'★'.repeat(r.r)}</span>
-          ${r.verified?'<span style="font-size:10px;color:var(--teal);background:rgba(0,180,171,0.1);padding:2px 8px;border-radius:50px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox=\'0 0 24 24\' width=\'10\' height=\'10\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'20,6 9,17 4,12\'/></svg> Compra verificada</span>':''}
+          ${r.verified?`<span style="font-size:10px;color:var(--teal);background:rgba(0,180,171,0.1);padding:2px 8px;border-radius:50px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox='0 0 24 24' width='10' height='10' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20,6 9,17 4,12'/></svg> ${t('reviewVerifiedBadge')}</span>`:''}
         </div>
         <div style="font-size:13px;color:var(--muted);">${r.text}</div>
       </div>
@@ -11139,7 +12621,7 @@ function openStore(storeId){
   const tplFollowBtn = document.querySelector('.store-tpl-actions .btn-follow, .store-tpl-actions .btn-unfollow');
   if(tplFollowBtn){
     const isAlreadyFollowed = followedStores.some(fs => fs.n === s.name);
-    tplFollowBtn.textContent = isAlreadyFollowed ? '💔 Deixar de Seguir' : '+ Seguir';
+    tplFollowBtn.textContent = isAlreadyFollowed ? t('storeUnfollowBtn') : t('storeFollowBtn');
     tplFollowBtn.className = isAlreadyFollowed ? 'btn-unfollow' : 'btn-follow';
     tplFollowBtn.onclick = function(){ toggleFollowStoreByName(s.name, this); };
   }
@@ -11148,12 +12630,11 @@ function openStore(storeId){
   showPage('store-detail');
 }
 
-// Loja atualmente aberta em page-store-detail (nome de exibição + chave
-// de vendedor usada para filtrar products[].s) e página atual da
-// paginação de "Produtos da Loja".
-let currentStoreName = '';
-let currentStoreSellerKey = '';
-let storeCurrentPage = 1;
+// [FIX v30] Loja atualmente aberta (id em DB.stores), usada só para poder
+// re-traduzir os textos gerados por JS (stats/políticas/botão seguir/
+// selo de review) quando o idioma muda com a página de loja já aberta —
+// sem isso, applyTranslations() não tinha como saber qual loja redesenhar.
+let currentOpenStoreId = null;
 
 // Ordena, pagina (10/20/30 por página, igual à página de Eletrônicos) e
 // renderiza os "Produtos da Loja". Mesmo padrão de renderCatProducts(),
@@ -11186,14 +12667,14 @@ function renderStoreProducts(page){
   const rangeStart = totalItems ? startIdx + 1 : 0;
   const rangeEnd = Math.min(startIdx + perPage, totalItems);
 
-  if(rb) rb.innerHTML = `<div class="search-result-bar"><span class="srb-count"><strong>${totalItems}</strong> produto${totalItems!==1?'s':''}${totalItems?` <span style="color:var(--muted);font-weight:400;">(mostrando ${rangeStart}–${rangeEnd})</span>`:''}</span></div>`;
+  if(rb) rb.innerHTML = `<div class="search-result-bar"><span class="srb-count">${t('resultsTotalTpl').replace('{n}','<strong>'+totalItems+'</strong>')}${totalItems?` <span style="color:var(--muted);font-weight:400;">${t('showingRangeTpl').replace('{a}',rangeStart).replace('{b}',rangeEnd)}</span>`:''}</span></div>`;
 
   const pag = document.getElementById('storePagination');
 
   if(!list.length){
     g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);">
       <div style="font-size:40px;margin-bottom:12px;">🏪</div>
-      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">Esta loja ainda não tem produtos publicados</div>
+      <div style="font-weight:700;margin-bottom:6px;color:var(--text);">${t('storeNoProductsMsg')}</div>
     </div>`;
     if(pag) pag.innerHTML='';
     return;
@@ -11207,19 +12688,19 @@ function renderStoreProducts(page){
       <div class="product-img"><wkz-product-image src="${p.img||''}" emoji="${p.e}" alt="${p.n}"></wkz-product-image>
         <div class="product-badges">
           ${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}
-          ${p.badge==='new'?'<span class="badge badge-new">NOVO</span>':''}
+          ${p.badge==='new'?`<span class="badge badge-new">${t('badgeNew')}</span>`:''}
           ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
-          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">🚚 Grátis</span>':''}
+          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?`<span class="badge badge-frete">${t('badgeFreeShip')}</span>`:''}
         </div>
         <button class="product-wish" data-action="wishToggle" data-args='["$this",${realIdx},"$event"]'>♡</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.n}</div>
-        <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?'<span class="store-official-tag">🏅 Loja Oficial</span>':''}</div>
+        <div class="product-store"><span class="store-verified">✅</span>${p.s}${isOfficialStore(p.s)?`<span class="store-official-tag">${t('officialStoreTag')}</span>`:''}</div>
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span><span class="price-old">${formatPrice(p.op)}</span><span class="price-off">-${p.off}%</span></div>
-        <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales} vendidos</div></div>
-        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> Adicionar ao carrinho</span></button>
-        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> Comprar Agora</span></button>
+        <div class="product-meta"><div class="product-stars"><span class="stars">★★★★★</span> ${p.r}</div><div class="product-sales">${p.sales} ${t('sold')}</div></div>
+        <button class="btn-add" onclick="event.stopPropagation();btnFeedback(this,()=>addToCart(${realIdx}))"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> ${t('addToCart')}</span></button>
+        <button class="btn-buy" onclick="event.stopPropagation();btnFeedback(this,()=>{addToCart(${realIdx});setTimeout(()=>showPage('cart'),400)},{loadingMs:500,successMs:600})"><span class="btn-spinner"></span><span class="btn-check">✓</span><span class="btn-label"><span class="wkz-icon wkz-icon-zap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg></span> ${t('buyNowPlain')}</span></button>
       </div>
     </div>`;
   }).join('');
@@ -11252,9 +12733,9 @@ function buildStorePaginationHTML(current, total){
     nums.push(total);
   }
 
-  let html = pageBtn('‹ Anterior', current-1, {isNav:true, disabled: current===1});
+  let html = pageBtn(t('prevPageBtn'), current-1, {isNav:true, disabled: current===1});
   html += nums.map(n => n==='...' ? ellipsis : pageBtn(String(n), n)).join('');
-  html += pageBtn('Próxima ›', current+1, {isNav:true, disabled: current===total});
+  html += pageBtn(t('nextPageBtn'), current+1, {isNav:true, disabled: current===total});
   return html;
 }
 
@@ -11781,6 +13262,36 @@ function trkCloseModal() {
 }
 window.trkCloseModal = trkCloseModal;
 
+/* [FIX v30] Rótulos do stepper horizontal (Confirmado/Separado/Despachado/
+   Em trânsito/Saiu p/ entrega/Entregue) são um conjunto fechado de 6
+   estágios genéricos, reaproveitado por TODOS os pedidos demo — mesmo
+   padrão do POLICY_I18N_MAP da página de loja. O histórico de eventos
+   detalhado (_TRK_DATA[].events, com textos como "Liberado pela alfândega
+   HK") continua em PT: é conteúdo específico de cada pedido/transportadora
+   (dado, não rótulo de interface) — mesmo raciocínio já aplicado à
+   descrição livre de cada loja (s.desc). Ver changelog para o que falta. */
+const STEP_I18N_MAP = {
+  'Confirmado': 'stepConfirmed', 'Separado': 'stepSeparated', 'Despachado': 'stepDispatched',
+  'Em trânsito': 'stepTransit', 'Saiu p/ entrega': 'stepOutForDelivery', 'Entregue': 'stepDelivered',
+};
+function _tStep(rawLabel){
+  const key = STEP_I18N_MAP[rawLabel];
+  return key ? t(key) : rawLabel;
+}
+/* Mesma lógica para os 5 rótulos curtos da barra de progresso do escrow
+   (Pago/Em preparo/Enviado/Na sua cidade/Avaliação/✔ Liberado) — reaproveita
+   stepDelivered/stepTransit (já traduzidos acima) para as duas palavras
+   que também aparecem no stepper principal. */
+const ESTEP_I18N_MAP = {
+  'Pago':'estepPaid', 'Em preparo':'estepPreparing', 'Enviado':'estepShipped',
+  'Entregue':'stepDelivered', 'Em trânsito':'stepTransit', 'Liberado':'estepReleased',
+  'Na sua cidade':'estepInYourCity', 'Avaliação':'estepReview', '✔ Liberado':'estepReleasedCheck',
+};
+function _tEstep(rawLabel){
+  const key = ESTEP_I18N_MAP[rawLabel];
+  return key ? t(key) : rawLabel;
+}
+
 function loadTracking(code) {
   if(!code) code = (document.getElementById('trkInput')||{}).value || '';
   code = code.trim().toUpperCase();
@@ -11794,8 +13305,8 @@ function loadTracking(code) {
   if(!data) {
     el.innerHTML = `<div class="trk-empty">
       <div class="trk-empty-icon">🔍</div>
-      <div class="trk-empty-title">Pedido não encontrado</div>
-      <div class="trk-empty-sub">Verifique o código <strong>${code||'—'}</strong> e tente novamente. <em style="font-size:11px;color:var(--muted);">(Em modo demo apenas os códigos WKZ-8821, WKZ-8654, WKZ-8412 e WKZ-8200 são válidos)</em></div>
+      <div class="trk-empty-title">${t('trkNotFoundTitle')}</div>
+      <div class="trk-empty-sub">${t('trkNotFoundSubTpl').replace('{code}','<strong>'+(code||'—')+'</strong>')} <em style="font-size:11px;color:var(--muted);">${t('trkNotFoundDemoHint')}</em></div>
     </div>`;
     return;
   }
@@ -11832,7 +13343,7 @@ function loadTracking(code) {
   // BUG-05 FIX: prefixo de aviso demo antes do conteúdo real (só para pedidos demo, não para compras reais)
   var _demoNotice = data.isNewOrder ? '' : `<div style="display:flex;align-items:center;gap:8px;background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:8px 12px;margin-bottom:14px;font-size:11px;color:#FCD34D;">
     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <span>⚙ <strong>Dados fictícios</strong> — este pedido é de demonstração. Rastreamento real disponível após integração com transportadoras.</span>
+    <span>${t('trkDemoNoticeText')}</span>
   </div>`;
 
   // Build horizontal stepper
@@ -11845,7 +13356,7 @@ function loadTracking(code) {
           : _trkIco(s.icon, 12)
         }
       </div>
-      <div class="trk-hstep-lbl">${s.label}</div>
+      <div class="trk-hstep-lbl">${_tStep(s.label)}</div>
       <div class="trk-hstep-date">${s.date}</div>
     </div>`;
   }).join('');
@@ -11871,14 +13382,14 @@ function loadTracking(code) {
 
   // Out-for-delivery urgency banner
   var urgencyBanner = data.status === 'out_delivery'
-    ? `<div class="trk-out-banner"><div class="trk-out-dot"></div>Seu pedido está com o entregador agora! Fique atento — pode chegar a qualquer momento.</div>`
+    ? `<div class="trk-out-banner"><div class="trk-out-dot"></div>${t('trkUrgencyText')}</div>`
     : '';
 
   // Map (only for in-transit/out-delivery)
   var mapHtml = (data.status === 'out_delivery' || data.status === 'transit')
     ? `<div class="trk-map">
         <div class="trk-map-grid"></div>
-        <div class="trk-map-label">🗺 Rota de entrega — ${data.carrier.name}</div>
+        <div class="trk-map-label">${t('trkRouteLabel')} ${data.carrier.name}</div>
         <div class="trk-map-route"></div>
         <div class="trk-map-origin"></div>
         <div class="trk-map-dest">🏠</div>
@@ -11890,22 +13401,22 @@ function loadTracking(code) {
   var etaHtml = '';
   if(data.status === 'delivered') {
     etaHtml = `<div class="trk-eta-box" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.25);">
-      <div class="trk-eta-label">Status final</div>
-      <div class="trk-eta-date" style="color:#4ade80;">✅ Entregue em ${data.etaLabel}</div>
+      <div class="trk-eta-label">${t('trkFinalStatusLabel')}</div>
+      <div class="trk-eta-date" style="color:#4ade80;">${t('trkDeliveredOnTpl').replace('{date}',data.etaLabel)}</div>
     </div>`;
   } else {
     var cd = _trkFmtCountdown(data.etaDate);
     etaHtml = `<div class="trk-eta-box">
-      <div class="trk-eta-label">Previsão de Entrega</div>
+      <div class="trk-eta-label">${t('trkEtaLabel')}</div>
       <div class="trk-eta-date">${data.etaLabel}</div>
       <div class="trk-eta-timer" id="trkCdTimer">
-        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_d">${cd?String(cd.d).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">dias</div></div>
+        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_d">${cd?String(cd.d).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">${t('trkDaysUnit')}</div></div>
         <div style="color:var(--teal);font-size:18px;font-weight:800;align-self:flex-start;margin-top:2px;">:</div>
-        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_h">${cd?String(cd.h).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">hrs</div></div>
+        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_h">${cd?String(cd.h).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">${t('trkHoursUnit')}</div></div>
         <div style="color:var(--teal);font-size:18px;font-weight:800;align-self:flex-start;margin-top:2px;">:</div>
-        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_m">${cd?String(cd.m).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">min</div></div>
+        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_m">${cd?String(cd.m).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">${t('trkMinUnit')}</div></div>
         <div style="color:var(--teal);font-size:18px;font-weight:800;align-self:flex-start;margin-top:2px;">:</div>
-        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_s">${cd?String(cd.s).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">seg</div></div>
+        <div class="trk-eta-unit"><div class="trk-eta-num" id="trkCd_s">${cd?String(cd.s).padStart(2,'0'):'--'}</div><div class="trk-eta-uname">${t('trkSecUnit')}</div></div>
       </div>
     </div>`;
     // Start countdown
@@ -11931,15 +13442,15 @@ function loadTracking(code) {
   var confirmBtn = '';
   if (data.status === 'out_delivery') {
     confirmBtn = `<button class="trk-action-btn primary" data-action="wkzMarkOrderDelivered" data-args='["${_trkCodeEsc}"]'>
-        ${_trkIco('check',15)} Confirmar Recebimento
+        ${_trkIco('check',15)} ${t('trkConfirmReceiptBtn')}
        </button>`;
   } else if (data.status === 'delivered' && !data.escrowReleased) {
     confirmBtn = `<button class="trk-action-btn primary" data-action="trkReleasePayment" data-args='["${_trkCodeEsc}"]'>
-        ${_trkIco('check',15)} Confirmar Recebimento
+        ${_trkIco('check',15)} ${t('trkConfirmReceiptBtn')}
        </button>`;
   } else if (data.status === 'delivered' && data.escrowReleased) {
     confirmBtn = `<div class="trk-action-btn" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.3);color:#4ade80;cursor:default;justify-content:center;">
-        ${_trkIco('check',15)} Recebimento Confirmado
+        ${_trkIco('check',15)} ${t('trkReceiptConfirmedLabel')}
        </div>`;
   }
 
@@ -11948,18 +13459,18 @@ function loadTracking(code) {
     var rep = _TRK_REPORTS[_trkCodeEsc];
     reportOrReviewBtn = rep
       ? `<div class="trk-action-btn" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.3);color:#F59E0B;cursor:default;">
-          ${_trkIco('map',14)} Problema Reportado — Protocolo ${rep.protocol}
+          ${_trkIco('map',14)} ${t('trkProblemReportedTpl').replace('{protocol}',rep.protocol)}
          </div>`
       : `<button class="trk-action-btn danger" data-action="trkOpenReportModal" data-args='["${_trkCodeEsc}"]'>
-          ${_trkIco('map',14)} Reportar Problema na Entrega
+          ${_trkIco('map',14)} ${t('trkReportProblemBtn')}
          </button>`;
   } else {
     reportOrReviewBtn = data.userReview
       ? `<div class="trk-action-btn" style="background:rgba(234,179,8,0.08);border-color:rgba(234,179,8,0.3);color:#FCD34D;cursor:default;">
-          ${'★'.repeat(data.userReview.stars)}${'☆'.repeat(5-data.userReview.stars)} Avaliação Enviada
+          ${'★'.repeat(data.userReview.stars)}${'☆'.repeat(5-data.userReview.stars)} ${t('trkReviewSentLabel')}
          </div>`
       : `<button class="trk-action-btn" data-action="trkOpenReviewModal" data-args='["${_trkCodeEsc}","${_trkProdEsc}"]'>
-          ⭐ Avaliar Produto
+          ${t('trkRateProductBtn')}
          </button>`;
   }
 
@@ -11973,10 +13484,10 @@ function loadTracking(code) {
             <div class="trk-hero-icon">${data.statusIcon}</div>
             <div class="trk-hero-text">
               <div class="trk-hero-status">${data.statusLabel}</div>
-              <div class="trk-hero-sub">Pedido ${data.orderNum} · ${data.product.name}</div>
+              <div class="trk-hero-sub">${t('trkOrderPrefix')} ${data.orderNum} · ${data.product.name}</div>
             </div>
             <div class="trk-hero-eta">
-              <div class="trk-hero-eta-label">Entrega</div>
+              <div class="trk-hero-eta-label">${t('trkHeroDeliveryLabel')}</div>
               <div class="trk-hero-eta-date">${data.etaLabel}</div>
               <div class="trk-hero-eta-countdown">${data.address.split('—')[0].trim()}</div>
             </div>
@@ -11990,7 +13501,7 @@ function loadTracking(code) {
 
         <!-- Timeline -->
         <div class="trk-timeline-wrap">
-          <div class="trk-timeline-title">${_trkIco('map',16)} Histórico de Eventos</div>
+          <div class="trk-timeline-title">${_trkIco('map',16)} ${t('trkHistoryTitle')}</div>
           <div class="trk-timeline">${evHtml}</div>
         </div>
       </div>
@@ -12002,12 +13513,12 @@ function loadTracking(code) {
 
         <!-- Package info -->
         <div class="trk-sb-card">
-          <div class="trk-sb-title">${_trkIco('box',14)} Pacote</div>
+          <div class="trk-sb-title">${_trkIco('box',14)} ${t('trkPackageTitle')}</div>
           <div class="trk-pkg-row">
             <wkz-product-image class="trk-pkg-img" src="${data.product.img||''}" emoji="${data.product.emoji}" alt="${data.product.name}"></wkz-product-image>
             <div class="trk-pkg-info">
               <div class="trk-pkg-name">${data.product.name}</div>
-              <div class="trk-pkg-meta">Qtd: ${data.product.qty}</div>
+              <div class="trk-pkg-meta">${t('trkQtyLabel')} ${data.product.qty}</div>
             </div>
             <div class="trk-pkg-price">${data.product.price}</div>
           </div>
@@ -12018,18 +13529,18 @@ function loadTracking(code) {
               <div class="trk-carrier-code" id="trkCode">${data.carrier.code}</div>
             </div>
             ${data.carrier.code !== 'Aguardando código'
-              ? `<button class="trk-copy-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${data.carrier.code}');showToast('📋 Código copiado!')">Copiar</button>`
+              ? `<button class="trk-copy-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${data.carrier.code}');showToast(t('trkCodeCopiedToast'))">${t('trkCopyBtn')}</button>`
               : ''}
           </div>
         </div>
 
         <!-- Actions -->
         <div class="trk-sb-card">
-          <div class="trk-sb-title">Ações</div>
+          <div class="trk-sb-title">${t('trkActionsTitle')}</div>
           <div class="trk-actions">
             ${confirmBtn}
             <button class="trk-action-btn" data-action="trkOpenSellerChat" data-args='["${_trkCodeEsc}","${_trkSellerEsc}"]'>
-              ${_trkIco('check',14)} Contactar Vendedor (${data.seller.name} ⭐${data.seller.rating})
+              ${_trkIco('check',14)} ${t('trkContactSellerTpl').replace('{seller}',data.seller.name).replace('{rating}',data.seller.rating)}
             </button>
             ${_trkNotifyBtnHtml(_trkCodeEsc)}
             ${reportOrReviewBtn}
@@ -12042,43 +13553,43 @@ function loadTracking(code) {
             confirmed:{
               bg:'rgba(124,58,237,0.10)',border:'rgba(124,58,237,0.30)',
               barColor:'#7C3AED',barPct:15,
-              icon:'🔒',title:'Pagamento Retido em Custódia',
-              desc:'Seu pagamento foi recebido e está <strong style="color:var(--text);">retido com segurança</strong> na WeKz. O vendedor ainda não tem acesso ao valor.',
+              icon:'🔒',title:t('trkEscrowConfirmedTitle'),
+              desc:t('trkEscrowConfirmedDesc'),
               steps:['Pago','Em preparo','Enviado','Entregue','Liberado'],
               stepActive:0,
-              note:'O valor só é transferido ao vendedor após confirmação da entrega. Em caso de problema, você recebe de volta.',
+              note:t('trkEscrowConfirmedNote'),
               cta:'', ctaStyle:''
             },
             transit:{
               bg:'rgba(0,180,171,0.08)',border:'rgba(0,180,171,0.25)',
               barColor:'var(--teal)',barPct:55,
-              icon:'🔐',title:'Pagamento em Custódia — Pedido em Trânsito',
-              desc:'Seu dinheiro continua <strong style="color:var(--text);">retido pela WeKz</strong>. O vendedor receberá somente após você confirmar a entrega.',
+              icon:'🔐',title:t('trkEscrowTransitTitle'),
+              desc:t('trkEscrowTransitDesc'),
               steps:['Pago','Enviado','Em trânsito','Entregue','Liberado'],
               stepActive:2,
-              note:'Prazo de liberação automática: 7 dias após confirmação de entrega pelo rastreamento.',
+              note:t('trkEscrowTransitNote'),
               cta:'', ctaStyle:''
             },
             out_delivery:{
               bg:'rgba(255,107,53,0.09)',border:'rgba(255,107,53,0.30)',
               barColor:'#FF6B35',barPct:85,
-              icon:'📦',title:'Quase lá — Pagamento ainda retido',
-              desc:'O pedido está <strong style="color:#ffa07a;">saindo para entrega</strong>. Seu pagamento permanece protegido em nossa conta de custódia garantida até a validação da entrega.',
+              icon:'📦',title:t('trkEscrowOutDeliveryTitle'),
+              desc:t('trkEscrowOutDeliveryDesc'),
               steps:['Pago','Enviado','Em trânsito','Na sua cidade','Liberado'],
               stepActive:3,
-              note:'Ao confirmar o recebimento, o pagamento é liberado imediatamente ao vendedor.',
-              cta:'✅ Confirmar Recebimento Agora',
+              note:t('trkEscrowOutDeliveryNote'),
+              cta:t('trkEscrowOutDeliveryCta'),
               ctaStyle:'background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;'
             },
             delivered:{
               bg:'rgba(34,197,94,0.08)',border:'rgba(34,197,94,0.28)',
               barColor:'#22C55E',barPct:100,
-              icon:'✅',title:'Entregue — Aguardando Liberação',
-              desc:'Produto entregue! O pagamento será <strong style="color:#4ade80;">liberado ao vendedor em até 7 dias</strong> ou imediatamente se você confirmar abaixo.',
+              icon:'✅',title:t('trkEscrowDeliveredTitle'),
+              desc:t('trkEscrowDeliveredDesc'),
               steps:['Pago','Enviado','Entregue','Avaliação','✔ Liberado'],
               stepActive:3,
-              note:'Após o prazo ou sua confirmação, o vendedor recebe o valor líquido (descontada a comissão WeKz).',
-              cta:'✅ Liberar Pagamento ao Vendedor',
+              note:t('trkEscrowDeliveredNote'),
+              cta:t('trkEscrowDeliveredCta'),
               ctaStyle:'background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;'
             }
           };
@@ -12088,17 +13599,17 @@ function loadTracking(code) {
             c = {
               bg:'rgba(34,197,94,0.08)',border:'rgba(34,197,94,0.28)',
               barColor:'#22C55E',barPct:100,
-              icon:'✅',title:'Pagamento Liberado ao Vendedor',
-              desc:'Tudo certo! O valor deste pedido já foi <strong style="color:#4ade80;">transferido ao vendedor</strong> (descontada a comissão WeKz).',
+              icon:'✅',title:t('trkEscrowReleasedTitle'),
+              desc:t('trkEscrowReleasedDesc'),
               steps:['Pago','Enviado','Entregue','Avaliação','✔ Liberado'],
               stepActive:5,
-              note:'Obrigado por comprar na WeKz Shop. Aproveite para avaliar sua compra ao lado.',
+              note:t('trkEscrowReleasedNote'),
               cta:'', ctaStyle:''
             };
           }
           var stepsHtml = c.steps.map(function(s,i){
             var col = i < c.stepActive ? 'color:#4ade80;' : (i===c.stepActive ? 'color:var(--teal);font-weight:700;' : '');
-            return '<span style="'+col+'">'+s+'</span>';
+            return '<span style="'+col+'">'+_tEstep(s)+'</span>';
           }).join('');
           var _escrowAction = data.status === 'out_delivery'
             ? "wkzMarkOrderDelivered('" + _trkCodeEsc + "')"
@@ -14682,9 +16193,9 @@ window.closeKzNegotiatorOnBg = closeKzNegotiatorOnBg;
       if (current < total - 2) nums.push('...');
       nums.push(total);
     }
-    var html = pageBtn('‹ Anterior', current - 1, { isNav: true, disabled: current === 1 });
+    var html = pageBtn(t('prevPageBtn'), current - 1, { isNav: true, disabled: current === 1 });
     html += nums.map(function(n) { return n === '...' ? ellipsis : pageBtn(String(n), n); }).join('');
-    html += pageBtn('Próxima ›', current + 1, { isNav: true, disabled: current === total });
+    html += pageBtn(t('nextPageBtn'), current + 1, { isNav: true, disabled: current === total });
     return html;
   }
 
