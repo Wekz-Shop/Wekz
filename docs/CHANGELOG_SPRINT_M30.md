@@ -68,6 +68,12 @@ forçada).
   Loja). Também traduzido: estado de carrinho vazio, sugestões, botões de
   quantidade/remover/salvar, badge Flash Sale, e a sidebar de resumo
   inteira (Subtotal/Frete/Desconto/Total/cupom/nota de segurança).
+- **Favoritos (Wishlist):** era a 4ª cópia do template de card de produto
+  com badges fixas em PT (mesma causa raiz de Home/Categoria/Loja) —
+  corrigida reaproveitando as mesmas chaves já existentes. Estado vazio
+  (produtos e lojas), coleções, e a aba "Lojas Seguidas" traduzidos;
+  `renderWishlistStores()` (não estava na lista de re-render) agora é
+  chamada ao trocar idioma.
 - Corrigido o seletor `.footer-col h4` → `.footer-nav-col summary`; todos
   os 22 links do rodapé receberam `data-i18n`.
 - `applyTranslations()`/`updateCurrency()` agora re-renderizam Loja,
@@ -96,7 +102,7 @@ forçada).
   ele, com o mesmo padrão de texto fixo em PT encontrado em todo o resto.
   Não tentei fazer isso nesta sprint por ser justamente a etapa mais
   sensível do fluxo (dinheiro muda de mão ali) — prefiro tratar como uma
-  sprint dedicada (M31) em vez de apressar. Também não auditados: Wishlist,
+  sprint dedicada (M31) em vez de apressar. Também não auditados:
   Chat/mensagens, ticker social da PDP ("18 vendidos nas últimas 2h"),
   ferramenta de Comparar Produtos.
 
