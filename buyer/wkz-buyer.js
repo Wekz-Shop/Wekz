@@ -548,7 +548,7 @@ function renderCart(){
   if(cartItemsData.length === 0 && savedForLaterData.length === 0){
     const emptyMsg = (typeof getKzWisdom === 'function')
       ? getKzWisdom('empty_cart')
-      : 'O teu carrinho está vazio... Os meus sensores detetaram <strong>ofertas incríveis</strong> na Home. Vamos lá?';
+      : t('cartEmptyWisdomFallback');
     const kzSvg = (typeof getKzSVG === 'function') ? getKzSVG(80) : '🛒';
 
     // CRO-01: carrossel compacto de sugestões alinhadas aos interesses do usuário
@@ -557,7 +557,7 @@ function renderCart(){
     const suggestIconSvg = hasInterests
       ? '<span class="wkz-icon wkz-icon-sparkles"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:4px;"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M5 14l.85 2 2 .85-2 .85L5 20l-.85-2-2-.85 2-.85L5 14z"/><path d="M17 1l.85 2 2 .85-2 .85L17 7l-.85-2-2-.85 2-.85L17 1z"/></svg></span>'
       : '<span class="wkz-icon wkz-icon-flame"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:4px;"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-7 7A7 7 0 015 14c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 3.5z"/></svg></span>';
-    const suggestTitle = suggestIconSvg + (hasInterests ? 'Baseado nos seus interesses' : 'Mais procurados agora');
+    const suggestTitle = suggestIconSvg + (hasInterests ? t('cartSuggestBasedOnInterests') : t('cartSuggestTrending'));
     const suggestHtml = suggestions.length ? `
         <div class="kz-cart-suggest-wrap">
           <div class="kz-cart-suggest-title">${suggestTitle}</div>
@@ -576,10 +576,10 @@ function renderCart(){
         <div class="kz-cart-empty-glass">
           <div class="kz-cart-scan"></div>
           <div class="kz-cart-mascot">${kzSvg}</div>
-          <div class="kz-cart-empty-title">Carrinho Vazio</div>
+          <div class="kz-cart-empty-title">${t('cartEmptyTitle')}</div>
           <div class="kz-cart-empty-msg">${emptyMsg}</div>
           <button class="kz-cart-explore-btn" data-action="MapsTo" data-args='["home"]'>
-            <span class="wkz-icon wkz-icon-shoppingbag"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span> Explorar Ofertas
+            <span class="wkz-icon wkz-icon-shoppingbag"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span> ${t('cartExploreOffersBtn')}
           </button>
           ${suggestHtml}
         </div>
@@ -595,7 +595,12 @@ function renderCart(){
   const sb = document.getElementById('cartSelectBar');
   if(sb && cartItemsData.length > 0) sb.style.display = 'flex';
 
-  const fmt = v => 'R$ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  /* [FIX v30 — moeda-carrinho] `fmt` fazia sua PRÓPRIA formatação PT-BR
+     fixa com "R$" hardcoded, ignorando currentCurrency por completo — o
+     carrinho continuava em Reais mesmo com o site inteiro já em outra
+     moeda selecionada. formatPrice() (já usada em toda a Home/Categoria/
+     Loja) já sabe converter e formatar por moeda corretamente. */
+  const fmt = v => formatPrice(v);
 
   // Calcula desconto de cupom por linha (itens normais apenas)
   const _ac = window._activeCoupon;
@@ -615,7 +620,7 @@ function renderCart(){
     const lineTotal = c.rawPrice * c.qty;
     const disc      = lineDiscount(c);
     const lineFinal = lineTotal - disc;
-    const unitLabel = c.qty > 1 ? `${fmt(c.rawPrice)} cada` : '';
+    const unitLabel = c.qty > 1 ? t('cartUnitPriceEachTpl').replace('{price}', fmt(c.rawPrice)) : '';
     const isChecked = c._selected !== false; // default selected
     return `
     <div class="cart-item cart-item-v2 ${isChecked ? 'cart-item-selected' : ''}" id="cart-item-${idx}" data-idx="${idx}">
@@ -638,13 +643,13 @@ function renderCart(){
         <!-- Qty controls + remove -->
         <div class="cart-qty-row">
           <div class="cart-qty-ctrl">
-            <button class="cart-qty-btn" data-action="changeCartQty" data-args='[${idx},-1]' ${c.qty <= 1 ? 'disabled' : ''} title="Diminuir">−</button>
+            <button class="cart-qty-btn" data-action="changeCartQty" data-args='[${idx},-1]' ${c.qty <= 1 ? 'disabled' : ''} title="${t('cartQtyDecreaseTitle')}">−</button>
             <span class="cart-qty-num">${c.qty}</span>
-            <button class="cart-qty-btn" data-action="changeCartQty" data-args='[${idx},1]' title="Aumentar">+</button>
+            <button class="cart-qty-btn" data-action="changeCartQty" data-args='[${idx},1]' title="${t('cartQtyIncreaseTitle')}">+</button>
           </div>
           ${unitLabel ? `<span class="cart-item-unit-price">${unitLabel}</span>` : ''}
-          <button class="cart-save-later-btn" data-action="cartMoveSaveForLater" data-args='[${idx}]' title="Salvar para depois">🔖</button>
-          <button class="cart-item-remove-btn" data-action="removeCartItem" data-args='[${idx}]' title="Remover">🗑</button>
+          <button class="cart-save-later-btn" data-action="cartMoveSaveForLater" data-args='[${idx}]' title="${t('cartSaveForLaterTitle')}">🔖</button>
+          <button class="cart-item-remove-btn" data-action="removeCartItem" data-args='[${idx}]' title="${t('cartRemoveTitle')}">🗑</button>
         </div>
       </div>
 
@@ -652,7 +657,7 @@ function renderCart(){
       <div class="cart-item-right">
         ${disc > 0 ? `<div class="cart-item-price-orig" style="font-size:11px;color:var(--muted);text-decoration:line-through;">${fmt(lineTotal)}</div>` : ''}
         <div class="cart-item-price" style="${disc > 0 ? 'color:var(--teal);' : ''}">${fmt(disc > 0 ? lineFinal : lineTotal)}</div>
-        ${c._isFlash ? '<div style="font-size:10px;color:#FF6B35;font-weight:700;margin-top:2px;">⚡ Flash Sale</div>' : ''}
+        ${c._isFlash ? `<div style="font-size:10px;color:#FF6B35;font-weight:700;margin-top:2px;">${t('cartFlashSaleBadge')}</div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -1852,6 +1857,32 @@ const TRANSLATIONS = {
     pdpStockPrefix: 'Estoque:',
     pdpStockOutShort: 'Esgotado',
     pdpStockUnitsShort: 'unidades',
+    cartEmptyWisdomFallback: 'O teu carrinho está vazio... Os meus sensores detetaram <strong>ofertas incríveis</strong> na Home. Vamos lá?',
+    cartEmptyTitle: 'Carrinho Vazio',
+    cartExploreOffersBtn: 'Explorar Ofertas',
+    cartSuggestBasedOnInterests: 'Baseado nos seus interesses',
+    cartSuggestTrending: 'Mais procurados agora',
+    cartQtyDecreaseTitle: 'Diminuir',
+    cartQtyIncreaseTitle: 'Aumentar',
+    cartSaveForLaterTitle: 'Salvar para depois',
+    cartRemoveTitle: 'Remover',
+    cartFlashSaleBadge: '⚡ Flash Sale',
+    cartUnitPriceEachTpl: '{price} cada',
+    sflMoveBtn: 'Mover',
+    cartSelectionNotePrefix: 'Comprando apenas',
+    cartSelectionNoteSuffix: 'item(ns) selecionado(s)',
+    cartSubtotalLabel: 'Subtotal',
+    cartShippingLabel: 'Frete',
+    cartShippingFreeLabel: 'Grátis',
+    cartDiscountLabel: 'Desconto',
+    cartProtectionLabel: 'Proteção WeKz',
+    cartProtectionIncludedLabel: 'Inclusa',
+    cartCouponPlaceholder: 'Código de cupom (ex: WEKZ10)',
+    cartCouponApplyBtn: 'Aplicar',
+    cartCouponSeeAllLabel: 'Ver cupons disponíveis',
+    cartPointsDiscountLabel: '⭐ Desconto Pontos',
+    cartTotalLabel: 'Total',
+    cartSecurePaymentNote: '🔒 Pagamento 100% seguro · PCI DSS Certified',
   },
 
   en: {
@@ -2324,6 +2355,32 @@ const TRANSLATIONS = {
     pdpStockPrefix: 'Stock:',
     pdpStockOutShort: 'Sold out',
     pdpStockUnitsShort: 'units',
+    cartEmptyWisdomFallback: 'Your cart is empty... My sensors detected <strong>amazing deals</strong> on the Home page. Shall we go?',
+    cartEmptyTitle: 'Empty Cart',
+    cartExploreOffersBtn: 'Explore Deals',
+    cartSuggestBasedOnInterests: 'Based on your interests',
+    cartSuggestTrending: 'Trending now',
+    cartQtyDecreaseTitle: 'Decrease',
+    cartQtyIncreaseTitle: 'Increase',
+    cartSaveForLaterTitle: 'Save for later',
+    cartRemoveTitle: 'Remove',
+    cartFlashSaleBadge: '⚡ Flash Sale',
+    cartUnitPriceEachTpl: '{price} each',
+    sflMoveBtn: 'Move',
+    cartSelectionNotePrefix: 'Buying only',
+    cartSelectionNoteSuffix: 'selected item(s)',
+    cartSubtotalLabel: 'Subtotal',
+    cartShippingLabel: 'Shipping',
+    cartShippingFreeLabel: 'Free',
+    cartDiscountLabel: 'Discount',
+    cartProtectionLabel: 'WeKz Protection',
+    cartProtectionIncludedLabel: 'Included',
+    cartCouponPlaceholder: 'Coupon code (e.g. WEKZ10)',
+    cartCouponApplyBtn: 'Apply',
+    cartCouponSeeAllLabel: 'See available coupons',
+    cartPointsDiscountLabel: '⭐ Points Discount',
+    cartTotalLabel: 'Total',
+    cartSecurePaymentNote: '🔒 100% secure payment · PCI DSS Certified',
   },
 
   es: {
@@ -2796,6 +2853,32 @@ const TRANSLATIONS = {
     pdpStockPrefix: 'Stock:',
     pdpStockOutShort: 'Agotado',
     pdpStockUnitsShort: 'unidades',
+    cartEmptyWisdomFallback: 'Tu carrito está vacío... Mis sensores detectaron <strong>ofertas increíbles</strong> en Inicio. ¿Vamos?',
+    cartEmptyTitle: 'Carrito Vacío',
+    cartExploreOffersBtn: 'Explorar Ofertas',
+    cartSuggestBasedOnInterests: 'Basado en tus intereses',
+    cartSuggestTrending: 'Más buscados ahora',
+    cartQtyDecreaseTitle: 'Disminuir',
+    cartQtyIncreaseTitle: 'Aumentar',
+    cartSaveForLaterTitle: 'Guardar para después',
+    cartRemoveTitle: 'Eliminar',
+    cartFlashSaleBadge: '⚡ Oferta Flash',
+    cartUnitPriceEachTpl: '{price} c/u',
+    sflMoveBtn: 'Mover',
+    cartSelectionNotePrefix: 'Comprando solo',
+    cartSelectionNoteSuffix: 'artículo(s) seleccionado(s)',
+    cartSubtotalLabel: 'Subtotal',
+    cartShippingLabel: 'Envío',
+    cartShippingFreeLabel: 'Gratis',
+    cartDiscountLabel: 'Descuento',
+    cartProtectionLabel: 'Protección WeKz',
+    cartProtectionIncludedLabel: 'Incluida',
+    cartCouponPlaceholder: 'Código de cupón (ej: WEKZ10)',
+    cartCouponApplyBtn: 'Aplicar',
+    cartCouponSeeAllLabel: 'Ver cupones disponibles',
+    cartPointsDiscountLabel: '⭐ Descuento por Puntos',
+    cartTotalLabel: 'Total',
+    cartSecurePaymentNote: '🔒 Pago 100% seguro · Certificado PCI DSS',
   },
 
   zh: {
@@ -3268,6 +3351,32 @@ const TRANSLATIONS = {
     pdpStockPrefix: '库存：',
     pdpStockOutShort: '已售罄',
     pdpStockUnitsShort: '件',
+    cartEmptyWisdomFallback: '购物车是空的……我的传感器在首页探测到了<strong>超值好物</strong>，一起去看看吗？',
+    cartEmptyTitle: '购物车是空的',
+    cartExploreOffersBtn: '去逛逛',
+    cartSuggestBasedOnInterests: '根据您的兴趣推荐',
+    cartSuggestTrending: '当前热门',
+    cartQtyDecreaseTitle: '减少',
+    cartQtyIncreaseTitle: '增加',
+    cartSaveForLaterTitle: '稍后购买',
+    cartRemoveTitle: '删除',
+    cartFlashSaleBadge: '⚡ 限时秒杀',
+    cartUnitPriceEachTpl: '单价 {price}',
+    sflMoveBtn: '移入购物车',
+    cartSelectionNotePrefix: '仅购买',
+    cartSelectionNoteSuffix: '件已选商品',
+    cartSubtotalLabel: '小计',
+    cartShippingLabel: '运费',
+    cartShippingFreeLabel: '免运费',
+    cartDiscountLabel: '优惠',
+    cartProtectionLabel: 'WeKz 保障',
+    cartProtectionIncludedLabel: '已包含',
+    cartCouponPlaceholder: '优惠码（例如 WEKZ10）',
+    cartCouponApplyBtn: '使用',
+    cartCouponSeeAllLabel: '查看可用优惠券',
+    cartPointsDiscountLabel: '⭐ 积分抵扣',
+    cartTotalLabel: '总计',
+    cartSecurePaymentNote: '🔒 100% 安全支付 · PCI DSS 认证',
   },
 
   fr: {
@@ -3740,6 +3849,32 @@ const TRANSLATIONS = {
     pdpStockPrefix: 'Stock :',
     pdpStockOutShort: 'Épuisé',
     pdpStockUnitsShort: 'unités',
+    cartEmptyWisdomFallback: 'Votre panier est vide... Mes capteurs ont détecté des <strong>offres incroyables</strong> sur la page d\'accueil. On y va ?',
+    cartEmptyTitle: 'Panier Vide',
+    cartExploreOffersBtn: 'Explorer les Offres',
+    cartSuggestBasedOnInterests: 'Basé sur vos centres d\'intérêt',
+    cartSuggestTrending: 'Tendance actuellement',
+    cartQtyDecreaseTitle: 'Diminuer',
+    cartQtyIncreaseTitle: 'Augmenter',
+    cartSaveForLaterTitle: 'Enregistrer pour plus tard',
+    cartRemoveTitle: 'Retirer',
+    cartFlashSaleBadge: '⚡ Vente Flash',
+    cartUnitPriceEachTpl: '{price} chacun',
+    sflMoveBtn: 'Déplacer',
+    cartSelectionNotePrefix: 'N\'achetez que',
+    cartSelectionNoteSuffix: 'article(s) sélectionné(s)',
+    cartSubtotalLabel: 'Sous-total',
+    cartShippingLabel: 'Livraison',
+    cartShippingFreeLabel: 'Gratuit',
+    cartDiscountLabel: 'Remise',
+    cartProtectionLabel: 'Protection WeKz',
+    cartProtectionIncludedLabel: 'Incluse',
+    cartCouponPlaceholder: 'Code promo (ex : WEKZ10)',
+    cartCouponApplyBtn: 'Appliquer',
+    cartCouponSeeAllLabel: 'Voir les codes promo disponibles',
+    cartPointsDiscountLabel: '⭐ Remise Points',
+    cartTotalLabel: 'Total',
+    cartSecurePaymentNote: '🔒 Paiement 100% sécurisé · Certifié PCI DSS',
   },
 
   de: {
@@ -4212,6 +4347,32 @@ const TRANSLATIONS = {
     pdpStockPrefix: 'Bestand:',
     pdpStockOutShort: 'Ausverkauft',
     pdpStockUnitsShort: 'Stück',
+    cartEmptyWisdomFallback: 'Dein Warenkorb ist leer... Meine Sensoren haben <strong>unglaubliche Angebote</strong> auf der Startseite entdeckt. Sollen wir?',
+    cartEmptyTitle: 'Warenkorb Leer',
+    cartExploreOffersBtn: 'Angebote Entdecken',
+    cartSuggestBasedOnInterests: 'Basierend auf Ihren Interessen',
+    cartSuggestTrending: 'Gerade im Trend',
+    cartQtyDecreaseTitle: 'Verringern',
+    cartQtyIncreaseTitle: 'Erhöhen',
+    cartSaveForLaterTitle: 'Für später speichern',
+    cartRemoveTitle: 'Entfernen',
+    cartFlashSaleBadge: '⚡ Blitzverkauf',
+    cartUnitPriceEachTpl: '{price} pro Stück',
+    sflMoveBtn: 'Verschieben',
+    cartSelectionNotePrefix: 'Kaufe nur',
+    cartSelectionNoteSuffix: 'ausgewählte(s) Artikel',
+    cartSubtotalLabel: 'Zwischensumme',
+    cartShippingLabel: 'Versand',
+    cartShippingFreeLabel: 'Kostenlos',
+    cartDiscountLabel: 'Rabatt',
+    cartProtectionLabel: 'WeKz-Schutz',
+    cartProtectionIncludedLabel: 'Inklusive',
+    cartCouponPlaceholder: 'Gutscheincode (z.B. WEKZ10)',
+    cartCouponApplyBtn: 'Anwenden',
+    cartCouponSeeAllLabel: 'Verfügbare Gutscheine ansehen',
+    cartPointsDiscountLabel: '⭐ Punkte-Rabatt',
+    cartTotalLabel: 'Gesamt',
+    cartSecurePaymentNote: '🔒 100% sichere Zahlung · PCI-DSS-zertifiziert',
   },
 
   ja: {
@@ -4684,6 +4845,32 @@ const TRANSLATIONS = {
     pdpStockPrefix: '在庫：',
     pdpStockOutShort: '完売',
     pdpStockUnitsShort: '点',
+    cartEmptyWisdomFallback: 'カートは空です……センサーがホーム画面で<strong>お得な商品</strong>を検知しました。見てみましょうか？',
+    cartEmptyTitle: 'カートは空です',
+    cartExploreOffersBtn: 'おすすめを見る',
+    cartSuggestBasedOnInterests: 'あなたの興味に基づく',
+    cartSuggestTrending: '今人気の商品',
+    cartQtyDecreaseTitle: '減らす',
+    cartQtyIncreaseTitle: '増やす',
+    cartSaveForLaterTitle: '後で購入',
+    cartRemoveTitle: '削除',
+    cartFlashSaleBadge: '⚡ タイムセール',
+    cartUnitPriceEachTpl: '{price}（1点あたり）',
+    sflMoveBtn: 'カートへ移動',
+    cartSelectionNotePrefix: 'のみ購入',
+    cartSelectionNoteSuffix: '点の選択商品',
+    cartSubtotalLabel: '小計',
+    cartShippingLabel: '配送料',
+    cartShippingFreeLabel: '無料',
+    cartDiscountLabel: '割引',
+    cartProtectionLabel: 'WeKz保護',
+    cartProtectionIncludedLabel: '含む',
+    cartCouponPlaceholder: 'クーポンコード（例：WEKZ10）',
+    cartCouponApplyBtn: '適用',
+    cartCouponSeeAllLabel: '利用可能なクーポンを見る',
+    cartPointsDiscountLabel: '⭐ ポイント割引',
+    cartTotalLabel: '合計',
+    cartSecurePaymentNote: '🔒 100%安全なお支払い · PCI DSS認証済み',
   },
 };
 
@@ -6884,7 +7071,7 @@ function renderSavedForLater() {
   }
   sec.style.display = 'block';
   if(cntEl) cntEl.textContent = savedForLaterData.length;
-  const fmt = v => 'R$ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  const fmt = v => formatPrice(v); // [FIX v30] mesmo bug de moeda do renderCart()
   cont.innerHTML = savedForLaterData.map((c, i) => `
     <div class="sfl-item">
       <div class="sfl-item-img">${c.e}</div>
@@ -6893,7 +7080,7 @@ function renderSavedForLater() {
         <div class="sfl-item-price">${fmt(c.rawPrice)}</div>
       </div>
       <div class="sfl-item-actions">
-        <button class="sfl-btn sfl-btn-move" data-action="sflMoveToCart" data-args='[${i}]'><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> Mover</button>
+        <button class="sfl-btn sfl-btn-move" data-action="sflMoveToCart" data-args='[${i}]'><span class="wkz-icon wkz-icon-cart"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg></span> ${t('sflMoveBtn')}</button>
         <button class="sfl-btn sfl-btn-del" data-action="sflRemove" data-args='[${i}]'>✕</button>
       </div>
     </div>`).join('');

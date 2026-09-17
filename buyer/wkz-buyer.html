@@ -1768,32 +1768,32 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="summary-title"><span class="wkz-icon wkz-icon-clipboard"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg></span> Resumo do Pedido</div>
         <!-- SELECTED ITEMS NOTE -->
         <div class="cart-selection-note" id="cartSelectionNote" style="display:none;">
-          <span><span class="wkz-icon wkz-icon-shoppingbag"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span> Comprando apenas <strong id="cartSelectionNoteCount">0</strong> item(ns) selecionado(s)</span>
+          <span><span class="wkz-icon wkz-icon-shoppingbag"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span> <span data-i18n="cartSelectionNotePrefix">Comprando apenas</span> <strong id="cartSelectionNoteCount">0</strong> <span data-i18n="cartSelectionNoteSuffix">item(ns) selecionado(s)</span></span>
         </div>
-        <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">R$ 0,00</span></div>
-        <div class="summary-row"><span>Frete</span><span style="color:#22C55E;">Grátis</span></div>
-        <div class="summary-row" id="cartDiscountRow"><span>Desconto</span><span id="cartDiscountVal" style="color:#FF6B35;">-R$ 0,00</span></div>
-        <div class="summary-row"><span>Proteção WeKz</span><span style="color:var(--muted);">Inclusa</span></div>
+        <div class="summary-row"><span data-i18n="cartSubtotalLabel">Subtotal</span><span id="cartSubtotal">R$ 0,00</span></div>
+        <div class="summary-row"><span data-i18n="cartShippingLabel">Frete</span><span style="color:#22C55E;" data-i18n="cartShippingFreeLabel">Grátis</span></div>
+        <div class="summary-row" id="cartDiscountRow"><span data-i18n="cartDiscountLabel">Desconto</span><span id="cartDiscountVal" style="color:#FF6B35;">-R$ 0,00</span></div>
+        <div class="summary-row"><span data-i18n="cartProtectionLabel">Proteção WeKz</span><span style="color:var(--muted);" data-i18n="cartProtectionIncludedLabel">Inclusa</span></div>
         <!-- ══ CUPOM v2 ══ -->
         <div id="couponActiveBanner" style="display:none;"></div>
         <div id="couponMinProgress" style="display:none;"></div>
         <div class="coupon-row-v2">
           <div class="coupon-input-wrap">
-            <input id="cartCouponField" type="text" placeholder="Código de cupom (ex: WEKZ10)"
+            <input id="cartCouponField" type="text" placeholder="Código de cupom (ex: WEKZ10)" data-i18n-placeholder="cartCouponPlaceholder"
               oninput="couponAutoComplete(this.value)"
               onkeydown="if(event.key==='Enter')applyCartCoupon()"
               autocomplete="off" spellcheck="false">
             <div class="coupon-autocomplete" id="couponAC"></div>
             <button class="btn-apply-coupon" id="couponApplyBtn" data-action="applyCartCoupon" data-args="[]">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Aplicar
+              <span data-i18n="cartCouponApplyBtn">Aplicar</span>
             </button>
           </div>
           <div class="coupon-feedback" id="couponFeedbackInline"></div>
           <div class="coupon-see-all" data-action="toggleCouponDrawer" data-args="[]">
             <div class="coupon-see-all-label">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4a1 1 0 011 1v9a1 1 0 01-1 1H8a1 1 0 01-1-1v-4"/></svg>
-              Ver cupons disponíveis
+              <span data-i18n="cartCouponSeeAllLabel">Ver cupons disponíveis</span>
             </div>
             <span class="coupon-see-all-arrow" id="couponDrawerArrow">▼</span>
           </div>
@@ -1802,8 +1802,8 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
         <!-- Desconto de pontos (hidden until redeemed) -->
-        <div class="summary-row" id="cartPtsDiscountRow" style="display:none;color:#A78BFA;"><span>⭐ Desconto Pontos</span><span></span></div>
-        <div class="summary-row total"><span>Total</span><span class="val" id="cartTotal">R$ 0,00</span></div>
+        <div class="summary-row" id="cartPtsDiscountRow" style="display:none;color:#A78BFA;"><span data-i18n="cartPointsDiscountLabel">⭐ Desconto Pontos</span><span></span></div>
+        <div class="summary-row total"><span data-i18n="cartTotalLabel">Total</span><span class="val" id="cartTotal">R$ 0,00</span></div>
         <!-- ══ PONTOS A GANHAR ══ -->
         <div class="cart-pts-earn" id="cartPtsEarn"></div>
         <!-- ══ RESGATAR PONTOS ══ -->
@@ -1811,7 +1811,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- ══ NÍVEL DO USUÁRIO ══ -->
         <div class="cart-loyalty-bar" id="cartLoyaltyBar"></div>
         <button class="btn-submit" style="margin-top:16px;" data-action="cartCheckout" data-args="[]"><span class="wkz-icon wkz-icon-lock"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Finalizar Compra</button>
-        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">🔒 Pagamento 100% seguro · PCI DSS Certified</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;" data-i18n="cartSecurePaymentNote">🔒 Pagamento 100% seguro · PCI DSS Certified</div>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
           <span class="payment-icon">💳 Visa</span>
           <span class="payment-icon">💳 Master</span>
