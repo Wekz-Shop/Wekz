@@ -60,6 +60,14 @@ forçada).
 - `_stockConfig()` (widget de urgência/escassez de estoque da PDP —
   "Restam apenas X unidades!", "Esgotado temporariamente" etc., os 5
   estados) traduzido; hook de re-render adicionado via `currentPdpIndex`.
+- **Bug de moeda no Carrinho (não era só tradução):** `renderCart()` e
+  `renderSavedForLater()` tinham sua própria função `fmt()` local que
+  formatava preço fixo em `R$`, ignorando `currentCurrency` por completo
+  — o carrinho continuava em Reais mesmo com o resto do site já em outra
+  moeda. Substituído por `formatPrice()` (a mesma usada em Home/Categoria/
+  Loja). Também traduzido: estado de carrinho vazio, sugestões, botões de
+  quantidade/remover/salvar, badge Flash Sale, e a sidebar de resumo
+  inteira (Subtotal/Frete/Desconto/Total/cupom/nota de segurança).
 - Corrigido o seletor `.footer-col h4` → `.footer-nav-col summary`; todos
   os 22 links do rodapé receberam `data-i18n`.
 - `applyTranslations()`/`updateCurrency()` agora re-renderizam Loja,
@@ -82,13 +90,15 @@ forçada).
 - **`title` de compliance no rodapé** (menções a Art. 49 CDC, Art. 19 MCI,
   NF-e) mantidos só em PT — são referências à legislação brasileira
   especificamente; recomendo não traduzir automaticamente texto legal.
-- **Não auditado ainda nesta sprint:** Carrinho, Checkout, Wishlist,
+- **Não auditado ainda nesta sprint:** o "Checkout Engine" inteiro
+  (abertura do checkout, métodos de pagamento Pix/Cartão/Boleto,
+  endereços salvos, revisão do pedido) — é um bloco de ~2.000 linhas só
+  ele, com o mesmo padrão de texto fixo em PT encontrado em todo o resto.
+  Não tentei fazer isso nesta sprint por ser justamente a etapa mais
+  sensível do fluxo (dinheiro muda de mão ali) — prefiro tratar como uma
+  sprint dedicada (M31) em vez de apressar. Também não auditados: Wishlist,
   Chat/mensagens, ticker social da PDP ("18 vendidos nas últimas 2h"),
-  ferramenta de Comparar Produtos. Uma varredura rápida por padrões
-  (`grep` de literais em PT) não encontrou volume significativo de texto
-  fixo no Carrinho — parece já usar `t()` corretamente — mas não fiz a
-  verificação linha a linha que fiz nas páginas acima. Recomendo abrir
-  cada uma nos 7 idiomas antes de considerar o módulo de i18n "fechado".
+  ferramenta de Comparar Produtos.
 
 ## Como validar
 
