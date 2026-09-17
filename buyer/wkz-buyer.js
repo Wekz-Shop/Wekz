@@ -767,9 +767,9 @@ function renderWishlist(){
         <div class="kz-cart-empty-glass" style="max-width:460px;width:100%;">
           <div class="kz-cart-scan"></div>
           <div class="kz-cart-mascot">${kzSvg}</div>
-          <div class="kz-cart-empty-title" style="margin-bottom:10px;">Nenhum Favorito Ainda</div>
-          <div class="kz-cart-empty-msg">Os meus sensores ainda não detetaram produtos nos teus favoritos... <em>Que tal explorar a Home?</em></div>
-          <button class="kz-cart-explore-btn" data-action="MapsTo" data-args='["home"]'>${WKZ_ICO.bag} Explorar Produtos</button>
+          <div class="kz-cart-empty-title" style="margin-bottom:10px;">${t('wishEmptyTitle')}</div>
+          <div class="kz-cart-empty-msg">${t('wishEmptyMsg')}</div>
+          <button class="kz-cart-explore-btn" data-action="MapsTo" data-args='["home"]'>${WKZ_ICO.bag} ${t('wishExploreBtn')}</button>
         </div>
       </div>`;
     return;
@@ -780,9 +780,9 @@ function renderWishlist(){
     g.innerHTML = `
       <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;">
         <div style="font-size:40px;margin-bottom:12px;">${col?col.emoji:'📁'}</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;">Coleção vazia</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">Ainda não há produtos em <strong>${col?col.name:'esta coleção'}</strong>.<br>Clique no ícone 📂 em qualquer favorito para adicionar aqui.</div>
-        <button class="wish-col-btn-cancel" onclick="wishColActiveFilter=null;renderWishlist();" style="border-radius:50px;">← Ver todos os favoritos</button>
+        <div style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;">${t('wishColEmptyTitle')}</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">${t('wishColEmptyMsgTpl').replace('{col}', col?col.name:t('wishColEmptyFallback'))}</div>
+        <button class="wish-col-btn-cancel" onclick="wishColActiveFilter=null;renderWishlist();" style="border-radius:50px;">${t('wishColSeeAllBtn')}</button>
       </div>`;
     return;
   }
@@ -793,30 +793,30 @@ function renderWishlist(){
     const realIdx = p._wkzIdx !== undefined ? p._wkzIdx : products.findIndex(prod => prod.n === p.n && prod.p === p.p);
     const col = p._colId ? wishCollections.find(c=>c.id===p._colId) : null;
     const colBadge = col
-      ? `<button class="wish-col-badge wkz-col-badge-btn" data-wi="${wi}" title="Mover para outra coleção">${col.emoji} ${col.name}</button>`
-      : `<button class="wish-col-badge wkz-col-badge-btn" data-wi="${wi}" style="background:rgba(255,255,255,0.04);border-color:var(--border);color:var(--muted);" title="Adicionar a uma coleção">📂 Adicionar à coleção</button>`;
+      ? `<button class="wish-col-badge wkz-col-badge-btn" data-wi="${wi}" title="${t('wishColMoveTitle')}">${col.emoji} ${col.name}</button>`
+      : `<button class="wish-col-badge wkz-col-badge-btn" data-wi="${wi}" style="background:rgba(255,255,255,0.04);border-color:var(--border);color:var(--muted);" title="${t('wishColAddTitle')}">📂 ${t('wishColAddBtnLabel')}</button>`;
     return `
     <div class="product-card wkz-wish-card" data-wi="${wi}" data-pidx="${realIdx}" style="cursor:pointer;">
       <div class="product-img wkz-wish-img">
         ${p.e}
         <div class="product-badges">
           ${p.badge==='sale'?'<span class="badge badge-sale">SALE</span>':''}
-          ${p.badge==='new'?'<span class="badge badge-new">NOVO</span>':''}
+          ${p.badge==='new'?`<span class="badge badge-new">${t('badgeNew')}</span>`:''}
           ${p.badge==='hot'?'<span class="badge badge-hot">HOT</span>':''}
-          ${p._sponsored?'<span class="badge badge-ad">'+WKZ_ICO.megaphone+' Patrocinado</span>':''}
-          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">'+WKZ_ICO.truck+' Gr\u00e1tis</span>':''}
-          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">'+WKZ_ICO.tag+' Cupom</span>':''}
+          ${p._sponsored?'<span class="badge badge-ad">'+WKZ_ICO.megaphone+' '+t('badgeSponsored').replace(/^\S+\s*/,'')+'</span>':''}
+          ${p._frete||FRETE_GRATIS_SELLERS.includes(p.s)?'<span class="badge badge-frete">'+WKZ_ICO.truck+' '+t('badgeFreeShip').replace(/^\S+\s*/,'')+'</span>':''}
+          ${Object.values(SELLER_COUPONS).some(c=>c.seller===p.s)?'<span class="badge badge-coupon">'+WKZ_ICO.tag+' '+t('badgeCoupon').replace(/^\S+\s*/,'')+'</span>':''}
         </div>
-        <button class="product-wish wkz-wish-btn" data-wi="${wi}" style="color:#FF2D7A;" aria-label="Remover dos favoritos">&#x2665;</button>
+        <button class="product-wish wkz-wish-btn" data-wi="${wi}" style="color:#FF2D7A;" aria-label="${t('wishRemoveAria')}">&#x2665;</button>
       </div>
       <div class="product-info">
         <div class="product-name wkz-wish-name">${p.n}</div>
-        <div class="product-store"><span class="store-verified">&#x2705;</span>${p.s}${isOfficialStore(p.s)?'<span class="store-official-tag">🏅 Loja Oficial</span>':''}</div>
+        <div class="product-store"><span class="store-verified">&#x2705;</span>${p.s}${isOfficialStore(p.s)?`<span class="store-official-tag">${t('officialStoreTag')}</span>`:''}</div>
         <div class="product-price"><span class="price-main">${formatPrice(p.p)}</span><span class="price-old">${formatPrice(p.op)}</span><span class="price-off">-${p.off}%</span></div>
-        <div class="product-meta"><div class="product-stars"><span class="stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span> ${p.r}</div><div class="product-sales">${p.sales} vendidos</div></div>
+        <div class="product-meta"><div class="product-stars"><span class="stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span> ${p.r}</div><div class="product-sales">${p.sales} ${t('sold')}</div></div>
         ${colBadge}
-        <button class="btn-add wkz-wish-add" data-pidx="${realIdx}"><span class="btn-spinner"></span><span class="btn-check">&#x2713;</span><span class="btn-label">${WKZ_ICO.cart} Adicionar ao carrinho</span></button>
-        <button class="btn-buy wkz-wish-buy" data-pidx="${realIdx}"><span class="btn-spinner"></span><span class="btn-check">&#x2713;</span><span class="btn-label">&#x26A1; Comprar Agora</span></button>
+        <button class="btn-add wkz-wish-add" data-pidx="${realIdx}"><span class="btn-spinner"></span><span class="btn-check">&#x2713;</span><span class="btn-label">${WKZ_ICO.cart} ${t('addToCart')}</span></button>
+        <button class="btn-buy wkz-wish-buy" data-pidx="${realIdx}"><span class="btn-spinner"></span><span class="btn-check">&#x2713;</span><span class="btn-label">&#x26A1; ${t('buyNowPlain')}</span></button>
       </div>
     </div>`;
   }).join('');
@@ -844,7 +844,7 @@ function renderWishlist(){
       } else {
         wishlistItems.splice(wi,1); syncWishHearts(); renderWishlist();
       }
-      showToast('\uD83D\uDC94 Removido dos favoritos');
+      showToast(t('wishRemovedToast'));
       return;
     }
     if(colBtn){
@@ -1099,9 +1099,9 @@ function renderWishlistStores(){
         <div class="kz-cart-empty-glass" style="max-width:460px;width:100%;">
           <div class="kz-cart-scan"></div>
           <div class="kz-cart-mascot">${kzSvg}</div>
-          <div class="kz-cart-empty-title" style="margin-bottom:10px;">Nenhuma Loja Seguida</div>
-          <div class="kz-cart-empty-msg">Ainda não segues nenhuma loja... <em>Descobre as nossas lojas verificadas!</em></div>
-          <button class="kz-cart-explore-btn" data-action="MapsTo" data-args='["stores"]'>🏪 Explorar Lojas</button>
+          <div class="kz-cart-empty-title" style="margin-bottom:10px;">${t('wishNoStoresTitle')}</div>
+          <div class="kz-cart-empty-msg">${t('wishNoStoresMsg')}</div>
+          <button class="kz-cart-explore-btn" data-action="MapsTo" data-args='["stores"]'>${t('wishExploreStoresBtn')}</button>
         </div>
       </div>`;
     return;
@@ -1113,8 +1113,8 @@ function renderWishlistStores(){
       <div class="store-avatar">${s.a}</div>
       <div class="store-name">${s.n}</div>
       <div class="store-info">${s.i} · ${s.r} · ${s.v}</div>
-      <div class="store-tags"><span class="store-tag">✅ Verificado</span><span class="store-tag">⚡ Rápido</span></div>
-      <button class="btn-unfollow wkz-wstore-unfollow" data-si="${si}">💔 Deixar de Seguir</button>
+      <div class="store-tags"><span class="store-tag">✅ ${t('storeVerifiedBadge')}</span><span class="store-tag">${t('wishStoreQuickTag')}</span></div>
+      <button class="btn-unfollow wkz-wstore-unfollow" data-si="${si}">${t('storeUnfollowBtn')}</button>
     </div>`;
   }).join('');
 
@@ -1140,7 +1140,7 @@ function renderWishlistStores(){
         syncWishHearts();
         renderWishlistStores();
       }
-      showToast('🏪 Deixou de seguir a loja');
+      showToast(t('wishUnfollowedToast'));
     }
   };
 }
@@ -1883,6 +1883,23 @@ const TRANSLATIONS = {
     cartPointsDiscountLabel: '⭐ Desconto Pontos',
     cartTotalLabel: 'Total',
     cartSecurePaymentNote: '🔒 Pagamento 100% seguro · PCI DSS Certified',
+    wishRemoveAria: 'Remover dos favoritos',
+    wishRemovedToast: '💔 Removido dos favoritos',
+    wishEmptyTitle: 'Nenhum Favorito Ainda',
+    wishEmptyMsg: 'Os meus sensores ainda não detetaram produtos nos teus favoritos... <em>Que tal explorar a Home?</em>',
+    wishExploreBtn: 'Explorar Produtos',
+    wishColEmptyTitle: 'Coleção vazia',
+    wishColEmptyMsgTpl: 'Ainda não há produtos em <strong>{col}</strong>.<br>Clique no ícone 📂 em qualquer favorito para adicionar aqui.',
+    wishColEmptyFallback: 'esta coleção',
+    wishColSeeAllBtn: '← Ver todos os favoritos',
+    wishColMoveTitle: 'Mover para outra coleção',
+    wishColAddTitle: 'Adicionar a uma coleção',
+    wishColAddBtnLabel: 'Adicionar à coleção',
+    wishNoStoresTitle: 'Nenhuma Loja Seguida',
+    wishNoStoresMsg: 'Ainda não segues nenhuma loja... <em>Descobre as nossas lojas verificadas!</em>',
+    wishExploreStoresBtn: '🏪 Explorar Lojas',
+    wishStoreQuickTag: '⚡ Rápido',
+    wishUnfollowedToast: '🏪 Deixou de seguir a loja',
   },
 
   en: {
@@ -2381,6 +2398,23 @@ const TRANSLATIONS = {
     cartPointsDiscountLabel: '⭐ Points Discount',
     cartTotalLabel: 'Total',
     cartSecurePaymentNote: '🔒 100% secure payment · PCI DSS Certified',
+    wishRemoveAria: 'Remove from wishlist',
+    wishRemovedToast: '💔 Removed from wishlist',
+    wishEmptyTitle: 'No Favorites Yet',
+    wishEmptyMsg: 'My sensors haven\'t detected any products in your favorites yet... <em>How about exploring the Home page?</em>',
+    wishExploreBtn: 'Explore Products',
+    wishColEmptyTitle: 'Empty collection',
+    wishColEmptyMsgTpl: 'There are no products in <strong>{col}</strong> yet.<br>Click the 📂 icon on any favorite to add it here.',
+    wishColEmptyFallback: 'this collection',
+    wishColSeeAllBtn: '← See all favorites',
+    wishColMoveTitle: 'Move to another collection',
+    wishColAddTitle: 'Add to a collection',
+    wishColAddBtnLabel: 'Add to collection',
+    wishNoStoresTitle: 'No Stores Followed',
+    wishNoStoresMsg: 'You don\'t follow any stores yet... <em>Discover our verified stores!</em>',
+    wishExploreStoresBtn: '🏪 Explore Stores',
+    wishStoreQuickTag: '⚡ Fast',
+    wishUnfollowedToast: '🏪 Unfollowed the store',
   },
 
   es: {
@@ -2879,6 +2913,23 @@ const TRANSLATIONS = {
     cartPointsDiscountLabel: '⭐ Descuento por Puntos',
     cartTotalLabel: 'Total',
     cartSecurePaymentNote: '🔒 Pago 100% seguro · Certificado PCI DSS',
+    wishRemoveAria: 'Quitar de favoritos',
+    wishRemovedToast: '💔 Eliminado de favoritos',
+    wishEmptyTitle: 'Aún Sin Favoritos',
+    wishEmptyMsg: 'Mis sensores aún no detectaron productos en tus favoritos... <em>¿Qué tal explorar Inicio?</em>',
+    wishExploreBtn: 'Explorar Productos',
+    wishColEmptyTitle: 'Colección vacía',
+    wishColEmptyMsgTpl: 'Aún no hay productos en <strong>{col}</strong>.<br>Haz clic en el ícono 📂 de cualquier favorito para añadirlo aquí.',
+    wishColEmptyFallback: 'esta colección',
+    wishColSeeAllBtn: '← Ver todos los favoritos',
+    wishColMoveTitle: 'Mover a otra colección',
+    wishColAddTitle: 'Añadir a una colección',
+    wishColAddBtnLabel: 'Añadir a colección',
+    wishNoStoresTitle: 'Ninguna Tienda Seguida',
+    wishNoStoresMsg: 'Aún no sigues ninguna tienda... <em>¡Descubre nuestras tiendas verificadas!</em>',
+    wishExploreStoresBtn: '🏪 Explorar Tiendas',
+    wishStoreQuickTag: '⚡ Rápido',
+    wishUnfollowedToast: '🏪 Dejaste de seguir la tienda',
   },
 
   zh: {
@@ -3377,6 +3428,23 @@ const TRANSLATIONS = {
     cartPointsDiscountLabel: '⭐ 积分抵扣',
     cartTotalLabel: '总计',
     cartSecurePaymentNote: '🔒 100% 安全支付 · PCI DSS 认证',
+    wishRemoveAria: '从收藏中移除',
+    wishRemovedToast: '💔 已从收藏中移除',
+    wishEmptyTitle: '暂无收藏商品',
+    wishEmptyMsg: '我的传感器还没在您的收藏中检测到商品……<em>要不要去首页逛逛？</em>',
+    wishExploreBtn: '去逛逛商品',
+    wishColEmptyTitle: '收藏夹为空',
+    wishColEmptyMsgTpl: '<strong>{col}</strong> 中还没有商品。<br>点击任意收藏商品上的 📂 图标即可添加到此处。',
+    wishColEmptyFallback: '该收藏夹',
+    wishColSeeAllBtn: '← 查看全部收藏',
+    wishColMoveTitle: '移动到其他收藏夹',
+    wishColAddTitle: '添加到收藏夹',
+    wishColAddBtnLabel: '添加到收藏夹',
+    wishNoStoresTitle: '暂未关注任何店铺',
+    wishNoStoresMsg: '您还没有关注任何店铺……<em>快去发现我们的认证店铺吧！</em>',
+    wishExploreStoresBtn: '🏪 浏览店铺',
+    wishStoreQuickTag: '⚡ 快速',
+    wishUnfollowedToast: '🏪 已取消关注该店铺',
   },
 
   fr: {
@@ -3875,6 +3943,23 @@ const TRANSLATIONS = {
     cartPointsDiscountLabel: '⭐ Remise Points',
     cartTotalLabel: 'Total',
     cartSecurePaymentNote: '🔒 Paiement 100% sécurisé · Certifié PCI DSS',
+    wishRemoveAria: 'Retirer des favoris',
+    wishRemovedToast: '💔 Retiré des favoris',
+    wishEmptyTitle: 'Aucun Favori pour le Moment',
+    wishEmptyMsg: 'Mes capteurs n\'ont pas encore détecté de produits dans vos favoris... <em>Et si vous exploriez la page d\'accueil ?</em>',
+    wishExploreBtn: 'Explorer les Produits',
+    wishColEmptyTitle: 'Collection vide',
+    wishColEmptyMsgTpl: 'Il n\'y a pas encore de produits dans <strong>{col}</strong>.<br>Cliquez sur l\'icône 📂 de n\'importe quel favori pour l\'ajouter ici.',
+    wishColEmptyFallback: 'cette collection',
+    wishColSeeAllBtn: '← Voir tous les favoris',
+    wishColMoveTitle: 'Déplacer vers une autre collection',
+    wishColAddTitle: 'Ajouter à une collection',
+    wishColAddBtnLabel: 'Ajouter à la collection',
+    wishNoStoresTitle: 'Aucune Boutique Suivie',
+    wishNoStoresMsg: 'Vous ne suivez encore aucune boutique... <em>Découvrez nos boutiques vérifiées !</em>',
+    wishExploreStoresBtn: '🏪 Explorer les Boutiques',
+    wishStoreQuickTag: '⚡ Rapide',
+    wishUnfollowedToast: '🏪 Vous ne suivez plus cette boutique',
   },
 
   de: {
@@ -4373,6 +4458,23 @@ const TRANSLATIONS = {
     cartPointsDiscountLabel: '⭐ Punkte-Rabatt',
     cartTotalLabel: 'Gesamt',
     cartSecurePaymentNote: '🔒 100% sichere Zahlung · PCI-DSS-zertifiziert',
+    wishRemoveAria: 'Aus Favoriten entfernen',
+    wishRemovedToast: '💔 Aus Favoriten entfernt',
+    wishEmptyTitle: 'Noch Keine Favoriten',
+    wishEmptyMsg: 'Meine Sensoren haben noch keine Produkte in deinen Favoriten entdeckt... <em>Wie wäre es, die Startseite zu erkunden?</em>',
+    wishExploreBtn: 'Produkte Entdecken',
+    wishColEmptyTitle: 'Sammlung leer',
+    wishColEmptyMsgTpl: 'Es gibt noch keine Produkte in <strong>{col}</strong>.<br>Klicken Sie auf das 📂-Symbol bei einem Favoriten, um ihn hier hinzuzufügen.',
+    wishColEmptyFallback: 'diese Sammlung',
+    wishColSeeAllBtn: '← Alle Favoriten anzeigen',
+    wishColMoveTitle: 'In andere Sammlung verschieben',
+    wishColAddTitle: 'Zu einer Sammlung hinzufügen',
+    wishColAddBtnLabel: 'Zur Sammlung hinzufügen',
+    wishNoStoresTitle: 'Keine Shops Gefolgt',
+    wishNoStoresMsg: 'Du folgst noch keinem Shop... <em>Entdecke unsere verifizierten Shops!</em>',
+    wishExploreStoresBtn: '🏪 Shops Entdecken',
+    wishStoreQuickTag: '⚡ Schnell',
+    wishUnfollowedToast: '🏪 Shop nicht mehr gefolgt',
   },
 
   ja: {
@@ -4871,6 +4973,23 @@ const TRANSLATIONS = {
     cartPointsDiscountLabel: '⭐ ポイント割引',
     cartTotalLabel: '合計',
     cartSecurePaymentNote: '🔒 100%安全なお支払い · PCI DSS認証済み',
+    wishRemoveAria: 'お気に入りから削除',
+    wishRemovedToast: '💔 お気に入りから削除しました',
+    wishEmptyTitle: 'お気に入りはまだありません',
+    wishEmptyMsg: 'センサーはまだお気に入りに商品を検知していません……<em>ホーム画面を見てみませんか？</em>',
+    wishExploreBtn: '商品を見る',
+    wishColEmptyTitle: 'コレクションが空です',
+    wishColEmptyMsgTpl: '<strong>{col}</strong>にはまだ商品がありません。<br>お気に入りの📂アイコンをクリックしてここに追加してください。',
+    wishColEmptyFallback: 'このコレクション',
+    wishColSeeAllBtn: '← すべてのお気に入りを見る',
+    wishColMoveTitle: '別のコレクションに移動',
+    wishColAddTitle: 'コレクションに追加',
+    wishColAddBtnLabel: 'コレクションに追加',
+    wishNoStoresTitle: 'フォロー中のショップはありません',
+    wishNoStoresMsg: 'まだショップをフォローしていません……<em>認証済みショップを見つけましょう！</em>',
+    wishExploreStoresBtn: '🏪 ショップを見る',
+    wishStoreQuickTag: '⚡ 迅速',
+    wishUnfollowedToast: '🏪 ショップのフォローを解除しました',
   },
 };
 
@@ -5140,6 +5259,7 @@ function applyTranslations() {
   if (typeof populateSearchCatOptions === 'function') populateSearchCatOptions();
   if (typeof renderProducts === 'function') renderProducts();
   if (typeof renderWishlist === 'function') renderWishlist();
+  if (typeof renderWishlistStores === 'function') renderWishlistStores();
   if (typeof renderCart     === 'function') renderCart();
 
   /* [FIX v30] Estas três telas nunca eram re-desenhadas ao trocar de
