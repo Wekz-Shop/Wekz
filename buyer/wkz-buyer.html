@@ -1831,10 +1831,10 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="ckout-topbar">
     <button class="ckout-back" data-action="showPage" data-args='["cart"]'>
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Voltar ao Carrinho
+      <span data-i18n="ckoutBackToCartBtn">Voltar ao Carrinho</span>
     </button>
-    <span class="ckout-title">Finalizar Pedido</span>
-    <span style="font-size:11px;font-weight:700;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#4ade80;padding:3px 10px;border-radius:50px;margin-left:4px;">🔒 Protegido WeKz</span>
+    <span class="ckout-title" data-i18n="ckoutPageTitle">Finalizar Pedido</span>
+    <span style="font-size:11px;font-weight:700;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#4ade80;padding:3px 10px;border-radius:50px;margin-left:4px;" data-i18n="ckoutProtectedBadge">🔒 Protegido WeKz</span>
   </div>
 
   <div class="ckout-wrap">
@@ -1845,22 +1845,22 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ckout-stepper" id="ckoutStepper">
         <div class="ckout-step active" id="cstep1">
           <div class="ckout-step-num">1</div>
-          <div class="ckout-step-label">Endereço</div>
+          <div class="ckout-step-label" data-i18n="ckoutStepAddress">Endereço</div>
         </div>
         <div class="ckout-step-connector" id="conn12"></div>
         <div class="ckout-step" id="cstep2">
           <div class="ckout-step-num">2</div>
-          <div class="ckout-step-label">Pagamento</div>
+          <div class="ckout-step-label" data-i18n="ckoutStepPayment">Pagamento</div>
         </div>
         <div class="ckout-step-connector" id="conn23"></div>
         <div class="ckout-step" id="cstep3">
           <div class="ckout-step-num">3</div>
-          <div class="ckout-step-label">Revisão</div>
+          <div class="ckout-step-label" data-i18n="ckoutStepReview">Revisão</div>
         </div>
         <div class="ckout-step-connector" id="conn34"></div>
         <div class="ckout-step" id="cstep4">
           <div class="ckout-step-num">4</div>
-          <div class="ckout-step-label">Confirmação</div>
+          <div class="ckout-step-label" data-i18n="ckoutStepConfirm">Confirmação</div>
         </div>
       </div>
 
@@ -1868,46 +1868,46 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ckout-panel active" id="ckoutStep1">
         <div class="ckout-panel-title">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Entrega ou Retirada
+          <span data-i18n="ckoutStep1Title">Entrega ou Retirada</span>
         </div>
 
         <!-- ══ MODO: Entrega vs Retirada ══ -->
         <div class="ckout-mode-toggle">
           <div class="ckout-mode-card sel" id="modeDelivery" data-action="ckoutSetMode" data-args='["delivery"]'>
             <div class="ckout-mode-icon">🚚</div>
-            <div class="ckout-mode-name">Entrega</div>
-            <div class="ckout-mode-sub">Receba no endereço cadastrado</div>
-            <div class="ckout-mode-badge">Grátis acima R$ 150</div>
+            <div class="ckout-mode-name" data-i18n="ckoutModeDeliveryName">Entrega</div>
+            <div class="ckout-mode-sub" data-i18n="ckoutModeDeliverySub">Receba no endereço cadastrado</div>
+            <div class="ckout-mode-badge" data-i18n="ckoutModeDeliveryBadge">Grátis acima R$ 150</div>
           </div>
           <div class="ckout-mode-card" id="modePickup" data-action="ckoutSetMode" data-args='["pickup"]'>
             <div class="ckout-mode-icon">📦</div>
-            <div class="ckout-mode-name">Retirar na Loja</div>
-            <div class="ckout-mode-sub">WeKz Locker ou parceiro</div>
-            <div class="ckout-mode-badge" style="background:rgba(167,139,250,0.12);color:#A78BFA;border-color:rgba(167,139,250,0.25);">Sempre Grátis</div>
+            <div class="ckout-mode-name" data-i18n="ckoutModePickupName">Retirar na Loja</div>
+            <div class="ckout-mode-sub" data-i18n="ckoutModePickupSub">WeKz Locker ou parceiro</div>
+            <div class="ckout-mode-badge" style="background:rgba(167,139,250,0.12);color:#A78BFA;border-color:rgba(167,139,250,0.25);" data-i18n="ckoutModePickupBadge">Sempre Grátis</div>
           </div>
         </div>
 
         <!-- ══ SEÇÃO ENTREGA ══ -->
         <div id="ckoutDeliverySection" class="ckout-delivery-section">
-          <div class="ckout-divider">Endereços salvos</div>
+          <div class="ckout-divider" data-i18n="ckoutSavedAddressesLabel">Endereços salvos</div>
           <div class="ckout-addr-cards">
             <div class="ckout-addr-card sel" id="addrCard1" data-action="selectAddr" data-args='[1]'>
-              <div class="addr-lbl">🏠 Casa</div>
+              <div class="addr-lbl" data-i18n="ckoutAddrHome">🏠 Casa</div>
               <div class="addr-nm">João da Silva</div>
               <div class="addr-tx">Rua das Flores, 42, Ap 12<br>São Paulo – SP · 01310-100</div>
             </div>
             <div class="ckout-addr-card" id="addrCard2" data-action="selectAddr" data-args='[2]'>
-              <div class="addr-lbl">💼 Trabalho</div>
+              <div class="addr-lbl" data-i18n="ckoutAddrWork">💼 Trabalho</div>
               <div class="addr-nm">João da Silva</div>
               <div class="addr-tx">Av. Paulista, 1500, Sala 47<br>São Paulo – SP · 01311-200</div>
             </div>
           </div>
-          <button class="ckout-new-btn" data-action="toggleNewAddr" data-args="[]">+ Adicionar novo endereço</button>
+          <button class="ckout-new-btn" data-action="toggleNewAddr" data-args="[]" data-i18n="ckoutAddNewAddrBtn">+ Adicionar novo endereço</button>
         </div>
 
         <!-- ══ SEÇÃO RETIRADA ══ -->
         <div id="ckoutPickupSection" class="ckout-pickup-section">
-          <div class="ckout-divider">Pontos de retirada próximos</div>
+          <div class="ckout-divider" data-i18n="ckoutPickupPointsLabel">Pontos de retirada próximos</div>
           <!-- Mapa simulado -->
           <div class="pickup-map-wrap">
             <div class="pickup-map" id="pickupMap">
@@ -1941,10 +1941,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <!-- Formulário novo endereço (inicialmente oculto) -->
         <div id="ckoutNewAddrForm" style="display:none;margin-top:18px;">
-          <div class="ckout-divider">Novo endereço</div>
+          <div class="ckout-divider" data-i18n="ckoutNewAddrLabel">Novo endereço</div>
           <div class="ckout-form-grid" style="margin-bottom:12px;">
             <div class="ckout-field">
-              <label>CEP</label>
+              <label data-i18n="ckoutFieldCep">CEP</label>
               <div class="ckout-field-wrap">
                 <input type="text" id="ckoutCep" class="ckout-cep-input" placeholder="00000-000" maxlength="9" oninput="ckoutCepMask(this)" onblur="ckoutFetchCep(this.value)">
                 <div class="ckout-spin" id="ckoutCepSpin"></div>
@@ -1952,51 +1952,51 @@ document.addEventListener('DOMContentLoaded', function() {
               </div>
             </div>
             <div class="ckout-field">
-              <label>Número</label>
-              <input type="text" id="ckoutNum" placeholder="Ex: 42" required>
+              <label data-i18n="ckoutFieldNum">Número</label>
+              <input type="text" id="ckoutNum" placeholder="Ex: 42" data-i18n-placeholder="ckoutFieldNumPh" required>
             </div>
           </div>
           <div class="ckout-form-grid" style="margin-bottom:12px;">
             <div class="ckout-field">
-              <label>Rua / Logradouro</label>
-              <input type="text" id="ckoutRua" placeholder="Preenchido pelo CEP">
+              <label data-i18n="ckoutFieldRua">Rua / Logradouro</label>
+              <input type="text" id="ckoutRua" placeholder="Preenchido pelo CEP" data-i18n-placeholder="ckoutFieldFilledByCep">
             </div>
             <div class="ckout-field">
-              <label>Complemento</label>
-              <input type="text" id="ckoutComp" placeholder="Ap, Bloco...">
-            </div>
-          </div>
-          <div class="ckout-form-grid" style="margin-bottom:12px;">
-            <div class="ckout-field">
-              <label>Bairro</label>
-              <input type="text" id="ckoutBairro" placeholder="Preenchido pelo CEP">
-            </div>
-            <div class="ckout-field">
-              <label>Cidade</label>
-              <input type="text" id="ckoutCidade" placeholder="Preenchido pelo CEP">
+              <label data-i18n="ckoutFieldComp">Complemento</label>
+              <input type="text" id="ckoutComp" placeholder="Ap, Bloco..." data-i18n-placeholder="ckoutFieldCompPh">
             </div>
           </div>
           <div class="ckout-form-grid" style="margin-bottom:12px;">
             <div class="ckout-field">
-              <label>Estado (UF)</label>
+              <label data-i18n="ckoutFieldBairro">Bairro</label>
+              <input type="text" id="ckoutBairro" placeholder="Preenchido pelo CEP" data-i18n-placeholder="ckoutFieldFilledByCep">
+            </div>
+            <div class="ckout-field">
+              <label data-i18n="ckoutFieldCidade">Cidade</label>
+              <input type="text" id="ckoutCidade" placeholder="Preenchido pelo CEP" data-i18n-placeholder="ckoutFieldFilledByCep">
+            </div>
+          </div>
+          <div class="ckout-form-grid" style="margin-bottom:12px;">
+            <div class="ckout-field">
+              <label data-i18n="ckoutFieldUf">Estado (UF)</label>
               <input type="text" id="ckoutUf" placeholder="SP" maxlength="2">
             </div>
             <div class="ckout-field">
-              <label>Nome do destinatário</label>
-              <input type="text" id="ckoutNome" placeholder="Nome completo">
+              <label data-i18n="ckoutFieldNome">Nome do destinatário</label>
+              <input type="text" id="ckoutNome" placeholder="Nome completo" data-i18n-placeholder="ckoutFieldNomePh">
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
             <input type="checkbox" id="ckoutSaveAddr" style="accent-color:var(--teal);">
-            <label for="ckoutSaveAddr" style="font-size:12px;color:var(--muted);cursor:pointer;">Salvar este endereço para próximas compras</label>
+            <label for="ckoutSaveAddr" style="font-size:12px;color:var(--muted);cursor:pointer;" data-i18n="ckoutSaveAddrChk">Salvar este endereço para próximas compras</label>
           </div>
         </div>
 
-        <div class="ckout-protection-banner">
+        <div class="ckout-protection-banner" data-i18n="ckoutProtectionBanner1" data-i18n-html>
           🛡 <strong>Seu dinheiro só vai ao vendedor depois que você confirmar o recebimento.</strong> Toda entrega é monitorada pela IA do WeKz e protegida por 30 dias.
         </div>
         <button class="ckout-btn-next" data-action="ckoutNext" data-args='[1]'>
-          Continuar para Pagamento
+          <span data-i18n="ckoutContinueToPaymentBtn">Continuar para Pagamento</span>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
@@ -2005,42 +2005,42 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ckout-panel" id="ckoutStep2">
         <div class="ckout-panel-title">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Forma de Pagamento
+          <span data-i18n="ckoutStep2Title">Forma de Pagamento</span>
         </div>
         <div class="ckout-pay-grid">
           <div class="ckout-pay-opt sel" id="payPix" data-action="selectPay" data-args='["pix"]'>
             <div class="pay-icon">📱</div>
-            <div class="pay-nm">Pix</div>
-            <div class="pay-ds">Aprovação em segundos</div>
-            <div class="pay-bg">5% de desconto</div>
+            <div class="pay-nm" data-i18n="ckoutPayPixName">Pix</div>
+            <div class="pay-ds" data-i18n="ckoutPayPixDesc">Aprovação em segundos</div>
+            <div class="pay-bg" data-i18n="ckoutPayPixBadge">5% de desconto</div>
           </div>
           <div class="ckout-pay-opt" id="payCard" data-action="selectPay" data-args='["card"]'>
             <div class="pay-icon">💳</div>
-            <div class="pay-nm">Cartão de Crédito</div>
-            <div class="pay-ds">Até 12x sem juros</div>
+            <div class="pay-nm" data-i18n="ckoutPayCardName">Cartão de Crédito</div>
+            <div class="pay-ds" data-i18n="ckoutPayCardDesc">Até 12x sem juros</div>
           </div>
           <div class="ckout-pay-opt" id="payBoleto" data-action="selectPay" data-args='["boleto"]'>
             <div class="pay-icon">📄</div>
-            <div class="pay-nm">Boleto Bancário</div>
-            <div class="pay-ds">Vence em 3 dias úteis</div>
+            <div class="pay-nm" data-i18n="ckoutPayBoletoName">Boleto Bancário</div>
+            <div class="pay-ds" data-i18n="ckoutPayBoletoDesc">Vence em 3 dias úteis</div>
           </div>
         </div>
 
         <!-- PIX detail -->
         <div class="ckout-pay-detail" id="payDetailPix" style="display:block;text-align:center;">
-          <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Escaneie o QR Code ou copie o código Pix</div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;" data-i18n="ckoutPixScanTitle">Escaneie o QR Code ou copie o código Pix</div>
           <div class="ckout-pix-qr"></div>
-          <div class="ckout-pix-code" onclick="navigator.clipboard&&navigator.clipboard.writeText('00020126580014br.gov.bcb.pix01360b3f2ae9-fa52-40fb-a24c-8dccfc3d6e1d5204000053039865802BR5910WeKzShop6009SAO_PAULO62140510wkz20261128630437DE');showToast('✅ Código Pix copiado!')">
-            00020126580014br.gov.bcb.pix...wkz2026 <span style="color:var(--teal);font-weight:700;">Clique para copiar</span>
+          <div class="ckout-pix-code" onclick="navigator.clipboard&&navigator.clipboard.writeText('00020126580014br.gov.bcb.pix01360b3f2ae9-fa52-40fb-a24c-8dccfc3d6e1d5204000053039865802BR5910WeKzShop6009SAO_PAULO62140510wkz20261128630437DE');showToast(t('ckoutPixCopiedToast'))">
+            00020126580014br.gov.bcb.pix...wkz2026 <span style="color:var(--teal);font-weight:700;" data-i18n="ckoutPixClickToCopy">Clique para copiar</span>
           </div>
-          <div style="font-size:11px;color:var(--muted);">Pix tem desconto de <strong style="color:#4ade80;">5%</strong> · Confirmação em até 30 segundos</div>
+          <div style="font-size:11px;color:var(--muted);" id="ckoutPixDiscountNote" data-i18n="ckoutPixDiscountNoteTpl" data-i18n-html>Pix tem desconto de <strong style="color:#4ade80;">5%</strong> · Confirmação em até 30 segundos</div>
         </div>
 
         <!-- Card detail -->
         <div class="ckout-pay-detail" id="payDetailCard">
           <div class="ckout-card-fields">
             <div class="ckout-field">
-              <label for="cardNum">Número do Cartão</label>
+              <label for="cardNum" data-i18n="ckoutCardNumberLabel">Número do Cartão</label>
               <div class="ckout-field-wrap">
                 <input type="text" id="cardNum" aria-label="Número do Cartão" placeholder="0000 0000 0000 0000" maxlength="19" oninput="cardNumMask(this)" style="letter-spacing:2px;" autocomplete="cc-number">
                 <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;" id="cardBrandIcon" aria-hidden="true">💳</span>
@@ -2048,21 +2048,21 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="ckout-form-grid">
               <div class="ckout-field">
-                <label for="cardExp">Validade</label>
+                <label for="cardExp" data-i18n="ckoutCardExpLabel">Validade</label>
                 <input type="text" id="cardExp" aria-label="Data de Validade do Cartão" placeholder="MM/AA" maxlength="5" oninput="cardExpMask(this)" autocomplete="cc-exp">
               </div>
               <div class="ckout-field">
-                <label for="cardCvv">CVV</label>
+                <label for="cardCvv" data-i18n="ckoutCardCvvLabel">CVV</label>
                 <input type="text" id="cardCvv" aria-label="Código de Segurança CVV" placeholder="123" maxlength="4" autocomplete="cc-csc">
               </div>
             </div>
             <div class="ckout-field">
-              <label for="cardName">Nome no Cartão</label>
+              <label for="cardName" data-i18n="ckoutCardNameLabel">Nome no Cartão</label>
               <input type="text" id="cardName" aria-label="Nome impresso no Cartão" placeholder="Como aparece no cartão" autocomplete="cc-name">
             </div>
             <div class="ckout-field">
-              <label for="cardInst">Parcelas</label>
-              <select id="cardInst" class="form-select wkz-select wkz-select--lg" data-title="Parcelas" aria-label="Número de Parcelas" onchange="this.dataset.selectedN=this.value">
+              <label for="cardInst" data-i18n="ckoutInstallmentsLabel">Parcelas</label>
+              <select id="cardInst" class="form-select wkz-select wkz-select--lg" data-title="Parcelas" data-i18n-title="ckoutInstallmentsLabel" aria-label="Número de Parcelas" onchange="this.dataset.selectedN=this.value">
                 <option value="1">1x de R$ 1.249,90 (sem juros)</option>
                 <option value="2">2x de R$ 624,95 (sem juros)</option>
                 <option value="3">3x de R$ 416,63 (sem juros)</option>
@@ -2077,14 +2077,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="ckout-pay-detail" id="payDetailBoleto">
           <div style="text-align:center;">
             <div style="font-size:32px;margin-bottom:10px;">📄</div>
-            <div style="font-size:14px;font-weight:700;margin-bottom:6px;">Boleto Bancário</div>
-            <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">O boleto será gerado após a confirmação. Vence em <strong style="color:var(--text);">3 dias úteis</strong>.</div>
-            <div style="font-size:11px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:10px;color:#ffa07a;">⚠ Após o vencimento, o pedido é cancelado automaticamente.</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px;" data-i18n="ckoutBoletoTitle">Boleto Bancário</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px;" data-i18n="ckoutBoletoDescTpl" data-i18n-html>O boleto será gerado após a confirmação. Vence em <strong style="color:var(--text);">3 dias úteis</strong>.</div>
+            <div style="font-size:11px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:10px;color:#ffa07a;" data-i18n="ckoutBoletoWarning">⚠ Após o vencimento, o pedido é cancelado automaticamente.</div>
           </div>
         </div>
 
         <button class="ckout-btn-next" data-action="ckoutNext" data-args='[2]'>
-          Revisar Pedido
+          <span data-i18n="ckoutReviewOrderBtn">Revisar Pedido</span>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
@@ -2093,7 +2093,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ckout-panel" id="ckoutStep3">
         <div class="ckout-panel-title">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          Revisão do Pedido
+          <span data-i18n="ckoutStep3Title">Revisão do Pedido</span>
         </div>
 
         <div id="ckoutRevItemsList" class="ckout-rev-items">
@@ -2107,24 +2107,24 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- 💰 FISCAL/SPLIT: Breakdown de Valores (LC 214/2025 + IBS/CBS) -->
         <div style="margin-top:14px;background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(34,197,94,0.04));border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:12px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.7px;">💰 Detalhamento Fiscal</div>
-            <button data-action="wkzToggleFiscalDetails" data-args="[]" style="background:none;border:none;color:var(--teal);cursor:pointer;font-size:11px;font-weight:700;padding:0;">Ver detalhes ▼</button>
+            <div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.7px;" data-i18n="ckoutFiscalDetailTitle">💰 Detalhamento Fiscal</div>
+            <button data-action="wkzToggleFiscalDetails" data-args="[]" style="background:none;border:none;color:var(--teal);cursor:pointer;font-size:11px;font-weight:700;padding:0;" data-i18n="ckoutSeeDetailsBtn">Ver detalhes ▼</button>
           </div>
           <div id="ckoutFiscalBreakdown" style="display:none;font-size:12px;line-height:1.8;color:var(--text);border-top:1px solid rgba(34,197,94,0.2);padding-top:10px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-              <span>Valor do Produto</span>
+              <span data-i18n="ckoutProductValueLabel">Valor do Produto</span>
               <span id="splitProduto">R$ 0,00</span>
             </div>
             <div style="display:flex;justify-content:space-between;margin-bottom:6px;color:var(--muted);font-size:11px;">
-              <span style="margin-left:12px;">┗ IBS/CBS (estimado)</span>
+              <span style="margin-left:12px;" data-i18n="ckoutIbsCbsEstimateLabel">┗ IBS/CBS (estimado)</span>
               <span id="splitIbsCbs" style="color:#F59E0B;">-R$ 0,00</span>
             </div>
             <div style="display:flex;justify-content:space-between;margin-bottom:6px;color:var(--muted);font-size:11px;">
-              <span style="margin-left:12px;">┗ Comissão WeKz (10% GMV)</span>
+              <span style="margin-left:12px;" data-i18n="ckoutWekzCommissionLabel">┗ Comissão WeKz (10% GMV)</span>
               <span id="splitComissao" style="color:#7C3AED;">-R$ 0,00</span>
             </div>
             <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-top:6px;border-top:1px solid rgba(34,197,94,0.2);font-weight:700;">
-              <span>Líquido ao Vendedor</span>
+              <span data-i18n="ckoutNetToSellerLabel">Líquido ao Vendedor</span>
               <span id="splitLiquido" style="color:#22C55E;">R$ 0,00</span>
             </div>
             <!-- Aviso período de transição 2026-2032 -->
@@ -2133,14 +2133,14 @@ document.addEventListener('DOMContentLoaded', function() {
             <div id="splitRemessaConforme" style="display:none;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px;margin-bottom:8px;"></div>
             <div style="background:rgba(34,197,94,0.1);border-left:3px solid #22C55E;padding:8px;border-radius:4px;font-size:11px;color:var(--muted);">
               <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:middle;margin-right:3px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <strong>NF-e mockada:</strong> <span id="splitNfeNum" style="font-family:monospace;font-size:10px;color:var(--text);word-break:break-all;"></span>
+              <strong data-i18n="ckoutNfeMockedLabel">NF-e mockada:</strong> <span id="splitNfeNum" style="font-family:monospace;font-size:10px;color:var(--text);word-break:break-all;"></span>
             </div>
           </div>
         </div>
 
         <!-- Delivery address summary -->
         <div style="margin-top:14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;">
-          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;">📦 Entrega em</div>
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;" data-i18n="ckoutDeliverToLabel">📦 Entrega em</div>
           <div id="ckoutRevAddr" style="font-size:13px;line-height:1.6;"></div>
         </div>
 
@@ -2151,10 +2151,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="font-size:13px;font-weight:700;" id="ckoutRevPayName">Pix — aprovação em segundos</div>
             <div style="font-size:11px;color:var(--muted);" id="ckoutRevPayDesc">5% de desconto aplicado</div>
           </div>
-          <button data-action="ckoutGoTo" data-args='[2]' style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:7px;font-size:11px;cursor:pointer;">Trocar</button>
+          <button data-action="ckoutGoTo" data-args='[2]' style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:7px;font-size:11px;cursor:pointer;" data-i18n="ckoutChangeBtnSmall">Trocar</button>
         </div>
 
-        <div class="ckout-protection-banner" style="margin-top:14px;">
+        <div class="ckout-protection-banner" style="margin-top:14px;" data-i18n="ckoutProtectionBanner2" data-i18n-html>
           🛡 <strong>Confirmar Pedido com Proteção Total 🔒</strong> — Seu pagamento só é liberado ao vendedor após você confirmar o recebimento. IA monitora a entrega. Disputa resolvida em até 3 dias úteis.
         </div>
 
@@ -2163,18 +2163,18 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <div>
-              <strong style="color:var(--text);display:block;margin-bottom:4px;">Seus Direitos como Consumidor (CDC Lei 8.078/90)</strong>
-              ✓ <strong>Direito de Arrependimento:</strong> Você tem até 7 dias para cancelar sem justificativa (Decreto 7.962/13). Clique em "Exercer Direito de Arrependimento" em Meus Pedidos.<br>
+              <strong style="color:var(--text);display:block;margin-bottom:4px;" data-i18n="ckoutConsumerRightsTitle">Seus Direitos como Consumidor (CDC Lei 8.078/90)</strong>
+              <span data-i18n="ckoutConsumerRightsBody" data-i18n-html>✓ <strong>Direito de Arrependimento:</strong> Você tem até 7 dias para cancelar sem justificativa (Decreto 7.962/13). Clique em "Exercer Direito de Arrependimento" em Meus Pedidos.<br>
               ✓ <strong>Responsabilidade do Vendedor:</strong> Qualidade, segurança e prazo de entrega são responsabilidade exclusiva do lojista. A WeKz não fabrica, armazena nem entrega os produtos.<br>
               ✓ <strong>Sua Proteção WeKz:</strong> Seu pagamento é mantido seguro até você confirmar o recebimento. Se houver disputa, arbitra somos nós de forma imparcial.<br>
-              📞 <strong>Dúvidas?</strong> Central de Ajuda → Suporte → Canais de Contato.
+              📞 <strong>Dúvidas?</strong> Central de Ajuda → Suporte → Canais de Contato.</span>
             </div>
           </div>
         </div>
 
         <button class="ckout-btn-next" style="background:linear-gradient(135deg,#22C55E 0%,#16A34A 100%);font-size:16px;padding:16px;" data-action="ckoutNext" data-args='[3]'>
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          Confirmar Pedido com Proteção Total 🔒
+          <span data-i18n="ckoutConfirmOrderBtn">Confirmar Pedido com Proteção Total 🔒</span>
         </button>
       </div>
 
@@ -2184,11 +2184,11 @@ document.addEventListener('DOMContentLoaded', function() {
           <img class="wkz-kz-illus wkz-kz-illus--md wkz-kz-illus-fade-in" src="../shared/assets/mascot/compra-aprovada.png"
             alt="Kz aprovando a compra" style="margin:0 auto 12px;" onerror="this.style.display='none'">
           <div class="ckout-ok-ring">✓</div>
-          <div class="ckout-conf-title">Pedido Confirmado!</div>
-          <div class="ckout-conf-sub">Sua proteção WeKz está ativa. Nós monitoramos tudo até a entrega.</div>
+          <div class="ckout-conf-title" data-i18n="ckoutOrderConfirmedTitle">Pedido Confirmado!</div>
+          <div class="ckout-conf-sub" data-i18n="ckoutOrderConfirmedSub">Sua proteção WeKz está ativa. Nós monitoramos tudo até a entrega.</div>
         </div>
         <div class="ckout-order-box">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Número do Pedido</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="ckoutOrderNumberLabel">Número do Pedido</div>
           <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:var(--teal);" id="ckoutOrderNum">#WKZ-0000</div>
           <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="ckoutOrderDate"></div>
         </div>
@@ -2198,50 +2198,49 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="ckout-next-step">
             <div class="ckout-ns-ico">📧</div>
             <div>
-              <div style="font-size:13px;font-weight:700;">Confirmação por e-mail</div>
-              <div style="font-size:11px;color:var(--muted);">Enviada para seu e-mail cadastrado em instantes</div>
+              <div style="font-size:13px;font-weight:700;" data-i18n="ckoutNsEmailTitle">Confirmação por e-mail</div>
+              <div style="font-size:11px;color:var(--muted);" data-i18n="ckoutNsEmailDesc">Enviada para seu e-mail cadastrado em instantes</div>
             </div>
           </div>
           <div class="ckout-next-step">
             <div class="ckout-ns-ico">📦</div>
             <div>
-              <div style="font-size:13px;font-weight:700;">Rastreamento automático</div>
-              <div style="font-size:11px;color:var(--muted);">Código de rastreio aparece em "Meus Pedidos" assim que despachado</div>
+              <div style="font-size:13px;font-weight:700;" data-i18n="ckoutNsTrackTitle">Rastreamento automático</div>
+              <div style="font-size:11px;color:var(--muted);" data-i18n="ckoutNsTrackDesc">Código de rastreio aparece em "Meus Pedidos" assim que despachado</div>
             </div>
           </div>
           <div class="ckout-next-step">
             <div class="ckout-ns-ico">🛡</div>
             <div>
-              <div style="font-size:13px;font-weight:700;">Proteção ativa por 30 dias</div>
-              <div style="font-size:11px;color:var(--muted);">Seu dinheiro só é liberado ao vendedor após você confirmar o recebimento</div>
+              <div style="font-size:13px;font-weight:700;" data-i18n="ckoutNsProtectionTitle">Proteção ativa por 30 dias</div>
+              <div style="font-size:11px;color:var(--muted);" data-i18n="ckoutNsProtectionDesc">Seu dinheiro só é liberado ao vendedor após você confirmar o recebimento</div>
             </div>
           </div>
         </div>
 
         <!-- 💰 CONFIRMAÇÃO FISCAL: NF-e e IBS/CBS -->
         <div style="margin-top:14px;background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(34,197,94,0.04));border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:12px;">
-          <div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">📋 Informações Fiscais</div>
+          <div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;" data-i18n="ckoutFiscalInfoTitle">📋 Informações Fiscais</div>
           <div style="font-size:12px;line-height:1.8;color:var(--text);">
             <div style="margin-bottom:6px;">
-              <strong>NF-e Mockada:</strong><br>
+              <strong data-i18n="ckoutNfeMockedLabel2">NF-e Mockada:</strong><br>
               <code style="background:rgba(0,180,171,0.12);padding:4px 8px;border-radius:4px;font-family:monospace;font-size:11px;color:var(--teal);display:block;margin-top:3px;word-break:break-all;" id="ckoutConfNfe">Carregando...</code>
             </div>
-            <div style="margin-bottom:6px;font-size:11px;color:var(--muted);">
+            <div style="margin-bottom:6px;font-size:11px;color:var(--muted);" data-i18n="ckoutFiscalSimNote">
               ℹ Esta é uma simulação educacional. A NF-e real será gerada pelo vendedor conforme legislação fiscal.
             </div>
           </div>
           <details style="margin-top:8px;font-size:11px;">
-            <summary style="cursor:pointer;color:var(--teal);font-weight:700;user-select:none;">Entender IBS/CBS e split de valores ▼</summary>
+            <summary style="cursor:pointer;color:var(--teal);font-weight:700;user-select:none;" data-i18n="ckoutUnderstandIbsCbs">Entender IBS/CBS e split de valores ▼</summary>
             <div style="margin-top:8px;padding:10px;background:rgba(245,158,11,0.08);border-left:3px solid #F59E0B;border-radius:4px;color:var(--muted);line-height:1.6;">
-              <strong style="color:var(--text);display:block;margin-bottom:4px;">O que é IBS/CBS? (Lei Complementar 214/2025)</strong>
-              IBS (Imposto sobre Bens e Serviços) e CBS (Contribuição sobre Bens e Serviços) substituem gradualmente tributos federais e estaduais. 
-              O valor estimado aqui (~6.5%) é uma simulação. Seu cálculo real varia por categoria do produto e regime tributário.<br><br>
-              <strong style="color:var(--text);display:block;margin-bottom:4px;">Como funciona o split de valores?</strong>
-              <div style="margin-left:12px;">• <strong>Você paga:</strong> Valor total (incluindo IBS/CBS)<br>
-              • <strong>Desconta IBS/CBS:</strong> Repassado ao governo<br>
-              • <strong>Desconta comissão WeKz:</strong> 10% para manutenção da plataforma<br>
-              • <strong>Vendedor recebe:</strong> O restante (líquido)</div><br>
-              Exemplo: R$ 100 → -R$ 6,50 (IBS) → -R$ 9,35 (comissão) = R$ 84,15 ao vendedor.
+              <strong style="color:var(--text);display:block;margin-bottom:4px;" data-i18n="ckoutIbsCbsWhatIsTitle">O que é IBS/CBS? (Lei Complementar 214/2025)</strong>
+              <span data-i18n="ckoutIbsCbsExplainP1">IBS (Imposto sobre Bens e Serviços) e CBS (Contribuição sobre Bens e Serviços) substituem gradualmente tributos federais e estaduais. O valor estimado aqui (~6.5%) é uma simulação. Seu cálculo real varia por categoria do produto e regime tributário.</span><br><br>
+              <strong style="color:var(--text);display:block;margin-bottom:4px;" data-i18n="ckoutSplitHowTitle">Como funciona o split de valores?</strong>
+              <div style="margin-left:12px;">• <span data-i18n="ckoutSplitYouPay" data-i18n-html><strong>Você paga:</strong> Valor total (incluindo IBS/CBS)</span><br>
+              • <span data-i18n="ckoutSplitDeductIbs" data-i18n-html><strong>Desconta IBS/CBS:</strong> Repassado ao governo</span><br>
+              • <span data-i18n="ckoutSplitDeductCommission" data-i18n-html><strong>Desconta comissão WeKz:</strong> 10% para manutenção da plataforma</span><br>
+              • <span data-i18n="ckoutSplitSellerReceives" data-i18n-html><strong>Vendedor recebe:</strong> O restante (líquido)</span></div><br>
+              <span data-i18n="ckoutSplitExampleTpl">Exemplo: R$ 100 → -R$ 6,50 (IBS) → -R$ 9,35 (comissão) = R$ 84,15 ao vendedor.</span>
             </div>
           </details>
         </div>
@@ -2259,16 +2258,16 @@ document.addEventListener('DOMContentLoaded', function() {
           <!-- FIX FUNC-02: finalizeOrder limpa o carrinho ao sair da confirmação -->
           <button data-action="finalizeOrder" data-args='["home"]' style="flex:1;padding:13px;background:var(--grad1);border:none;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:5px;"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            Continuar Comprando
+            <span data-i18n="ckoutContinueShoppingBtn">Continuar Comprando</span>
           </button>
           <button data-action="wkzTrackLastOrder" data-args="[]" style="flex:1;padding:13px;background:rgba(0,180,171,0.1);border:1px solid rgba(0,180,171,0.35);color:var(--teal);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:var(--transition);" onmouseover="this.style.background='rgba(0,180,171,0.18)'" onmouseout="this.style.background='rgba(0,180,171,0.1)'">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:5px;"><path d="M16.5 9.4l-9-5.19"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            Rastrear Pedido
+            <span data-i18n="ckoutTrackOrderBtn">Rastrear Pedido</span>
           </button>
         </div>
         <button data-action="finalizeOrder" data-args='["client-profile"]' style="width:100%;margin-top:8px;padding:10px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M16.5 9.4l-9-5.19"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          Ver Meus Pedidos
+          <span data-i18n="ckoutSeeMyOrdersBtn">Ver Meus Pedidos</span>
         </button>
       </div>
 
@@ -2279,19 +2278,19 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ckout-sb-card">
         <div class="ckout-sb-title">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px;"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
-          Resumo do Pedido
+          <span data-i18n="ckoutSbTitle">Resumo do Pedido</span>
         </div>
         <div class="ckout-sb-items" id="ckoutSbItems">
           <!-- Populated by JS -->
         </div>
         <div class="ckout-sb-div"></div>
-        <div class="ckout-sb-row"><span>Preço do Produto <span style="opacity:.65;font-size:10px;">(Vendedor Parceiro)</span></span><span id="ckoutSbSub">R$ 0,00</span></div>
-        <div class="ckout-sb-row" style="font-size:11px;color:var(--muted);"><span>Taxa de Intermediação / Serviço WeKz</span><span>Já incluída no preço</span></div>
-        <div class="ckout-sb-row" id="ckoutSbImportRow" style="font-size:11px;color:var(--muted);"><span>Tributos de Importação <span style="opacity:.65;">(estimativa)</span></span><span id="ckoutSbImportVal">Não aplicável — entrega nacional</span></div>
-        <div class="ckout-sb-row"><span>Frete</span><span style="color:#22C55E;">Grátis</span></div>
+        <div class="ckout-sb-row"><span><span data-i18n="ckoutSbProductPriceLabel">Preço do Produto</span> <span style="opacity:.65;font-size:10px;" data-i18n="ckoutSbPartnerSellerNote">(Vendedor Parceiro)</span></span><span id="ckoutSbSub">R$ 0,00</span></div>
+        <div class="ckout-sb-row" style="font-size:11px;color:var(--muted);"><span data-i18n="ckoutSbServiceFeeLabel">Taxa de Intermediação / Serviço WeKz</span><span data-i18n="ckoutSbIncludedInPrice">Já incluída no preço</span></div>
+        <div class="ckout-sb-row" id="ckoutSbImportRow" style="font-size:11px;color:var(--muted);"><span><span data-i18n="ckoutSbImportTaxLabel">Tributos de Importação</span> <span style="opacity:.65;" data-i18n="ckoutSbEstimateNote">(estimativa)</span></span><span id="ckoutSbImportVal" data-i18n="ckoutSbNotApplicable">Não aplicável — entrega nacional</span></div>
+        <div class="ckout-sb-row"><span data-i18n="ckoutSbShippingLabel">Frete</span><span style="color:#22C55E;" data-i18n="ckoutSbFreeLabel">Grátis</span></div>
         <!-- [v2.9.30] Desconto do produto (preço anunciado) + cupom, separado do desconto por forma de pagamento -->
-        <div class="ckout-sb-row" id="ckoutSbDiscPromo" style="color:#FF6B35;display:none;"><span id="ckoutSbDiscPromoLabel">Desconto</span><span id="ckoutSbDiscPromoVal"></span></div>
-        <div class="ckout-sb-row" id="ckoutSbDisc" style="color:#4ade80;display:none;"><span>Desconto Pix (5%)</span><span id="ckoutSbDiscVal"></span></div>
+        <div class="ckout-sb-row" id="ckoutSbDiscPromo" style="color:#FF6B35;display:none;"><span id="ckoutSbDiscPromoLabel" data-i18n="ckoutSbDiscountLabel">Desconto</span><span id="ckoutSbDiscPromoVal"></span></div>
+        <div class="ckout-sb-row" id="ckoutSbDisc" style="color:#4ade80;display:none;"><span data-i18n="ckoutSbPixDiscountLabel">Desconto Pix (5%)</span><span id="ckoutSbDiscVal"></span></div>
         <!-- [FIX-item9] Opção de usar o saldo da Carteira WeKz (créditos ganhos
              via indicação) no checkout — antes não existia nenhuma forma de
              aplicar esse saldo na compra, mesmo aparecendo na Carteira Multimoedas
@@ -2299,15 +2298,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="ckout-sb-row" id="ckoutSbWalletRow" style="display:none;align-items:center;color:#a78bfa;">
           <span style="display:flex;align-items:center;gap:6px;font-size:12px;">
             <input type="checkbox" id="ckoutUseWalletCredits" onchange="ckoutToggleWalletCredits(this)" style="cursor:pointer;accent-color:#a78bfa;">
-            <label for="ckoutUseWalletCredits" style="cursor:pointer;">Usar Créditos WeKz (<span id="ckoutWalletBalanceLabel">R$ 0,00</span> disp.)</label>
+            <label for="ckoutUseWalletCredits" style="cursor:pointer;"><span data-i18n="ckoutWalletCreditsPrefix">Usar Créditos WeKz (</span><span id="ckoutWalletBalanceLabel">R$ 0,00</span><span data-i18n="ckoutWalletCreditsSuffix"> disp.)</span></label>
           </span>
           <span id="ckoutWalletCreditsApplied">-R$ 0,00</span>
         </div>
-        <div class="ckout-sb-row grand"><span>Total</span><span id="ckoutSbTotal">R$ 0,00</span></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;border-top:1px solid var(--border);padding-top:10px;"><span class="wkz-icon wkz-icon-scale"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>A WeKz atua como <strong style="color:var(--text);">intermediária de pagamento</strong> entre você e o Vendedor Parceiro. Tributos aduaneiros, quando aplicáveis a envios internacionais, são de responsabilidade do comprador conforme a legislação vigente (Remessa Conforme / VAT).</div>
+        <div class="ckout-sb-row grand"><span data-i18n="ckoutSbTotalLabel">Total</span><span id="ckoutSbTotal">R$ 0,00</span></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;border-top:1px solid var(--border);padding-top:10px;"><span class="wkz-icon wkz-icon-scale"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-1px;margin-right:3px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span><span data-i18n="ckoutIntermediaryNote" data-i18n-html>A WeKz atua como <strong style="color:var(--text);">intermediária de pagamento</strong> entre você e o Vendedor Parceiro. Tributos aduaneiros, quando aplicáveis a envios internacionais, são de responsabilidade do comprador conforme a legislação vigente (Remessa Conforme / VAT).</span></div>
         <div class="ckout-trust">
-          <div class="ckout-trust-item">🔒 <span>Pagamento criptografado AES-256</span></div>
-          <div class="ckout-trust-item">🛡 <span>Proteção WeKz Buyer inclusa</span></div>
+          <div class="ckout-trust-item">🔒 <span data-i18n="ckoutTrustEncrypted">Pagamento criptografado AES-256</span></div>
+          <div class="ckout-trust-item">🛡 <span data-i18n="ckoutTrustProtection">Proteção WeKz Buyer inclusa</span></div>
           <!-- [FIX-JUR-02] Era "Devolução grátis em 30 dias" — no ponto exato de
                pagamento, uma promessa de devolução grátis por 30 dias sem
                qualificação é o texto mais arriscado do fluxo (o frete de retorno
@@ -2315,8 +2314,8 @@ document.addEventListener('DOMContentLoaded', function() {
                gratuidade só vale para defeito/divergência, ver #sec-devolucao).
                Trocado por uma claim curta e 100% precisa, sem overclaim de
                gratuidade. -->
-          <div class="ckout-trust-item">↩️ <span>7 dias de arrependimento</span></div>
-          <div class="ckout-trust-item">✅ <span>Vendedor verificado WeKz</span></div>
+          <div class="ckout-trust-item">↩️ <span data-i18n="ckoutTrustWithdrawal">7 dias de arrependimento</span></div>
+          <div class="ckout-trust-item">✅ <span data-i18n="ckoutTrustVerifiedSeller">Vendedor verificado WeKz</span></div>
         </div>
       </div>
     </div>
