@@ -106,6 +106,37 @@ forçada).
   Chat/mensagens, ticker social da PDP ("18 vendidos nas últimas 2h"),
   ferramenta de Comparar Produtos.
 
+## Sprint M31 — Checkout (parte 1: casca estática)
+
+Com aprovação do usuário após revisão da M30, iniciei o Checkout.
+Traduzido nesta parte: **as 4 telas estáticas inteiras** (Endereço,
+Pagamento, Revisão, Confirmação) + sidebar de resumo — 113 elementos
+com `data-i18n`, +137 chaves novas × 7 idiomas (622 chaves totais agora).
+Inclui o aviso de direitos do consumidor (CDC Lei 8.078/90, Decreto
+7.962/13) e a explicação de IBS/CBS (Lei Complementar 214/2025) —
+citações legais mantidas intactas (são referências específicas à
+legislação brasileira, não se "traduzem"), mas o texto explicativo ao
+redor delas foi traduzido de verdade: mesmo um comprador lendo em inglês/
+chinês/etc. precisa conseguir entender seus direitos antes de confirmar
+a compra — diferente da decisão sobre os `title` do rodapé (que são só
+tooltips de categorização interna).
+
+**Decisões técnicas de segurança:**
+- `ckoutConfNfe` (número da NF-e) e `ckoutConfDeliveryText` (estimativa
+  de entrega) **não** receberam `data-i18n`, de propósito: são
+  sobrescritos por JS com valores reais/calculados, e o loop genérico de
+  tradução re-escreveria por cima o valor real sempre que o idioma
+  mudasse (ex.: reverter um número de pedido real de volta para
+  "Carregando..."). Confirmado por teste antes de fechar a sprint.
+  Como este é justamente o tipo de escrita "dinheiro muda de mão", cada
+  string nova foi conferida manualmente, não só grepada.
+
+**Ainda falta (parte 2, JS dinâmico):** `_ckoutPopulateSidebar()`,
+`_ckoutPopulateInstallments()` (parcelas), `ckoutNext()` (mensagens de
+validação de formulário), `finalizeOrder()`, e o modal de compra expressa
+(`cartBuyExpressNow`, ~940 linhas) — todos ainda geram HTML com texto
+fixo em PT. É o próximo passo natural desta mesma sprint.
+
 ## Como validar
 
 Todas as edições em `wkz-buyer.js` foram checadas com `node -c` após cada
